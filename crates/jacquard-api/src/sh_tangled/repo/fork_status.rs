@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::Did;
@@ -80,99 +83,99 @@ pub mod fork_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Did;
         type Source;
-        type HiddenRef;
+        type Name;
         type Branch;
+        type HiddenRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Did = Unset;
         type Source = Unset;
-        type HiddenRef = Unset;
+        type Name = Unset;
         type Branch = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Did = S::Did;
-        type Source = S::Source;
-        type HiddenRef = S::HiddenRef;
-        type Branch = S::Branch;
+        type HiddenRef = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Name = S::Name;
         type Did = Set<members::did>;
         type Source = S::Source;
-        type HiddenRef = S::HiddenRef;
+        type Name = S::Name;
         type Branch = S::Branch;
+        type HiddenRef = S::HiddenRef;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSource<S> {}
     impl<S: State> State for SetSource<S> {
-        type Name = S::Name;
         type Did = S::Did;
         type Source = Set<members::source>;
-        type HiddenRef = S::HiddenRef;
-        type Branch = S::Branch;
-    }
-    ///State transition - sets the `hidden_ref` field to Set
-    pub struct SetHiddenRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHiddenRef<S> {}
-    impl<S: State> State for SetHiddenRef<S> {
         type Name = S::Name;
+        type Branch = S::Branch;
+        type HiddenRef = S::HiddenRef;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
         type Did = S::Did;
         type Source = S::Source;
-        type HiddenRef = Set<members::hidden_ref>;
+        type Name = Set<members::name>;
         type Branch = S::Branch;
+        type HiddenRef = S::HiddenRef;
     }
     ///State transition - sets the `branch` field to Set
     pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBranch<S> {}
     impl<S: State> State for SetBranch<S> {
-        type Name = S::Name;
         type Did = S::Did;
         type Source = S::Source;
-        type HiddenRef = S::HiddenRef;
+        type Name = S::Name;
         type Branch = Set<members::branch>;
+        type HiddenRef = S::HiddenRef;
+    }
+    ///State transition - sets the `hidden_ref` field to Set
+    pub struct SetHiddenRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHiddenRef<S> {}
+    impl<S: State> State for SetHiddenRef<S> {
+        type Did = S::Did;
+        type Source = S::Source;
+        type Name = S::Name;
+        type Branch = S::Branch;
+        type HiddenRef = Set<members::hidden_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `source` field
         pub struct source(());
-        ///Marker type for the `hidden_ref` field
-        pub struct hidden_ref(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `branch` field
         pub struct branch(());
+        ///Marker type for the `hidden_ref` field
+        pub struct hidden_ref(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ForkStatusBuilder<'a, S: fork_status_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Did<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ForkStatus<'a> {
@@ -186,9 +189,9 @@ impl<'a> ForkStatusBuilder<'a, fork_status_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ForkStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -203,11 +206,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ForkStatusBuilder<'a, fork_status_state::SetBranch<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ForkStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -222,11 +225,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> ForkStatusBuilder<'a, fork_status_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ForkStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -241,11 +244,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ForkStatusBuilder<'a, fork_status_state::SetHiddenRef<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ForkStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -260,11 +263,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ForkStatusBuilder<'a, fork_status_state::SetName<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ForkStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -279,11 +282,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ForkStatusBuilder<'a, fork_status_state::SetSource<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ForkStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -291,20 +294,20 @@ where
 impl<'a, S> ForkStatusBuilder<'a, S>
 where
     S: fork_status_state::State,
-    S::Name: fork_status_state::IsSet,
     S::Did: fork_status_state::IsSet,
     S::Source: fork_status_state::IsSet,
-    S::HiddenRef: fork_status_state::IsSet,
+    S::Name: fork_status_state::IsSet,
     S::Branch: fork_status_state::IsSet,
+    S::HiddenRef: fork_status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ForkStatus<'a> {
         ForkStatus {
-            branch: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            hidden_ref: self.__unsafe_private_named.2.unwrap(),
-            name: self.__unsafe_private_named.3.unwrap(),
-            source: self.__unsafe_private_named.4.unwrap(),
+            branch: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            hidden_ref: self._fields.2.unwrap(),
+            name: self._fields.3.unwrap(),
+            source: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -317,11 +320,11 @@ where
         >,
     ) -> ForkStatus<'a> {
         ForkStatus {
-            branch: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            hidden_ref: self.__unsafe_private_named.2.unwrap(),
-            name: self.__unsafe_private_named.3.unwrap(),
-            source: self.__unsafe_private_named.4.unwrap(),
+            branch: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            hidden_ref: self._fields.2.unwrap(),
+            name: self._fields.3.unwrap(),
+            source: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

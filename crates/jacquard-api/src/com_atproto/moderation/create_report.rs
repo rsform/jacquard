@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -189,14 +192,14 @@ pub mod create_report_state {
 
 /// Builder for constructing an instance of this type
 pub struct CreateReportBuilder<'a, S: create_report_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<create_report::ModTool<'a>>,
         Option<CowStr<'a>>,
         Option<ReasonType<'a>>,
         Option<CreateReportSubject<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CreateReport<'a> {
@@ -210,9 +213,9 @@ impl<'a> CreateReportBuilder<'a, create_report_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreateReportBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -223,12 +226,12 @@ impl<'a, S: create_report_state::State> CreateReportBuilder<'a, S> {
         mut self,
         value: impl Into<Option<create_report::ModTool<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `modTool` field to an Option value (optional)
     pub fn maybe_mod_tool(mut self, value: Option<create_report::ModTool<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -236,12 +239,12 @@ impl<'a, S: create_report_state::State> CreateReportBuilder<'a, S> {
 impl<'a, S: create_report_state::State> CreateReportBuilder<'a, S> {
     /// Set the `reason` field (optional)
     pub fn reason(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `reason` field to an Option value (optional)
     pub fn maybe_reason(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -256,11 +259,11 @@ where
         mut self,
         value: impl Into<ReasonType<'a>>,
     ) -> CreateReportBuilder<'a, create_report_state::SetReasonType<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CreateReportBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -275,11 +278,11 @@ where
         mut self,
         value: impl Into<CreateReportSubject<'a>>,
     ) -> CreateReportBuilder<'a, create_report_state::SetSubject<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         CreateReportBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -293,10 +296,10 @@ where
     /// Build the final struct
     pub fn build(self) -> CreateReport<'a> {
         CreateReport {
-            mod_tool: self.__unsafe_private_named.0,
-            reason: self.__unsafe_private_named.1,
-            reason_type: self.__unsafe_private_named.2.unwrap(),
-            subject: self.__unsafe_private_named.3.unwrap(),
+            mod_tool: self._fields.0,
+            reason: self._fields.1,
+            reason_type: self._fields.2.unwrap(),
+            subject: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -306,10 +309,10 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> CreateReport<'a> {
         CreateReport {
-            mod_tool: self.__unsafe_private_named.0,
-            reason: self.__unsafe_private_named.1,
-            reason_type: self.__unsafe_private_named.2.unwrap(),
-            subject: self.__unsafe_private_named.3.unwrap(),
+            mod_tool: self._fields.0,
+            reason: self._fields.1,
+            reason_type: self._fields.2.unwrap(),
+            subject: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

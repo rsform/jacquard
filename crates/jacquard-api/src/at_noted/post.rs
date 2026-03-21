@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -155,8 +158,8 @@ pub mod post_state {
 
 /// Builder for constructing an instance of this type
 pub struct PostBuilder<'a, S: post_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -164,7 +167,7 @@ pub struct PostBuilder<'a, S: post_state::State> {
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Post<'a> {
@@ -178,9 +181,9 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -188,12 +191,12 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `body` field (optional)
     pub fn body(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `body` field to an Option value (optional)
     pub fn maybe_body(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -201,12 +204,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -214,12 +217,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `extended` field (optional)
     pub fn extended(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `extended` field to an Option value (optional)
     pub fn maybe_extended(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -234,11 +237,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PostBuilder<'a, post_state::SetSlug<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -246,12 +249,12 @@ where
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -266,11 +269,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PostBuilder<'a, post_state::SetTitle<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -284,12 +287,12 @@ where
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
         Post {
-            body: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            extended: self.__unsafe_private_named.2,
-            slug: self.__unsafe_private_named.3.unwrap(),
-            tags: self.__unsafe_private_named.4,
-            title: self.__unsafe_private_named.5.unwrap(),
+            body: self._fields.0,
+            created_at: self._fields.1,
+            extended: self._fields.2,
+            slug: self._fields.3.unwrap(),
+            tags: self._fields.4,
+            title: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -302,12 +305,12 @@ where
         >,
     ) -> Post<'a> {
         Post {
-            body: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            extended: self.__unsafe_private_named.2,
-            slug: self.__unsafe_private_named.3.unwrap(),
-            tags: self.__unsafe_private_named.4,
-            title: self.__unsafe_private_named.5.unwrap(),
+            body: self._fields.0,
+            created_at: self._fields.1,
+            extended: self._fields.2,
+            slug: self._fields.3.unwrap(),
+            tags: self._fields.4,
+            title: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

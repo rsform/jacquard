@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -2829,8 +2832,8 @@ pub mod offer_state {
 
 /// Builder for constructing an instance of this type
 pub struct OfferBuilder<'a, S: offer_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<OfferAcceptedPaymentMethod<'a>>,
         Option<OfferAddOn<'a>>,
         Option<OfferAdditionalProperty<'a>>,
@@ -2898,7 +2901,7 @@ pub struct OfferBuilder<'a, S: offer_state::State> {
         Option<OfferValidThrough<'a>>,
         Option<OfferWarranty<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Offer<'a> {
@@ -2912,8 +2915,8 @@ impl<'a> OfferBuilder<'a, offer_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         OfferBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -2981,7 +2984,7 @@ impl<'a> OfferBuilder<'a, offer_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2992,7 +2995,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferAcceptedPaymentMethod<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `acceptedPaymentMethod` field to an Option value (optional)
@@ -3000,7 +3003,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferAcceptedPaymentMethod<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -3008,12 +3011,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `addOn` field (optional)
     pub fn add_on(mut self, value: impl Into<Option<OfferAddOn<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `addOn` field to an Option value (optional)
     pub fn maybe_add_on(mut self, value: Option<OfferAddOn<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -3024,7 +3027,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferAdditionalProperty<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `additionalProperty` field to an Option value (optional)
@@ -3032,7 +3035,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferAdditionalProperty<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -3043,7 +3046,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferAdditionalType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
@@ -3051,7 +3054,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferAdditionalType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -3062,7 +3065,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferAdvanceBookingRequirement<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `advanceBookingRequirement` field to an Option value (optional)
@@ -3070,7 +3073,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferAdvanceBookingRequirement<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -3081,7 +3084,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferAggregateRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
@@ -3089,7 +3092,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferAggregateRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -3100,7 +3103,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferAlternateName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
@@ -3108,7 +3111,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferAlternateName<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -3116,12 +3119,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `areaServed` field (optional)
     pub fn area_served(mut self, value: impl Into<Option<OfferAreaServed<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `areaServed` field to an Option value (optional)
     pub fn maybe_area_served(mut self, value: Option<OfferAreaServed<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -3129,12 +3132,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `asin` field (optional)
     pub fn asin(mut self, value: impl Into<Option<OfferAsin<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `asin` field to an Option value (optional)
     pub fn maybe_asin(mut self, value: Option<OfferAsin<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -3145,12 +3148,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferAvailability<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `availability` field to an Option value (optional)
     pub fn maybe_availability(mut self, value: Option<OfferAvailability<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -3161,7 +3164,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferAvailabilityEnds<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `availabilityEnds` field to an Option value (optional)
@@ -3169,7 +3172,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferAvailabilityEnds<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -3180,7 +3183,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferAvailabilityStarts<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `availabilityStarts` field to an Option value (optional)
@@ -3188,7 +3191,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferAvailabilityStarts<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -3199,7 +3202,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferAvailableAtOrFrom<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `availableAtOrFrom` field to an Option value (optional)
@@ -3207,7 +3210,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferAvailableAtOrFrom<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -3218,7 +3221,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferAvailableDeliveryMethod<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `availableDeliveryMethod` field to an Option value (optional)
@@ -3226,7 +3229,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferAvailableDeliveryMethod<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -3237,7 +3240,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferBusinessFunction<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `businessFunction` field to an Option value (optional)
@@ -3245,7 +3248,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferBusinessFunction<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -3253,12 +3256,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<OfferCategory<'a>>>) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
     pub fn maybe_category(mut self, value: Option<OfferCategory<'a>>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -3269,7 +3272,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferCheckoutPageUrlTemplate<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `checkoutPageURLTemplate` field to an Option value (optional)
@@ -3277,7 +3280,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferCheckoutPageUrlTemplate<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -3288,7 +3291,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferDeliveryLeadTime<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `deliveryLeadTime` field to an Option value (optional)
@@ -3296,7 +3299,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferDeliveryLeadTime<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -3307,12 +3310,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<OfferDescription<'a>>) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -3323,7 +3326,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferDisambiguatingDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `disambiguatingDescription` field to an Option value (optional)
@@ -3331,7 +3334,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferDisambiguatingDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -3342,7 +3345,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferEligibleCustomerType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `eligibleCustomerType` field to an Option value (optional)
@@ -3350,7 +3353,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferEligibleCustomerType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -3361,7 +3364,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferEligibleDuration<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `eligibleDuration` field to an Option value (optional)
@@ -3369,7 +3372,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferEligibleDuration<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -3380,7 +3383,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferEligibleQuantity<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `eligibleQuantity` field to an Option value (optional)
@@ -3388,7 +3391,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferEligibleQuantity<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -3399,7 +3402,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferEligibleRegion<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.23 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `eligibleRegion` field to an Option value (optional)
@@ -3407,7 +3410,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferEligibleRegion<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.23 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -3418,7 +3421,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferEligibleTransactionVolume<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.24 = value.into();
+        self._fields.24 = value.into();
         self
     }
     /// Set the `eligibleTransactionVolume` field to an Option value (optional)
@@ -3426,7 +3429,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferEligibleTransactionVolume<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.24 = value;
+        self._fields.24 = value;
         self
     }
 }
@@ -3434,12 +3437,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `gtin` field (optional)
     pub fn gtin(mut self, value: impl Into<Option<OfferGtin<'a>>>) -> Self {
-        self.__unsafe_private_named.25 = value.into();
+        self._fields.25 = value.into();
         self
     }
     /// Set the `gtin` field to an Option value (optional)
     pub fn maybe_gtin(mut self, value: Option<OfferGtin<'a>>) -> Self {
-        self.__unsafe_private_named.25 = value;
+        self._fields.25 = value;
         self
     }
 }
@@ -3447,12 +3450,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `gtin12` field (optional)
     pub fn gtin12(mut self, value: impl Into<Option<OfferGtin12<'a>>>) -> Self {
-        self.__unsafe_private_named.26 = value.into();
+        self._fields.26 = value.into();
         self
     }
     /// Set the `gtin12` field to an Option value (optional)
     pub fn maybe_gtin12(mut self, value: Option<OfferGtin12<'a>>) -> Self {
-        self.__unsafe_private_named.26 = value;
+        self._fields.26 = value;
         self
     }
 }
@@ -3460,12 +3463,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `gtin13` field (optional)
     pub fn gtin13(mut self, value: impl Into<Option<OfferGtin13<'a>>>) -> Self {
-        self.__unsafe_private_named.27 = value.into();
+        self._fields.27 = value.into();
         self
     }
     /// Set the `gtin13` field to an Option value (optional)
     pub fn maybe_gtin13(mut self, value: Option<OfferGtin13<'a>>) -> Self {
-        self.__unsafe_private_named.27 = value;
+        self._fields.27 = value;
         self
     }
 }
@@ -3473,12 +3476,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `gtin14` field (optional)
     pub fn gtin14(mut self, value: impl Into<Option<OfferGtin14<'a>>>) -> Self {
-        self.__unsafe_private_named.28 = value.into();
+        self._fields.28 = value.into();
         self
     }
     /// Set the `gtin14` field to an Option value (optional)
     pub fn maybe_gtin14(mut self, value: Option<OfferGtin14<'a>>) -> Self {
-        self.__unsafe_private_named.28 = value;
+        self._fields.28 = value;
         self
     }
 }
@@ -3486,12 +3489,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `gtin8` field (optional)
     pub fn gtin8(mut self, value: impl Into<Option<OfferGtin8<'a>>>) -> Self {
-        self.__unsafe_private_named.29 = value.into();
+        self._fields.29 = value.into();
         self
     }
     /// Set the `gtin8` field to an Option value (optional)
     pub fn maybe_gtin8(mut self, value: Option<OfferGtin8<'a>>) -> Self {
-        self.__unsafe_private_named.29 = value;
+        self._fields.29 = value;
         self
     }
 }
@@ -3502,7 +3505,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferHasAdultConsideration<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.30 = value.into();
+        self._fields.30 = value.into();
         self
     }
     /// Set the `hasAdultConsideration` field to an Option value (optional)
@@ -3510,7 +3513,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferHasAdultConsideration<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.30 = value;
+        self._fields.30 = value;
         self
     }
 }
@@ -3521,7 +3524,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferHasGs1DigitalLink<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value.into();
+        self._fields.31 = value.into();
         self
     }
     /// Set the `hasGS1DigitalLink` field to an Option value (optional)
@@ -3529,7 +3532,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferHasGs1DigitalLink<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value;
+        self._fields.31 = value;
         self
     }
 }
@@ -3540,7 +3543,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferHasMeasurement<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value.into();
+        self._fields.32 = value.into();
         self
     }
     /// Set the `hasMeasurement` field to an Option value (optional)
@@ -3548,7 +3551,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferHasMeasurement<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value;
+        self._fields.32 = value;
         self
     }
 }
@@ -3559,7 +3562,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferHasMerchantReturnPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value.into();
+        self._fields.33 = value.into();
         self
     }
     /// Set the `hasMerchantReturnPolicy` field to an Option value (optional)
@@ -3567,7 +3570,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferHasMerchantReturnPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value;
+        self._fields.33 = value;
         self
     }
 }
@@ -3575,12 +3578,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `identifier` field (optional)
     pub fn identifier(mut self, value: impl Into<Option<OfferIdentifier<'a>>>) -> Self {
-        self.__unsafe_private_named.34 = value.into();
+        self._fields.34 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
     pub fn maybe_identifier(mut self, value: Option<OfferIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.34 = value;
+        self._fields.34 = value;
         self
     }
 }
@@ -3588,12 +3591,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<OfferImage<'a>>>) -> Self {
-        self.__unsafe_private_named.35 = value.into();
+        self._fields.35 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<OfferImage<'a>>) -> Self {
-        self.__unsafe_private_named.35 = value;
+        self._fields.35 = value;
         self
     }
 }
@@ -3604,7 +3607,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferIncludesObject<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value.into();
+        self._fields.36 = value.into();
         self
     }
     /// Set the `includesObject` field to an Option value (optional)
@@ -3612,7 +3615,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferIncludesObject<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value;
+        self._fields.36 = value;
         self
     }
 }
@@ -3623,7 +3626,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferIneligibleRegion<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.37 = value.into();
+        self._fields.37 = value.into();
         self
     }
     /// Set the `ineligibleRegion` field to an Option value (optional)
@@ -3631,7 +3634,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferIneligibleRegion<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.37 = value;
+        self._fields.37 = value;
         self
     }
 }
@@ -3642,7 +3645,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferInventoryLevel<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.38 = value.into();
+        self._fields.38 = value.into();
         self
     }
     /// Set the `inventoryLevel` field to an Option value (optional)
@@ -3650,7 +3653,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferInventoryLevel<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.38 = value;
+        self._fields.38 = value;
         self
     }
 }
@@ -3661,7 +3664,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferIsFamilyFriendly<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value.into();
+        self._fields.39 = value.into();
         self
     }
     /// Set the `isFamilyFriendly` field to an Option value (optional)
@@ -3669,7 +3672,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferIsFamilyFriendly<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value;
+        self._fields.39 = value;
         self
     }
 }
@@ -3680,7 +3683,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferItemCondition<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.40 = value.into();
+        self._fields.40 = value.into();
         self
     }
     /// Set the `itemCondition` field to an Option value (optional)
@@ -3688,7 +3691,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferItemCondition<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.40 = value;
+        self._fields.40 = value;
         self
     }
 }
@@ -3699,12 +3702,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferItemOffered<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.41 = value.into();
+        self._fields.41 = value.into();
         self
     }
     /// Set the `itemOffered` field to an Option value (optional)
     pub fn maybe_item_offered(mut self, value: Option<OfferItemOffered<'a>>) -> Self {
-        self.__unsafe_private_named.41 = value;
+        self._fields.41 = value;
         self
     }
 }
@@ -3715,12 +3718,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferLeaseLength<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.42 = value.into();
+        self._fields.42 = value.into();
         self
     }
     /// Set the `leaseLength` field to an Option value (optional)
     pub fn maybe_lease_length(mut self, value: Option<OfferLeaseLength<'a>>) -> Self {
-        self.__unsafe_private_named.42 = value;
+        self._fields.42 = value;
         self
     }
 }
@@ -3731,7 +3734,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferMainEntityOfPage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.43 = value.into();
+        self._fields.43 = value.into();
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
@@ -3739,7 +3742,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferMainEntityOfPage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.43 = value;
+        self._fields.43 = value;
         self
     }
 }
@@ -3747,12 +3750,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `mobileUrl` field (optional)
     pub fn mobile_url(mut self, value: impl Into<Option<OfferMobileUrl<'a>>>) -> Self {
-        self.__unsafe_private_named.44 = value.into();
+        self._fields.44 = value.into();
         self
     }
     /// Set the `mobileUrl` field to an Option value (optional)
     pub fn maybe_mobile_url(mut self, value: Option<OfferMobileUrl<'a>>) -> Self {
-        self.__unsafe_private_named.44 = value;
+        self._fields.44 = value;
         self
     }
 }
@@ -3760,12 +3763,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `mpn` field (optional)
     pub fn mpn(mut self, value: impl Into<Option<OfferMpn<'a>>>) -> Self {
-        self.__unsafe_private_named.45 = value.into();
+        self._fields.45 = value.into();
         self
     }
     /// Set the `mpn` field to an Option value (optional)
     pub fn maybe_mpn(mut self, value: Option<OfferMpn<'a>>) -> Self {
-        self.__unsafe_private_named.45 = value;
+        self._fields.45 = value;
         self
     }
 }
@@ -3773,12 +3776,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<OfferName<'a>>>) -> Self {
-        self.__unsafe_private_named.46 = value.into();
+        self._fields.46 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<OfferName<'a>>) -> Self {
-        self.__unsafe_private_named.46 = value;
+        self._fields.46 = value;
         self
     }
 }
@@ -3786,12 +3789,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `offeredBy` field (optional)
     pub fn offered_by(mut self, value: impl Into<Option<OfferOfferedBy<'a>>>) -> Self {
-        self.__unsafe_private_named.47 = value.into();
+        self._fields.47 = value.into();
         self
     }
     /// Set the `offeredBy` field to an Option value (optional)
     pub fn maybe_offered_by(mut self, value: Option<OfferOfferedBy<'a>>) -> Self {
-        self.__unsafe_private_named.47 = value;
+        self._fields.47 = value;
         self
     }
 }
@@ -3802,7 +3805,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferPotentialAction<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value.into();
+        self._fields.48 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
@@ -3810,7 +3813,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferPotentialAction<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value;
+        self._fields.48 = value;
         self
     }
 }
@@ -3818,12 +3821,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `price` field (optional)
     pub fn price(mut self, value: impl Into<Option<OfferPrice<'a>>>) -> Self {
-        self.__unsafe_private_named.49 = value.into();
+        self._fields.49 = value.into();
         self
     }
     /// Set the `price` field to an Option value (optional)
     pub fn maybe_price(mut self, value: Option<OfferPrice<'a>>) -> Self {
-        self.__unsafe_private_named.49 = value;
+        self._fields.49 = value;
         self
     }
 }
@@ -3834,7 +3837,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferPriceCurrency<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.50 = value.into();
+        self._fields.50 = value.into();
         self
     }
     /// Set the `priceCurrency` field to an Option value (optional)
@@ -3842,7 +3845,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferPriceCurrency<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.50 = value;
+        self._fields.50 = value;
         self
     }
 }
@@ -3853,7 +3856,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferPriceSpecification<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.51 = value.into();
+        self._fields.51 = value.into();
         self
     }
     /// Set the `priceSpecification` field to an Option value (optional)
@@ -3861,7 +3864,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferPriceSpecification<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.51 = value;
+        self._fields.51 = value;
         self
     }
 }
@@ -3872,7 +3875,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferPriceValidUntil<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.52 = value.into();
+        self._fields.52 = value.into();
         self
     }
     /// Set the `priceValidUntil` field to an Option value (optional)
@@ -3880,7 +3883,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferPriceValidUntil<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.52 = value;
+        self._fields.52 = value;
         self
     }
 }
@@ -3888,12 +3891,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<OfferReview<'a>>>) -> Self {
-        self.__unsafe_private_named.53 = value.into();
+        self._fields.53 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
     pub fn maybe_review(mut self, value: Option<OfferReview<'a>>) -> Self {
-        self.__unsafe_private_named.53 = value;
+        self._fields.53 = value;
         self
     }
 }
@@ -3901,12 +3904,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `reviews` field (optional)
     pub fn reviews(mut self, value: impl Into<Option<OfferReviews<'a>>>) -> Self {
-        self.__unsafe_private_named.54 = value.into();
+        self._fields.54 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
     pub fn maybe_reviews(mut self, value: Option<OfferReviews<'a>>) -> Self {
-        self.__unsafe_private_named.54 = value;
+        self._fields.54 = value;
         self
     }
 }
@@ -3914,12 +3917,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<OfferSameAs<'a>>>) -> Self {
-        self.__unsafe_private_named.55 = value.into();
+        self._fields.55 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
     pub fn maybe_same_as(mut self, value: Option<OfferSameAs<'a>>) -> Self {
-        self.__unsafe_private_named.55 = value;
+        self._fields.55 = value;
         self
     }
 }
@@ -3927,12 +3930,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `seller` field (optional)
     pub fn seller(mut self, value: impl Into<Option<OfferSeller<'a>>>) -> Self {
-        self.__unsafe_private_named.56 = value.into();
+        self._fields.56 = value.into();
         self
     }
     /// Set the `seller` field to an Option value (optional)
     pub fn maybe_seller(mut self, value: Option<OfferSeller<'a>>) -> Self {
-        self.__unsafe_private_named.56 = value;
+        self._fields.56 = value;
         self
     }
 }
@@ -3943,12 +3946,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferSerialNumber<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.57 = value.into();
+        self._fields.57 = value.into();
         self
     }
     /// Set the `serialNumber` field to an Option value (optional)
     pub fn maybe_serial_number(mut self, value: Option<OfferSerialNumber<'a>>) -> Self {
-        self.__unsafe_private_named.57 = value;
+        self._fields.57 = value;
         self
     }
 }
@@ -3959,7 +3962,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferShippingDetails<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.58 = value.into();
+        self._fields.58 = value.into();
         self
     }
     /// Set the `shippingDetails` field to an Option value (optional)
@@ -3967,7 +3970,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferShippingDetails<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.58 = value;
+        self._fields.58 = value;
         self
     }
 }
@@ -3975,12 +3978,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `sku` field (optional)
     pub fn sku(mut self, value: impl Into<Option<OfferSku<'a>>>) -> Self {
-        self.__unsafe_private_named.59 = value.into();
+        self._fields.59 = value.into();
         self
     }
     /// Set the `sku` field to an Option value (optional)
     pub fn maybe_sku(mut self, value: Option<OfferSku<'a>>) -> Self {
-        self.__unsafe_private_named.59 = value;
+        self._fields.59 = value;
         self
     }
 }
@@ -3988,12 +3991,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(mut self, value: impl Into<Option<OfferSubjectOf<'a>>>) -> Self {
-        self.__unsafe_private_named.60 = value.into();
+        self._fields.60 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
     pub fn maybe_subject_of(mut self, value: Option<OfferSubjectOf<'a>>) -> Self {
-        self.__unsafe_private_named.60 = value;
+        self._fields.60 = value;
         self
     }
 }
@@ -4001,12 +4004,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<OfferUrl<'a>>>) -> Self {
-        self.__unsafe_private_named.61 = value.into();
+        self._fields.61 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<OfferUrl<'a>>) -> Self {
-        self.__unsafe_private_named.61 = value;
+        self._fields.61 = value;
         self
     }
 }
@@ -4017,7 +4020,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferValidForMemberTier<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.62 = value.into();
+        self._fields.62 = value.into();
         self
     }
     /// Set the `validForMemberTier` field to an Option value (optional)
@@ -4025,7 +4028,7 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: Option<OfferValidForMemberTier<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.62 = value;
+        self._fields.62 = value;
         self
     }
 }
@@ -4033,12 +4036,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `validFrom` field (optional)
     pub fn valid_from(mut self, value: impl Into<Option<OfferValidFrom<'a>>>) -> Self {
-        self.__unsafe_private_named.63 = value.into();
+        self._fields.63 = value.into();
         self
     }
     /// Set the `validFrom` field to an Option value (optional)
     pub fn maybe_valid_from(mut self, value: Option<OfferValidFrom<'a>>) -> Self {
-        self.__unsafe_private_named.63 = value;
+        self._fields.63 = value;
         self
     }
 }
@@ -4049,12 +4052,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OfferValidThrough<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.64 = value.into();
+        self._fields.64 = value.into();
         self
     }
     /// Set the `validThrough` field to an Option value (optional)
     pub fn maybe_valid_through(mut self, value: Option<OfferValidThrough<'a>>) -> Self {
-        self.__unsafe_private_named.64 = value;
+        self._fields.64 = value;
         self
     }
 }
@@ -4062,12 +4065,12 @@ impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
 impl<'a, S: offer_state::State> OfferBuilder<'a, S> {
     /// Set the `warranty` field (optional)
     pub fn warranty(mut self, value: impl Into<Option<OfferWarranty<'a>>>) -> Self {
-        self.__unsafe_private_named.65 = value.into();
+        self._fields.65 = value.into();
         self
     }
     /// Set the `warranty` field to an Option value (optional)
     pub fn maybe_warranty(mut self, value: Option<OfferWarranty<'a>>) -> Self {
-        self.__unsafe_private_named.65 = value;
+        self._fields.65 = value;
         self
     }
 }
@@ -4079,72 +4082,72 @@ where
     /// Build the final struct
     pub fn build(self) -> Offer<'a> {
         Offer {
-            accepted_payment_method: self.__unsafe_private_named.0,
-            add_on: self.__unsafe_private_named.1,
-            additional_property: self.__unsafe_private_named.2,
-            additional_type: self.__unsafe_private_named.3,
-            advance_booking_requirement: self.__unsafe_private_named.4,
-            aggregate_rating: self.__unsafe_private_named.5,
-            alternate_name: self.__unsafe_private_named.6,
-            area_served: self.__unsafe_private_named.7,
-            asin: self.__unsafe_private_named.8,
-            availability: self.__unsafe_private_named.9,
-            availability_ends: self.__unsafe_private_named.10,
-            availability_starts: self.__unsafe_private_named.11,
-            available_at_or_from: self.__unsafe_private_named.12,
-            available_delivery_method: self.__unsafe_private_named.13,
-            business_function: self.__unsafe_private_named.14,
-            category: self.__unsafe_private_named.15,
-            checkout_page_url_template: self.__unsafe_private_named.16,
-            delivery_lead_time: self.__unsafe_private_named.17,
-            description: self.__unsafe_private_named.18,
-            disambiguating_description: self.__unsafe_private_named.19,
-            eligible_customer_type: self.__unsafe_private_named.20,
-            eligible_duration: self.__unsafe_private_named.21,
-            eligible_quantity: self.__unsafe_private_named.22,
-            eligible_region: self.__unsafe_private_named.23,
-            eligible_transaction_volume: self.__unsafe_private_named.24,
-            gtin: self.__unsafe_private_named.25,
-            gtin12: self.__unsafe_private_named.26,
-            gtin13: self.__unsafe_private_named.27,
-            gtin14: self.__unsafe_private_named.28,
-            gtin8: self.__unsafe_private_named.29,
-            has_adult_consideration: self.__unsafe_private_named.30,
-            has_gs1_digital_link: self.__unsafe_private_named.31,
-            has_measurement: self.__unsafe_private_named.32,
-            has_merchant_return_policy: self.__unsafe_private_named.33,
-            identifier: self.__unsafe_private_named.34,
-            image: self.__unsafe_private_named.35,
-            includes_object: self.__unsafe_private_named.36,
-            ineligible_region: self.__unsafe_private_named.37,
-            inventory_level: self.__unsafe_private_named.38,
-            is_family_friendly: self.__unsafe_private_named.39,
-            item_condition: self.__unsafe_private_named.40,
-            item_offered: self.__unsafe_private_named.41,
-            lease_length: self.__unsafe_private_named.42,
-            main_entity_of_page: self.__unsafe_private_named.43,
-            mobile_url: self.__unsafe_private_named.44,
-            mpn: self.__unsafe_private_named.45,
-            name: self.__unsafe_private_named.46,
-            offered_by: self.__unsafe_private_named.47,
-            potential_action: self.__unsafe_private_named.48,
-            price: self.__unsafe_private_named.49,
-            price_currency: self.__unsafe_private_named.50,
-            price_specification: self.__unsafe_private_named.51,
-            price_valid_until: self.__unsafe_private_named.52,
-            review: self.__unsafe_private_named.53,
-            reviews: self.__unsafe_private_named.54,
-            same_as: self.__unsafe_private_named.55,
-            seller: self.__unsafe_private_named.56,
-            serial_number: self.__unsafe_private_named.57,
-            shipping_details: self.__unsafe_private_named.58,
-            sku: self.__unsafe_private_named.59,
-            subject_of: self.__unsafe_private_named.60,
-            url: self.__unsafe_private_named.61,
-            valid_for_member_tier: self.__unsafe_private_named.62,
-            valid_from: self.__unsafe_private_named.63,
-            valid_through: self.__unsafe_private_named.64,
-            warranty: self.__unsafe_private_named.65,
+            accepted_payment_method: self._fields.0,
+            add_on: self._fields.1,
+            additional_property: self._fields.2,
+            additional_type: self._fields.3,
+            advance_booking_requirement: self._fields.4,
+            aggregate_rating: self._fields.5,
+            alternate_name: self._fields.6,
+            area_served: self._fields.7,
+            asin: self._fields.8,
+            availability: self._fields.9,
+            availability_ends: self._fields.10,
+            availability_starts: self._fields.11,
+            available_at_or_from: self._fields.12,
+            available_delivery_method: self._fields.13,
+            business_function: self._fields.14,
+            category: self._fields.15,
+            checkout_page_url_template: self._fields.16,
+            delivery_lead_time: self._fields.17,
+            description: self._fields.18,
+            disambiguating_description: self._fields.19,
+            eligible_customer_type: self._fields.20,
+            eligible_duration: self._fields.21,
+            eligible_quantity: self._fields.22,
+            eligible_region: self._fields.23,
+            eligible_transaction_volume: self._fields.24,
+            gtin: self._fields.25,
+            gtin12: self._fields.26,
+            gtin13: self._fields.27,
+            gtin14: self._fields.28,
+            gtin8: self._fields.29,
+            has_adult_consideration: self._fields.30,
+            has_gs1_digital_link: self._fields.31,
+            has_measurement: self._fields.32,
+            has_merchant_return_policy: self._fields.33,
+            identifier: self._fields.34,
+            image: self._fields.35,
+            includes_object: self._fields.36,
+            ineligible_region: self._fields.37,
+            inventory_level: self._fields.38,
+            is_family_friendly: self._fields.39,
+            item_condition: self._fields.40,
+            item_offered: self._fields.41,
+            lease_length: self._fields.42,
+            main_entity_of_page: self._fields.43,
+            mobile_url: self._fields.44,
+            mpn: self._fields.45,
+            name: self._fields.46,
+            offered_by: self._fields.47,
+            potential_action: self._fields.48,
+            price: self._fields.49,
+            price_currency: self._fields.50,
+            price_specification: self._fields.51,
+            price_valid_until: self._fields.52,
+            review: self._fields.53,
+            reviews: self._fields.54,
+            same_as: self._fields.55,
+            seller: self._fields.56,
+            serial_number: self._fields.57,
+            shipping_details: self._fields.58,
+            sku: self._fields.59,
+            subject_of: self._fields.60,
+            url: self._fields.61,
+            valid_for_member_tier: self._fields.62,
+            valid_from: self._fields.63,
+            valid_through: self._fields.64,
+            warranty: self._fields.65,
             extra_data: Default::default(),
         }
     }
@@ -4154,72 +4157,72 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Offer<'a> {
         Offer {
-            accepted_payment_method: self.__unsafe_private_named.0,
-            add_on: self.__unsafe_private_named.1,
-            additional_property: self.__unsafe_private_named.2,
-            additional_type: self.__unsafe_private_named.3,
-            advance_booking_requirement: self.__unsafe_private_named.4,
-            aggregate_rating: self.__unsafe_private_named.5,
-            alternate_name: self.__unsafe_private_named.6,
-            area_served: self.__unsafe_private_named.7,
-            asin: self.__unsafe_private_named.8,
-            availability: self.__unsafe_private_named.9,
-            availability_ends: self.__unsafe_private_named.10,
-            availability_starts: self.__unsafe_private_named.11,
-            available_at_or_from: self.__unsafe_private_named.12,
-            available_delivery_method: self.__unsafe_private_named.13,
-            business_function: self.__unsafe_private_named.14,
-            category: self.__unsafe_private_named.15,
-            checkout_page_url_template: self.__unsafe_private_named.16,
-            delivery_lead_time: self.__unsafe_private_named.17,
-            description: self.__unsafe_private_named.18,
-            disambiguating_description: self.__unsafe_private_named.19,
-            eligible_customer_type: self.__unsafe_private_named.20,
-            eligible_duration: self.__unsafe_private_named.21,
-            eligible_quantity: self.__unsafe_private_named.22,
-            eligible_region: self.__unsafe_private_named.23,
-            eligible_transaction_volume: self.__unsafe_private_named.24,
-            gtin: self.__unsafe_private_named.25,
-            gtin12: self.__unsafe_private_named.26,
-            gtin13: self.__unsafe_private_named.27,
-            gtin14: self.__unsafe_private_named.28,
-            gtin8: self.__unsafe_private_named.29,
-            has_adult_consideration: self.__unsafe_private_named.30,
-            has_gs1_digital_link: self.__unsafe_private_named.31,
-            has_measurement: self.__unsafe_private_named.32,
-            has_merchant_return_policy: self.__unsafe_private_named.33,
-            identifier: self.__unsafe_private_named.34,
-            image: self.__unsafe_private_named.35,
-            includes_object: self.__unsafe_private_named.36,
-            ineligible_region: self.__unsafe_private_named.37,
-            inventory_level: self.__unsafe_private_named.38,
-            is_family_friendly: self.__unsafe_private_named.39,
-            item_condition: self.__unsafe_private_named.40,
-            item_offered: self.__unsafe_private_named.41,
-            lease_length: self.__unsafe_private_named.42,
-            main_entity_of_page: self.__unsafe_private_named.43,
-            mobile_url: self.__unsafe_private_named.44,
-            mpn: self.__unsafe_private_named.45,
-            name: self.__unsafe_private_named.46,
-            offered_by: self.__unsafe_private_named.47,
-            potential_action: self.__unsafe_private_named.48,
-            price: self.__unsafe_private_named.49,
-            price_currency: self.__unsafe_private_named.50,
-            price_specification: self.__unsafe_private_named.51,
-            price_valid_until: self.__unsafe_private_named.52,
-            review: self.__unsafe_private_named.53,
-            reviews: self.__unsafe_private_named.54,
-            same_as: self.__unsafe_private_named.55,
-            seller: self.__unsafe_private_named.56,
-            serial_number: self.__unsafe_private_named.57,
-            shipping_details: self.__unsafe_private_named.58,
-            sku: self.__unsafe_private_named.59,
-            subject_of: self.__unsafe_private_named.60,
-            url: self.__unsafe_private_named.61,
-            valid_for_member_tier: self.__unsafe_private_named.62,
-            valid_from: self.__unsafe_private_named.63,
-            valid_through: self.__unsafe_private_named.64,
-            warranty: self.__unsafe_private_named.65,
+            accepted_payment_method: self._fields.0,
+            add_on: self._fields.1,
+            additional_property: self._fields.2,
+            additional_type: self._fields.3,
+            advance_booking_requirement: self._fields.4,
+            aggregate_rating: self._fields.5,
+            alternate_name: self._fields.6,
+            area_served: self._fields.7,
+            asin: self._fields.8,
+            availability: self._fields.9,
+            availability_ends: self._fields.10,
+            availability_starts: self._fields.11,
+            available_at_or_from: self._fields.12,
+            available_delivery_method: self._fields.13,
+            business_function: self._fields.14,
+            category: self._fields.15,
+            checkout_page_url_template: self._fields.16,
+            delivery_lead_time: self._fields.17,
+            description: self._fields.18,
+            disambiguating_description: self._fields.19,
+            eligible_customer_type: self._fields.20,
+            eligible_duration: self._fields.21,
+            eligible_quantity: self._fields.22,
+            eligible_region: self._fields.23,
+            eligible_transaction_volume: self._fields.24,
+            gtin: self._fields.25,
+            gtin12: self._fields.26,
+            gtin13: self._fields.27,
+            gtin14: self._fields.28,
+            gtin8: self._fields.29,
+            has_adult_consideration: self._fields.30,
+            has_gs1_digital_link: self._fields.31,
+            has_measurement: self._fields.32,
+            has_merchant_return_policy: self._fields.33,
+            identifier: self._fields.34,
+            image: self._fields.35,
+            includes_object: self._fields.36,
+            ineligible_region: self._fields.37,
+            inventory_level: self._fields.38,
+            is_family_friendly: self._fields.39,
+            item_condition: self._fields.40,
+            item_offered: self._fields.41,
+            lease_length: self._fields.42,
+            main_entity_of_page: self._fields.43,
+            mobile_url: self._fields.44,
+            mpn: self._fields.45,
+            name: self._fields.46,
+            offered_by: self._fields.47,
+            potential_action: self._fields.48,
+            price: self._fields.49,
+            price_currency: self._fields.50,
+            price_specification: self._fields.51,
+            price_valid_until: self._fields.52,
+            review: self._fields.53,
+            reviews: self._fields.54,
+            same_as: self._fields.55,
+            seller: self._fields.56,
+            serial_number: self._fields.57,
+            shipping_details: self._fields.58,
+            sku: self._fields.59,
+            subject_of: self._fields.60,
+            url: self._fields.61,
+            valid_for_member_tier: self._fields.62,
+            valid_from: self._fields.63,
+            valid_through: self._fields.64,
+            warranty: self._fields.65,
             extra_data: Some(extra_data),
         }
     }

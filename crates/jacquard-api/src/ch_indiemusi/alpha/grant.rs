@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -172,57 +175,57 @@ pub mod grant_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ServiceDid;
-        type WrappedMasterKey;
         type CreatedAt;
+        type WrappedMasterKey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ServiceDid = Unset;
-        type WrappedMasterKey = Unset;
         type CreatedAt = Unset;
+        type WrappedMasterKey = Unset;
     }
     ///State transition - sets the `service_did` field to Set
     pub struct SetServiceDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetServiceDid<S> {}
     impl<S: State> State for SetServiceDid<S> {
         type ServiceDid = Set<members::service_did>;
+        type CreatedAt = S::CreatedAt;
         type WrappedMasterKey = S::WrappedMasterKey;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `wrapped_master_key` field to Set
-    pub struct SetWrappedMasterKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWrappedMasterKey<S> {}
-    impl<S: State> State for SetWrappedMasterKey<S> {
-        type ServiceDid = S::ServiceDid;
-        type WrappedMasterKey = Set<members::wrapped_master_key>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type ServiceDid = S::ServiceDid;
-        type WrappedMasterKey = S::WrappedMasterKey;
         type CreatedAt = Set<members::created_at>;
+        type WrappedMasterKey = S::WrappedMasterKey;
+    }
+    ///State transition - sets the `wrapped_master_key` field to Set
+    pub struct SetWrappedMasterKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWrappedMasterKey<S> {}
+    impl<S: State> State for SetWrappedMasterKey<S> {
+        type ServiceDid = S::ServiceDid;
+        type CreatedAt = S::CreatedAt;
+        type WrappedMasterKey = Set<members::wrapped_master_key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `service_did` field
         pub struct service_did(());
-        ///Marker type for the `wrapped_master_key` field
-        pub struct wrapped_master_key(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `wrapped_master_key` field
+        pub struct wrapped_master_key(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GrantBuilder<'a, S: grant_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Datetime>,
         Option<Did<'a>>,
@@ -230,7 +233,7 @@ pub struct GrantBuilder<'a, S: grant_state::State> {
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Grant<'a> {
@@ -244,9 +247,9 @@ impl<'a> GrantBuilder<'a, grant_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GrantBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -261,11 +264,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> GrantBuilder<'a, grant_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GrantBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -273,12 +276,12 @@ where
 impl<'a, S: grant_state::State> GrantBuilder<'a, S> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `expiresAt` field to an Option value (optional)
     pub fn maybe_expires_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -293,11 +296,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> GrantBuilder<'a, grant_state::SetServiceDid<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         GrantBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -312,11 +315,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GrantBuilder<'a, grant_state::SetWrappedMasterKey<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         GrantBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -327,12 +330,12 @@ impl<'a, S: grant_state::State> GrantBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `wrappedMasterKeyIv` field to an Option value (optional)
     pub fn maybe_wrapped_master_key_iv(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -340,12 +343,12 @@ impl<'a, S: grant_state::State> GrantBuilder<'a, S> {
 impl<'a, S: grant_state::State> GrantBuilder<'a, S> {
     /// Set the `wrappingAlgorithm` field (optional)
     pub fn wrapping_algorithm(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `wrappingAlgorithm` field to an Option value (optional)
     pub fn maybe_wrapping_algorithm(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -354,19 +357,19 @@ impl<'a, S> GrantBuilder<'a, S>
 where
     S: grant_state::State,
     S::ServiceDid: grant_state::IsSet,
-    S::WrappedMasterKey: grant_state::IsSet,
     S::CreatedAt: grant_state::IsSet,
+    S::WrappedMasterKey: grant_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Grant<'a> {
         Grant {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            expires_at: self.__unsafe_private_named.1,
-            service_did: self.__unsafe_private_named.2.unwrap(),
-            wrapped_master_key: self.__unsafe_private_named.3.unwrap(),
-            wrapped_master_key_iv: self.__unsafe_private_named.4,
+            created_at: self._fields.0.unwrap(),
+            expires_at: self._fields.1,
+            service_did: self._fields.2.unwrap(),
+            wrapped_master_key: self._fields.3.unwrap(),
+            wrapped_master_key_iv: self._fields.4,
             wrapping_algorithm: self
-                .__unsafe_private_named
+                ._fields
                 .5
                 .or_else(|| Some(CowStr::from("RSA-OAEP"))),
             extra_data: Default::default(),
@@ -381,13 +384,13 @@ where
         >,
     ) -> Grant<'a> {
         Grant {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            expires_at: self.__unsafe_private_named.1,
-            service_did: self.__unsafe_private_named.2.unwrap(),
-            wrapped_master_key: self.__unsafe_private_named.3.unwrap(),
-            wrapped_master_key_iv: self.__unsafe_private_named.4,
+            created_at: self._fields.0.unwrap(),
+            expires_at: self._fields.1,
+            service_did: self._fields.2.unwrap(),
+            wrapped_master_key: self._fields.3.unwrap(),
+            wrapped_master_key_iv: self._fields.4,
             wrapping_algorithm: self
-                .__unsafe_private_named
+                ._fields
                 .5
                 .or_else(|| Some(CowStr::from("RSA-OAEP"))),
             extra_data: Some(extra_data),

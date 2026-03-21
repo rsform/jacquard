@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -296,15 +299,15 @@ pub mod list_notifications_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListNotificationsBuilder<'a, S: list_notifications_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<i64>,
         Option<bool>,
         Option<Vec<CowStr<'a>>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ListNotifications<'a> {
@@ -318,9 +321,9 @@ impl<'a> ListNotificationsBuilder<'a, list_notifications_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListNotificationsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -328,12 +331,12 @@ impl<'a> ListNotificationsBuilder<'a, list_notifications_state::Empty> {
 impl<'a, S: list_notifications_state::State> ListNotificationsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -341,12 +344,12 @@ impl<'a, S: list_notifications_state::State> ListNotificationsBuilder<'a, S> {
 impl<'a, S: list_notifications_state::State> ListNotificationsBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -354,12 +357,12 @@ impl<'a, S: list_notifications_state::State> ListNotificationsBuilder<'a, S> {
 impl<'a, S: list_notifications_state::State> ListNotificationsBuilder<'a, S> {
     /// Set the `priority` field (optional)
     pub fn priority(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `priority` field to an Option value (optional)
     pub fn maybe_priority(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -367,12 +370,12 @@ impl<'a, S: list_notifications_state::State> ListNotificationsBuilder<'a, S> {
 impl<'a, S: list_notifications_state::State> ListNotificationsBuilder<'a, S> {
     /// Set the `reasons` field (optional)
     pub fn reasons(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `reasons` field to an Option value (optional)
     pub fn maybe_reasons(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -380,12 +383,12 @@ impl<'a, S: list_notifications_state::State> ListNotificationsBuilder<'a, S> {
 impl<'a, S: list_notifications_state::State> ListNotificationsBuilder<'a, S> {
     /// Set the `seenAt` field (optional)
     pub fn seen_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `seenAt` field to an Option value (optional)
     pub fn maybe_seen_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -397,11 +400,11 @@ where
     /// Build the final struct
     pub fn build(self) -> ListNotifications<'a> {
         ListNotifications {
-            cursor: self.__unsafe_private_named.0,
-            limit: self.__unsafe_private_named.1,
-            priority: self.__unsafe_private_named.2,
-            reasons: self.__unsafe_private_named.3,
-            seen_at: self.__unsafe_private_named.4,
+            cursor: self._fields.0,
+            limit: self._fields.1,
+            priority: self._fields.2,
+            reasons: self._fields.3,
+            seen_at: self._fields.4,
         }
     }
 }
@@ -416,134 +419,134 @@ pub mod notification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
-        type IndexedAt;
-        type Cid;
         type Uri;
-        type Reason;
+        type Record;
         type IsRead;
+        type Cid;
         type Author;
+        type Reason;
+        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
-        type IndexedAt = Unset;
-        type Cid = Unset;
         type Uri = Unset;
-        type Reason = Unset;
+        type Record = Unset;
         type IsRead = Unset;
+        type Cid = Unset;
         type Author = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Record = Set<members::record>;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Reason = S::Reason;
-        type IsRead = S::IsRead;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Record = S::Record;
-        type IndexedAt = Set<members::indexed_at>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Reason = S::Reason;
-        type IsRead = S::IsRead;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Record = S::Record;
-        type IndexedAt = S::IndexedAt;
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
-        type Reason = S::Reason;
-        type IsRead = S::IsRead;
-        type Author = S::Author;
+        type Reason = Unset;
+        type IndexedAt = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Record = S::Record;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
-        type Reason = S::Reason;
-        type IsRead = S::IsRead;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
         type Record = S::Record;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Reason = Set<members::reason>;
         type IsRead = S::IsRead;
+        type Cid = S::Cid;
         type Author = S::Author;
+        type Reason = S::Reason;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Uri = S::Uri;
+        type Record = Set<members::record>;
+        type IsRead = S::IsRead;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Reason = S::Reason;
+        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `is_read` field to Set
     pub struct SetIsRead<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIsRead<S> {}
     impl<S: State> State for SetIsRead<S> {
-        type Record = S::Record;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Uri = S::Uri;
-        type Reason = S::Reason;
+        type Record = S::Record;
         type IsRead = Set<members::is_read>;
+        type Cid = S::Cid;
         type Author = S::Author;
+        type Reason = S::Reason;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Record = S::Record;
+        type IsRead = S::IsRead;
+        type Cid = Set<members::cid>;
+        type Author = S::Author;
+        type Reason = S::Reason;
+        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type Record = S::Record;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Uri = S::Uri;
-        type Reason = S::Reason;
+        type Record = S::Record;
         type IsRead = S::IsRead;
+        type Cid = S::Cid;
         type Author = Set<members::author>;
+        type Reason = S::Reason;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type Uri = S::Uri;
+        type Record = S::Record;
+        type IsRead = S::IsRead;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Reason = Set<members::reason>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Record = S::Record;
+        type IsRead = S::IsRead;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Reason = S::Reason;
+        type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `reason` field
-        pub struct reason(());
+        ///Marker type for the `record` field
+        pub struct record(());
         ///Marker type for the `is_read` field
         pub struct is_read(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `reason` field
+        pub struct reason(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct NotificationBuilder<'a, S: notification_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ProfileView<'a>>,
         Option<Cid<'a>>,
         Option<Datetime>,
@@ -554,7 +557,7 @@ pub struct NotificationBuilder<'a, S: notification_state::State> {
         Option<Data<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Notification<'a> {
@@ -568,19 +571,9 @@ impl<'a> NotificationBuilder<'a, notification_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -595,11 +588,11 @@ where
         mut self,
         value: impl Into<ProfileView<'a>>,
     ) -> NotificationBuilder<'a, notification_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         NotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -614,11 +607,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> NotificationBuilder<'a, notification_state::SetCid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         NotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -633,11 +626,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> NotificationBuilder<'a, notification_state::SetIndexedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         NotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -652,11 +645,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> NotificationBuilder<'a, notification_state::SetIsRead<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         NotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -664,12 +657,12 @@ where
 impl<'a, S: notification_state::State> NotificationBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<Label<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<Vec<Label<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -684,11 +677,11 @@ where
         mut self,
         value: impl Into<NotificationReason<'a>>,
     ) -> NotificationBuilder<'a, notification_state::SetReason<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         NotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -696,12 +689,12 @@ where
 impl<'a, S: notification_state::State> NotificationBuilder<'a, S> {
     /// Set the `reasonSubject` field (optional)
     pub fn reason_subject(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `reasonSubject` field to an Option value (optional)
     pub fn maybe_reason_subject(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -716,11 +709,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> NotificationBuilder<'a, notification_state::SetRecord<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         NotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -735,11 +728,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> NotificationBuilder<'a, notification_state::SetUri<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         NotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -747,26 +740,26 @@ where
 impl<'a, S> NotificationBuilder<'a, S>
 where
     S: notification_state::State,
-    S::Record: notification_state::IsSet,
-    S::IndexedAt: notification_state::IsSet,
-    S::Cid: notification_state::IsSet,
     S::Uri: notification_state::IsSet,
-    S::Reason: notification_state::IsSet,
+    S::Record: notification_state::IsSet,
     S::IsRead: notification_state::IsSet,
+    S::Cid: notification_state::IsSet,
     S::Author: notification_state::IsSet,
+    S::Reason: notification_state::IsSet,
+    S::IndexedAt: notification_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Notification<'a> {
         Notification {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            is_read: self.__unsafe_private_named.3.unwrap(),
-            labels: self.__unsafe_private_named.4,
-            reason: self.__unsafe_private_named.5.unwrap(),
-            reason_subject: self.__unsafe_private_named.6,
-            record: self.__unsafe_private_named.7.unwrap(),
-            uri: self.__unsafe_private_named.8.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
+            is_read: self._fields.3.unwrap(),
+            labels: self._fields.4,
+            reason: self._fields.5.unwrap(),
+            reason_subject: self._fields.6,
+            record: self._fields.7.unwrap(),
+            uri: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -776,15 +769,15 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Notification<'a> {
         Notification {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            is_read: self.__unsafe_private_named.3.unwrap(),
-            labels: self.__unsafe_private_named.4,
-            reason: self.__unsafe_private_named.5.unwrap(),
-            reason_subject: self.__unsafe_private_named.6,
-            record: self.__unsafe_private_named.7.unwrap(),
-            uri: self.__unsafe_private_named.8.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
+            is_read: self._fields.3.unwrap(),
+            labels: self._fields.4,
+            reason: self._fields.5.unwrap(),
+            reason_subject: self._fields.6,
+            record: self._fields.7.unwrap(),
+            uri: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }

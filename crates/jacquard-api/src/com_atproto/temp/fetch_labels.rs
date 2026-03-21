@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_derive::{IntoStatic, lexicon};
 use serde::{Serialize, Deserialize};
@@ -80,8 +83,8 @@ pub mod fetch_labels_state {
 
 /// Builder for constructing an instance of this type
 pub struct FetchLabelsBuilder<S: fetch_labels_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>),
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>),
 }
 
 impl FetchLabels {
@@ -95,8 +98,8 @@ impl FetchLabelsBuilder<fetch_labels_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FetchLabelsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
+            _state: PhantomData,
+            _fields: (None, None),
         }
     }
 }
@@ -104,12 +107,12 @@ impl FetchLabelsBuilder<fetch_labels_state::Empty> {
 impl<S: fetch_labels_state::State> FetchLabelsBuilder<S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -117,12 +120,12 @@ impl<S: fetch_labels_state::State> FetchLabelsBuilder<S> {
 impl<S: fetch_labels_state::State> FetchLabelsBuilder<S> {
     /// Set the `since` field (optional)
     pub fn since(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `since` field to an Option value (optional)
     pub fn maybe_since(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -134,8 +137,8 @@ where
     /// Build the final struct
     pub fn build(self) -> FetchLabels {
         FetchLabels {
-            limit: self.__unsafe_private_named.0,
-            since: self.__unsafe_private_named.1,
+            limit: self._fields.0,
+            since: self._fields.1,
         }
     }
 }

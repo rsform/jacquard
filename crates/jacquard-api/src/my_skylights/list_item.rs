@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -279,65 +282,65 @@ pub mod list_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Position;
-        type AddedAt;
         type List;
+        type AddedAt;
+        type Position;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Position = Unset;
-        type AddedAt = Unset;
         type List = Unset;
-    }
-    ///State transition - sets the `position` field to Set
-    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPosition<S> {}
-    impl<S: State> State for SetPosition<S> {
-        type Position = Set<members::position>;
-        type AddedAt = S::AddedAt;
-        type List = S::List;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type Position = S::Position;
-        type AddedAt = Set<members::added_at>;
-        type List = S::List;
+        type AddedAt = Unset;
+        type Position = Unset;
     }
     ///State transition - sets the `list` field to Set
     pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetList<S> {}
     impl<S: State> State for SetList<S> {
-        type Position = S::Position;
-        type AddedAt = S::AddedAt;
         type List = Set<members::list>;
+        type AddedAt = S::AddedAt;
+        type Position = S::Position;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
+    impl<S: State> State for SetAddedAt<S> {
+        type List = S::List;
+        type AddedAt = Set<members::added_at>;
+        type Position = S::Position;
+    }
+    ///State transition - sets the `position` field to Set
+    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPosition<S> {}
+    impl<S: State> State for SetPosition<S> {
+        type List = S::List;
+        type AddedAt = S::AddedAt;
+        type Position = Set<members::position>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `position` field
-        pub struct position(());
-        ///Marker type for the `added_at` field
-        pub struct added_at(());
         ///Marker type for the `list` field
         pub struct list(());
+        ///Marker type for the `added_at` field
+        pub struct added_at(());
+        ///Marker type for the `position` field
+        pub struct position(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ListItemBuilder<'a, S: list_item_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Item<'a>>,
         Option<ListItemList<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ListItem<'a> {
@@ -351,9 +354,9 @@ impl<'a> ListItemBuilder<'a, list_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -368,11 +371,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ListItemBuilder<'a, list_item_state::SetAddedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ListItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -380,12 +383,12 @@ where
 impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
     /// Set the `item` field (optional)
     pub fn item(mut self, value: impl Into<Option<Item<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `item` field to an Option value (optional)
     pub fn maybe_item(mut self, value: Option<Item<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -400,11 +403,11 @@ where
         mut self,
         value: impl Into<ListItemList<'a>>,
     ) -> ListItemBuilder<'a, list_item_state::SetList<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ListItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -412,12 +415,12 @@ where
 impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
     pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -432,11 +435,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ListItemBuilder<'a, list_item_state::SetPosition<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ListItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -444,18 +447,18 @@ where
 impl<'a, S> ListItemBuilder<'a, S>
 where
     S: list_item_state::State,
-    S::Position: list_item_state::IsSet,
-    S::AddedAt: list_item_state::IsSet,
     S::List: list_item_state::IsSet,
+    S::AddedAt: list_item_state::IsSet,
+    S::Position: list_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ListItem<'a> {
         ListItem {
-            added_at: self.__unsafe_private_named.0.unwrap(),
-            item: self.__unsafe_private_named.1,
-            list: self.__unsafe_private_named.2.unwrap(),
-            note: self.__unsafe_private_named.3,
-            position: self.__unsafe_private_named.4.unwrap(),
+            added_at: self._fields.0.unwrap(),
+            item: self._fields.1,
+            list: self._fields.2.unwrap(),
+            note: self._fields.3,
+            position: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -468,11 +471,11 @@ where
         >,
     ) -> ListItem<'a> {
         ListItem {
-            added_at: self.__unsafe_private_named.0.unwrap(),
-            item: self.__unsafe_private_named.1,
-            list: self.__unsafe_private_named.2.unwrap(),
-            note: self.__unsafe_private_named.3,
-            position: self.__unsafe_private_named.4.unwrap(),
+            added_at: self._fields.0.unwrap(),
+            item: self._fields.1,
+            list: self._fields.2.unwrap(),
+            note: self._fields.3,
+            position: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

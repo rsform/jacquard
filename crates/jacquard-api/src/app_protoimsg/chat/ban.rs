@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -127,49 +130,49 @@ pub mod ban_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Room;
         type Subject;
+        type Room;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Room = Unset;
         type Subject = Unset;
+        type Room = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `room` field to Set
-    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoom<S> {}
-    impl<S: State> State for SetRoom<S> {
-        type Room = Set<members::room>;
-        type Subject = S::Subject;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Room = S::Room;
         type Subject = Set<members::subject>;
+        type Room = S::Room;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `room` field to Set
+    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoom<S> {}
+    impl<S: State> State for SetRoom<S> {
+        type Subject = S::Subject;
+        type Room = Set<members::room>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Room = S::Room;
         type Subject = S::Subject;
+        type Room = S::Room;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `room` field
-        pub struct room(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `room` field
+        pub struct room(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -177,14 +180,9 @@ pub mod ban_state {
 
 /// Builder for constructing an instance of this type
 pub struct BanBuilder<'a, S: ban_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<Did<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<CowStr<'a>>, Option<AtUri<'a>>, Option<Did<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Ban<'a> {
@@ -198,9 +196,9 @@ impl<'a> BanBuilder<'a, ban_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BanBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -215,11 +213,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> BanBuilder<'a, ban_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BanBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -227,12 +225,12 @@ where
 impl<'a, S: ban_state::State> BanBuilder<'a, S> {
     /// Set the `reason` field (optional)
     pub fn reason(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `reason` field to an Option value (optional)
     pub fn maybe_reason(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -247,11 +245,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> BanBuilder<'a, ban_state::SetRoom<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         BanBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -266,11 +264,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> BanBuilder<'a, ban_state::SetSubject<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         BanBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -278,17 +276,17 @@ where
 impl<'a, S> BanBuilder<'a, S>
 where
     S: ban_state::State,
-    S::Room: ban_state::IsSet,
     S::Subject: ban_state::IsSet,
+    S::Room: ban_state::IsSet,
     S::CreatedAt: ban_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Ban<'a> {
         Ban {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            reason: self.__unsafe_private_named.1,
-            room: self.__unsafe_private_named.2.unwrap(),
-            subject: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            reason: self._fields.1,
+            room: self._fields.2.unwrap(),
+            subject: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -301,10 +299,10 @@ where
         >,
     ) -> Ban<'a> {
         Ban {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            reason: self.__unsafe_private_named.1,
-            room: self.__unsafe_private_named.2.unwrap(),
-            subject: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            reason: self._fields.1,
+            room: self._fields.2.unwrap(),
+            subject: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -15,7 +15,11 @@ pub mod search_actors;
 pub mod search_actors_typeahead;
 pub mod status;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -2573,9 +2577,9 @@ pub mod adult_content_pref_state {
 
 /// Builder for constructing an instance of this type
 pub struct AdultContentPrefBuilder<'a, S: adult_content_pref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> AdultContentPref<'a> {
@@ -2589,9 +2593,9 @@ impl<'a> AdultContentPrefBuilder<'a, adult_content_pref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AdultContentPrefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2606,11 +2610,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> AdultContentPrefBuilder<'a, adult_content_pref_state::SetEnabled<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AdultContentPrefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2623,7 +2627,7 @@ where
     /// Build the final struct
     pub fn build(self) -> AdultContentPref<'a> {
         AdultContentPref {
-            enabled: self.__unsafe_private_named.0.unwrap(),
+            enabled: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2633,7 +2637,7 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> AdultContentPref<'a> {
         AdultContentPref {
-            enabled: self.__unsafe_private_named.0.unwrap(),
+            enabled: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -4270,9 +4274,9 @@ pub mod hidden_posts_pref_state {
 
 /// Builder for constructing an instance of this type
 pub struct HiddenPostsPrefBuilder<'a, S: hidden_posts_pref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<AtUri<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<AtUri<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> HiddenPostsPref<'a> {
@@ -4286,9 +4290,9 @@ impl<'a> HiddenPostsPrefBuilder<'a, hidden_posts_pref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         HiddenPostsPrefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4303,11 +4307,11 @@ where
         mut self,
         value: impl Into<Vec<AtUri<'a>>>,
     ) -> HiddenPostsPrefBuilder<'a, hidden_posts_pref_state::SetItems<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         HiddenPostsPrefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4320,7 +4324,7 @@ where
     /// Build the final struct
     pub fn build(self) -> HiddenPostsPref<'a> {
         HiddenPostsPref {
-            items: self.__unsafe_private_named.0.unwrap(),
+            items: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -4330,7 +4334,7 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> HiddenPostsPref<'a> {
         HiddenPostsPref {
-            items: self.__unsafe_private_named.0.unwrap(),
+            items: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -4370,9 +4374,9 @@ pub mod interests_pref_state {
 
 /// Builder for constructing an instance of this type
 pub struct InterestsPrefBuilder<'a, S: interests_pref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<CowStr<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<CowStr<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> InterestsPref<'a> {
@@ -4386,9 +4390,9 @@ impl<'a> InterestsPrefBuilder<'a, interests_pref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         InterestsPrefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4403,11 +4407,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> InterestsPrefBuilder<'a, interests_pref_state::SetTags<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         InterestsPrefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4420,7 +4424,7 @@ where
     /// Build the final struct
     pub fn build(self) -> InterestsPref<'a> {
         InterestsPref {
-            tags: self.__unsafe_private_named.0.unwrap(),
+            tags: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -4430,7 +4434,7 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> InterestsPref<'a> {
         InterestsPref {
-            tags: self.__unsafe_private_named.0.unwrap(),
+            tags: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -4446,45 +4450,45 @@ pub mod known_followers_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Followers;
         type Count;
+        type Followers;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Followers = Unset;
         type Count = Unset;
-    }
-    ///State transition - sets the `followers` field to Set
-    pub struct SetFollowers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFollowers<S> {}
-    impl<S: State> State for SetFollowers<S> {
-        type Followers = Set<members::followers>;
-        type Count = S::Count;
+        type Followers = Unset;
     }
     ///State transition - sets the `count` field to Set
     pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCount<S> {}
     impl<S: State> State for SetCount<S> {
-        type Followers = S::Followers;
         type Count = Set<members::count>;
+        type Followers = S::Followers;
+    }
+    ///State transition - sets the `followers` field to Set
+    pub struct SetFollowers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFollowers<S> {}
+    impl<S: State> State for SetFollowers<S> {
+        type Count = S::Count;
+        type Followers = Set<members::followers>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `followers` field
-        pub struct followers(());
         ///Marker type for the `count` field
         pub struct count(());
+        ///Marker type for the `followers` field
+        pub struct followers(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct KnownFollowersBuilder<'a, S: known_followers_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<Vec<actor::ProfileViewBasic<'a>>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<Vec<actor::ProfileViewBasic<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> KnownFollowers<'a> {
@@ -4498,9 +4502,9 @@ impl<'a> KnownFollowersBuilder<'a, known_followers_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         KnownFollowersBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4515,11 +4519,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> KnownFollowersBuilder<'a, known_followers_state::SetCount<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         KnownFollowersBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4534,11 +4538,11 @@ where
         mut self,
         value: impl Into<Vec<actor::ProfileViewBasic<'a>>>,
     ) -> KnownFollowersBuilder<'a, known_followers_state::SetFollowers<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         KnownFollowersBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4546,14 +4550,14 @@ where
 impl<'a, S> KnownFollowersBuilder<'a, S>
 where
     S: known_followers_state::State,
-    S::Followers: known_followers_state::IsSet,
     S::Count: known_followers_state::IsSet,
+    S::Followers: known_followers_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> KnownFollowers<'a> {
         KnownFollowers {
-            count: self.__unsafe_private_named.0.unwrap(),
-            followers: self.__unsafe_private_named.1.unwrap(),
+            count: self._fields.0.unwrap(),
+            followers: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -4563,8 +4567,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> KnownFollowers<'a> {
         KnownFollowers {
-            count: self.__unsafe_private_named.0.unwrap(),
-            followers: self.__unsafe_private_named.1.unwrap(),
+            count: self._fields.0.unwrap(),
+            followers: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -4604,9 +4608,9 @@ pub mod labeler_pref_item_state {
 
 /// Builder for constructing an instance of this type
 pub struct LabelerPrefItemBuilder<'a, S: labeler_pref_item_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LabelerPrefItem<'a> {
@@ -4620,9 +4624,9 @@ impl<'a> LabelerPrefItemBuilder<'a, labeler_pref_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LabelerPrefItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4637,11 +4641,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> LabelerPrefItemBuilder<'a, labeler_pref_item_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LabelerPrefItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4654,7 +4658,7 @@ where
     /// Build the final struct
     pub fn build(self) -> LabelerPrefItem<'a> {
         LabelerPrefItem {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -4664,7 +4668,7 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> LabelerPrefItem<'a> {
         LabelerPrefItem {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -4704,9 +4708,9 @@ pub mod labelers_pref_state {
 
 /// Builder for constructing an instance of this type
 pub struct LabelersPrefBuilder<'a, S: labelers_pref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<actor::LabelerPrefItem<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<actor::LabelerPrefItem<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LabelersPref<'a> {
@@ -4720,9 +4724,9 @@ impl<'a> LabelersPrefBuilder<'a, labelers_pref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LabelersPrefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4737,11 +4741,11 @@ where
         mut self,
         value: impl Into<Vec<actor::LabelerPrefItem<'a>>>,
     ) -> LabelersPrefBuilder<'a, labelers_pref_state::SetLabelers<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LabelersPrefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4754,7 +4758,7 @@ where
     /// Build the final struct
     pub fn build(self) -> LabelersPref<'a> {
         LabelersPref {
-            labelers: self.__unsafe_private_named.0.unwrap(),
+            labelers: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -4764,7 +4768,7 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> LabelersPref<'a> {
         LabelersPref {
-            labelers: self.__unsafe_private_named.0.unwrap(),
+            labelers: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -4830,15 +4834,15 @@ pub mod muted_word_state {
 
 /// Builder for constructing an instance of this type
 pub struct MutedWordBuilder<'a, S: muted_word_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<MutedWordActorTarget<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<Vec<actor::MutedWordTarget<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> MutedWord<'a> {
@@ -4852,9 +4856,9 @@ impl<'a> MutedWordBuilder<'a, muted_word_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MutedWordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4865,7 +4869,7 @@ impl<'a, S: muted_word_state::State> MutedWordBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MutedWordActorTarget<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `actorTarget` field to an Option value (optional)
@@ -4873,7 +4877,7 @@ impl<'a, S: muted_word_state::State> MutedWordBuilder<'a, S> {
         mut self,
         value: Option<MutedWordActorTarget<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -4881,12 +4885,12 @@ impl<'a, S: muted_word_state::State> MutedWordBuilder<'a, S> {
 impl<'a, S: muted_word_state::State> MutedWordBuilder<'a, S> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `expiresAt` field to an Option value (optional)
     pub fn maybe_expires_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -4894,12 +4898,12 @@ impl<'a, S: muted_word_state::State> MutedWordBuilder<'a, S> {
 impl<'a, S: muted_word_state::State> MutedWordBuilder<'a, S> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `id` field to an Option value (optional)
     pub fn maybe_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -4914,11 +4918,11 @@ where
         mut self,
         value: impl Into<Vec<actor::MutedWordTarget<'a>>>,
     ) -> MutedWordBuilder<'a, muted_word_state::SetTargets<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         MutedWordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4933,11 +4937,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> MutedWordBuilder<'a, muted_word_state::SetValue<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         MutedWordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4951,11 +4955,11 @@ where
     /// Build the final struct
     pub fn build(self) -> MutedWord<'a> {
         MutedWord {
-            actor_target: self.__unsafe_private_named.0,
-            expires_at: self.__unsafe_private_named.1,
-            id: self.__unsafe_private_named.2,
-            targets: self.__unsafe_private_named.3.unwrap(),
-            value: self.__unsafe_private_named.4.unwrap(),
+            actor_target: self._fields.0,
+            expires_at: self._fields.1,
+            id: self._fields.2,
+            targets: self._fields.3.unwrap(),
+            value: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -4965,11 +4969,11 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> MutedWord<'a> {
         MutedWord {
-            actor_target: self.__unsafe_private_named.0,
-            expires_at: self.__unsafe_private_named.1,
-            id: self.__unsafe_private_named.2,
-            targets: self.__unsafe_private_named.3.unwrap(),
-            value: self.__unsafe_private_named.4.unwrap(),
+            actor_target: self._fields.0,
+            expires_at: self._fields.1,
+            id: self._fields.2,
+            targets: self._fields.3.unwrap(),
+            value: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -5009,9 +5013,9 @@ pub mod muted_words_pref_state {
 
 /// Builder for constructing an instance of this type
 pub struct MutedWordsPrefBuilder<'a, S: muted_words_pref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<actor::MutedWord<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<actor::MutedWord<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> MutedWordsPref<'a> {
@@ -5025,9 +5029,9 @@ impl<'a> MutedWordsPrefBuilder<'a, muted_words_pref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MutedWordsPrefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -5042,11 +5046,11 @@ where
         mut self,
         value: impl Into<Vec<actor::MutedWord<'a>>>,
     ) -> MutedWordsPrefBuilder<'a, muted_words_pref_state::SetItems<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MutedWordsPrefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -5059,7 +5063,7 @@ where
     /// Build the final struct
     pub fn build(self) -> MutedWordsPref<'a> {
         MutedWordsPref {
-            items: self.__unsafe_private_named.0.unwrap(),
+            items: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -5069,7 +5073,7 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> MutedWordsPref<'a> {
         MutedWordsPref {
-            items: self.__unsafe_private_named.0.unwrap(),
+            items: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -5125,14 +5129,9 @@ pub mod nux_state {
 
 /// Builder for constructing an instance of this type
 pub struct NuxBuilder<'a, S: nux_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<bool>,
-        Option<CowStr<'a>>,
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<CowStr<'a>>, Option<Datetime>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Nux<'a> {
@@ -5146,9 +5145,9 @@ impl<'a> NuxBuilder<'a, nux_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NuxBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -5163,11 +5162,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> NuxBuilder<'a, nux_state::SetCompleted<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         NuxBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -5175,12 +5174,12 @@ where
 impl<'a, S: nux_state::State> NuxBuilder<'a, S> {
     /// Set the `data` field (optional)
     pub fn data(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `data` field to an Option value (optional)
     pub fn maybe_data(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -5188,12 +5187,12 @@ impl<'a, S: nux_state::State> NuxBuilder<'a, S> {
 impl<'a, S: nux_state::State> NuxBuilder<'a, S> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `expiresAt` field to an Option value (optional)
     pub fn maybe_expires_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -5208,11 +5207,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> NuxBuilder<'a, nux_state::SetId<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         NuxBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -5226,10 +5225,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Nux<'a> {
         Nux {
-            completed: self.__unsafe_private_named.0.unwrap(),
-            data: self.__unsafe_private_named.1,
-            expires_at: self.__unsafe_private_named.2,
-            id: self.__unsafe_private_named.3.unwrap(),
+            completed: self._fields.0.unwrap(),
+            data: self._fields.1,
+            expires_at: self._fields.2,
+            id: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -5239,10 +5238,10 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Nux<'a> {
         Nux {
-            completed: self.__unsafe_private_named.0.unwrap(),
-            data: self.__unsafe_private_named.1,
-            expires_at: self.__unsafe_private_named.2,
-            id: self.__unsafe_private_named.3.unwrap(),
+            completed: self._fields.0.unwrap(),
+            data: self._fields.1,
+            expires_at: self._fields.2,
+            id: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -5258,48 +5257,45 @@ pub mod profile_associated_germ_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ShowButtonTo;
         type MessageMeUrl;
+        type ShowButtonTo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ShowButtonTo = Unset;
         type MessageMeUrl = Unset;
-    }
-    ///State transition - sets the `show_button_to` field to Set
-    pub struct SetShowButtonTo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShowButtonTo<S> {}
-    impl<S: State> State for SetShowButtonTo<S> {
-        type ShowButtonTo = Set<members::show_button_to>;
-        type MessageMeUrl = S::MessageMeUrl;
+        type ShowButtonTo = Unset;
     }
     ///State transition - sets the `message_me_url` field to Set
     pub struct SetMessageMeUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessageMeUrl<S> {}
     impl<S: State> State for SetMessageMeUrl<S> {
-        type ShowButtonTo = S::ShowButtonTo;
         type MessageMeUrl = Set<members::message_me_url>;
+        type ShowButtonTo = S::ShowButtonTo;
+    }
+    ///State transition - sets the `show_button_to` field to Set
+    pub struct SetShowButtonTo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShowButtonTo<S> {}
+    impl<S: State> State for SetShowButtonTo<S> {
+        type MessageMeUrl = S::MessageMeUrl;
+        type ShowButtonTo = Set<members::show_button_to>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `show_button_to` field
-        pub struct show_button_to(());
         ///Marker type for the `message_me_url` field
         pub struct message_me_url(());
+        ///Marker type for the `show_button_to` field
+        pub struct show_button_to(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ProfileAssociatedGermBuilder<'a, S: profile_associated_germ_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<UriValue<'a>>,
-        Option<ProfileAssociatedGermShowButtonTo<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<UriValue<'a>>, Option<ProfileAssociatedGermShowButtonTo<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ProfileAssociatedGerm<'a> {
@@ -5316,9 +5312,9 @@ impl<'a> ProfileAssociatedGermBuilder<'a, profile_associated_germ_state::Empty> 
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileAssociatedGermBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -5336,11 +5332,11 @@ where
         'a,
         profile_associated_germ_state::SetMessageMeUrl<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ProfileAssociatedGermBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -5358,11 +5354,11 @@ where
         'a,
         profile_associated_germ_state::SetShowButtonTo<S>,
     > {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ProfileAssociatedGermBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -5370,14 +5366,14 @@ where
 impl<'a, S> ProfileAssociatedGermBuilder<'a, S>
 where
     S: profile_associated_germ_state::State,
-    S::ShowButtonTo: profile_associated_germ_state::IsSet,
     S::MessageMeUrl: profile_associated_germ_state::IsSet,
+    S::ShowButtonTo: profile_associated_germ_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileAssociatedGerm<'a> {
         ProfileAssociatedGerm {
-            message_me_url: self.__unsafe_private_named.0.unwrap(),
-            show_button_to: self.__unsafe_private_named.1.unwrap(),
+            message_me_url: self._fields.0.unwrap(),
+            show_button_to: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -5387,8 +5383,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ProfileAssociatedGerm<'a> {
         ProfileAssociatedGerm {
-            message_me_url: self.__unsafe_private_named.0.unwrap(),
-            show_button_to: self.__unsafe_private_named.1.unwrap(),
+            message_me_url: self._fields.0.unwrap(),
+            show_button_to: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -5404,44 +5400,44 @@ pub mod profile_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Handle;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Handle = S::Handle;
+        type Did = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type Did = S::Did;
         type Handle = Set<members::handle>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Handle = S::Handle;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ProfileViewBuilder<'a, S: profile_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<actor::ProfileAssociated<'a>>,
         Option<UriValue<'a>>,
         Option<Datetime>,
@@ -5457,7 +5453,7 @@ pub struct ProfileViewBuilder<'a, S: profile_view_state::State> {
         Option<actor::VerificationState<'a>>,
         Option<actor::ViewerState<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ProfileView<'a> {
@@ -5471,8 +5467,8 @@ impl<'a> ProfileViewBuilder<'a, profile_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -5488,7 +5484,7 @@ impl<'a> ProfileViewBuilder<'a, profile_view_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -5499,7 +5495,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<actor::ProfileAssociated<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `associated` field to an Option value (optional)
@@ -5507,7 +5503,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: Option<actor::ProfileAssociated<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -5515,12 +5511,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
     pub fn maybe_avatar(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -5528,12 +5524,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -5541,12 +5537,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `debug` field (optional)
     pub fn debug(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `debug` field to an Option value (optional)
     pub fn maybe_debug(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -5554,12 +5550,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -5574,11 +5570,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> ProfileViewBuilder<'a, profile_view_state::SetDid<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ProfileViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -5586,12 +5582,12 @@ where
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
     pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -5606,11 +5602,11 @@ where
         mut self,
         value: impl Into<Handle<'a>>,
     ) -> ProfileViewBuilder<'a, profile_view_state::SetHandle<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         ProfileViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -5618,12 +5614,12 @@ where
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `indexedAt` field (optional)
     pub fn indexed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `indexedAt` field to an Option value (optional)
     pub fn maybe_indexed_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -5631,12 +5627,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<Label<'a>>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<Vec<Label<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -5644,12 +5640,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `pronouns` field (optional)
     pub fn pronouns(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `pronouns` field to an Option value (optional)
     pub fn maybe_pronouns(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -5657,12 +5653,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<actor::StatusView<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<actor::StatusView<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -5673,7 +5669,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<actor::VerificationState<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `verification` field to an Option value (optional)
@@ -5681,7 +5677,7 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: Option<actor::VerificationState<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -5689,12 +5685,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `viewer` field (optional)
     pub fn viewer(mut self, value: impl Into<Option<actor::ViewerState<'a>>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
     pub fn maybe_viewer(mut self, value: Option<actor::ViewerState<'a>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -5702,26 +5698,26 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S> ProfileViewBuilder<'a, S>
 where
     S: profile_view_state::State,
-    S::Did: profile_view_state::IsSet,
     S::Handle: profile_view_state::IsSet,
+    S::Did: profile_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileView<'a> {
         ProfileView {
-            associated: self.__unsafe_private_named.0,
-            avatar: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2,
-            debug: self.__unsafe_private_named.3,
-            description: self.__unsafe_private_named.4,
-            did: self.__unsafe_private_named.5.unwrap(),
-            display_name: self.__unsafe_private_named.6,
-            handle: self.__unsafe_private_named.7.unwrap(),
-            indexed_at: self.__unsafe_private_named.8,
-            labels: self.__unsafe_private_named.9,
-            pronouns: self.__unsafe_private_named.10,
-            status: self.__unsafe_private_named.11,
-            verification: self.__unsafe_private_named.12,
-            viewer: self.__unsafe_private_named.13,
+            associated: self._fields.0,
+            avatar: self._fields.1,
+            created_at: self._fields.2,
+            debug: self._fields.3,
+            description: self._fields.4,
+            did: self._fields.5.unwrap(),
+            display_name: self._fields.6,
+            handle: self._fields.7.unwrap(),
+            indexed_at: self._fields.8,
+            labels: self._fields.9,
+            pronouns: self._fields.10,
+            status: self._fields.11,
+            verification: self._fields.12,
+            viewer: self._fields.13,
             extra_data: Default::default(),
         }
     }
@@ -5731,20 +5727,20 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ProfileView<'a> {
         ProfileView {
-            associated: self.__unsafe_private_named.0,
-            avatar: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2,
-            debug: self.__unsafe_private_named.3,
-            description: self.__unsafe_private_named.4,
-            did: self.__unsafe_private_named.5.unwrap(),
-            display_name: self.__unsafe_private_named.6,
-            handle: self.__unsafe_private_named.7.unwrap(),
-            indexed_at: self.__unsafe_private_named.8,
-            labels: self.__unsafe_private_named.9,
-            pronouns: self.__unsafe_private_named.10,
-            status: self.__unsafe_private_named.11,
-            verification: self.__unsafe_private_named.12,
-            viewer: self.__unsafe_private_named.13,
+            associated: self._fields.0,
+            avatar: self._fields.1,
+            created_at: self._fields.2,
+            debug: self._fields.3,
+            description: self._fields.4,
+            did: self._fields.5.unwrap(),
+            display_name: self._fields.6,
+            handle: self._fields.7.unwrap(),
+            indexed_at: self._fields.8,
+            labels: self._fields.9,
+            pronouns: self._fields.10,
+            status: self._fields.11,
+            verification: self._fields.12,
+            viewer: self._fields.13,
             extra_data: Some(extra_data),
         }
     }
@@ -5760,44 +5756,44 @@ pub mod profile_view_basic_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Did;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type Did = S::Did;
+        type Handle = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Handle = S::Handle;
         type Did = Set<members::did>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Did = S::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ProfileViewBasicBuilder<'a, S: profile_view_basic_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<actor::ProfileAssociated<'a>>,
         Option<UriValue<'a>>,
         Option<Datetime>,
@@ -5811,7 +5807,7 @@ pub struct ProfileViewBasicBuilder<'a, S: profile_view_basic_state::State> {
         Option<actor::VerificationState<'a>>,
         Option<actor::ViewerState<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ProfileViewBasic<'a> {
@@ -5825,8 +5821,8 @@ impl<'a> ProfileViewBasicBuilder<'a, profile_view_basic_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileViewBasicBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -5840,7 +5836,7 @@ impl<'a> ProfileViewBasicBuilder<'a, profile_view_basic_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -5851,7 +5847,7 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
         mut self,
         value: impl Into<Option<actor::ProfileAssociated<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `associated` field to an Option value (optional)
@@ -5859,7 +5855,7 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
         mut self,
         value: Option<actor::ProfileAssociated<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -5867,12 +5863,12 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
     pub fn maybe_avatar(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -5880,12 +5876,12 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -5893,12 +5889,12 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `debug` field (optional)
     pub fn debug(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `debug` field to an Option value (optional)
     pub fn maybe_debug(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -5913,11 +5909,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> ProfileViewBasicBuilder<'a, profile_view_basic_state::SetDid<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ProfileViewBasicBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -5925,12 +5921,12 @@ where
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
     pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -5945,11 +5941,11 @@ where
         mut self,
         value: impl Into<Handle<'a>>,
     ) -> ProfileViewBasicBuilder<'a, profile_view_basic_state::SetHandle<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         ProfileViewBasicBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -5957,12 +5953,12 @@ where
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<Label<'a>>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<Vec<Label<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -5970,12 +5966,12 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `pronouns` field (optional)
     pub fn pronouns(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `pronouns` field to an Option value (optional)
     pub fn maybe_pronouns(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -5983,12 +5979,12 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<actor::StatusView<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<actor::StatusView<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -5999,7 +5995,7 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
         mut self,
         value: impl Into<Option<actor::VerificationState<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `verification` field to an Option value (optional)
@@ -6007,7 +6003,7 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
         mut self,
         value: Option<actor::VerificationState<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -6015,12 +6011,12 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `viewer` field (optional)
     pub fn viewer(mut self, value: impl Into<Option<actor::ViewerState<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
     pub fn maybe_viewer(mut self, value: Option<actor::ViewerState<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -6028,24 +6024,24 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
 impl<'a, S> ProfileViewBasicBuilder<'a, S>
 where
     S: profile_view_basic_state::State,
-    S::Handle: profile_view_basic_state::IsSet,
     S::Did: profile_view_basic_state::IsSet,
+    S::Handle: profile_view_basic_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileViewBasic<'a> {
         ProfileViewBasic {
-            associated: self.__unsafe_private_named.0,
-            avatar: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2,
-            debug: self.__unsafe_private_named.3,
-            did: self.__unsafe_private_named.4.unwrap(),
-            display_name: self.__unsafe_private_named.5,
-            handle: self.__unsafe_private_named.6.unwrap(),
-            labels: self.__unsafe_private_named.7,
-            pronouns: self.__unsafe_private_named.8,
-            status: self.__unsafe_private_named.9,
-            verification: self.__unsafe_private_named.10,
-            viewer: self.__unsafe_private_named.11,
+            associated: self._fields.0,
+            avatar: self._fields.1,
+            created_at: self._fields.2,
+            debug: self._fields.3,
+            did: self._fields.4.unwrap(),
+            display_name: self._fields.5,
+            handle: self._fields.6.unwrap(),
+            labels: self._fields.7,
+            pronouns: self._fields.8,
+            status: self._fields.9,
+            verification: self._fields.10,
+            viewer: self._fields.11,
             extra_data: Default::default(),
         }
     }
@@ -6055,18 +6051,18 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ProfileViewBasic<'a> {
         ProfileViewBasic {
-            associated: self.__unsafe_private_named.0,
-            avatar: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2,
-            debug: self.__unsafe_private_named.3,
-            did: self.__unsafe_private_named.4.unwrap(),
-            display_name: self.__unsafe_private_named.5,
-            handle: self.__unsafe_private_named.6.unwrap(),
-            labels: self.__unsafe_private_named.7,
-            pronouns: self.__unsafe_private_named.8,
-            status: self.__unsafe_private_named.9,
-            verification: self.__unsafe_private_named.10,
-            viewer: self.__unsafe_private_named.11,
+            associated: self._fields.0,
+            avatar: self._fields.1,
+            created_at: self._fields.2,
+            debug: self._fields.3,
+            did: self._fields.4.unwrap(),
+            display_name: self._fields.5,
+            handle: self._fields.6.unwrap(),
+            labels: self._fields.7,
+            pronouns: self._fields.8,
+            status: self._fields.9,
+            verification: self._fields.10,
+            viewer: self._fields.11,
             extra_data: Some(extra_data),
         }
     }
@@ -6082,44 +6078,44 @@ pub mod profile_view_detailed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Handle;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Handle = S::Handle;
+        type Did = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type Did = S::Did;
         type Handle = Set<members::handle>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Handle = S::Handle;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ProfileViewDetailedBuilder<'a, S: profile_view_detailed_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<actor::ProfileAssociated<'a>>,
         Option<UriValue<'a>>,
         Option<UriValue<'a>>,
@@ -6142,7 +6138,7 @@ pub struct ProfileViewDetailedBuilder<'a, S: profile_view_detailed_state::State>
         Option<actor::ViewerState<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ProfileViewDetailed<'a> {
@@ -6156,8 +6152,8 @@ impl<'a> ProfileViewDetailedBuilder<'a, profile_view_detailed_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileViewDetailedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -6180,7 +6176,7 @@ impl<'a> ProfileViewDetailedBuilder<'a, profile_view_detailed_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -6191,7 +6187,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: impl Into<Option<actor::ProfileAssociated<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `associated` field to an Option value (optional)
@@ -6199,7 +6195,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: Option<actor::ProfileAssociated<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -6207,12 +6203,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
     pub fn maybe_avatar(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -6220,12 +6216,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `banner` field (optional)
     pub fn banner(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `banner` field to an Option value (optional)
     pub fn maybe_banner(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -6233,12 +6229,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -6246,12 +6242,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `debug` field (optional)
     pub fn debug(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `debug` field to an Option value (optional)
     pub fn maybe_debug(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -6259,12 +6255,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -6279,11 +6275,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> ProfileViewDetailedBuilder<'a, profile_view_detailed_state::SetDid<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         ProfileViewDetailedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -6291,12 +6287,12 @@ where
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
     pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -6304,12 +6300,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `followersCount` field (optional)
     pub fn followers_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `followersCount` field to an Option value (optional)
     pub fn maybe_followers_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -6317,12 +6313,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `followsCount` field (optional)
     pub fn follows_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `followsCount` field to an Option value (optional)
     pub fn maybe_follows_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -6337,11 +6333,11 @@ where
         mut self,
         value: impl Into<Handle<'a>>,
     ) -> ProfileViewDetailedBuilder<'a, profile_view_detailed_state::SetHandle<S>> {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         ProfileViewDetailedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -6349,12 +6345,12 @@ where
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `indexedAt` field (optional)
     pub fn indexed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `indexedAt` field to an Option value (optional)
     pub fn maybe_indexed_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -6365,7 +6361,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: impl Into<Option<StarterPackViewBasic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `joinedViaStarterPack` field to an Option value (optional)
@@ -6373,7 +6369,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: Option<StarterPackViewBasic<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -6381,12 +6377,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<Label<'a>>>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<Vec<Label<'a>>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -6394,12 +6390,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `pinnedPost` field (optional)
     pub fn pinned_post(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `pinnedPost` field to an Option value (optional)
     pub fn maybe_pinned_post(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -6407,12 +6403,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `postsCount` field (optional)
     pub fn posts_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `postsCount` field to an Option value (optional)
     pub fn maybe_posts_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -6420,12 +6416,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `pronouns` field (optional)
     pub fn pronouns(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `pronouns` field to an Option value (optional)
     pub fn maybe_pronouns(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -6433,12 +6429,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<actor::StatusView<'a>>>) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<actor::StatusView<'a>>) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -6449,7 +6445,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: impl Into<Option<actor::VerificationState<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `verification` field to an Option value (optional)
@@ -6457,7 +6453,7 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
         mut self,
         value: Option<actor::VerificationState<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -6465,12 +6461,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `viewer` field (optional)
     pub fn viewer(mut self, value: impl Into<Option<actor::ViewerState<'a>>>) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
     pub fn maybe_viewer(mut self, value: Option<actor::ViewerState<'a>>) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -6478,12 +6474,12 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S> {
     /// Set the `website` field (optional)
     pub fn website(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `website` field to an Option value (optional)
     pub fn maybe_website(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -6491,33 +6487,33 @@ impl<'a, S: profile_view_detailed_state::State> ProfileViewDetailedBuilder<'a, S
 impl<'a, S> ProfileViewDetailedBuilder<'a, S>
 where
     S: profile_view_detailed_state::State,
-    S::Did: profile_view_detailed_state::IsSet,
     S::Handle: profile_view_detailed_state::IsSet,
+    S::Did: profile_view_detailed_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileViewDetailed<'a> {
         ProfileViewDetailed {
-            associated: self.__unsafe_private_named.0,
-            avatar: self.__unsafe_private_named.1,
-            banner: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3,
-            debug: self.__unsafe_private_named.4,
-            description: self.__unsafe_private_named.5,
-            did: self.__unsafe_private_named.6.unwrap(),
-            display_name: self.__unsafe_private_named.7,
-            followers_count: self.__unsafe_private_named.8,
-            follows_count: self.__unsafe_private_named.9,
-            handle: self.__unsafe_private_named.10.unwrap(),
-            indexed_at: self.__unsafe_private_named.11,
-            joined_via_starter_pack: self.__unsafe_private_named.12,
-            labels: self.__unsafe_private_named.13,
-            pinned_post: self.__unsafe_private_named.14,
-            posts_count: self.__unsafe_private_named.15,
-            pronouns: self.__unsafe_private_named.16,
-            status: self.__unsafe_private_named.17,
-            verification: self.__unsafe_private_named.18,
-            viewer: self.__unsafe_private_named.19,
-            website: self.__unsafe_private_named.20,
+            associated: self._fields.0,
+            avatar: self._fields.1,
+            banner: self._fields.2,
+            created_at: self._fields.3,
+            debug: self._fields.4,
+            description: self._fields.5,
+            did: self._fields.6.unwrap(),
+            display_name: self._fields.7,
+            followers_count: self._fields.8,
+            follows_count: self._fields.9,
+            handle: self._fields.10.unwrap(),
+            indexed_at: self._fields.11,
+            joined_via_starter_pack: self._fields.12,
+            labels: self._fields.13,
+            pinned_post: self._fields.14,
+            posts_count: self._fields.15,
+            pronouns: self._fields.16,
+            status: self._fields.17,
+            verification: self._fields.18,
+            viewer: self._fields.19,
+            website: self._fields.20,
             extra_data: Default::default(),
         }
     }
@@ -6527,27 +6523,27 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ProfileViewDetailed<'a> {
         ProfileViewDetailed {
-            associated: self.__unsafe_private_named.0,
-            avatar: self.__unsafe_private_named.1,
-            banner: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3,
-            debug: self.__unsafe_private_named.4,
-            description: self.__unsafe_private_named.5,
-            did: self.__unsafe_private_named.6.unwrap(),
-            display_name: self.__unsafe_private_named.7,
-            followers_count: self.__unsafe_private_named.8,
-            follows_count: self.__unsafe_private_named.9,
-            handle: self.__unsafe_private_named.10.unwrap(),
-            indexed_at: self.__unsafe_private_named.11,
-            joined_via_starter_pack: self.__unsafe_private_named.12,
-            labels: self.__unsafe_private_named.13,
-            pinned_post: self.__unsafe_private_named.14,
-            posts_count: self.__unsafe_private_named.15,
-            pronouns: self.__unsafe_private_named.16,
-            status: self.__unsafe_private_named.17,
-            verification: self.__unsafe_private_named.18,
-            viewer: self.__unsafe_private_named.19,
-            website: self.__unsafe_private_named.20,
+            associated: self._fields.0,
+            avatar: self._fields.1,
+            banner: self._fields.2,
+            created_at: self._fields.3,
+            debug: self._fields.4,
+            description: self._fields.5,
+            did: self._fields.6.unwrap(),
+            display_name: self._fields.7,
+            followers_count: self._fields.8,
+            follows_count: self._fields.9,
+            handle: self._fields.10.unwrap(),
+            indexed_at: self._fields.11,
+            joined_via_starter_pack: self._fields.12,
+            labels: self._fields.13,
+            pinned_post: self._fields.14,
+            posts_count: self._fields.15,
+            pronouns: self._fields.16,
+            status: self._fields.17,
+            verification: self._fields.18,
+            viewer: self._fields.19,
+            website: self._fields.20,
             extra_data: Some(extra_data),
         }
     }
@@ -6563,65 +6559,65 @@ pub mod saved_feed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Value;
         type Id;
         type Pinned;
-        type Value;
         type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Value = Unset;
         type Id = Unset;
         type Pinned = Unset;
-        type Value = Unset;
         type Type = Unset;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Value = Set<members::value>;
+        type Id = S::Id;
+        type Pinned = S::Pinned;
+        type Type = S::Type;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
+        type Value = S::Value;
         type Id = Set<members::id>;
         type Pinned = S::Pinned;
-        type Value = S::Value;
         type Type = S::Type;
     }
     ///State transition - sets the `pinned` field to Set
     pub struct SetPinned<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPinned<S> {}
     impl<S: State> State for SetPinned<S> {
+        type Value = S::Value;
         type Id = S::Id;
         type Pinned = Set<members::pinned>;
-        type Value = S::Value;
-        type Type = S::Type;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Id = S::Id;
-        type Pinned = S::Pinned;
-        type Value = Set<members::value>;
         type Type = S::Type;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
+        type Value = S::Value;
         type Id = S::Id;
         type Pinned = S::Pinned;
-        type Value = S::Value;
         type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `value` field
+        pub struct value(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `pinned` field
         pub struct pinned(());
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `type` field
         pub struct r#type(());
     }
@@ -6629,14 +6625,14 @@ pub mod saved_feed_state {
 
 /// Builder for constructing an instance of this type
 pub struct SavedFeedBuilder<'a, S: saved_feed_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<bool>,
         Option<SavedFeedType<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SavedFeed<'a> {
@@ -6650,9 +6646,9 @@ impl<'a> SavedFeedBuilder<'a, saved_feed_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SavedFeedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -6667,11 +6663,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SavedFeedBuilder<'a, saved_feed_state::SetId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SavedFeedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -6686,11 +6682,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> SavedFeedBuilder<'a, saved_feed_state::SetPinned<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SavedFeedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -6705,11 +6701,11 @@ where
         mut self,
         value: impl Into<SavedFeedType<'a>>,
     ) -> SavedFeedBuilder<'a, saved_feed_state::SetType<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SavedFeedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -6724,11 +6720,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SavedFeedBuilder<'a, saved_feed_state::SetValue<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         SavedFeedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -6736,18 +6732,18 @@ where
 impl<'a, S> SavedFeedBuilder<'a, S>
 where
     S: saved_feed_state::State,
+    S::Value: saved_feed_state::IsSet,
     S::Id: saved_feed_state::IsSet,
     S::Pinned: saved_feed_state::IsSet,
-    S::Value: saved_feed_state::IsSet,
     S::Type: saved_feed_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SavedFeed<'a> {
         SavedFeed {
-            id: self.__unsafe_private_named.0.unwrap(),
-            pinned: self.__unsafe_private_named.1.unwrap(),
-            r#type: self.__unsafe_private_named.2.unwrap(),
-            value: self.__unsafe_private_named.3.unwrap(),
+            id: self._fields.0.unwrap(),
+            pinned: self._fields.1.unwrap(),
+            r#type: self._fields.2.unwrap(),
+            value: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -6757,10 +6753,10 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> SavedFeed<'a> {
         SavedFeed {
-            id: self.__unsafe_private_named.0.unwrap(),
-            pinned: self.__unsafe_private_named.1.unwrap(),
-            r#type: self.__unsafe_private_named.2.unwrap(),
-            value: self.__unsafe_private_named.3.unwrap(),
+            id: self._fields.0.unwrap(),
+            pinned: self._fields.1.unwrap(),
+            r#type: self._fields.2.unwrap(),
+            value: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -6776,49 +6772,45 @@ pub mod saved_feeds_pref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Saved;
         type Pinned;
+        type Saved;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Saved = Unset;
         type Pinned = Unset;
-    }
-    ///State transition - sets the `saved` field to Set
-    pub struct SetSaved<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSaved<S> {}
-    impl<S: State> State for SetSaved<S> {
-        type Saved = Set<members::saved>;
-        type Pinned = S::Pinned;
+        type Saved = Unset;
     }
     ///State transition - sets the `pinned` field to Set
     pub struct SetPinned<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPinned<S> {}
     impl<S: State> State for SetPinned<S> {
-        type Saved = S::Saved;
         type Pinned = Set<members::pinned>;
+        type Saved = S::Saved;
+    }
+    ///State transition - sets the `saved` field to Set
+    pub struct SetSaved<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSaved<S> {}
+    impl<S: State> State for SetSaved<S> {
+        type Pinned = S::Pinned;
+        type Saved = Set<members::saved>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `saved` field
-        pub struct saved(());
         ///Marker type for the `pinned` field
         pub struct pinned(());
+        ///Marker type for the `saved` field
+        pub struct saved(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SavedFeedsPrefBuilder<'a, S: saved_feeds_pref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Vec<AtUri<'a>>>,
-        Option<Vec<AtUri<'a>>>,
-        Option<i64>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<AtUri<'a>>>, Option<Vec<AtUri<'a>>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SavedFeedsPref<'a> {
@@ -6832,9 +6824,9 @@ impl<'a> SavedFeedsPrefBuilder<'a, saved_feeds_pref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SavedFeedsPrefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -6849,11 +6841,11 @@ where
         mut self,
         value: impl Into<Vec<AtUri<'a>>>,
     ) -> SavedFeedsPrefBuilder<'a, saved_feeds_pref_state::SetPinned<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SavedFeedsPrefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -6868,11 +6860,11 @@ where
         mut self,
         value: impl Into<Vec<AtUri<'a>>>,
     ) -> SavedFeedsPrefBuilder<'a, saved_feeds_pref_state::SetSaved<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SavedFeedsPrefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -6880,12 +6872,12 @@ where
 impl<'a, S: saved_feeds_pref_state::State> SavedFeedsPrefBuilder<'a, S> {
     /// Set the `timelineIndex` field (optional)
     pub fn timeline_index(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `timelineIndex` field to an Option value (optional)
     pub fn maybe_timeline_index(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -6893,15 +6885,15 @@ impl<'a, S: saved_feeds_pref_state::State> SavedFeedsPrefBuilder<'a, S> {
 impl<'a, S> SavedFeedsPrefBuilder<'a, S>
 where
     S: saved_feeds_pref_state::State,
-    S::Saved: saved_feeds_pref_state::IsSet,
     S::Pinned: saved_feeds_pref_state::IsSet,
+    S::Saved: saved_feeds_pref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SavedFeedsPref<'a> {
         SavedFeedsPref {
-            pinned: self.__unsafe_private_named.0.unwrap(),
-            saved: self.__unsafe_private_named.1.unwrap(),
-            timeline_index: self.__unsafe_private_named.2,
+            pinned: self._fields.0.unwrap(),
+            saved: self._fields.1.unwrap(),
+            timeline_index: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -6911,9 +6903,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> SavedFeedsPref<'a> {
         SavedFeedsPref {
-            pinned: self.__unsafe_private_named.0.unwrap(),
-            saved: self.__unsafe_private_named.1.unwrap(),
-            timeline_index: self.__unsafe_private_named.2,
+            pinned: self._fields.0.unwrap(),
+            saved: self._fields.1.unwrap(),
+            timeline_index: self._fields.2,
             extra_data: Some(extra_data),
         }
     }
@@ -6953,9 +6945,9 @@ pub mod saved_feeds_pref_v2_state {
 
 /// Builder for constructing an instance of this type
 pub struct SavedFeedsPrefV2Builder<'a, S: saved_feeds_pref_v2_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<actor::SavedFeed<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<actor::SavedFeed<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SavedFeedsPrefV2<'a> {
@@ -6969,9 +6961,9 @@ impl<'a> SavedFeedsPrefV2Builder<'a, saved_feeds_pref_v2_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SavedFeedsPrefV2Builder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -6986,11 +6978,11 @@ where
         mut self,
         value: impl Into<Vec<actor::SavedFeed<'a>>>,
     ) -> SavedFeedsPrefV2Builder<'a, saved_feeds_pref_v2_state::SetItems<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SavedFeedsPrefV2Builder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7003,7 +6995,7 @@ where
     /// Build the final struct
     pub fn build(self) -> SavedFeedsPrefV2<'a> {
         SavedFeedsPrefV2 {
-            items: self.__unsafe_private_named.0.unwrap(),
+            items: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -7013,7 +7005,7 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> SavedFeedsPrefV2<'a> {
         SavedFeedsPrefV2 {
-            items: self.__unsafe_private_named.0.unwrap(),
+            items: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -7065,8 +7057,8 @@ pub mod status_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct StatusViewBuilder<'a, S: status_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Cid<'a>>,
         Option<View<'a>>,
         Option<Datetime>,
@@ -7076,7 +7068,7 @@ pub struct StatusViewBuilder<'a, S: status_view_state::State> {
         Option<StatusViewStatus<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> StatusView<'a> {
@@ -7090,9 +7082,9 @@ impl<'a> StatusViewBuilder<'a, status_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StatusViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7100,12 +7092,12 @@ impl<'a> StatusViewBuilder<'a, status_view_state::Empty> {
 impl<'a, S: status_view_state::State> StatusViewBuilder<'a, S> {
     /// Set the `cid` field (optional)
     pub fn cid(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cid` field to an Option value (optional)
     pub fn maybe_cid(mut self, value: Option<Cid<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -7113,12 +7105,12 @@ impl<'a, S: status_view_state::State> StatusViewBuilder<'a, S> {
 impl<'a, S: status_view_state::State> StatusViewBuilder<'a, S> {
     /// Set the `embed` field (optional)
     pub fn embed(mut self, value: impl Into<Option<View<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `embed` field to an Option value (optional)
     pub fn maybe_embed(mut self, value: Option<View<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -7126,12 +7118,12 @@ impl<'a, S: status_view_state::State> StatusViewBuilder<'a, S> {
 impl<'a, S: status_view_state::State> StatusViewBuilder<'a, S> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `expiresAt` field to an Option value (optional)
     pub fn maybe_expires_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -7139,12 +7131,12 @@ impl<'a, S: status_view_state::State> StatusViewBuilder<'a, S> {
 impl<'a, S: status_view_state::State> StatusViewBuilder<'a, S> {
     /// Set the `isActive` field (optional)
     pub fn is_active(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `isActive` field to an Option value (optional)
     pub fn maybe_is_active(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -7152,12 +7144,12 @@ impl<'a, S: status_view_state::State> StatusViewBuilder<'a, S> {
 impl<'a, S: status_view_state::State> StatusViewBuilder<'a, S> {
     /// Set the `isDisabled` field (optional)
     pub fn is_disabled(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `isDisabled` field to an Option value (optional)
     pub fn maybe_is_disabled(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -7172,11 +7164,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> StatusViewBuilder<'a, status_view_state::SetRecord<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         StatusViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7191,11 +7183,11 @@ where
         mut self,
         value: impl Into<StatusViewStatus<'a>>,
     ) -> StatusViewBuilder<'a, status_view_state::SetStatus<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         StatusViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7203,12 +7195,12 @@ where
 impl<'a, S: status_view_state::State> StatusViewBuilder<'a, S> {
     /// Set the `uri` field (optional)
     pub fn uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `uri` field to an Option value (optional)
     pub fn maybe_uri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -7222,14 +7214,14 @@ where
     /// Build the final struct
     pub fn build(self) -> StatusView<'a> {
         StatusView {
-            cid: self.__unsafe_private_named.0,
-            embed: self.__unsafe_private_named.1,
-            expires_at: self.__unsafe_private_named.2,
-            is_active: self.__unsafe_private_named.3,
-            is_disabled: self.__unsafe_private_named.4,
-            record: self.__unsafe_private_named.5.unwrap(),
-            status: self.__unsafe_private_named.6.unwrap(),
-            uri: self.__unsafe_private_named.7,
+            cid: self._fields.0,
+            embed: self._fields.1,
+            expires_at: self._fields.2,
+            is_active: self._fields.3,
+            is_disabled: self._fields.4,
+            record: self._fields.5.unwrap(),
+            status: self._fields.6.unwrap(),
+            uri: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -7239,14 +7231,14 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> StatusView<'a> {
         StatusView {
-            cid: self.__unsafe_private_named.0,
-            embed: self.__unsafe_private_named.1,
-            expires_at: self.__unsafe_private_named.2,
-            is_active: self.__unsafe_private_named.3,
-            is_disabled: self.__unsafe_private_named.4,
-            record: self.__unsafe_private_named.5.unwrap(),
-            status: self.__unsafe_private_named.6.unwrap(),
-            uri: self.__unsafe_private_named.7,
+            cid: self._fields.0,
+            embed: self._fields.1,
+            expires_at: self._fields.2,
+            is_active: self._fields.3,
+            is_disabled: self._fields.4,
+            record: self._fields.5.unwrap(),
+            status: self._fields.6.unwrap(),
+            uri: self._fields.7,
             extra_data: Some(extra_data),
         }
     }
@@ -7275,63 +7267,63 @@ pub mod verification_state_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Verifications;
         type VerifiedStatus;
         type TrustedVerifierStatus;
+        type Verifications;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Verifications = Unset;
         type VerifiedStatus = Unset;
         type TrustedVerifierStatus = Unset;
-    }
-    ///State transition - sets the `verifications` field to Set
-    pub struct SetVerifications<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVerifications<S> {}
-    impl<S: State> State for SetVerifications<S> {
-        type Verifications = Set<members::verifications>;
-        type VerifiedStatus = S::VerifiedStatus;
-        type TrustedVerifierStatus = S::TrustedVerifierStatus;
+        type Verifications = Unset;
     }
     ///State transition - sets the `verified_status` field to Set
     pub struct SetVerifiedStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVerifiedStatus<S> {}
     impl<S: State> State for SetVerifiedStatus<S> {
-        type Verifications = S::Verifications;
         type VerifiedStatus = Set<members::verified_status>;
         type TrustedVerifierStatus = S::TrustedVerifierStatus;
+        type Verifications = S::Verifications;
     }
     ///State transition - sets the `trusted_verifier_status` field to Set
     pub struct SetTrustedVerifierStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTrustedVerifierStatus<S> {}
     impl<S: State> State for SetTrustedVerifierStatus<S> {
-        type Verifications = S::Verifications;
         type VerifiedStatus = S::VerifiedStatus;
         type TrustedVerifierStatus = Set<members::trusted_verifier_status>;
+        type Verifications = S::Verifications;
+    }
+    ///State transition - sets the `verifications` field to Set
+    pub struct SetVerifications<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVerifications<S> {}
+    impl<S: State> State for SetVerifications<S> {
+        type VerifiedStatus = S::VerifiedStatus;
+        type TrustedVerifierStatus = S::TrustedVerifierStatus;
+        type Verifications = Set<members::verifications>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `verifications` field
-        pub struct verifications(());
         ///Marker type for the `verified_status` field
         pub struct verified_status(());
         ///Marker type for the `trusted_verifier_status` field
         pub struct trusted_verifier_status(());
+        ///Marker type for the `verifications` field
+        pub struct verifications(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct VerificationStateBuilder<'a, S: verification_state_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<VerificationStateTrustedVerifierStatus<'a>>,
         Option<Vec<actor::VerificationView<'a>>>,
         Option<VerificationStateVerifiedStatus<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> VerificationState<'a> {
@@ -7345,9 +7337,9 @@ impl<'a> VerificationStateBuilder<'a, verification_state_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         VerificationStateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7365,11 +7357,11 @@ where
         'a,
         verification_state_state::SetTrustedVerifierStatus<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         VerificationStateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7384,11 +7376,11 @@ where
         mut self,
         value: impl Into<Vec<actor::VerificationView<'a>>>,
     ) -> VerificationStateBuilder<'a, verification_state_state::SetVerifications<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         VerificationStateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7403,11 +7395,11 @@ where
         mut self,
         value: impl Into<VerificationStateVerifiedStatus<'a>>,
     ) -> VerificationStateBuilder<'a, verification_state_state::SetVerifiedStatus<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         VerificationStateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7415,16 +7407,16 @@ where
 impl<'a, S> VerificationStateBuilder<'a, S>
 where
     S: verification_state_state::State,
-    S::Verifications: verification_state_state::IsSet,
     S::VerifiedStatus: verification_state_state::IsSet,
     S::TrustedVerifierStatus: verification_state_state::IsSet,
+    S::Verifications: verification_state_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VerificationState<'a> {
         VerificationState {
-            trusted_verifier_status: self.__unsafe_private_named.0.unwrap(),
-            verifications: self.__unsafe_private_named.1.unwrap(),
-            verified_status: self.__unsafe_private_named.2.unwrap(),
+            trusted_verifier_status: self._fields.0.unwrap(),
+            verifications: self._fields.1.unwrap(),
+            verified_status: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -7434,9 +7426,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> VerificationState<'a> {
         VerificationState {
-            trusted_verifier_status: self.__unsafe_private_named.0.unwrap(),
-            verifications: self.__unsafe_private_named.1.unwrap(),
-            verified_status: self.__unsafe_private_named.2.unwrap(),
+            trusted_verifier_status: self._fields.0.unwrap(),
+            verifications: self._fields.1.unwrap(),
+            verified_status: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -7452,80 +7444,75 @@ pub mod verification_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IsValid;
         type Issuer;
         type CreatedAt;
         type Uri;
+        type IsValid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IsValid = Unset;
         type Issuer = Unset;
         type CreatedAt = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `is_valid` field to Set
-    pub struct SetIsValid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsValid<S> {}
-    impl<S: State> State for SetIsValid<S> {
-        type IsValid = Set<members::is_valid>;
-        type Issuer = S::Issuer;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
+        type IsValid = Unset;
     }
     ///State transition - sets the `issuer` field to Set
     pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIssuer<S> {}
     impl<S: State> State for SetIssuer<S> {
-        type IsValid = S::IsValid;
         type Issuer = Set<members::issuer>;
         type CreatedAt = S::CreatedAt;
         type Uri = S::Uri;
+        type IsValid = S::IsValid;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type IsValid = S::IsValid;
         type Issuer = S::Issuer;
         type CreatedAt = Set<members::created_at>;
         type Uri = S::Uri;
+        type IsValid = S::IsValid;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type IsValid = S::IsValid;
         type Issuer = S::Issuer;
         type CreatedAt = S::CreatedAt;
         type Uri = Set<members::uri>;
+        type IsValid = S::IsValid;
+    }
+    ///State transition - sets the `is_valid` field to Set
+    pub struct SetIsValid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsValid<S> {}
+    impl<S: State> State for SetIsValid<S> {
+        type Issuer = S::Issuer;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type IsValid = Set<members::is_valid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `is_valid` field
-        pub struct is_valid(());
         ///Marker type for the `issuer` field
         pub struct issuer(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `is_valid` field
+        pub struct is_valid(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct VerificationViewBuilder<'a, S: verification_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Datetime>,
-        Option<bool>,
-        Option<Did<'a>>,
-        Option<AtUri<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<bool>, Option<Did<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> VerificationView<'a> {
@@ -7539,9 +7526,9 @@ impl<'a> VerificationViewBuilder<'a, verification_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         VerificationViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7556,11 +7543,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> VerificationViewBuilder<'a, verification_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         VerificationViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7575,11 +7562,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> VerificationViewBuilder<'a, verification_view_state::SetIsValid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         VerificationViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7594,11 +7581,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> VerificationViewBuilder<'a, verification_view_state::SetIssuer<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         VerificationViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7613,11 +7600,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> VerificationViewBuilder<'a, verification_view_state::SetUri<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         VerificationViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7625,18 +7612,18 @@ where
 impl<'a, S> VerificationViewBuilder<'a, S>
 where
     S: verification_view_state::State,
-    S::IsValid: verification_view_state::IsSet,
     S::Issuer: verification_view_state::IsSet,
     S::CreatedAt: verification_view_state::IsSet,
     S::Uri: verification_view_state::IsSet,
+    S::IsValid: verification_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VerificationView<'a> {
         VerificationView {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            is_valid: self.__unsafe_private_named.1.unwrap(),
-            issuer: self.__unsafe_private_named.2.unwrap(),
-            uri: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            is_valid: self._fields.1.unwrap(),
+            issuer: self._fields.2.unwrap(),
+            uri: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -7646,10 +7633,10 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> VerificationView<'a> {
         VerificationView {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            is_valid: self.__unsafe_private_named.1.unwrap(),
-            issuer: self.__unsafe_private_named.2.unwrap(),
-            uri: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            is_valid: self._fields.1.unwrap(),
+            issuer: self._fields.2.unwrap(),
+            uri: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

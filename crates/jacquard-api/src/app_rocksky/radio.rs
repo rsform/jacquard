@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -323,57 +326,57 @@ pub mod radio_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Url;
         type Name;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Url = Unset;
         type Name = Unset;
+        type Url = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
         type Url = S::Url;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type CreatedAt = S::CreatedAt;
-        type Url = Set<members::url>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type CreatedAt = S::CreatedAt;
-        type Url = S::Url;
         type Name = Set<members::name>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RadioBuilder<'a, S: radio_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
@@ -382,7 +385,7 @@ pub struct RadioBuilder<'a, S: radio_state::State> {
         Option<UriValue<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Radio<'a> {
@@ -396,9 +399,9 @@ impl<'a> RadioBuilder<'a, radio_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RadioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -413,11 +416,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> RadioBuilder<'a, radio_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RadioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -425,12 +428,12 @@ where
 impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -438,12 +441,12 @@ impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
 impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
     pub fn maybe_genre(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -451,12 +454,12 @@ impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
 impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
     /// Set the `logo` field (optional)
     pub fn logo(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `logo` field to an Option value (optional)
     pub fn maybe_logo(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -471,11 +474,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RadioBuilder<'a, radio_state::SetName<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         RadioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -490,11 +493,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> RadioBuilder<'a, radio_state::SetUrl<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         RadioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -502,12 +505,12 @@ where
 impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
     /// Set the `website` field (optional)
     pub fn website(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `website` field to an Option value (optional)
     pub fn maybe_website(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -516,19 +519,19 @@ impl<'a, S> RadioBuilder<'a, S>
 where
     S: radio_state::State,
     S::CreatedAt: radio_state::IsSet,
-    S::Url: radio_state::IsSet,
     S::Name: radio_state::IsSet,
+    S::Url: radio_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Radio<'a> {
         Radio {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            genre: self.__unsafe_private_named.2,
-            logo: self.__unsafe_private_named.3,
-            name: self.__unsafe_private_named.4.unwrap(),
-            url: self.__unsafe_private_named.5.unwrap(),
-            website: self.__unsafe_private_named.6,
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1,
+            genre: self._fields.2,
+            logo: self._fields.3,
+            name: self._fields.4.unwrap(),
+            url: self._fields.5.unwrap(),
+            website: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -541,13 +544,13 @@ where
         >,
     ) -> Radio<'a> {
         Radio {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            genre: self.__unsafe_private_named.2,
-            logo: self.__unsafe_private_named.3,
-            name: self.__unsafe_private_named.4.unwrap(),
-            url: self.__unsafe_private_named.5.unwrap(),
-            website: self.__unsafe_private_named.6,
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1,
+            genre: self._fields.2,
+            logo: self._fields.3,
+            name: self._fields.4.unwrap(),
+            url: self._fields.5.unwrap(),
+            website: self._fields.6,
             extra_data: Some(extra_data),
         }
     }

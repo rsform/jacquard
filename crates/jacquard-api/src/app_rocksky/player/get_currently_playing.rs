@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::ident::AtIdentifier;
@@ -78,9 +79,9 @@ pub mod get_currently_playing_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetCurrentlyPlayingBuilder<'a, S: get_currently_playing_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetCurrentlyPlaying<'a> {
@@ -94,9 +95,9 @@ impl<'a> GetCurrentlyPlayingBuilder<'a, get_currently_playing_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetCurrentlyPlayingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -104,12 +105,12 @@ impl<'a> GetCurrentlyPlayingBuilder<'a, get_currently_playing_state::Empty> {
 impl<'a, S: get_currently_playing_state::State> GetCurrentlyPlayingBuilder<'a, S> {
     /// Set the `actor` field (optional)
     pub fn actor(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `actor` field to an Option value (optional)
     pub fn maybe_actor(mut self, value: Option<AtIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -117,12 +118,12 @@ impl<'a, S: get_currently_playing_state::State> GetCurrentlyPlayingBuilder<'a, S
 impl<'a, S: get_currently_playing_state::State> GetCurrentlyPlayingBuilder<'a, S> {
     /// Set the `playerId` field (optional)
     pub fn player_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `playerId` field to an Option value (optional)
     pub fn maybe_player_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -134,8 +135,8 @@ where
     /// Build the final struct
     pub fn build(self) -> GetCurrentlyPlaying<'a> {
         GetCurrentlyPlaying {
-            actor: self.__unsafe_private_named.0,
-            player_id: self.__unsafe_private_named.1,
+            actor: self._fields.0,
+            player_id: self._fields.1,
         }
     }
 }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -181,49 +184,49 @@ pub mod language_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Percentage;
+        type Name;
         type Size;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Percentage = Unset;
+        type Name = Unset;
         type Size = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Percentage = S::Percentage;
-        type Size = S::Size;
     }
     ///State transition - sets the `percentage` field to Set
     pub struct SetPercentage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPercentage<S> {}
     impl<S: State> State for SetPercentage<S> {
-        type Name = S::Name;
         type Percentage = Set<members::percentage>;
+        type Name = S::Name;
+        type Size = S::Size;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Percentage = S::Percentage;
+        type Name = Set<members::name>;
         type Size = S::Size;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSize<S> {}
     impl<S: State> State for SetSize<S> {
-        type Name = S::Name;
         type Percentage = S::Percentage;
+        type Name = S::Name;
         type Size = Set<members::size>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `percentage` field
         pub struct percentage(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `size` field
         pub struct size(());
     }
@@ -231,8 +234,8 @@ pub mod language_state {
 
 /// Builder for constructing an instance of this type
 pub struct LanguageBuilder<'a, S: language_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Vec<CowStr<'a>>>,
         Option<i64>,
@@ -240,7 +243,7 @@ pub struct LanguageBuilder<'a, S: language_state::State> {
         Option<i64>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Language<'a> {
@@ -254,9 +257,9 @@ impl<'a> LanguageBuilder<'a, language_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LanguageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -264,12 +267,12 @@ impl<'a> LanguageBuilder<'a, language_state::Empty> {
 impl<'a, S: language_state::State> LanguageBuilder<'a, S> {
     /// Set the `color` field (optional)
     pub fn color(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `color` field to an Option value (optional)
     pub fn maybe_color(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -277,12 +280,12 @@ impl<'a, S: language_state::State> LanguageBuilder<'a, S> {
 impl<'a, S: language_state::State> LanguageBuilder<'a, S> {
     /// Set the `extensions` field (optional)
     pub fn extensions(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `extensions` field to an Option value (optional)
     pub fn maybe_extensions(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -290,12 +293,12 @@ impl<'a, S: language_state::State> LanguageBuilder<'a, S> {
 impl<'a, S: language_state::State> LanguageBuilder<'a, S> {
     /// Set the `fileCount` field (optional)
     pub fn file_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `fileCount` field to an Option value (optional)
     pub fn maybe_file_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -310,11 +313,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LanguageBuilder<'a, language_state::SetName<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         LanguageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -329,11 +332,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> LanguageBuilder<'a, language_state::SetPercentage<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         LanguageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -348,11 +351,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> LanguageBuilder<'a, language_state::SetSize<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         LanguageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -360,19 +363,19 @@ where
 impl<'a, S> LanguageBuilder<'a, S>
 where
     S: language_state::State,
-    S::Name: language_state::IsSet,
     S::Percentage: language_state::IsSet,
+    S::Name: language_state::IsSet,
     S::Size: language_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Language<'a> {
         Language {
-            color: self.__unsafe_private_named.0,
-            extensions: self.__unsafe_private_named.1,
-            file_count: self.__unsafe_private_named.2,
-            name: self.__unsafe_private_named.3.unwrap(),
-            percentage: self.__unsafe_private_named.4.unwrap(),
-            size: self.__unsafe_private_named.5.unwrap(),
+            color: self._fields.0,
+            extensions: self._fields.1,
+            file_count: self._fields.2,
+            name: self._fields.3.unwrap(),
+            percentage: self._fields.4.unwrap(),
+            size: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -385,12 +388,12 @@ where
         >,
     ) -> Language<'a> {
         Language {
-            color: self.__unsafe_private_named.0,
-            extensions: self.__unsafe_private_named.1,
-            file_count: self.__unsafe_private_named.2,
-            name: self.__unsafe_private_named.3.unwrap(),
-            percentage: self.__unsafe_private_named.4.unwrap(),
-            size: self.__unsafe_private_named.5.unwrap(),
+            color: self._fields.0,
+            extensions: self._fields.1,
+            file_count: self._fields.2,
+            name: self._fields.3.unwrap(),
+            percentage: self._fields.4.unwrap(),
+            size: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -556,9 +559,9 @@ pub mod languages_state {
 
 /// Builder for constructing an instance of this type
 pub struct LanguagesBuilder<'a, S: languages_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Languages<'a> {
@@ -572,9 +575,9 @@ impl<'a> LanguagesBuilder<'a, languages_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LanguagesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -582,12 +585,12 @@ impl<'a> LanguagesBuilder<'a, languages_state::Empty> {
 impl<'a, S: languages_state::State> LanguagesBuilder<'a, S> {
     /// Set the `ref` field (optional)
     pub fn r#ref(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `ref` field to an Option value (optional)
     pub fn maybe_ref(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -602,11 +605,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LanguagesBuilder<'a, languages_state::SetRepo<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LanguagesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -619,8 +622,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Languages<'a> {
         Languages {
-            r#ref: self.__unsafe_private_named.0,
-            repo: self.__unsafe_private_named.1.unwrap(),
+            r#ref: self._fields.0,
+            repo: self._fields.1.unwrap(),
         }
     }
 }

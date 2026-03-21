@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -163,9 +166,9 @@ pub mod collection_summary_state {
 
 /// Builder for constructing an instance of this type
 pub struct CollectionSummaryBuilder<'a, S: collection_summary_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>, Option<bool>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<i64>, Option<bool>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CollectionSummary<'a> {
@@ -179,9 +182,9 @@ impl<'a> CollectionSummaryBuilder<'a, collection_summary_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CollectionSummaryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -196,11 +199,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CollectionSummaryBuilder<'a, collection_summary_state::SetCollection<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CollectionSummaryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -215,11 +218,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CollectionSummaryBuilder<'a, collection_summary_state::SetEstimatedRepos<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CollectionSummaryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -234,11 +237,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> CollectionSummaryBuilder<'a, collection_summary_state::SetIsExternal<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CollectionSummaryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -253,9 +256,9 @@ where
     /// Build the final struct
     pub fn build(self) -> CollectionSummary<'a> {
         CollectionSummary {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            estimated_repos: self.__unsafe_private_named.1.unwrap(),
-            is_external: self.__unsafe_private_named.2.unwrap(),
+            collection: self._fields.0.unwrap(),
+            estimated_repos: self._fields.1.unwrap(),
+            is_external: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -268,9 +271,9 @@ where
         >,
     ) -> CollectionSummary<'a> {
         CollectionSummary {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            estimated_repos: self.__unsafe_private_named.1.unwrap(),
-            is_external: self.__unsafe_private_named.2.unwrap(),
+            collection: self._fields.0.unwrap(),
+            estimated_repos: self._fields.1.unwrap(),
+            is_external: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -413,14 +416,14 @@ pub mod get_sync_summary_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetSyncSummaryBuilder<'a, S: get_sync_summary_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<CowStr<'a>>>,
         Option<Vec<CowStr<'a>>>,
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetSyncSummary<'a> {
@@ -434,9 +437,9 @@ impl<'a> GetSyncSummaryBuilder<'a, get_sync_summary_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSyncSummaryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -444,12 +447,12 @@ impl<'a> GetSyncSummaryBuilder<'a, get_sync_summary_state::Empty> {
 impl<'a, S: get_sync_summary_state::State> GetSyncSummaryBuilder<'a, S> {
     /// Set the `collections` field (optional)
     pub fn collections(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `collections` field to an Option value (optional)
     pub fn maybe_collections(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -460,12 +463,12 @@ impl<'a, S: get_sync_summary_state::State> GetSyncSummaryBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `externalCollections` field to an Option value (optional)
     pub fn maybe_external_collections(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -473,12 +476,12 @@ impl<'a, S: get_sync_summary_state::State> GetSyncSummaryBuilder<'a, S> {
 impl<'a, S: get_sync_summary_state::State> GetSyncSummaryBuilder<'a, S> {
     /// Set the `repos` field (optional)
     pub fn repos(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `repos` field to an Option value (optional)
     pub fn maybe_repos(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -493,11 +496,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GetSyncSummaryBuilder<'a, get_sync_summary_state::SetSlice<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         GetSyncSummaryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -510,10 +513,10 @@ where
     /// Build the final struct
     pub fn build(self) -> GetSyncSummary<'a> {
         GetSyncSummary {
-            collections: self.__unsafe_private_named.0,
-            external_collections: self.__unsafe_private_named.1,
-            repos: self.__unsafe_private_named.2,
-            slice: self.__unsafe_private_named.3.unwrap(),
+            collections: self._fields.0,
+            external_collections: self._fields.1,
+            repos: self._fields.2,
+            slice: self._fields.3.unwrap(),
         }
     }
 }

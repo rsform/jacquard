@@ -30,7 +30,11 @@ pub mod search_actors_skeleton;
 pub mod search_posts_skeleton;
 pub mod search_starter_packs_skeleton;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -782,58 +786,58 @@ pub mod age_assurance_event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type AttemptId;
         type CreatedAt;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type AttemptId = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type AttemptId = S::AttemptId;
-        type CreatedAt = S::CreatedAt;
+        type Status = Unset;
     }
     ///State transition - sets the `attempt_id` field to Set
     pub struct SetAttemptId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAttemptId<S> {}
     impl<S: State> State for SetAttemptId<S> {
-        type Status = S::Status;
         type AttemptId = Set<members::attempt_id>;
         type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Status = S::Status;
         type AttemptId = S::AttemptId;
         type CreatedAt = Set<members::created_at>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type AttemptId = S::AttemptId;
+        type CreatedAt = S::CreatedAt;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `attempt_id` field
         pub struct attempt_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AgeAssuranceEventBuilder<'a, S: age_assurance_event_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
@@ -843,7 +847,7 @@ pub struct AgeAssuranceEventBuilder<'a, S: age_assurance_event_state::State> {
         Option<CowStr<'a>>,
         Option<AgeAssuranceEventStatus<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> AgeAssuranceEvent<'a> {
@@ -857,9 +861,9 @@ impl<'a> AgeAssuranceEventBuilder<'a, age_assurance_event_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AgeAssuranceEventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -874,11 +878,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AgeAssuranceEventBuilder<'a, age_assurance_event_state::SetAttemptId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AgeAssuranceEventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -886,12 +890,12 @@ where
 impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
     /// Set the `completeIp` field (optional)
     pub fn complete_ip(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `completeIp` field to an Option value (optional)
     pub fn maybe_complete_ip(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -899,12 +903,12 @@ impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
 impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
     /// Set the `completeUa` field (optional)
     pub fn complete_ua(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `completeUa` field to an Option value (optional)
     pub fn maybe_complete_ua(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -919,11 +923,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> AgeAssuranceEventBuilder<'a, age_assurance_event_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         AgeAssuranceEventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -931,12 +935,12 @@ where
 impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
     /// Set the `email` field (optional)
     pub fn email(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `email` field to an Option value (optional)
     pub fn maybe_email(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -944,12 +948,12 @@ impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
 impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
     /// Set the `initIp` field (optional)
     pub fn init_ip(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `initIp` field to an Option value (optional)
     pub fn maybe_init_ip(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -957,12 +961,12 @@ impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
 impl<'a, S: age_assurance_event_state::State> AgeAssuranceEventBuilder<'a, S> {
     /// Set the `initUa` field (optional)
     pub fn init_ua(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `initUa` field to an Option value (optional)
     pub fn maybe_init_ua(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -977,11 +981,11 @@ where
         mut self,
         value: impl Into<AgeAssuranceEventStatus<'a>>,
     ) -> AgeAssuranceEventBuilder<'a, age_assurance_event_state::SetStatus<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         AgeAssuranceEventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -989,21 +993,21 @@ where
 impl<'a, S> AgeAssuranceEventBuilder<'a, S>
 where
     S: age_assurance_event_state::State,
-    S::Status: age_assurance_event_state::IsSet,
     S::AttemptId: age_assurance_event_state::IsSet,
     S::CreatedAt: age_assurance_event_state::IsSet,
+    S::Status: age_assurance_event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AgeAssuranceEvent<'a> {
         AgeAssuranceEvent {
-            attempt_id: self.__unsafe_private_named.0.unwrap(),
-            complete_ip: self.__unsafe_private_named.1,
-            complete_ua: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            email: self.__unsafe_private_named.4,
-            init_ip: self.__unsafe_private_named.5,
-            init_ua: self.__unsafe_private_named.6,
-            status: self.__unsafe_private_named.7.unwrap(),
+            attempt_id: self._fields.0.unwrap(),
+            complete_ip: self._fields.1,
+            complete_ua: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            email: self._fields.4,
+            init_ip: self._fields.5,
+            init_ua: self._fields.6,
+            status: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1016,14 +1020,14 @@ where
         >,
     ) -> AgeAssuranceEvent<'a> {
         AgeAssuranceEvent {
-            attempt_id: self.__unsafe_private_named.0.unwrap(),
-            complete_ip: self.__unsafe_private_named.1,
-            complete_ua: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            email: self.__unsafe_private_named.4,
-            init_ip: self.__unsafe_private_named.5,
-            init_ua: self.__unsafe_private_named.6,
-            status: self.__unsafe_private_named.7.unwrap(),
+            attempt_id: self._fields.0.unwrap(),
+            complete_ip: self._fields.1,
+            complete_ua: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            email: self._fields.4,
+            init_ip: self._fields.5,
+            init_ua: self._fields.6,
+            status: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1546,9 +1550,9 @@ pub mod skeleton_search_actor_state {
 
 /// Builder for constructing an instance of this type
 pub struct SkeletonSearchActorBuilder<'a, S: skeleton_search_actor_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SkeletonSearchActor<'a> {
@@ -1562,9 +1566,9 @@ impl<'a> SkeletonSearchActorBuilder<'a, skeleton_search_actor_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SkeletonSearchActorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1579,11 +1583,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> SkeletonSearchActorBuilder<'a, skeleton_search_actor_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SkeletonSearchActorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1596,7 +1600,7 @@ where
     /// Build the final struct
     pub fn build(self) -> SkeletonSearchActor<'a> {
         SkeletonSearchActor {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1609,7 +1613,7 @@ where
         >,
     ) -> SkeletonSearchActor<'a> {
         SkeletonSearchActor {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1649,9 +1653,9 @@ pub mod skeleton_search_post_state {
 
 /// Builder for constructing an instance of this type
 pub struct SkeletonSearchPostBuilder<'a, S: skeleton_search_post_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SkeletonSearchPost<'a> {
@@ -1665,9 +1669,9 @@ impl<'a> SkeletonSearchPostBuilder<'a, skeleton_search_post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SkeletonSearchPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1682,11 +1686,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> SkeletonSearchPostBuilder<'a, skeleton_search_post_state::SetUri<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SkeletonSearchPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1699,7 +1703,7 @@ where
     /// Build the final struct
     pub fn build(self) -> SkeletonSearchPost<'a> {
         SkeletonSearchPost {
-            uri: self.__unsafe_private_named.0.unwrap(),
+            uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1712,7 +1716,7 @@ where
         >,
     ) -> SkeletonSearchPost<'a> {
         SkeletonSearchPost {
-            uri: self.__unsafe_private_named.0.unwrap(),
+            uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1755,9 +1759,9 @@ pub struct SkeletonSearchStarterPackBuilder<
     'a,
     S: skeleton_search_starter_pack_state::State,
 > {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SkeletonSearchStarterPack<'a> {
@@ -1776,9 +1780,9 @@ impl<
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SkeletonSearchStarterPackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1796,11 +1800,11 @@ where
         'a,
         skeleton_search_starter_pack_state::SetUri<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SkeletonSearchStarterPackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1813,7 +1817,7 @@ where
     /// Build the final struct
     pub fn build(self) -> SkeletonSearchStarterPack<'a> {
         SkeletonSearchStarterPack {
-            uri: self.__unsafe_private_named.0.unwrap(),
+            uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1826,7 +1830,7 @@ where
         >,
     ) -> SkeletonSearchStarterPack<'a> {
         SkeletonSearchStarterPack {
-            uri: self.__unsafe_private_named.0.unwrap(),
+            uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1842,112 +1846,112 @@ pub mod skeleton_trend_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartedAt;
-        type DisplayName;
         type Dids;
         type Topic;
+        type DisplayName;
         type Link;
         type PostCount;
+        type StartedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartedAt = Unset;
-        type DisplayName = Unset;
         type Dids = Unset;
         type Topic = Unset;
+        type DisplayName = Unset;
         type Link = Unset;
         type PostCount = Unset;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
-        type StartedAt = Set<members::started_at>;
-        type DisplayName = S::DisplayName;
-        type Dids = S::Dids;
-        type Topic = S::Topic;
-        type Link = S::Link;
-        type PostCount = S::PostCount;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type StartedAt = S::StartedAt;
-        type DisplayName = Set<members::display_name>;
-        type Dids = S::Dids;
-        type Topic = S::Topic;
-        type Link = S::Link;
-        type PostCount = S::PostCount;
+        type StartedAt = Unset;
     }
     ///State transition - sets the `dids` field to Set
     pub struct SetDids<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDids<S> {}
     impl<S: State> State for SetDids<S> {
-        type StartedAt = S::StartedAt;
-        type DisplayName = S::DisplayName;
         type Dids = Set<members::dids>;
         type Topic = S::Topic;
+        type DisplayName = S::DisplayName;
         type Link = S::Link;
         type PostCount = S::PostCount;
+        type StartedAt = S::StartedAt;
     }
     ///State transition - sets the `topic` field to Set
     pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTopic<S> {}
     impl<S: State> State for SetTopic<S> {
-        type StartedAt = S::StartedAt;
-        type DisplayName = S::DisplayName;
         type Dids = S::Dids;
         type Topic = Set<members::topic>;
+        type DisplayName = S::DisplayName;
         type Link = S::Link;
         type PostCount = S::PostCount;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
+    impl<S: State> State for SetDisplayName<S> {
+        type Dids = S::Dids;
+        type Topic = S::Topic;
+        type DisplayName = Set<members::display_name>;
+        type Link = S::Link;
+        type PostCount = S::PostCount;
+        type StartedAt = S::StartedAt;
     }
     ///State transition - sets the `link` field to Set
     pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLink<S> {}
     impl<S: State> State for SetLink<S> {
-        type StartedAt = S::StartedAt;
-        type DisplayName = S::DisplayName;
         type Dids = S::Dids;
         type Topic = S::Topic;
+        type DisplayName = S::DisplayName;
         type Link = Set<members::link>;
         type PostCount = S::PostCount;
+        type StartedAt = S::StartedAt;
     }
     ///State transition - sets the `post_count` field to Set
     pub struct SetPostCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPostCount<S> {}
     impl<S: State> State for SetPostCount<S> {
-        type StartedAt = S::StartedAt;
-        type DisplayName = S::DisplayName;
         type Dids = S::Dids;
         type Topic = S::Topic;
+        type DisplayName = S::DisplayName;
         type Link = S::Link;
         type PostCount = Set<members::post_count>;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type Dids = S::Dids;
+        type Topic = S::Topic;
+        type DisplayName = S::DisplayName;
+        type Link = S::Link;
+        type PostCount = S::PostCount;
+        type StartedAt = Set<members::started_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
         ///Marker type for the `dids` field
         pub struct dids(());
         ///Marker type for the `topic` field
         pub struct topic(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
         ///Marker type for the `link` field
         pub struct link(());
         ///Marker type for the `post_count` field
         pub struct post_count(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SkeletonTrendBuilder<'a, S: skeleton_trend_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Vec<Did<'a>>>,
         Option<CowStr<'a>>,
@@ -1957,7 +1961,7 @@ pub struct SkeletonTrendBuilder<'a, S: skeleton_trend_state::State> {
         Option<SkeletonTrendStatus<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SkeletonTrend<'a> {
@@ -1971,9 +1975,9 @@ impl<'a> SkeletonTrendBuilder<'a, skeleton_trend_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SkeletonTrendBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1981,12 +1985,12 @@ impl<'a> SkeletonTrendBuilder<'a, skeleton_trend_state::Empty> {
 impl<'a, S: skeleton_trend_state::State> SkeletonTrendBuilder<'a, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
     pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -2001,11 +2005,11 @@ where
         mut self,
         value: impl Into<Vec<Did<'a>>>,
     ) -> SkeletonTrendBuilder<'a, skeleton_trend_state::SetDids<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SkeletonTrendBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2020,11 +2024,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SkeletonTrendBuilder<'a, skeleton_trend_state::SetDisplayName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SkeletonTrendBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2039,11 +2043,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SkeletonTrendBuilder<'a, skeleton_trend_state::SetLink<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         SkeletonTrendBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2058,11 +2062,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SkeletonTrendBuilder<'a, skeleton_trend_state::SetPostCount<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         SkeletonTrendBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2077,11 +2081,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SkeletonTrendBuilder<'a, skeleton_trend_state::SetStartedAt<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         SkeletonTrendBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2089,12 +2093,12 @@ where
 impl<'a, S: skeleton_trend_state::State> SkeletonTrendBuilder<'a, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<SkeletonTrendStatus<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<SkeletonTrendStatus<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -2109,11 +2113,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SkeletonTrendBuilder<'a, skeleton_trend_state::SetTopic<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         SkeletonTrendBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2121,24 +2125,24 @@ where
 impl<'a, S> SkeletonTrendBuilder<'a, S>
 where
     S: skeleton_trend_state::State,
-    S::StartedAt: skeleton_trend_state::IsSet,
-    S::DisplayName: skeleton_trend_state::IsSet,
     S::Dids: skeleton_trend_state::IsSet,
     S::Topic: skeleton_trend_state::IsSet,
+    S::DisplayName: skeleton_trend_state::IsSet,
     S::Link: skeleton_trend_state::IsSet,
     S::PostCount: skeleton_trend_state::IsSet,
+    S::StartedAt: skeleton_trend_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SkeletonTrend<'a> {
         SkeletonTrend {
-            category: self.__unsafe_private_named.0,
-            dids: self.__unsafe_private_named.1.unwrap(),
-            display_name: self.__unsafe_private_named.2.unwrap(),
-            link: self.__unsafe_private_named.3.unwrap(),
-            post_count: self.__unsafe_private_named.4.unwrap(),
-            started_at: self.__unsafe_private_named.5.unwrap(),
-            status: self.__unsafe_private_named.6,
-            topic: self.__unsafe_private_named.7.unwrap(),
+            category: self._fields.0,
+            dids: self._fields.1.unwrap(),
+            display_name: self._fields.2.unwrap(),
+            link: self._fields.3.unwrap(),
+            post_count: self._fields.4.unwrap(),
+            started_at: self._fields.5.unwrap(),
+            status: self._fields.6,
+            topic: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2151,14 +2155,14 @@ where
         >,
     ) -> SkeletonTrend<'a> {
         SkeletonTrend {
-            category: self.__unsafe_private_named.0,
-            dids: self.__unsafe_private_named.1.unwrap(),
-            display_name: self.__unsafe_private_named.2.unwrap(),
-            link: self.__unsafe_private_named.3.unwrap(),
-            post_count: self.__unsafe_private_named.4.unwrap(),
-            started_at: self.__unsafe_private_named.5.unwrap(),
-            status: self.__unsafe_private_named.6,
-            topic: self.__unsafe_private_named.7.unwrap(),
+            category: self._fields.0,
+            dids: self._fields.1.unwrap(),
+            display_name: self._fields.2.unwrap(),
+            link: self._fields.3.unwrap(),
+            post_count: self._fields.4.unwrap(),
+            started_at: self._fields.5.unwrap(),
+            status: self._fields.6,
+            topic: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2198,9 +2202,9 @@ pub mod thread_item_blocked_state {
 
 /// Builder for constructing an instance of this type
 pub struct ThreadItemBlockedBuilder<'a, S: thread_item_blocked_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<BlockedAuthor<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<BlockedAuthor<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ThreadItemBlocked<'a> {
@@ -2214,9 +2218,9 @@ impl<'a> ThreadItemBlockedBuilder<'a, thread_item_blocked_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ThreadItemBlockedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2231,11 +2235,11 @@ where
         mut self,
         value: impl Into<BlockedAuthor<'a>>,
     ) -> ThreadItemBlockedBuilder<'a, thread_item_blocked_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ThreadItemBlockedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2248,7 +2252,7 @@ where
     /// Build the final struct
     pub fn build(self) -> ThreadItemBlocked<'a> {
         ThreadItemBlocked {
-            author: self.__unsafe_private_named.0.unwrap(),
+            author: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2261,7 +2265,7 @@ where
         >,
     ) -> ThreadItemBlocked<'a> {
         ThreadItemBlocked {
-            author: self.__unsafe_private_named.0.unwrap(),
+            author: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2277,112 +2281,112 @@ pub mod thread_item_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type OpThread;
+        type MoreReplies;
+        type HiddenByThreadgate;
         type MoreParents;
         type Post;
-        type OpThread;
-        type HiddenByThreadgate;
         type MutedByViewer;
-        type MoreReplies;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type OpThread = Unset;
+        type MoreReplies = Unset;
+        type HiddenByThreadgate = Unset;
         type MoreParents = Unset;
         type Post = Unset;
-        type OpThread = Unset;
-        type HiddenByThreadgate = Unset;
         type MutedByViewer = Unset;
-        type MoreReplies = Unset;
-    }
-    ///State transition - sets the `more_parents` field to Set
-    pub struct SetMoreParents<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMoreParents<S> {}
-    impl<S: State> State for SetMoreParents<S> {
-        type MoreParents = Set<members::more_parents>;
-        type Post = S::Post;
-        type OpThread = S::OpThread;
-        type HiddenByThreadgate = S::HiddenByThreadgate;
-        type MutedByViewer = S::MutedByViewer;
-        type MoreReplies = S::MoreReplies;
-    }
-    ///State transition - sets the `post` field to Set
-    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPost<S> {}
-    impl<S: State> State for SetPost<S> {
-        type MoreParents = S::MoreParents;
-        type Post = Set<members::post>;
-        type OpThread = S::OpThread;
-        type HiddenByThreadgate = S::HiddenByThreadgate;
-        type MutedByViewer = S::MutedByViewer;
-        type MoreReplies = S::MoreReplies;
     }
     ///State transition - sets the `op_thread` field to Set
     pub struct SetOpThread<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOpThread<S> {}
     impl<S: State> State for SetOpThread<S> {
-        type MoreParents = S::MoreParents;
-        type Post = S::Post;
         type OpThread = Set<members::op_thread>;
-        type HiddenByThreadgate = S::HiddenByThreadgate;
-        type MutedByViewer = S::MutedByViewer;
         type MoreReplies = S::MoreReplies;
-    }
-    ///State transition - sets the `hidden_by_threadgate` field to Set
-    pub struct SetHiddenByThreadgate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHiddenByThreadgate<S> {}
-    impl<S: State> State for SetHiddenByThreadgate<S> {
+        type HiddenByThreadgate = S::HiddenByThreadgate;
         type MoreParents = S::MoreParents;
         type Post = S::Post;
-        type OpThread = S::OpThread;
-        type HiddenByThreadgate = Set<members::hidden_by_threadgate>;
         type MutedByViewer = S::MutedByViewer;
-        type MoreReplies = S::MoreReplies;
-    }
-    ///State transition - sets the `muted_by_viewer` field to Set
-    pub struct SetMutedByViewer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMutedByViewer<S> {}
-    impl<S: State> State for SetMutedByViewer<S> {
-        type MoreParents = S::MoreParents;
-        type Post = S::Post;
-        type OpThread = S::OpThread;
-        type HiddenByThreadgate = S::HiddenByThreadgate;
-        type MutedByViewer = Set<members::muted_by_viewer>;
-        type MoreReplies = S::MoreReplies;
     }
     ///State transition - sets the `more_replies` field to Set
     pub struct SetMoreReplies<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMoreReplies<S> {}
     impl<S: State> State for SetMoreReplies<S> {
+        type OpThread = S::OpThread;
+        type MoreReplies = Set<members::more_replies>;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
         type MoreParents = S::MoreParents;
         type Post = S::Post;
-        type OpThread = S::OpThread;
-        type HiddenByThreadgate = S::HiddenByThreadgate;
         type MutedByViewer = S::MutedByViewer;
-        type MoreReplies = Set<members::more_replies>;
+    }
+    ///State transition - sets the `hidden_by_threadgate` field to Set
+    pub struct SetHiddenByThreadgate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHiddenByThreadgate<S> {}
+    impl<S: State> State for SetHiddenByThreadgate<S> {
+        type OpThread = S::OpThread;
+        type MoreReplies = S::MoreReplies;
+        type HiddenByThreadgate = Set<members::hidden_by_threadgate>;
+        type MoreParents = S::MoreParents;
+        type Post = S::Post;
+        type MutedByViewer = S::MutedByViewer;
+    }
+    ///State transition - sets the `more_parents` field to Set
+    pub struct SetMoreParents<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMoreParents<S> {}
+    impl<S: State> State for SetMoreParents<S> {
+        type OpThread = S::OpThread;
+        type MoreReplies = S::MoreReplies;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+        type MoreParents = Set<members::more_parents>;
+        type Post = S::Post;
+        type MutedByViewer = S::MutedByViewer;
+    }
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPost<S> {}
+    impl<S: State> State for SetPost<S> {
+        type OpThread = S::OpThread;
+        type MoreReplies = S::MoreReplies;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+        type MoreParents = S::MoreParents;
+        type Post = Set<members::post>;
+        type MutedByViewer = S::MutedByViewer;
+    }
+    ///State transition - sets the `muted_by_viewer` field to Set
+    pub struct SetMutedByViewer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMutedByViewer<S> {}
+    impl<S: State> State for SetMutedByViewer<S> {
+        type OpThread = S::OpThread;
+        type MoreReplies = S::MoreReplies;
+        type HiddenByThreadgate = S::HiddenByThreadgate;
+        type MoreParents = S::MoreParents;
+        type Post = S::Post;
+        type MutedByViewer = Set<members::muted_by_viewer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `op_thread` field
+        pub struct op_thread(());
+        ///Marker type for the `more_replies` field
+        pub struct more_replies(());
+        ///Marker type for the `hidden_by_threadgate` field
+        pub struct hidden_by_threadgate(());
         ///Marker type for the `more_parents` field
         pub struct more_parents(());
         ///Marker type for the `post` field
         pub struct post(());
-        ///Marker type for the `op_thread` field
-        pub struct op_thread(());
-        ///Marker type for the `hidden_by_threadgate` field
-        pub struct hidden_by_threadgate(());
         ///Marker type for the `muted_by_viewer` field
         pub struct muted_by_viewer(());
-        ///Marker type for the `more_replies` field
-        pub struct more_replies(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ThreadItemPostBuilder<'a, S: thread_item_post_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<bool>,
         Option<bool>,
         Option<i64>,
@@ -2390,7 +2394,7 @@ pub struct ThreadItemPostBuilder<'a, S: thread_item_post_state::State> {
         Option<bool>,
         Option<PostView<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ThreadItemPost<'a> {
@@ -2404,9 +2408,9 @@ impl<'a> ThreadItemPostBuilder<'a, thread_item_post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ThreadItemPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2421,11 +2425,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ThreadItemPostBuilder<'a, thread_item_post_state::SetHiddenByThreadgate<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ThreadItemPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2440,11 +2444,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ThreadItemPostBuilder<'a, thread_item_post_state::SetMoreParents<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ThreadItemPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2459,11 +2463,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ThreadItemPostBuilder<'a, thread_item_post_state::SetMoreReplies<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ThreadItemPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2478,11 +2482,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ThreadItemPostBuilder<'a, thread_item_post_state::SetMutedByViewer<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ThreadItemPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2497,11 +2501,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ThreadItemPostBuilder<'a, thread_item_post_state::SetOpThread<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ThreadItemPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2516,11 +2520,11 @@ where
         mut self,
         value: impl Into<PostView<'a>>,
     ) -> ThreadItemPostBuilder<'a, thread_item_post_state::SetPost<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ThreadItemPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2528,22 +2532,22 @@ where
 impl<'a, S> ThreadItemPostBuilder<'a, S>
 where
     S: thread_item_post_state::State,
+    S::OpThread: thread_item_post_state::IsSet,
+    S::MoreReplies: thread_item_post_state::IsSet,
+    S::HiddenByThreadgate: thread_item_post_state::IsSet,
     S::MoreParents: thread_item_post_state::IsSet,
     S::Post: thread_item_post_state::IsSet,
-    S::OpThread: thread_item_post_state::IsSet,
-    S::HiddenByThreadgate: thread_item_post_state::IsSet,
     S::MutedByViewer: thread_item_post_state::IsSet,
-    S::MoreReplies: thread_item_post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ThreadItemPost<'a> {
         ThreadItemPost {
-            hidden_by_threadgate: self.__unsafe_private_named.0.unwrap(),
-            more_parents: self.__unsafe_private_named.1.unwrap(),
-            more_replies: self.__unsafe_private_named.2.unwrap(),
-            muted_by_viewer: self.__unsafe_private_named.3.unwrap(),
-            op_thread: self.__unsafe_private_named.4.unwrap(),
-            post: self.__unsafe_private_named.5.unwrap(),
+            hidden_by_threadgate: self._fields.0.unwrap(),
+            more_parents: self._fields.1.unwrap(),
+            more_replies: self._fields.2.unwrap(),
+            muted_by_viewer: self._fields.3.unwrap(),
+            op_thread: self._fields.4.unwrap(),
+            post: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2556,12 +2560,12 @@ where
         >,
     ) -> ThreadItemPost<'a> {
         ThreadItemPost {
-            hidden_by_threadgate: self.__unsafe_private_named.0.unwrap(),
-            more_parents: self.__unsafe_private_named.1.unwrap(),
-            more_replies: self.__unsafe_private_named.2.unwrap(),
-            muted_by_viewer: self.__unsafe_private_named.3.unwrap(),
-            op_thread: self.__unsafe_private_named.4.unwrap(),
-            post: self.__unsafe_private_named.5.unwrap(),
+            hidden_by_threadgate: self._fields.0.unwrap(),
+            more_parents: self._fields.1.unwrap(),
+            more_replies: self._fields.2.unwrap(),
+            muted_by_viewer: self._fields.3.unwrap(),
+            op_thread: self._fields.4.unwrap(),
+            post: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2577,112 +2581,112 @@ pub mod trend_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PostCount;
-        type Topic;
         type DisplayName;
-        type Actors;
+        type PostCount;
         type Link;
+        type Actors;
         type StartedAt;
+        type Topic;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PostCount = Unset;
-        type Topic = Unset;
         type DisplayName = Unset;
-        type Actors = Unset;
+        type PostCount = Unset;
         type Link = Unset;
+        type Actors = Unset;
         type StartedAt = Unset;
-    }
-    ///State transition - sets the `post_count` field to Set
-    pub struct SetPostCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPostCount<S> {}
-    impl<S: State> State for SetPostCount<S> {
-        type PostCount = Set<members::post_count>;
-        type Topic = S::Topic;
-        type DisplayName = S::DisplayName;
-        type Actors = S::Actors;
-        type Link = S::Link;
-        type StartedAt = S::StartedAt;
-    }
-    ///State transition - sets the `topic` field to Set
-    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTopic<S> {}
-    impl<S: State> State for SetTopic<S> {
-        type PostCount = S::PostCount;
-        type Topic = Set<members::topic>;
-        type DisplayName = S::DisplayName;
-        type Actors = S::Actors;
-        type Link = S::Link;
-        type StartedAt = S::StartedAt;
+        type Topic = Unset;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisplayName<S> {}
     impl<S: State> State for SetDisplayName<S> {
-        type PostCount = S::PostCount;
-        type Topic = S::Topic;
         type DisplayName = Set<members::display_name>;
-        type Actors = S::Actors;
-        type Link = S::Link;
-        type StartedAt = S::StartedAt;
-    }
-    ///State transition - sets the `actors` field to Set
-    pub struct SetActors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActors<S> {}
-    impl<S: State> State for SetActors<S> {
         type PostCount = S::PostCount;
-        type Topic = S::Topic;
-        type DisplayName = S::DisplayName;
-        type Actors = Set<members::actors>;
         type Link = S::Link;
+        type Actors = S::Actors;
         type StartedAt = S::StartedAt;
+        type Topic = S::Topic;
+    }
+    ///State transition - sets the `post_count` field to Set
+    pub struct SetPostCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPostCount<S> {}
+    impl<S: State> State for SetPostCount<S> {
+        type DisplayName = S::DisplayName;
+        type PostCount = Set<members::post_count>;
+        type Link = S::Link;
+        type Actors = S::Actors;
+        type StartedAt = S::StartedAt;
+        type Topic = S::Topic;
     }
     ///State transition - sets the `link` field to Set
     pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLink<S> {}
     impl<S: State> State for SetLink<S> {
-        type PostCount = S::PostCount;
-        type Topic = S::Topic;
         type DisplayName = S::DisplayName;
-        type Actors = S::Actors;
+        type PostCount = S::PostCount;
         type Link = Set<members::link>;
+        type Actors = S::Actors;
         type StartedAt = S::StartedAt;
+        type Topic = S::Topic;
+    }
+    ///State transition - sets the `actors` field to Set
+    pub struct SetActors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActors<S> {}
+    impl<S: State> State for SetActors<S> {
+        type DisplayName = S::DisplayName;
+        type PostCount = S::PostCount;
+        type Link = S::Link;
+        type Actors = Set<members::actors>;
+        type StartedAt = S::StartedAt;
+        type Topic = S::Topic;
     }
     ///State transition - sets the `started_at` field to Set
     pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartedAt<S> {}
     impl<S: State> State for SetStartedAt<S> {
-        type PostCount = S::PostCount;
-        type Topic = S::Topic;
         type DisplayName = S::DisplayName;
-        type Actors = S::Actors;
+        type PostCount = S::PostCount;
         type Link = S::Link;
+        type Actors = S::Actors;
         type StartedAt = Set<members::started_at>;
+        type Topic = S::Topic;
+    }
+    ///State transition - sets the `topic` field to Set
+    pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTopic<S> {}
+    impl<S: State> State for SetTopic<S> {
+        type DisplayName = S::DisplayName;
+        type PostCount = S::PostCount;
+        type Link = S::Link;
+        type Actors = S::Actors;
+        type StartedAt = S::StartedAt;
+        type Topic = Set<members::topic>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `post_count` field
-        pub struct post_count(());
-        ///Marker type for the `topic` field
-        pub struct topic(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
-        ///Marker type for the `actors` field
-        pub struct actors(());
+        ///Marker type for the `post_count` field
+        pub struct post_count(());
         ///Marker type for the `link` field
         pub struct link(());
+        ///Marker type for the `actors` field
+        pub struct actors(());
         ///Marker type for the `started_at` field
         pub struct started_at(());
+        ///Marker type for the `topic` field
+        pub struct topic(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TrendViewBuilder<'a, S: trend_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<ProfileViewBasic<'a>>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
@@ -2692,7 +2696,7 @@ pub struct TrendViewBuilder<'a, S: trend_view_state::State> {
         Option<TrendViewStatus<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TrendView<'a> {
@@ -2706,9 +2710,9 @@ impl<'a> TrendViewBuilder<'a, trend_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TrendViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2723,11 +2727,11 @@ where
         mut self,
         value: impl Into<Vec<ProfileViewBasic<'a>>>,
     ) -> TrendViewBuilder<'a, trend_view_state::SetActors<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TrendViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2735,12 +2739,12 @@ where
 impl<'a, S: trend_view_state::State> TrendViewBuilder<'a, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
     pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -2755,11 +2759,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TrendViewBuilder<'a, trend_view_state::SetDisplayName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         TrendViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2774,11 +2778,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TrendViewBuilder<'a, trend_view_state::SetLink<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         TrendViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2793,11 +2797,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> TrendViewBuilder<'a, trend_view_state::SetPostCount<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         TrendViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2812,11 +2816,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> TrendViewBuilder<'a, trend_view_state::SetStartedAt<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         TrendViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2824,12 +2828,12 @@ where
 impl<'a, S: trend_view_state::State> TrendViewBuilder<'a, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<TrendViewStatus<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<TrendViewStatus<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -2844,11 +2848,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TrendViewBuilder<'a, trend_view_state::SetTopic<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         TrendViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2856,24 +2860,24 @@ where
 impl<'a, S> TrendViewBuilder<'a, S>
 where
     S: trend_view_state::State,
-    S::PostCount: trend_view_state::IsSet,
-    S::Topic: trend_view_state::IsSet,
     S::DisplayName: trend_view_state::IsSet,
-    S::Actors: trend_view_state::IsSet,
+    S::PostCount: trend_view_state::IsSet,
     S::Link: trend_view_state::IsSet,
+    S::Actors: trend_view_state::IsSet,
     S::StartedAt: trend_view_state::IsSet,
+    S::Topic: trend_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TrendView<'a> {
         TrendView {
-            actors: self.__unsafe_private_named.0.unwrap(),
-            category: self.__unsafe_private_named.1,
-            display_name: self.__unsafe_private_named.2.unwrap(),
-            link: self.__unsafe_private_named.3.unwrap(),
-            post_count: self.__unsafe_private_named.4.unwrap(),
-            started_at: self.__unsafe_private_named.5.unwrap(),
-            status: self.__unsafe_private_named.6,
-            topic: self.__unsafe_private_named.7.unwrap(),
+            actors: self._fields.0.unwrap(),
+            category: self._fields.1,
+            display_name: self._fields.2.unwrap(),
+            link: self._fields.3.unwrap(),
+            post_count: self._fields.4.unwrap(),
+            started_at: self._fields.5.unwrap(),
+            status: self._fields.6,
+            topic: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2886,14 +2890,14 @@ where
         >,
     ) -> TrendView<'a> {
         TrendView {
-            actors: self.__unsafe_private_named.0.unwrap(),
-            category: self.__unsafe_private_named.1,
-            display_name: self.__unsafe_private_named.2.unwrap(),
-            link: self.__unsafe_private_named.3.unwrap(),
-            post_count: self.__unsafe_private_named.4.unwrap(),
-            started_at: self.__unsafe_private_named.5.unwrap(),
-            status: self.__unsafe_private_named.6,
-            topic: self.__unsafe_private_named.7.unwrap(),
+            actors: self._fields.0.unwrap(),
+            category: self._fields.1,
+            display_name: self._fields.2.unwrap(),
+            link: self._fields.3.unwrap(),
+            post_count: self._fields.4.unwrap(),
+            started_at: self._fields.5.unwrap(),
+            status: self._fields.6,
+            topic: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }

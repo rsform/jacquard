@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -240,14 +243,14 @@ pub mod profile_state {
 
 /// Builder for constructing an instance of this type
 pub struct ProfileBuilder<'a, S: profile_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<StrongRef<'a>>,
         Option<CowStr<'a>>,
         Option<Vec<profile::ProfileLink<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Profile<'a> {
@@ -261,9 +264,9 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -271,12 +274,12 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
     pub fn maybe_avatar(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -284,12 +287,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `bio` field (optional)
     pub fn bio(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `bio` field to an Option value (optional)
     pub fn maybe_bio(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -300,12 +303,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<profile::ProfileLink<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `links` field to an Option value (optional)
     pub fn maybe_links(mut self, value: Option<Vec<profile::ProfileLink<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -313,12 +316,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `nickname` field (optional)
     pub fn nickname(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `nickname` field to an Option value (optional)
     pub fn maybe_nickname(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -330,10 +333,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
         Profile {
-            avatar: self.__unsafe_private_named.0,
-            bio: self.__unsafe_private_named.1,
-            links: self.__unsafe_private_named.2,
-            nickname: self.__unsafe_private_named.3,
+            avatar: self._fields.0,
+            bio: self._fields.1,
+            links: self._fields.2,
+            nickname: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -346,10 +349,10 @@ where
         >,
     ) -> Profile<'a> {
         Profile {
-            avatar: self.__unsafe_private_named.0,
-            bio: self.__unsafe_private_named.1,
-            links: self.__unsafe_private_named.2,
-            nickname: self.__unsafe_private_named.3,
+            avatar: self._fields.0,
+            bio: self._fields.1,
+            links: self._fields.2,
+            nickname: self._fields.3,
             extra_data: Some(extra_data),
         }
     }
@@ -514,9 +517,9 @@ pub mod profile_link_state {
 
 /// Builder for constructing an instance of this type
 pub struct ProfileLinkBuilder<'a, S: profile_link_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<UriValue<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<UriValue<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ProfileLink<'a> {
@@ -530,9 +533,9 @@ impl<'a> ProfileLinkBuilder<'a, profile_link_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileLinkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -547,11 +550,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ProfileLinkBuilder<'a, profile_link_state::SetLink<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ProfileLinkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -566,11 +569,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ProfileLinkBuilder<'a, profile_link_state::SetName<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ProfileLinkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -584,8 +587,8 @@ where
     /// Build the final struct
     pub fn build(self) -> ProfileLink<'a> {
         ProfileLink {
-            link: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1.unwrap(),
+            link: self._fields.0.unwrap(),
+            name: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -598,8 +601,8 @@ where
         >,
     ) -> ProfileLink<'a> {
         ProfileLink {
-            link: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1.unwrap(),
+            link: self._fields.0.unwrap(),
+            name: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

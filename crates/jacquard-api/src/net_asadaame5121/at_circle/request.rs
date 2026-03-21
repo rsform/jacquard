@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -169,74 +172,74 @@ pub mod request_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SiteTitle;
-        type CreatedAt;
         type Ring;
         type SiteUrl;
+        type CreatedAt;
+        type SiteTitle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SiteTitle = Unset;
-        type CreatedAt = Unset;
         type Ring = Unset;
         type SiteUrl = Unset;
-    }
-    ///State transition - sets the `site_title` field to Set
-    pub struct SetSiteTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSiteTitle<S> {}
-    impl<S: State> State for SetSiteTitle<S> {
-        type SiteTitle = Set<members::site_title>;
-        type CreatedAt = S::CreatedAt;
-        type Ring = S::Ring;
-        type SiteUrl = S::SiteUrl;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type SiteTitle = S::SiteTitle;
-        type CreatedAt = Set<members::created_at>;
-        type Ring = S::Ring;
-        type SiteUrl = S::SiteUrl;
+        type CreatedAt = Unset;
+        type SiteTitle = Unset;
     }
     ///State transition - sets the `ring` field to Set
     pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRing<S> {}
     impl<S: State> State for SetRing<S> {
-        type SiteTitle = S::SiteTitle;
-        type CreatedAt = S::CreatedAt;
         type Ring = Set<members::ring>;
         type SiteUrl = S::SiteUrl;
+        type CreatedAt = S::CreatedAt;
+        type SiteTitle = S::SiteTitle;
     }
     ///State transition - sets the `site_url` field to Set
     pub struct SetSiteUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSiteUrl<S> {}
     impl<S: State> State for SetSiteUrl<S> {
-        type SiteTitle = S::SiteTitle;
-        type CreatedAt = S::CreatedAt;
         type Ring = S::Ring;
         type SiteUrl = Set<members::site_url>;
+        type CreatedAt = S::CreatedAt;
+        type SiteTitle = S::SiteTitle;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Ring = S::Ring;
+        type SiteUrl = S::SiteUrl;
+        type CreatedAt = Set<members::created_at>;
+        type SiteTitle = S::SiteTitle;
+    }
+    ///State transition - sets the `site_title` field to Set
+    pub struct SetSiteTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSiteTitle<S> {}
+    impl<S: State> State for SetSiteTitle<S> {
+        type Ring = S::Ring;
+        type SiteUrl = S::SiteUrl;
+        type CreatedAt = S::CreatedAt;
+        type SiteTitle = Set<members::site_title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `site_title` field
-        pub struct site_title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `ring` field
         pub struct ring(());
         ///Marker type for the `site_url` field
         pub struct site_url(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `site_title` field
+        pub struct site_title(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RequestBuilder<'a, S: request_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<RingRef<'a>>,
@@ -244,7 +247,7 @@ pub struct RequestBuilder<'a, S: request_state::State> {
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Request<'a> {
@@ -258,9 +261,9 @@ impl<'a> RequestBuilder<'a, request_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RequestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -275,11 +278,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> RequestBuilder<'a, request_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RequestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -287,12 +290,12 @@ where
 impl<'a, S: request_state::State> RequestBuilder<'a, S> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
     pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -307,11 +310,11 @@ where
         mut self,
         value: impl Into<RingRef<'a>>,
     ) -> RequestBuilder<'a, request_state::SetRing<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RequestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -319,12 +322,12 @@ where
 impl<'a, S: request_state::State> RequestBuilder<'a, S> {
     /// Set the `rssUrl` field (optional)
     pub fn rss_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `rssUrl` field to an Option value (optional)
     pub fn maybe_rss_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -339,11 +342,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RequestBuilder<'a, request_state::SetSiteTitle<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         RequestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -358,11 +361,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> RequestBuilder<'a, request_state::SetSiteUrl<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         RequestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -370,20 +373,20 @@ where
 impl<'a, S> RequestBuilder<'a, S>
 where
     S: request_state::State,
-    S::SiteTitle: request_state::IsSet,
-    S::CreatedAt: request_state::IsSet,
     S::Ring: request_state::IsSet,
     S::SiteUrl: request_state::IsSet,
+    S::CreatedAt: request_state::IsSet,
+    S::SiteTitle: request_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Request<'a> {
         Request {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            message: self.__unsafe_private_named.1,
-            ring: self.__unsafe_private_named.2.unwrap(),
-            rss_url: self.__unsafe_private_named.3,
-            site_title: self.__unsafe_private_named.4.unwrap(),
-            site_url: self.__unsafe_private_named.5.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            message: self._fields.1,
+            ring: self._fields.2.unwrap(),
+            rss_url: self._fields.3,
+            site_title: self._fields.4.unwrap(),
+            site_url: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -396,12 +399,12 @@ where
         >,
     ) -> Request<'a> {
         Request {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            message: self.__unsafe_private_named.1,
-            ring: self.__unsafe_private_named.2.unwrap(),
-            rss_url: self.__unsafe_private_named.3,
-            site_title: self.__unsafe_private_named.4.unwrap(),
-            site_url: self.__unsafe_private_named.5.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            message: self._fields.1,
+            ring: self._fields.2.unwrap(),
+            rss_url: self._fields.3,
+            site_title: self._fields.4.unwrap(),
+            site_url: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -118,49 +121,49 @@ pub mod example_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Lexicon;
         type Value;
+        type Lexicon;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Lexicon = Unset;
         type Value = Unset;
+        type Lexicon = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `lexicon` field to Set
-    pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLexicon<S> {}
-    impl<S: State> State for SetLexicon<S> {
-        type Lexicon = Set<members::lexicon>;
-        type Value = S::Value;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Lexicon = S::Lexicon;
         type Value = Set<members::value>;
+        type Lexicon = S::Lexicon;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `lexicon` field to Set
+    pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLexicon<S> {}
+    impl<S: State> State for SetLexicon<S> {
+        type Value = S::Value;
+        type Lexicon = Set<members::lexicon>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Lexicon = S::Lexicon;
         type Value = S::Value;
+        type Lexicon = S::Lexicon;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lexicon` field
-        pub struct lexicon(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `lexicon` field
+        pub struct lexicon(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -168,14 +171,9 @@ pub mod example_state {
 
 /// Builder for constructing an instance of this type
 pub struct ExampleBuilder<'a, S: example_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Nsid<'a>>,
-        Option<Data<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<CowStr<'a>>, Option<Nsid<'a>>, Option<Data<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Example<'a> {
@@ -189,9 +187,9 @@ impl<'a> ExampleBuilder<'a, example_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ExampleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -206,11 +204,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ExampleBuilder<'a, example_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ExampleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -218,12 +216,12 @@ where
 impl<'a, S: example_state::State> ExampleBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -238,11 +236,11 @@ where
         mut self,
         value: impl Into<Nsid<'a>>,
     ) -> ExampleBuilder<'a, example_state::SetLexicon<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ExampleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -257,11 +255,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> ExampleBuilder<'a, example_state::SetValue<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ExampleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -269,17 +267,17 @@ where
 impl<'a, S> ExampleBuilder<'a, S>
 where
     S: example_state::State,
-    S::Lexicon: example_state::IsSet,
     S::Value: example_state::IsSet,
+    S::Lexicon: example_state::IsSet,
     S::CreatedAt: example_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Example<'a> {
         Example {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            lexicon: self.__unsafe_private_named.2.unwrap(),
-            value: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1,
+            lexicon: self._fields.2.unwrap(),
+            value: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -289,10 +287,10 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Example<'a> {
         Example {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            lexicon: self.__unsafe_private_named.2.unwrap(),
-            value: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1,
+            lexicon: self._fields.2.unwrap(),
+            value: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

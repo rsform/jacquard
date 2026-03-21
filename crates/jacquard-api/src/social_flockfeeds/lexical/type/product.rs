@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -3071,8 +3074,8 @@ pub mod product_state {
 
 /// Builder for constructing an instance of this type
 pub struct ProductBuilder<'a, S: product_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ProductAdditionalProperty<'a>>,
         Option<ProductAdditionalType<'a>>,
         Option<ProductAggregateRating<'a>>,
@@ -3145,7 +3148,7 @@ pub struct ProductBuilder<'a, S: product_state::State> {
         Option<ProductWeight<'a>>,
         Option<ProductWidth<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Product<'a> {
@@ -3159,8 +3162,8 @@ impl<'a> ProductBuilder<'a, product_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProductBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -3233,7 +3236,7 @@ impl<'a> ProductBuilder<'a, product_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3244,7 +3247,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductAdditionalProperty<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `additionalProperty` field to an Option value (optional)
@@ -3252,7 +3255,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductAdditionalProperty<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -3263,7 +3266,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductAdditionalType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
@@ -3271,7 +3274,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductAdditionalType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -3282,7 +3285,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductAggregateRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
@@ -3290,7 +3293,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductAggregateRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -3301,7 +3304,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductAlternateName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
@@ -3309,7 +3312,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductAlternateName<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -3317,12 +3320,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `asin` field (optional)
     pub fn asin(mut self, value: impl Into<Option<ProductAsin<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `asin` field to an Option value (optional)
     pub fn maybe_asin(mut self, value: Option<ProductAsin<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -3330,12 +3333,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `audience` field (optional)
     pub fn audience(mut self, value: impl Into<Option<ProductAudience<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `audience` field to an Option value (optional)
     pub fn maybe_audience(mut self, value: Option<ProductAudience<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -3343,12 +3346,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<ProductAward<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
     pub fn maybe_award(mut self, value: Option<ProductAward<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -3356,12 +3359,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<ProductAwards<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
     pub fn maybe_awards(mut self, value: Option<ProductAwards<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -3369,12 +3372,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `brand` field (optional)
     pub fn brand(mut self, value: impl Into<Option<ProductBrand<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `brand` field to an Option value (optional)
     pub fn maybe_brand(mut self, value: Option<ProductBrand<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -3382,12 +3385,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<ProductCategory<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
     pub fn maybe_category(mut self, value: Option<ProductCategory<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -3395,12 +3398,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `color` field (optional)
     pub fn color(mut self, value: impl Into<Option<ProductColor<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `color` field to an Option value (optional)
     pub fn maybe_color(mut self, value: Option<ProductColor<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -3411,12 +3414,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductColorSwatch<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `colorSwatch` field to an Option value (optional)
     pub fn maybe_color_swatch(mut self, value: Option<ProductColorSwatch<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -3427,7 +3430,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductCountryOfAssembly<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `countryOfAssembly` field to an Option value (optional)
@@ -3435,7 +3438,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductCountryOfAssembly<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -3446,7 +3449,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductCountryOfLastProcessing<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `countryOfLastProcessing` field to an Option value (optional)
@@ -3454,7 +3457,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductCountryOfLastProcessing<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -3465,7 +3468,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductCountryOfOrigin<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `countryOfOrigin` field to an Option value (optional)
@@ -3473,7 +3476,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductCountryOfOrigin<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -3481,12 +3484,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `depth` field (optional)
     pub fn depth(mut self, value: impl Into<Option<ProductDepth<'a>>>) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `depth` field to an Option value (optional)
     pub fn maybe_depth(mut self, value: Option<ProductDepth<'a>>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -3497,12 +3500,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<ProductDescription<'a>>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -3513,7 +3516,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductDisambiguatingDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `disambiguatingDescription` field to an Option value (optional)
@@ -3521,7 +3524,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductDisambiguatingDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -3529,12 +3532,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<ProductFunding<'a>>>) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
     pub fn maybe_funding(mut self, value: Option<ProductFunding<'a>>) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -3542,12 +3545,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `gtin` field (optional)
     pub fn gtin(mut self, value: impl Into<Option<ProductGtin<'a>>>) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `gtin` field to an Option value (optional)
     pub fn maybe_gtin(mut self, value: Option<ProductGtin<'a>>) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -3555,12 +3558,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `gtin12` field (optional)
     pub fn gtin12(mut self, value: impl Into<Option<ProductGtin12<'a>>>) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `gtin12` field to an Option value (optional)
     pub fn maybe_gtin12(mut self, value: Option<ProductGtin12<'a>>) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -3568,12 +3571,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `gtin13` field (optional)
     pub fn gtin13(mut self, value: impl Into<Option<ProductGtin13<'a>>>) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `gtin13` field to an Option value (optional)
     pub fn maybe_gtin13(mut self, value: Option<ProductGtin13<'a>>) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -3581,12 +3584,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `gtin14` field (optional)
     pub fn gtin14(mut self, value: impl Into<Option<ProductGtin14<'a>>>) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `gtin14` field to an Option value (optional)
     pub fn maybe_gtin14(mut self, value: Option<ProductGtin14<'a>>) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -3594,12 +3597,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `gtin8` field (optional)
     pub fn gtin8(mut self, value: impl Into<Option<ProductGtin8<'a>>>) -> Self {
-        self.__unsafe_private_named.23 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `gtin8` field to an Option value (optional)
     pub fn maybe_gtin8(mut self, value: Option<ProductGtin8<'a>>) -> Self {
-        self.__unsafe_private_named.23 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -3610,7 +3613,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductHasAdultConsideration<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.24 = value.into();
+        self._fields.24 = value.into();
         self
     }
     /// Set the `hasAdultConsideration` field to an Option value (optional)
@@ -3618,7 +3621,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductHasAdultConsideration<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.24 = value;
+        self._fields.24 = value;
         self
     }
 }
@@ -3629,7 +3632,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductHasCertification<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.25 = value.into();
+        self._fields.25 = value.into();
         self
     }
     /// Set the `hasCertification` field to an Option value (optional)
@@ -3637,7 +3640,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductHasCertification<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.25 = value;
+        self._fields.25 = value;
         self
     }
 }
@@ -3648,7 +3651,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductHasEnergyConsumptionDetails<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.26 = value.into();
+        self._fields.26 = value.into();
         self
     }
     /// Set the `hasEnergyConsumptionDetails` field to an Option value (optional)
@@ -3656,7 +3659,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductHasEnergyConsumptionDetails<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.26 = value;
+        self._fields.26 = value;
         self
     }
 }
@@ -3667,7 +3670,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductHasGs1DigitalLink<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.27 = value.into();
+        self._fields.27 = value.into();
         self
     }
     /// Set the `hasGS1DigitalLink` field to an Option value (optional)
@@ -3675,7 +3678,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductHasGs1DigitalLink<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.27 = value;
+        self._fields.27 = value;
         self
     }
 }
@@ -3686,7 +3689,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductHasMeasurement<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.28 = value.into();
+        self._fields.28 = value.into();
         self
     }
     /// Set the `hasMeasurement` field to an Option value (optional)
@@ -3694,7 +3697,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductHasMeasurement<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.28 = value;
+        self._fields.28 = value;
         self
     }
 }
@@ -3705,7 +3708,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductHasMerchantReturnPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.29 = value.into();
+        self._fields.29 = value.into();
         self
     }
     /// Set the `hasMerchantReturnPolicy` field to an Option value (optional)
@@ -3713,7 +3716,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductHasMerchantReturnPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.29 = value;
+        self._fields.29 = value;
         self
     }
 }
@@ -3724,7 +3727,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductHasProductReturnPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.30 = value.into();
+        self._fields.30 = value.into();
         self
     }
     /// Set the `hasProductReturnPolicy` field to an Option value (optional)
@@ -3732,7 +3735,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductHasProductReturnPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.30 = value;
+        self._fields.30 = value;
         self
     }
 }
@@ -3740,12 +3743,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `height` field (optional)
     pub fn height(mut self, value: impl Into<Option<ProductHeight<'a>>>) -> Self {
-        self.__unsafe_private_named.31 = value.into();
+        self._fields.31 = value.into();
         self
     }
     /// Set the `height` field to an Option value (optional)
     pub fn maybe_height(mut self, value: Option<ProductHeight<'a>>) -> Self {
-        self.__unsafe_private_named.31 = value;
+        self._fields.31 = value;
         self
     }
 }
@@ -3756,12 +3759,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductIdentifier<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value.into();
+        self._fields.32 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
     pub fn maybe_identifier(mut self, value: Option<ProductIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.32 = value;
+        self._fields.32 = value;
         self
     }
 }
@@ -3769,12 +3772,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<ProductImage<'a>>>) -> Self {
-        self.__unsafe_private_named.33 = value.into();
+        self._fields.33 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<ProductImage<'a>>) -> Self {
-        self.__unsafe_private_named.33 = value;
+        self._fields.33 = value;
         self
     }
 }
@@ -3785,7 +3788,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductInProductGroupWithId<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.34 = value.into();
+        self._fields.34 = value.into();
         self
     }
     /// Set the `inProductGroupWithID` field to an Option value (optional)
@@ -3793,7 +3796,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductInProductGroupWithId<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.34 = value;
+        self._fields.34 = value;
         self
     }
 }
@@ -3804,7 +3807,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductIsAccessoryOrSparePartFor<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value.into();
+        self._fields.35 = value.into();
         self
     }
     /// Set the `isAccessoryOrSparePartFor` field to an Option value (optional)
@@ -3812,7 +3815,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductIsAccessoryOrSparePartFor<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value;
+        self._fields.35 = value;
         self
     }
 }
@@ -3823,7 +3826,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductIsConsumableFor<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value.into();
+        self._fields.36 = value.into();
         self
     }
     /// Set the `isConsumableFor` field to an Option value (optional)
@@ -3831,7 +3834,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductIsConsumableFor<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value;
+        self._fields.36 = value;
         self
     }
 }
@@ -3842,7 +3845,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductIsFamilyFriendly<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.37 = value.into();
+        self._fields.37 = value.into();
         self
     }
     /// Set the `isFamilyFriendly` field to an Option value (optional)
@@ -3850,7 +3853,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductIsFamilyFriendly<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.37 = value;
+        self._fields.37 = value;
         self
     }
 }
@@ -3861,12 +3864,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductIsRelatedTo<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.38 = value.into();
+        self._fields.38 = value.into();
         self
     }
     /// Set the `isRelatedTo` field to an Option value (optional)
     pub fn maybe_is_related_to(mut self, value: Option<ProductIsRelatedTo<'a>>) -> Self {
-        self.__unsafe_private_named.38 = value;
+        self._fields.38 = value;
         self
     }
 }
@@ -3877,12 +3880,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductIsSimilarTo<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value.into();
+        self._fields.39 = value.into();
         self
     }
     /// Set the `isSimilarTo` field to an Option value (optional)
     pub fn maybe_is_similar_to(mut self, value: Option<ProductIsSimilarTo<'a>>) -> Self {
-        self.__unsafe_private_named.39 = value;
+        self._fields.39 = value;
         self
     }
 }
@@ -3893,12 +3896,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductIsVariantOf<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.40 = value.into();
+        self._fields.40 = value.into();
         self
     }
     /// Set the `isVariantOf` field to an Option value (optional)
     pub fn maybe_is_variant_of(mut self, value: Option<ProductIsVariantOf<'a>>) -> Self {
-        self.__unsafe_private_named.40 = value;
+        self._fields.40 = value;
         self
     }
 }
@@ -3909,7 +3912,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductItemCondition<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.41 = value.into();
+        self._fields.41 = value.into();
         self
     }
     /// Set the `itemCondition` field to an Option value (optional)
@@ -3917,7 +3920,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductItemCondition<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.41 = value;
+        self._fields.41 = value;
         self
     }
 }
@@ -3925,12 +3928,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<ProductKeywords<'a>>>) -> Self {
-        self.__unsafe_private_named.42 = value.into();
+        self._fields.42 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
     pub fn maybe_keywords(mut self, value: Option<ProductKeywords<'a>>) -> Self {
-        self.__unsafe_private_named.42 = value;
+        self._fields.42 = value;
         self
     }
 }
@@ -3938,12 +3941,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `logo` field (optional)
     pub fn logo(mut self, value: impl Into<Option<ProductLogo<'a>>>) -> Self {
-        self.__unsafe_private_named.43 = value.into();
+        self._fields.43 = value.into();
         self
     }
     /// Set the `logo` field to an Option value (optional)
     pub fn maybe_logo(mut self, value: Option<ProductLogo<'a>>) -> Self {
-        self.__unsafe_private_named.43 = value;
+        self._fields.43 = value;
         self
     }
 }
@@ -3954,7 +3957,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductMainEntityOfPage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.44 = value.into();
+        self._fields.44 = value.into();
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
@@ -3962,7 +3965,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductMainEntityOfPage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.44 = value;
+        self._fields.44 = value;
         self
     }
 }
@@ -3973,12 +3976,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductManufacturer<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value.into();
+        self._fields.45 = value.into();
         self
     }
     /// Set the `manufacturer` field to an Option value (optional)
     pub fn maybe_manufacturer(mut self, value: Option<ProductManufacturer<'a>>) -> Self {
-        self.__unsafe_private_named.45 = value;
+        self._fields.45 = value;
         self
     }
 }
@@ -3986,12 +3989,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `material` field (optional)
     pub fn material(mut self, value: impl Into<Option<ProductMaterial<'a>>>) -> Self {
-        self.__unsafe_private_named.46 = value.into();
+        self._fields.46 = value.into();
         self
     }
     /// Set the `material` field to an Option value (optional)
     pub fn maybe_material(mut self, value: Option<ProductMaterial<'a>>) -> Self {
-        self.__unsafe_private_named.46 = value;
+        self._fields.46 = value;
         self
     }
 }
@@ -3999,12 +4002,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `mobileUrl` field (optional)
     pub fn mobile_url(mut self, value: impl Into<Option<ProductMobileUrl<'a>>>) -> Self {
-        self.__unsafe_private_named.47 = value.into();
+        self._fields.47 = value.into();
         self
     }
     /// Set the `mobileUrl` field to an Option value (optional)
     pub fn maybe_mobile_url(mut self, value: Option<ProductMobileUrl<'a>>) -> Self {
-        self.__unsafe_private_named.47 = value;
+        self._fields.47 = value;
         self
     }
 }
@@ -4012,12 +4015,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `model` field (optional)
     pub fn model(mut self, value: impl Into<Option<ProductModel<'a>>>) -> Self {
-        self.__unsafe_private_named.48 = value.into();
+        self._fields.48 = value.into();
         self
     }
     /// Set the `model` field to an Option value (optional)
     pub fn maybe_model(mut self, value: Option<ProductModel<'a>>) -> Self {
-        self.__unsafe_private_named.48 = value;
+        self._fields.48 = value;
         self
     }
 }
@@ -4025,12 +4028,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `mpn` field (optional)
     pub fn mpn(mut self, value: impl Into<Option<ProductMpn<'a>>>) -> Self {
-        self.__unsafe_private_named.49 = value.into();
+        self._fields.49 = value.into();
         self
     }
     /// Set the `mpn` field to an Option value (optional)
     pub fn maybe_mpn(mut self, value: Option<ProductMpn<'a>>) -> Self {
-        self.__unsafe_private_named.49 = value;
+        self._fields.49 = value;
         self
     }
 }
@@ -4038,12 +4041,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<ProductName<'a>>>) -> Self {
-        self.__unsafe_private_named.50 = value.into();
+        self._fields.50 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<ProductName<'a>>) -> Self {
-        self.__unsafe_private_named.50 = value;
+        self._fields.50 = value;
         self
     }
 }
@@ -4054,7 +4057,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductNegativeNotes<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.51 = value.into();
+        self._fields.51 = value.into();
         self
     }
     /// Set the `negativeNotes` field to an Option value (optional)
@@ -4062,7 +4065,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductNegativeNotes<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.51 = value;
+        self._fields.51 = value;
         self
     }
 }
@@ -4070,12 +4073,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `nsn` field (optional)
     pub fn nsn(mut self, value: impl Into<Option<ProductNsn<'a>>>) -> Self {
-        self.__unsafe_private_named.52 = value.into();
+        self._fields.52 = value.into();
         self
     }
     /// Set the `nsn` field to an Option value (optional)
     pub fn maybe_nsn(mut self, value: Option<ProductNsn<'a>>) -> Self {
-        self.__unsafe_private_named.52 = value;
+        self._fields.52 = value;
         self
     }
 }
@@ -4083,12 +4086,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `offers` field (optional)
     pub fn offers(mut self, value: impl Into<Option<ProductOffers<'a>>>) -> Self {
-        self.__unsafe_private_named.53 = value.into();
+        self._fields.53 = value.into();
         self
     }
     /// Set the `offers` field to an Option value (optional)
     pub fn maybe_offers(mut self, value: Option<ProductOffers<'a>>) -> Self {
-        self.__unsafe_private_named.53 = value;
+        self._fields.53 = value;
         self
     }
 }
@@ -4096,12 +4099,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `pattern` field (optional)
     pub fn pattern(mut self, value: impl Into<Option<ProductPattern<'a>>>) -> Self {
-        self.__unsafe_private_named.54 = value.into();
+        self._fields.54 = value.into();
         self
     }
     /// Set the `pattern` field to an Option value (optional)
     pub fn maybe_pattern(mut self, value: Option<ProductPattern<'a>>) -> Self {
-        self.__unsafe_private_named.54 = value;
+        self._fields.54 = value;
         self
     }
 }
@@ -4112,7 +4115,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductPositiveNotes<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.55 = value.into();
+        self._fields.55 = value.into();
         self
     }
     /// Set the `positiveNotes` field to an Option value (optional)
@@ -4120,7 +4123,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductPositiveNotes<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.55 = value;
+        self._fields.55 = value;
         self
     }
 }
@@ -4131,7 +4134,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductPotentialAction<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value.into();
+        self._fields.56 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
@@ -4139,7 +4142,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductPotentialAction<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value;
+        self._fields.56 = value;
         self
     }
 }
@@ -4147,12 +4150,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `productID` field (optional)
     pub fn product_id(mut self, value: impl Into<Option<ProductProductId<'a>>>) -> Self {
-        self.__unsafe_private_named.57 = value.into();
+        self._fields.57 = value.into();
         self
     }
     /// Set the `productID` field to an Option value (optional)
     pub fn maybe_product_id(mut self, value: Option<ProductProductId<'a>>) -> Self {
-        self.__unsafe_private_named.57 = value;
+        self._fields.57 = value;
         self
     }
 }
@@ -4163,7 +4166,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductProductionDate<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.58 = value.into();
+        self._fields.58 = value.into();
         self
     }
     /// Set the `productionDate` field to an Option value (optional)
@@ -4171,7 +4174,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductProductionDate<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.58 = value;
+        self._fields.58 = value;
         self
     }
 }
@@ -4182,7 +4185,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductPurchaseDate<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.59 = value.into();
+        self._fields.59 = value.into();
         self
     }
     /// Set the `purchaseDate` field to an Option value (optional)
@@ -4190,7 +4193,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: Option<ProductPurchaseDate<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.59 = value;
+        self._fields.59 = value;
         self
     }
 }
@@ -4201,12 +4204,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProductReleaseDate<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.60 = value.into();
+        self._fields.60 = value.into();
         self
     }
     /// Set the `releaseDate` field to an Option value (optional)
     pub fn maybe_release_date(mut self, value: Option<ProductReleaseDate<'a>>) -> Self {
-        self.__unsafe_private_named.60 = value;
+        self._fields.60 = value;
         self
     }
 }
@@ -4214,12 +4217,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<ProductReview<'a>>>) -> Self {
-        self.__unsafe_private_named.61 = value.into();
+        self._fields.61 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
     pub fn maybe_review(mut self, value: Option<ProductReview<'a>>) -> Self {
-        self.__unsafe_private_named.61 = value;
+        self._fields.61 = value;
         self
     }
 }
@@ -4227,12 +4230,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `reviews` field (optional)
     pub fn reviews(mut self, value: impl Into<Option<ProductReviews<'a>>>) -> Self {
-        self.__unsafe_private_named.62 = value.into();
+        self._fields.62 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
     pub fn maybe_reviews(mut self, value: Option<ProductReviews<'a>>) -> Self {
-        self.__unsafe_private_named.62 = value;
+        self._fields.62 = value;
         self
     }
 }
@@ -4240,12 +4243,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<ProductSameAs<'a>>>) -> Self {
-        self.__unsafe_private_named.63 = value.into();
+        self._fields.63 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
     pub fn maybe_same_as(mut self, value: Option<ProductSameAs<'a>>) -> Self {
-        self.__unsafe_private_named.63 = value;
+        self._fields.63 = value;
         self
     }
 }
@@ -4253,12 +4256,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<ProductSize<'a>>>) -> Self {
-        self.__unsafe_private_named.64 = value.into();
+        self._fields.64 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
     pub fn maybe_size(mut self, value: Option<ProductSize<'a>>) -> Self {
-        self.__unsafe_private_named.64 = value;
+        self._fields.64 = value;
         self
     }
 }
@@ -4266,12 +4269,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `sku` field (optional)
     pub fn sku(mut self, value: impl Into<Option<ProductSku<'a>>>) -> Self {
-        self.__unsafe_private_named.65 = value.into();
+        self._fields.65 = value.into();
         self
     }
     /// Set the `sku` field to an Option value (optional)
     pub fn maybe_sku(mut self, value: Option<ProductSku<'a>>) -> Self {
-        self.__unsafe_private_named.65 = value;
+        self._fields.65 = value;
         self
     }
 }
@@ -4279,12 +4282,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `slogan` field (optional)
     pub fn slogan(mut self, value: impl Into<Option<ProductSlogan<'a>>>) -> Self {
-        self.__unsafe_private_named.66 = value.into();
+        self._fields.66 = value.into();
         self
     }
     /// Set the `slogan` field to an Option value (optional)
     pub fn maybe_slogan(mut self, value: Option<ProductSlogan<'a>>) -> Self {
-        self.__unsafe_private_named.66 = value;
+        self._fields.66 = value;
         self
     }
 }
@@ -4292,12 +4295,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(mut self, value: impl Into<Option<ProductSubjectOf<'a>>>) -> Self {
-        self.__unsafe_private_named.67 = value.into();
+        self._fields.67 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
     pub fn maybe_subject_of(mut self, value: Option<ProductSubjectOf<'a>>) -> Self {
-        self.__unsafe_private_named.67 = value;
+        self._fields.67 = value;
         self
     }
 }
@@ -4305,12 +4308,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<ProductUrl<'a>>>) -> Self {
-        self.__unsafe_private_named.68 = value.into();
+        self._fields.68 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<ProductUrl<'a>>) -> Self {
-        self.__unsafe_private_named.68 = value;
+        self._fields.68 = value;
         self
     }
 }
@@ -4318,12 +4321,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `weight` field (optional)
     pub fn weight(mut self, value: impl Into<Option<ProductWeight<'a>>>) -> Self {
-        self.__unsafe_private_named.69 = value.into();
+        self._fields.69 = value.into();
         self
     }
     /// Set the `weight` field to an Option value (optional)
     pub fn maybe_weight(mut self, value: Option<ProductWeight<'a>>) -> Self {
-        self.__unsafe_private_named.69 = value;
+        self._fields.69 = value;
         self
     }
 }
@@ -4331,12 +4334,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
 impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     /// Set the `width` field (optional)
     pub fn width(mut self, value: impl Into<Option<ProductWidth<'a>>>) -> Self {
-        self.__unsafe_private_named.70 = value.into();
+        self._fields.70 = value.into();
         self
     }
     /// Set the `width` field to an Option value (optional)
     pub fn maybe_width(mut self, value: Option<ProductWidth<'a>>) -> Self {
-        self.__unsafe_private_named.70 = value;
+        self._fields.70 = value;
         self
     }
 }
@@ -4348,77 +4351,77 @@ where
     /// Build the final struct
     pub fn build(self) -> Product<'a> {
         Product {
-            additional_property: self.__unsafe_private_named.0,
-            additional_type: self.__unsafe_private_named.1,
-            aggregate_rating: self.__unsafe_private_named.2,
-            alternate_name: self.__unsafe_private_named.3,
-            asin: self.__unsafe_private_named.4,
-            audience: self.__unsafe_private_named.5,
-            award: self.__unsafe_private_named.6,
-            awards: self.__unsafe_private_named.7,
-            brand: self.__unsafe_private_named.8,
-            category: self.__unsafe_private_named.9,
-            color: self.__unsafe_private_named.10,
-            color_swatch: self.__unsafe_private_named.11,
-            country_of_assembly: self.__unsafe_private_named.12,
-            country_of_last_processing: self.__unsafe_private_named.13,
-            country_of_origin: self.__unsafe_private_named.14,
-            depth: self.__unsafe_private_named.15,
-            description: self.__unsafe_private_named.16,
-            disambiguating_description: self.__unsafe_private_named.17,
-            funding: self.__unsafe_private_named.18,
-            gtin: self.__unsafe_private_named.19,
-            gtin12: self.__unsafe_private_named.20,
-            gtin13: self.__unsafe_private_named.21,
-            gtin14: self.__unsafe_private_named.22,
-            gtin8: self.__unsafe_private_named.23,
-            has_adult_consideration: self.__unsafe_private_named.24,
-            has_certification: self.__unsafe_private_named.25,
-            has_energy_consumption_details: self.__unsafe_private_named.26,
-            has_gs1_digital_link: self.__unsafe_private_named.27,
-            has_measurement: self.__unsafe_private_named.28,
-            has_merchant_return_policy: self.__unsafe_private_named.29,
-            has_product_return_policy: self.__unsafe_private_named.30,
-            height: self.__unsafe_private_named.31,
-            identifier: self.__unsafe_private_named.32,
-            image: self.__unsafe_private_named.33,
-            in_product_group_with_id: self.__unsafe_private_named.34,
-            is_accessory_or_spare_part_for: self.__unsafe_private_named.35,
-            is_consumable_for: self.__unsafe_private_named.36,
-            is_family_friendly: self.__unsafe_private_named.37,
-            is_related_to: self.__unsafe_private_named.38,
-            is_similar_to: self.__unsafe_private_named.39,
-            is_variant_of: self.__unsafe_private_named.40,
-            item_condition: self.__unsafe_private_named.41,
-            keywords: self.__unsafe_private_named.42,
-            logo: self.__unsafe_private_named.43,
-            main_entity_of_page: self.__unsafe_private_named.44,
-            manufacturer: self.__unsafe_private_named.45,
-            material: self.__unsafe_private_named.46,
-            mobile_url: self.__unsafe_private_named.47,
-            model: self.__unsafe_private_named.48,
-            mpn: self.__unsafe_private_named.49,
-            name: self.__unsafe_private_named.50,
-            negative_notes: self.__unsafe_private_named.51,
-            nsn: self.__unsafe_private_named.52,
-            offers: self.__unsafe_private_named.53,
-            pattern: self.__unsafe_private_named.54,
-            positive_notes: self.__unsafe_private_named.55,
-            potential_action: self.__unsafe_private_named.56,
-            product_id: self.__unsafe_private_named.57,
-            production_date: self.__unsafe_private_named.58,
-            purchase_date: self.__unsafe_private_named.59,
-            release_date: self.__unsafe_private_named.60,
-            review: self.__unsafe_private_named.61,
-            reviews: self.__unsafe_private_named.62,
-            same_as: self.__unsafe_private_named.63,
-            size: self.__unsafe_private_named.64,
-            sku: self.__unsafe_private_named.65,
-            slogan: self.__unsafe_private_named.66,
-            subject_of: self.__unsafe_private_named.67,
-            url: self.__unsafe_private_named.68,
-            weight: self.__unsafe_private_named.69,
-            width: self.__unsafe_private_named.70,
+            additional_property: self._fields.0,
+            additional_type: self._fields.1,
+            aggregate_rating: self._fields.2,
+            alternate_name: self._fields.3,
+            asin: self._fields.4,
+            audience: self._fields.5,
+            award: self._fields.6,
+            awards: self._fields.7,
+            brand: self._fields.8,
+            category: self._fields.9,
+            color: self._fields.10,
+            color_swatch: self._fields.11,
+            country_of_assembly: self._fields.12,
+            country_of_last_processing: self._fields.13,
+            country_of_origin: self._fields.14,
+            depth: self._fields.15,
+            description: self._fields.16,
+            disambiguating_description: self._fields.17,
+            funding: self._fields.18,
+            gtin: self._fields.19,
+            gtin12: self._fields.20,
+            gtin13: self._fields.21,
+            gtin14: self._fields.22,
+            gtin8: self._fields.23,
+            has_adult_consideration: self._fields.24,
+            has_certification: self._fields.25,
+            has_energy_consumption_details: self._fields.26,
+            has_gs1_digital_link: self._fields.27,
+            has_measurement: self._fields.28,
+            has_merchant_return_policy: self._fields.29,
+            has_product_return_policy: self._fields.30,
+            height: self._fields.31,
+            identifier: self._fields.32,
+            image: self._fields.33,
+            in_product_group_with_id: self._fields.34,
+            is_accessory_or_spare_part_for: self._fields.35,
+            is_consumable_for: self._fields.36,
+            is_family_friendly: self._fields.37,
+            is_related_to: self._fields.38,
+            is_similar_to: self._fields.39,
+            is_variant_of: self._fields.40,
+            item_condition: self._fields.41,
+            keywords: self._fields.42,
+            logo: self._fields.43,
+            main_entity_of_page: self._fields.44,
+            manufacturer: self._fields.45,
+            material: self._fields.46,
+            mobile_url: self._fields.47,
+            model: self._fields.48,
+            mpn: self._fields.49,
+            name: self._fields.50,
+            negative_notes: self._fields.51,
+            nsn: self._fields.52,
+            offers: self._fields.53,
+            pattern: self._fields.54,
+            positive_notes: self._fields.55,
+            potential_action: self._fields.56,
+            product_id: self._fields.57,
+            production_date: self._fields.58,
+            purchase_date: self._fields.59,
+            release_date: self._fields.60,
+            review: self._fields.61,
+            reviews: self._fields.62,
+            same_as: self._fields.63,
+            size: self._fields.64,
+            sku: self._fields.65,
+            slogan: self._fields.66,
+            subject_of: self._fields.67,
+            url: self._fields.68,
+            weight: self._fields.69,
+            width: self._fields.70,
             extra_data: Default::default(),
         }
     }
@@ -4428,77 +4431,77 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Product<'a> {
         Product {
-            additional_property: self.__unsafe_private_named.0,
-            additional_type: self.__unsafe_private_named.1,
-            aggregate_rating: self.__unsafe_private_named.2,
-            alternate_name: self.__unsafe_private_named.3,
-            asin: self.__unsafe_private_named.4,
-            audience: self.__unsafe_private_named.5,
-            award: self.__unsafe_private_named.6,
-            awards: self.__unsafe_private_named.7,
-            brand: self.__unsafe_private_named.8,
-            category: self.__unsafe_private_named.9,
-            color: self.__unsafe_private_named.10,
-            color_swatch: self.__unsafe_private_named.11,
-            country_of_assembly: self.__unsafe_private_named.12,
-            country_of_last_processing: self.__unsafe_private_named.13,
-            country_of_origin: self.__unsafe_private_named.14,
-            depth: self.__unsafe_private_named.15,
-            description: self.__unsafe_private_named.16,
-            disambiguating_description: self.__unsafe_private_named.17,
-            funding: self.__unsafe_private_named.18,
-            gtin: self.__unsafe_private_named.19,
-            gtin12: self.__unsafe_private_named.20,
-            gtin13: self.__unsafe_private_named.21,
-            gtin14: self.__unsafe_private_named.22,
-            gtin8: self.__unsafe_private_named.23,
-            has_adult_consideration: self.__unsafe_private_named.24,
-            has_certification: self.__unsafe_private_named.25,
-            has_energy_consumption_details: self.__unsafe_private_named.26,
-            has_gs1_digital_link: self.__unsafe_private_named.27,
-            has_measurement: self.__unsafe_private_named.28,
-            has_merchant_return_policy: self.__unsafe_private_named.29,
-            has_product_return_policy: self.__unsafe_private_named.30,
-            height: self.__unsafe_private_named.31,
-            identifier: self.__unsafe_private_named.32,
-            image: self.__unsafe_private_named.33,
-            in_product_group_with_id: self.__unsafe_private_named.34,
-            is_accessory_or_spare_part_for: self.__unsafe_private_named.35,
-            is_consumable_for: self.__unsafe_private_named.36,
-            is_family_friendly: self.__unsafe_private_named.37,
-            is_related_to: self.__unsafe_private_named.38,
-            is_similar_to: self.__unsafe_private_named.39,
-            is_variant_of: self.__unsafe_private_named.40,
-            item_condition: self.__unsafe_private_named.41,
-            keywords: self.__unsafe_private_named.42,
-            logo: self.__unsafe_private_named.43,
-            main_entity_of_page: self.__unsafe_private_named.44,
-            manufacturer: self.__unsafe_private_named.45,
-            material: self.__unsafe_private_named.46,
-            mobile_url: self.__unsafe_private_named.47,
-            model: self.__unsafe_private_named.48,
-            mpn: self.__unsafe_private_named.49,
-            name: self.__unsafe_private_named.50,
-            negative_notes: self.__unsafe_private_named.51,
-            nsn: self.__unsafe_private_named.52,
-            offers: self.__unsafe_private_named.53,
-            pattern: self.__unsafe_private_named.54,
-            positive_notes: self.__unsafe_private_named.55,
-            potential_action: self.__unsafe_private_named.56,
-            product_id: self.__unsafe_private_named.57,
-            production_date: self.__unsafe_private_named.58,
-            purchase_date: self.__unsafe_private_named.59,
-            release_date: self.__unsafe_private_named.60,
-            review: self.__unsafe_private_named.61,
-            reviews: self.__unsafe_private_named.62,
-            same_as: self.__unsafe_private_named.63,
-            size: self.__unsafe_private_named.64,
-            sku: self.__unsafe_private_named.65,
-            slogan: self.__unsafe_private_named.66,
-            subject_of: self.__unsafe_private_named.67,
-            url: self.__unsafe_private_named.68,
-            weight: self.__unsafe_private_named.69,
-            width: self.__unsafe_private_named.70,
+            additional_property: self._fields.0,
+            additional_type: self._fields.1,
+            aggregate_rating: self._fields.2,
+            alternate_name: self._fields.3,
+            asin: self._fields.4,
+            audience: self._fields.5,
+            award: self._fields.6,
+            awards: self._fields.7,
+            brand: self._fields.8,
+            category: self._fields.9,
+            color: self._fields.10,
+            color_swatch: self._fields.11,
+            country_of_assembly: self._fields.12,
+            country_of_last_processing: self._fields.13,
+            country_of_origin: self._fields.14,
+            depth: self._fields.15,
+            description: self._fields.16,
+            disambiguating_description: self._fields.17,
+            funding: self._fields.18,
+            gtin: self._fields.19,
+            gtin12: self._fields.20,
+            gtin13: self._fields.21,
+            gtin14: self._fields.22,
+            gtin8: self._fields.23,
+            has_adult_consideration: self._fields.24,
+            has_certification: self._fields.25,
+            has_energy_consumption_details: self._fields.26,
+            has_gs1_digital_link: self._fields.27,
+            has_measurement: self._fields.28,
+            has_merchant_return_policy: self._fields.29,
+            has_product_return_policy: self._fields.30,
+            height: self._fields.31,
+            identifier: self._fields.32,
+            image: self._fields.33,
+            in_product_group_with_id: self._fields.34,
+            is_accessory_or_spare_part_for: self._fields.35,
+            is_consumable_for: self._fields.36,
+            is_family_friendly: self._fields.37,
+            is_related_to: self._fields.38,
+            is_similar_to: self._fields.39,
+            is_variant_of: self._fields.40,
+            item_condition: self._fields.41,
+            keywords: self._fields.42,
+            logo: self._fields.43,
+            main_entity_of_page: self._fields.44,
+            manufacturer: self._fields.45,
+            material: self._fields.46,
+            mobile_url: self._fields.47,
+            model: self._fields.48,
+            mpn: self._fields.49,
+            name: self._fields.50,
+            negative_notes: self._fields.51,
+            nsn: self._fields.52,
+            offers: self._fields.53,
+            pattern: self._fields.54,
+            positive_notes: self._fields.55,
+            potential_action: self._fields.56,
+            product_id: self._fields.57,
+            production_date: self._fields.58,
+            purchase_date: self._fields.59,
+            release_date: self._fields.60,
+            review: self._fields.61,
+            reviews: self._fields.62,
+            same_as: self._fields.63,
+            size: self._fields.64,
+            sku: self._fields.65,
+            slogan: self._fields.66,
+            subject_of: self._fields.67,
+            url: self._fields.68,
+            weight: self._fields.69,
+            width: self._fields.70,
             extra_data: Some(extra_data),
         }
     }

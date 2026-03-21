@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::ident::AtIdentifier;
@@ -119,8 +122,8 @@ pub mod search_notebooks_state {
 
 /// Builder for constructing an instance of this type
 pub struct SearchNotebooksBuilder<'a, S: search_notebooks_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AtIdentifier<'a>>,
         Option<CowStr<'a>>,
         Option<i64>,
@@ -129,7 +132,7 @@ pub struct SearchNotebooksBuilder<'a, S: search_notebooks_state::State> {
         Option<CowStr<'a>>,
         Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SearchNotebooks<'a> {
@@ -143,9 +146,9 @@ impl<'a> SearchNotebooksBuilder<'a, search_notebooks_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SearchNotebooksBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -153,12 +156,12 @@ impl<'a> SearchNotebooksBuilder<'a, search_notebooks_state::Empty> {
 impl<'a, S: search_notebooks_state::State> SearchNotebooksBuilder<'a, S> {
     /// Set the `author` field (optional)
     pub fn author(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
     pub fn maybe_author(mut self, value: Option<AtIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -166,12 +169,12 @@ impl<'a, S: search_notebooks_state::State> SearchNotebooksBuilder<'a, S> {
 impl<'a, S: search_notebooks_state::State> SearchNotebooksBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -179,12 +182,12 @@ impl<'a, S: search_notebooks_state::State> SearchNotebooksBuilder<'a, S> {
 impl<'a, S: search_notebooks_state::State> SearchNotebooksBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -199,11 +202,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SearchNotebooksBuilder<'a, search_notebooks_state::SetQ<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         SearchNotebooksBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -211,12 +214,12 @@ where
 impl<'a, S: search_notebooks_state::State> SearchNotebooksBuilder<'a, S> {
     /// Set the `rating` field (optional)
     pub fn rating(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `rating` field to an Option value (optional)
     pub fn maybe_rating(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -224,12 +227,12 @@ impl<'a, S: search_notebooks_state::State> SearchNotebooksBuilder<'a, S> {
 impl<'a, S: search_notebooks_state::State> SearchNotebooksBuilder<'a, S> {
     /// Set the `sort` field (optional)
     pub fn sort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
     pub fn maybe_sort(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -237,12 +240,12 @@ impl<'a, S: search_notebooks_state::State> SearchNotebooksBuilder<'a, S> {
 impl<'a, S: search_notebooks_state::State> SearchNotebooksBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -255,13 +258,13 @@ where
     /// Build the final struct
     pub fn build(self) -> SearchNotebooks<'a> {
         SearchNotebooks {
-            author: self.__unsafe_private_named.0,
-            cursor: self.__unsafe_private_named.1,
-            limit: self.__unsafe_private_named.2,
-            q: self.__unsafe_private_named.3.unwrap(),
-            rating: self.__unsafe_private_named.4,
-            sort: self.__unsafe_private_named.5,
-            tags: self.__unsafe_private_named.6,
+            author: self._fields.0,
+            cursor: self._fields.1,
+            limit: self._fields.2,
+            q: self._fields.3.unwrap(),
+            rating: self._fields.4,
+            sort: self._fields.5,
+            tags: self._fields.6,
         }
     }
 }

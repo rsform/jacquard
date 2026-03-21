@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -172,9 +175,9 @@ pub mod get_reviews_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetReviewsBuilder<'a, S: get_reviews_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<i64>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetReviews<'a> {
@@ -188,9 +191,9 @@ impl<'a> GetReviewsBuilder<'a, get_reviews_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetReviewsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -198,12 +201,12 @@ impl<'a> GetReviewsBuilder<'a, get_reviews_state::Empty> {
 impl<'a, S: get_reviews_state::State> GetReviewsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -211,12 +214,12 @@ impl<'a, S: get_reviews_state::State> GetReviewsBuilder<'a, S> {
 impl<'a, S: get_reviews_state::State> GetReviewsBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -231,11 +234,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> GetReviewsBuilder<'a, get_reviews_state::SetUri<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         GetReviewsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -248,9 +251,9 @@ where
     /// Build the final struct
     pub fn build(self) -> GetReviews<'a> {
         GetReviews {
-            cursor: self.__unsafe_private_named.0,
-            limit: self.__unsafe_private_named.1,
-            uri: self.__unsafe_private_named.2.unwrap(),
+            cursor: self._fields.0,
+            limit: self._fields.1,
+            uri: self._fields.2.unwrap(),
         }
     }
 }
@@ -265,65 +268,65 @@ pub mod popfeed_review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Uri;
         type Did;
         type Rating;
-        type Uri;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Uri = Unset;
         type Did = Unset;
         type Rating = Unset;
-        type Uri = Unset;
         type CreatedAt = Unset;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Uri = Set<members::uri>;
+        type Did = S::Did;
+        type Rating = S::Rating;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
+        type Uri = S::Uri;
         type Did = Set<members::did>;
         type Rating = S::Rating;
-        type Uri = S::Uri;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `rating` field to Set
     pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRating<S> {}
     impl<S: State> State for SetRating<S> {
+        type Uri = S::Uri;
         type Did = S::Did;
         type Rating = Set<members::rating>;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Did = S::Did;
-        type Rating = S::Rating;
-        type Uri = Set<members::uri>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type Uri = S::Uri;
         type Did = S::Did;
         type Rating = S::Rating;
-        type Uri = S::Uri;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `rating` field
         pub struct rating(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -331,8 +334,8 @@ pub mod popfeed_review_state {
 
 /// Builder for constructing an instance of this type
 pub struct PopfeedReviewBuilder<'a, S: popfeed_review_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<bool>,
         Option<Datetime>,
         Option<Did<'a>>,
@@ -343,7 +346,7 @@ pub struct PopfeedReviewBuilder<'a, S: popfeed_review_state::State> {
         Option<CowStr<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> PopfeedReview<'a> {
@@ -357,19 +360,9 @@ impl<'a> PopfeedReviewBuilder<'a, popfeed_review_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PopfeedReviewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -377,12 +370,12 @@ impl<'a> PopfeedReviewBuilder<'a, popfeed_review_state::Empty> {
 impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
     /// Set the `containsSpoilers` field (optional)
     pub fn contains_spoilers(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `containsSpoilers` field to an Option value (optional)
     pub fn maybe_contains_spoilers(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -397,11 +390,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PopfeedReviewBuilder<'a, popfeed_review_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PopfeedReviewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -416,11 +409,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> PopfeedReviewBuilder<'a, popfeed_review_state::SetDid<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PopfeedReviewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -428,12 +421,12 @@ where
 impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Data<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
     pub fn maybe_facets(mut self, value: Option<Vec<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -448,11 +441,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PopfeedReviewBuilder<'a, popfeed_review_state::SetRating<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         PopfeedReviewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -460,12 +453,12 @@ where
 impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -473,12 +466,12 @@ impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
 impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
     pub fn maybe_text(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -486,12 +479,12 @@ impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
 impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -506,11 +499,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> PopfeedReviewBuilder<'a, popfeed_review_state::SetUri<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         PopfeedReviewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -518,23 +511,23 @@ where
 impl<'a, S> PopfeedReviewBuilder<'a, S>
 where
     S: popfeed_review_state::State,
+    S::Uri: popfeed_review_state::IsSet,
     S::Did: popfeed_review_state::IsSet,
     S::Rating: popfeed_review_state::IsSet,
-    S::Uri: popfeed_review_state::IsSet,
     S::CreatedAt: popfeed_review_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PopfeedReview<'a> {
         PopfeedReview {
-            contains_spoilers: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            did: self.__unsafe_private_named.2.unwrap(),
-            facets: self.__unsafe_private_named.3,
-            rating: self.__unsafe_private_named.4.unwrap(),
-            tags: self.__unsafe_private_named.5,
-            text: self.__unsafe_private_named.6,
-            title: self.__unsafe_private_named.7,
-            uri: self.__unsafe_private_named.8.unwrap(),
+            contains_spoilers: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            did: self._fields.2.unwrap(),
+            facets: self._fields.3,
+            rating: self._fields.4.unwrap(),
+            tags: self._fields.5,
+            text: self._fields.6,
+            title: self._fields.7,
+            uri: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -544,15 +537,15 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> PopfeedReview<'a> {
         PopfeedReview {
-            contains_spoilers: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            did: self.__unsafe_private_named.2.unwrap(),
-            facets: self.__unsafe_private_named.3,
-            rating: self.__unsafe_private_named.4.unwrap(),
-            tags: self.__unsafe_private_named.5,
-            text: self.__unsafe_private_named.6,
-            title: self.__unsafe_private_named.7,
-            uri: self.__unsafe_private_named.8.unwrap(),
+            contains_spoilers: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            did: self._fields.2.unwrap(),
+            facets: self._fields.3,
+            rating: self._fields.4.unwrap(),
+            tags: self._fields.5,
+            text: self._fields.6,
+            title: self._fields.7,
+            uri: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }

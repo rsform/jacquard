@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -202,44 +205,44 @@ pub mod show_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ShowBuilder<'a, S: show_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<CowStr<'a>>>,
         Option<BlobRef<'a>>,
         Option<Datetime>,
@@ -249,7 +252,7 @@ pub struct ShowBuilder<'a, S: show_state::State> {
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Show<'a> {
@@ -263,9 +266,9 @@ impl<'a> ShowBuilder<'a, show_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ShowBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -273,12 +276,12 @@ impl<'a> ShowBuilder<'a, show_state::Empty> {
 impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     /// Set the `categories` field (optional)
     pub fn categories(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `categories` field to an Option value (optional)
     pub fn maybe_categories(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -286,12 +289,12 @@ impl<'a, S: show_state::State> ShowBuilder<'a, S> {
 impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     /// Set the `coverArt` field (optional)
     pub fn cover_art(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `coverArt` field to an Option value (optional)
     pub fn maybe_cover_art(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -306,11 +309,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ShowBuilder<'a, show_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ShowBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -318,12 +321,12 @@ where
 impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -331,12 +334,12 @@ impl<'a, S: show_state::State> ShowBuilder<'a, S> {
 impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     /// Set the `explicit` field (optional)
     pub fn explicit(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `explicit` field to an Option value (optional)
     pub fn maybe_explicit(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -344,12 +347,12 @@ impl<'a, S: show_state::State> ShowBuilder<'a, S> {
 impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     /// Set the `language` field (optional)
     pub fn language(mut self, value: impl Into<Option<Language>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `language` field to an Option value (optional)
     pub fn maybe_language(mut self, value: Option<Language>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -364,11 +367,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ShowBuilder<'a, show_state::SetName<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         ShowBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -376,12 +379,12 @@ where
 impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     /// Set the `websiteUrl` field (optional)
     pub fn website_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `websiteUrl` field to an Option value (optional)
     pub fn maybe_website_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -389,20 +392,20 @@ impl<'a, S: show_state::State> ShowBuilder<'a, S> {
 impl<'a, S> ShowBuilder<'a, S>
 where
     S: show_state::State,
-    S::Name: show_state::IsSet,
     S::CreatedAt: show_state::IsSet,
+    S::Name: show_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Show<'a> {
         Show {
-            categories: self.__unsafe_private_named.0,
-            cover_art: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3,
-            explicit: self.__unsafe_private_named.4,
-            language: self.__unsafe_private_named.5,
-            name: self.__unsafe_private_named.6.unwrap(),
-            website_url: self.__unsafe_private_named.7,
+            categories: self._fields.0,
+            cover_art: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3,
+            explicit: self._fields.4,
+            language: self._fields.5,
+            name: self._fields.6.unwrap(),
+            website_url: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -415,14 +418,14 @@ where
         >,
     ) -> Show<'a> {
         Show {
-            categories: self.__unsafe_private_named.0,
-            cover_art: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3,
-            explicit: self.__unsafe_private_named.4,
-            language: self.__unsafe_private_named.5,
-            name: self.__unsafe_private_named.6.unwrap(),
-            website_url: self.__unsafe_private_named.7,
+            categories: self._fields.0,
+            cover_art: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3,
+            explicit: self._fields.4,
+            language: self._fields.5,
+            name: self._fields.6.unwrap(),
+            website_url: self._fields.7,
             extra_data: Some(extra_data),
         }
     }

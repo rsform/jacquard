@@ -8,7 +8,11 @@
 pub mod comment;
 pub mod status;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -237,74 +241,74 @@ pub mod pull_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Target;
         type Title;
-        type CreatedAt;
         type PatchBlob;
+        type Target;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Target = Unset;
         type Title = Unset;
-        type CreatedAt = Unset;
         type PatchBlob = Unset;
-    }
-    ///State transition - sets the `target` field to Set
-    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTarget<S> {}
-    impl<S: State> State for SetTarget<S> {
-        type Target = Set<members::target>;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type PatchBlob = S::PatchBlob;
+        type Target = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Target = S::Target;
         type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
         type PatchBlob = S::PatchBlob;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type Target = S::Target;
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
-        type PatchBlob = S::PatchBlob;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `patch_blob` field to Set
     pub struct SetPatchBlob<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPatchBlob<S> {}
     impl<S: State> State for SetPatchBlob<S> {
-        type Target = S::Target;
         type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
         type PatchBlob = Set<members::patch_blob>;
+        type Target = S::Target;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `target` field to Set
+    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTarget<S> {}
+    impl<S: State> State for SetTarget<S> {
+        type Title = S::Title;
+        type PatchBlob = S::PatchBlob;
+        type Target = Set<members::target>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type PatchBlob = S::PatchBlob;
+        type Target = S::Target;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `target` field
-        pub struct target(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `patch_blob` field
         pub struct patch_blob(());
+        ///Marker type for the `target` field
+        pub struct target(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PullBuilder<'a, S: pull_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<Vec<Did<'a>>>,
@@ -315,7 +319,7 @@ pub struct PullBuilder<'a, S: pull_state::State> {
         Option<pull::Target<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Pull<'a> {
@@ -329,19 +333,9 @@ impl<'a> PullBuilder<'a, pull_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PullBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -349,12 +343,12 @@ impl<'a> PullBuilder<'a, pull_state::Empty> {
 impl<'a, S: pull_state::State> PullBuilder<'a, S> {
     /// Set the `body` field (optional)
     pub fn body(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `body` field to an Option value (optional)
     pub fn maybe_body(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -369,11 +363,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PullBuilder<'a, pull_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PullBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -381,12 +375,12 @@ where
 impl<'a, S: pull_state::State> PullBuilder<'a, S> {
     /// Set the `mentions` field (optional)
     pub fn mentions(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `mentions` field to an Option value (optional)
     pub fn maybe_mentions(mut self, value: Option<Vec<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -394,12 +388,12 @@ impl<'a, S: pull_state::State> PullBuilder<'a, S> {
 impl<'a, S: pull_state::State> PullBuilder<'a, S> {
     /// Set the `patch` field (optional)
     pub fn patch(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `patch` field to an Option value (optional)
     pub fn maybe_patch(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -414,11 +408,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> PullBuilder<'a, pull_state::SetPatchBlob<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         PullBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -426,12 +420,12 @@ where
 impl<'a, S: pull_state::State> PullBuilder<'a, S> {
     /// Set the `references` field (optional)
     pub fn references(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `references` field to an Option value (optional)
     pub fn maybe_references(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -439,12 +433,12 @@ impl<'a, S: pull_state::State> PullBuilder<'a, S> {
 impl<'a, S: pull_state::State> PullBuilder<'a, S> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<pull::Source<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
     pub fn maybe_source(mut self, value: Option<pull::Source<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -459,11 +453,11 @@ where
         mut self,
         value: impl Into<pull::Target<'a>>,
     ) -> PullBuilder<'a, pull_state::SetTarget<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         PullBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -478,11 +472,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PullBuilder<'a, pull_state::SetTitle<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         PullBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -490,23 +484,23 @@ where
 impl<'a, S> PullBuilder<'a, S>
 where
     S: pull_state::State,
-    S::Target: pull_state::IsSet,
     S::Title: pull_state::IsSet,
-    S::CreatedAt: pull_state::IsSet,
     S::PatchBlob: pull_state::IsSet,
+    S::Target: pull_state::IsSet,
+    S::CreatedAt: pull_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pull<'a> {
         Pull {
-            body: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            mentions: self.__unsafe_private_named.2,
-            patch: self.__unsafe_private_named.3,
-            patch_blob: self.__unsafe_private_named.4.unwrap(),
-            references: self.__unsafe_private_named.5,
-            source: self.__unsafe_private_named.6,
-            target: self.__unsafe_private_named.7.unwrap(),
-            title: self.__unsafe_private_named.8.unwrap(),
+            body: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            mentions: self._fields.2,
+            patch: self._fields.3,
+            patch_blob: self._fields.4.unwrap(),
+            references: self._fields.5,
+            source: self._fields.6,
+            target: self._fields.7.unwrap(),
+            title: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -519,15 +513,15 @@ where
         >,
     ) -> Pull<'a> {
         Pull {
-            body: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            mentions: self.__unsafe_private_named.2,
-            patch: self.__unsafe_private_named.3,
-            patch_blob: self.__unsafe_private_named.4.unwrap(),
-            references: self.__unsafe_private_named.5,
-            source: self.__unsafe_private_named.6,
-            target: self.__unsafe_private_named.7.unwrap(),
-            title: self.__unsafe_private_named.8.unwrap(),
+            body: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            mentions: self._fields.2,
+            patch: self._fields.3,
+            patch_blob: self._fields.4.unwrap(),
+            references: self._fields.5,
+            source: self._fields.6,
+            target: self._fields.7.unwrap(),
+            title: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -705,45 +699,45 @@ pub mod target_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Branch;
         type Repo;
+        type Branch;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Branch = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `branch` field to Set
-    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBranch<S> {}
-    impl<S: State> State for SetBranch<S> {
-        type Branch = Set<members::branch>;
-        type Repo = S::Repo;
+        type Branch = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Branch = S::Branch;
         type Repo = Set<members::repo>;
+        type Branch = S::Branch;
+    }
+    ///State transition - sets the `branch` field to Set
+    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBranch<S> {}
+    impl<S: State> State for SetBranch<S> {
+        type Repo = S::Repo;
+        type Branch = Set<members::branch>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `branch` field
-        pub struct branch(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `branch` field
+        pub struct branch(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TargetBuilder<'a, S: target_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Target<'a> {
@@ -757,9 +751,9 @@ impl<'a> TargetBuilder<'a, target_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TargetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -774,11 +768,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TargetBuilder<'a, target_state::SetBranch<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TargetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -793,11 +787,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> TargetBuilder<'a, target_state::SetRepo<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TargetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -805,14 +799,14 @@ where
 impl<'a, S> TargetBuilder<'a, S>
 where
     S: target_state::State,
-    S::Branch: target_state::IsSet,
     S::Repo: target_state::IsSet,
+    S::Branch: target_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Target<'a> {
         Target {
-            branch: self.__unsafe_private_named.0.unwrap(),
-            repo: self.__unsafe_private_named.1.unwrap(),
+            branch: self._fields.0.unwrap(),
+            repo: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -825,8 +819,8 @@ where
         >,
     ) -> Target<'a> {
         Target {
-            branch: self.__unsafe_private_named.0.unwrap(),
-            repo: self.__unsafe_private_named.1.unwrap(),
+            branch: self._fields.0.unwrap(),
+            repo: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

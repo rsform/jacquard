@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -130,8 +133,8 @@ pub mod preferences_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Notifications;
         type UpdatedAt;
+        type Notifications;
         type Visibility;
         type Activity;
         type Privacy;
@@ -140,28 +143,28 @@ pub mod preferences_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Notifications = Unset;
         type UpdatedAt = Unset;
+        type Notifications = Unset;
         type Visibility = Unset;
         type Activity = Unset;
         type Privacy = Unset;
-    }
-    ///State transition - sets the `notifications` field to Set
-    pub struct SetNotifications<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotifications<S> {}
-    impl<S: State> State for SetNotifications<S> {
-        type Notifications = Set<members::notifications>;
-        type UpdatedAt = S::UpdatedAt;
-        type Visibility = S::Visibility;
-        type Activity = S::Activity;
-        type Privacy = S::Privacy;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
-        type Notifications = S::Notifications;
         type UpdatedAt = Set<members::updated_at>;
+        type Notifications = S::Notifications;
+        type Visibility = S::Visibility;
+        type Activity = S::Activity;
+        type Privacy = S::Privacy;
+    }
+    ///State transition - sets the `notifications` field to Set
+    pub struct SetNotifications<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotifications<S> {}
+    impl<S: State> State for SetNotifications<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type Notifications = Set<members::notifications>;
         type Visibility = S::Visibility;
         type Activity = S::Activity;
         type Privacy = S::Privacy;
@@ -170,8 +173,8 @@ pub mod preferences_state {
     pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVisibility<S> {}
     impl<S: State> State for SetVisibility<S> {
-        type Notifications = S::Notifications;
         type UpdatedAt = S::UpdatedAt;
+        type Notifications = S::Notifications;
         type Visibility = Set<members::visibility>;
         type Activity = S::Activity;
         type Privacy = S::Privacy;
@@ -180,8 +183,8 @@ pub mod preferences_state {
     pub struct SetActivity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActivity<S> {}
     impl<S: State> State for SetActivity<S> {
-        type Notifications = S::Notifications;
         type UpdatedAt = S::UpdatedAt;
+        type Notifications = S::Notifications;
         type Visibility = S::Visibility;
         type Activity = Set<members::activity>;
         type Privacy = S::Privacy;
@@ -190,8 +193,8 @@ pub mod preferences_state {
     pub struct SetPrivacy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPrivacy<S> {}
     impl<S: State> State for SetPrivacy<S> {
-        type Notifications = S::Notifications;
         type UpdatedAt = S::UpdatedAt;
+        type Notifications = S::Notifications;
         type Visibility = S::Visibility;
         type Activity = S::Activity;
         type Privacy = Set<members::privacy>;
@@ -199,10 +202,10 @@ pub mod preferences_state {
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `notifications` field
-        pub struct notifications(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `notifications` field
+        pub struct notifications(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
         ///Marker type for the `activity` field
@@ -214,8 +217,8 @@ pub mod preferences_state {
 
 /// Builder for constructing an instance of this type
 pub struct PreferencesBuilder<'a, S: preferences_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ActivitySettings<'a>>,
         Option<DisplaySettings<'a>>,
         Option<NotificationSettings<'a>>,
@@ -224,7 +227,7 @@ pub struct PreferencesBuilder<'a, S: preferences_state::State> {
         Option<Datetime>,
         Option<VisibilitySettings<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Preferences<'a> {
@@ -238,9 +241,9 @@ impl<'a> PreferencesBuilder<'a, preferences_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PreferencesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -255,11 +258,11 @@ where
         mut self,
         value: impl Into<ActivitySettings<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetActivity<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -267,12 +270,12 @@ where
 impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     /// Set the `display` field (optional)
     pub fn display(mut self, value: impl Into<Option<DisplaySettings<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `display` field to an Option value (optional)
     pub fn maybe_display(mut self, value: Option<DisplaySettings<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -287,11 +290,11 @@ where
         mut self,
         value: impl Into<NotificationSettings<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetNotifications<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -306,11 +309,11 @@ where
         mut self,
         value: impl Into<PrivacySettings<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetPrivacy<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -318,12 +321,12 @@ where
 impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     /// Set the `schemaVersion` field (optional)
     pub fn schema_version(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `schemaVersion` field to an Option value (optional)
     pub fn maybe_schema_version(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -338,11 +341,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PreferencesBuilder<'a, preferences_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -357,11 +360,11 @@ where
         mut self,
         value: impl Into<VisibilitySettings<'a>>,
     ) -> PreferencesBuilder<'a, preferences_state::SetVisibility<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         PreferencesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -369,8 +372,8 @@ where
 impl<'a, S> PreferencesBuilder<'a, S>
 where
     S: preferences_state::State,
-    S::Notifications: preferences_state::IsSet,
     S::UpdatedAt: preferences_state::IsSet,
+    S::Notifications: preferences_state::IsSet,
     S::Visibility: preferences_state::IsSet,
     S::Activity: preferences_state::IsSet,
     S::Privacy: preferences_state::IsSet,
@@ -378,13 +381,13 @@ where
     /// Build the final struct
     pub fn build(self) -> Preferences<'a> {
         Preferences {
-            activity: self.__unsafe_private_named.0.unwrap(),
-            display: self.__unsafe_private_named.1,
-            notifications: self.__unsafe_private_named.2.unwrap(),
-            privacy: self.__unsafe_private_named.3.unwrap(),
-            schema_version: self.__unsafe_private_named.4.or_else(|| Some(1i64)),
-            updated_at: self.__unsafe_private_named.5.unwrap(),
-            visibility: self.__unsafe_private_named.6.unwrap(),
+            activity: self._fields.0.unwrap(),
+            display: self._fields.1,
+            notifications: self._fields.2.unwrap(),
+            privacy: self._fields.3.unwrap(),
+            schema_version: self._fields.4.or_else(|| Some(1i64)),
+            updated_at: self._fields.5.unwrap(),
+            visibility: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -397,13 +400,13 @@ where
         >,
     ) -> Preferences<'a> {
         Preferences {
-            activity: self.__unsafe_private_named.0.unwrap(),
-            display: self.__unsafe_private_named.1,
-            notifications: self.__unsafe_private_named.2.unwrap(),
-            privacy: self.__unsafe_private_named.3.unwrap(),
-            schema_version: self.__unsafe_private_named.4.or_else(|| Some(1i64)),
-            updated_at: self.__unsafe_private_named.5.unwrap(),
-            visibility: self.__unsafe_private_named.6.unwrap(),
+            activity: self._fields.0.unwrap(),
+            display: self._fields.1,
+            notifications: self._fields.2.unwrap(),
+            privacy: self._fields.3.unwrap(),
+            schema_version: self._fields.4.or_else(|| Some(1i64)),
+            updated_at: self._fields.5.unwrap(),
+            visibility: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

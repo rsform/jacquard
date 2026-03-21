@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -149,9 +152,9 @@ pub mod status_state {
 
 /// Builder for constructing an instance of this type
 pub struct StatusBuilder<'a, S: status_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<PlayView<'a>>, Option<Datetime>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<PlayView<'a>>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Status<'a> {
@@ -165,9 +168,9 @@ impl<'a> StatusBuilder<'a, status_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -175,12 +178,12 @@ impl<'a> StatusBuilder<'a, status_state::Empty> {
 impl<'a, S: status_state::State> StatusBuilder<'a, S> {
     /// Set the `expiry` field (optional)
     pub fn expiry(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `expiry` field to an Option value (optional)
     pub fn maybe_expiry(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -195,11 +198,11 @@ where
         mut self,
         value: impl Into<PlayView<'a>>,
     ) -> StatusBuilder<'a, status_state::SetItem<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         StatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -214,11 +217,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> StatusBuilder<'a, status_state::SetTime<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         StatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -232,9 +235,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Status<'a> {
         Status {
-            expiry: self.__unsafe_private_named.0,
-            item: self.__unsafe_private_named.1.unwrap(),
-            time: self.__unsafe_private_named.2.unwrap(),
+            expiry: self._fields.0,
+            item: self._fields.1.unwrap(),
+            time: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -247,9 +250,9 @@ where
         >,
     ) -> Status<'a> {
         Status {
-            expiry: self.__unsafe_private_named.0,
-            item: self.__unsafe_private_named.1.unwrap(),
-            time: self.__unsafe_private_named.2.unwrap(),
+            expiry: self._fields.0,
+            item: self._fields.1.unwrap(),
+            time: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

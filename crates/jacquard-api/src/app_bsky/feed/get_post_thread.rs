@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::AtUri;
@@ -159,9 +162,9 @@ pub mod get_post_thread_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetPostThreadBuilder<'a, S: get_post_thread_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetPostThread<'a> {
@@ -175,9 +178,9 @@ impl<'a> GetPostThreadBuilder<'a, get_post_thread_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetPostThreadBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -185,12 +188,12 @@ impl<'a> GetPostThreadBuilder<'a, get_post_thread_state::Empty> {
 impl<'a, S: get_post_thread_state::State> GetPostThreadBuilder<'a, S> {
     /// Set the `depth` field (optional)
     pub fn depth(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `depth` field to an Option value (optional)
     pub fn maybe_depth(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -198,12 +201,12 @@ impl<'a, S: get_post_thread_state::State> GetPostThreadBuilder<'a, S> {
 impl<'a, S: get_post_thread_state::State> GetPostThreadBuilder<'a, S> {
     /// Set the `parentHeight` field (optional)
     pub fn parent_height(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `parentHeight` field to an Option value (optional)
     pub fn maybe_parent_height(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -218,11 +221,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> GetPostThreadBuilder<'a, get_post_thread_state::SetUri<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         GetPostThreadBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -235,9 +238,9 @@ where
     /// Build the final struct
     pub fn build(self) -> GetPostThread<'a> {
         GetPostThread {
-            depth: self.__unsafe_private_named.0,
-            parent_height: self.__unsafe_private_named.1,
-            uri: self.__unsafe_private_named.2.unwrap(),
+            depth: self._fields.0,
+            parent_height: self._fields.1,
+            uri: self._fields.2.unwrap(),
         }
     }
 }

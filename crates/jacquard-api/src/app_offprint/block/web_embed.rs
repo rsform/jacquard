@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -205,8 +208,8 @@ pub mod web_embed_state {
 
 /// Builder for constructing an instance of this type
 pub struct WebEmbedBuilder<'a, S: web_embed_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<i64>,
@@ -218,7 +221,7 @@ pub struct WebEmbedBuilder<'a, S: web_embed_state::State> {
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> WebEmbed<'a> {
@@ -232,20 +235,9 @@ impl<'a> WebEmbedBuilder<'a, web_embed_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         WebEmbedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -253,12 +245,12 @@ impl<'a> WebEmbedBuilder<'a, web_embed_state::Empty> {
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `alignment` field (optional)
     pub fn alignment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `alignment` field to an Option value (optional)
     pub fn maybe_alignment(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -266,12 +258,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -279,12 +271,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `embedHeight` field (optional)
     pub fn embed_height(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `embedHeight` field to an Option value (optional)
     pub fn maybe_embed_height(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -292,12 +284,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `embedUrl` field (optional)
     pub fn embed_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `embedUrl` field to an Option value (optional)
     pub fn maybe_embed_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -305,12 +297,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `embedWidth` field (optional)
     pub fn embed_width(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `embedWidth` field to an Option value (optional)
     pub fn maybe_embed_width(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -325,11 +317,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> WebEmbedBuilder<'a, web_embed_state::SetHref<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         WebEmbedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -337,12 +329,12 @@ where
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `preview` field (optional)
     pub fn preview(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `preview` field to an Option value (optional)
     pub fn maybe_preview(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -350,12 +342,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `siteName` field (optional)
     pub fn site_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `siteName` field to an Option value (optional)
     pub fn maybe_site_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -363,12 +355,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -376,12 +368,12 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
 impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     /// Set the `width` field (optional)
     pub fn width(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `width` field to an Option value (optional)
     pub fn maybe_width(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -394,16 +386,16 @@ where
     /// Build the final struct
     pub fn build(self) -> WebEmbed<'a> {
         WebEmbed {
-            alignment: self.__unsafe_private_named.0,
-            description: self.__unsafe_private_named.1,
-            embed_height: self.__unsafe_private_named.2,
-            embed_url: self.__unsafe_private_named.3,
-            embed_width: self.__unsafe_private_named.4,
-            href: self.__unsafe_private_named.5.unwrap(),
-            preview: self.__unsafe_private_named.6,
-            site_name: self.__unsafe_private_named.7,
-            title: self.__unsafe_private_named.8,
-            width: self.__unsafe_private_named.9,
+            alignment: self._fields.0,
+            description: self._fields.1,
+            embed_height: self._fields.2,
+            embed_url: self._fields.3,
+            embed_width: self._fields.4,
+            href: self._fields.5.unwrap(),
+            preview: self._fields.6,
+            site_name: self._fields.7,
+            title: self._fields.8,
+            width: self._fields.9,
             extra_data: Default::default(),
         }
     }
@@ -416,16 +408,16 @@ where
         >,
     ) -> WebEmbed<'a> {
         WebEmbed {
-            alignment: self.__unsafe_private_named.0,
-            description: self.__unsafe_private_named.1,
-            embed_height: self.__unsafe_private_named.2,
-            embed_url: self.__unsafe_private_named.3,
-            embed_width: self.__unsafe_private_named.4,
-            href: self.__unsafe_private_named.5.unwrap(),
-            preview: self.__unsafe_private_named.6,
-            site_name: self.__unsafe_private_named.7,
-            title: self.__unsafe_private_named.8,
-            width: self.__unsafe_private_named.9,
+            alignment: self._fields.0,
+            description: self._fields.1,
+            embed_height: self._fields.2,
+            embed_url: self._fields.3,
+            embed_width: self._fields.4,
+            href: self._fields.5.unwrap(),
+            preview: self._fields.6,
+            site_name: self._fields.7,
+            title: self._fields.8,
+            width: self._fields.9,
             extra_data: Some(extra_data),
         }
     }

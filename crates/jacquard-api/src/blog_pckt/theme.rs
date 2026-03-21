@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -222,14 +225,14 @@ pub mod theme_state {
 
 /// Builder for constructing an instance of this type
 pub struct ThemeBuilder<'a, S: theme_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<theme::Palette<'a>>,
         Option<CowStr<'a>>,
         Option<theme::Palette<'a>>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Theme<'a> {
@@ -243,9 +246,9 @@ impl<'a> ThemeBuilder<'a, theme_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ThemeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -260,11 +263,11 @@ where
         mut self,
         value: impl Into<theme::Palette<'a>>,
     ) -> ThemeBuilder<'a, theme_state::SetDark<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ThemeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -272,12 +275,12 @@ where
 impl<'a, S: theme_state::State> ThemeBuilder<'a, S> {
     /// Set the `font` field (optional)
     pub fn font(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `font` field to an Option value (optional)
     pub fn maybe_font(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -292,11 +295,11 @@ where
         mut self,
         value: impl Into<theme::Palette<'a>>,
     ) -> ThemeBuilder<'a, theme_state::SetLight<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ThemeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -304,12 +307,12 @@ where
 impl<'a, S: theme_state::State> ThemeBuilder<'a, S> {
     /// Set the `transparency` field (optional)
     pub fn transparency(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `transparency` field to an Option value (optional)
     pub fn maybe_transparency(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -323,10 +326,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Theme<'a> {
         Theme {
-            dark: self.__unsafe_private_named.0.unwrap(),
-            font: self.__unsafe_private_named.1,
-            light: self.__unsafe_private_named.2.unwrap(),
-            transparency: self.__unsafe_private_named.3,
+            dark: self._fields.0.unwrap(),
+            font: self._fields.1,
+            light: self._fields.2.unwrap(),
+            transparency: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -339,10 +342,10 @@ where
         >,
     ) -> Theme<'a> {
         Theme {
-            dark: self.__unsafe_private_named.0.unwrap(),
-            font: self.__unsafe_private_named.1,
-            light: self.__unsafe_private_named.2.unwrap(),
-            transparency: self.__unsafe_private_named.3,
+            dark: self._fields.0.unwrap(),
+            font: self._fields.1,
+            light: self._fields.2.unwrap(),
+            transparency: self._fields.3,
             extra_data: Some(extra_data),
         }
     }

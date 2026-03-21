@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -489,58 +492,58 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type EventId;
         type EventDate;
         type CreatedAt;
-        type EventId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type EventId = Unset;
         type EventDate = Unset;
         type CreatedAt = Unset;
-        type EventId = Unset;
-    }
-    ///State transition - sets the `event_date` field to Set
-    pub struct SetEventDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEventDate<S> {}
-    impl<S: State> State for SetEventDate<S> {
-        type EventDate = Set<members::event_date>;
-        type CreatedAt = S::CreatedAt;
-        type EventId = S::EventId;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type EventDate = S::EventDate;
-        type CreatedAt = Set<members::created_at>;
-        type EventId = S::EventId;
     }
     ///State transition - sets the `event_id` field to Set
     pub struct SetEventId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEventId<S> {}
     impl<S: State> State for SetEventId<S> {
+        type EventId = Set<members::event_id>;
         type EventDate = S::EventDate;
         type CreatedAt = S::CreatedAt;
-        type EventId = Set<members::event_id>;
+    }
+    ///State transition - sets the `event_date` field to Set
+    pub struct SetEventDate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEventDate<S> {}
+    impl<S: State> State for SetEventDate<S> {
+        type EventId = S::EventId;
+        type EventDate = Set<members::event_date>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type EventId = S::EventId;
+        type EventDate = S::EventDate;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `event_id` field
+        pub struct event_id(());
         ///Marker type for the `event_date` field
         pub struct event_date(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `event_id` field
-        pub struct event_id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EventBuilder<'a, S: event_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<i64>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
@@ -569,7 +572,7 @@ pub struct EventBuilder<'a, S: event_state::State> {
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Event<'a> {
@@ -583,8 +586,8 @@ impl<'a> EventBuilder<'a, event_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -613,7 +616,7 @@ impl<'a> EventBuilder<'a, event_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -624,12 +627,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<i64>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `coordinateUncertaintyInMeters` field to an Option value (optional)
     pub fn maybe_coordinate_uncertainty_in_meters(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -637,12 +640,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `country` field (optional)
     pub fn country(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `country` field to an Option value (optional)
     pub fn maybe_country(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -650,12 +653,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `countryCode` field (optional)
     pub fn country_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `countryCode` field to an Option value (optional)
     pub fn maybe_country_code(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -663,12 +666,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `county` field (optional)
     pub fn county(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `county` field to an Option value (optional)
     pub fn maybe_county(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -683,11 +686,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> EventBuilder<'a, event_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -695,12 +698,12 @@ where
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `decimalLatitude` field (optional)
     pub fn decimal_latitude(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `decimalLatitude` field to an Option value (optional)
     pub fn maybe_decimal_latitude(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -708,12 +711,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `decimalLongitude` field (optional)
     pub fn decimal_longitude(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `decimalLongitude` field to an Option value (optional)
     pub fn maybe_decimal_longitude(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -728,11 +731,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EventBuilder<'a, event_state::SetEventDate<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -747,11 +750,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EventBuilder<'a, event_state::SetEventId<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -759,12 +762,12 @@ where
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `eventRemarks` field (optional)
     pub fn event_remarks(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `eventRemarks` field to an Option value (optional)
     pub fn maybe_event_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -772,12 +775,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `eventTime` field (optional)
     pub fn event_time(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `eventTime` field to an Option value (optional)
     pub fn maybe_event_time(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -785,12 +788,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `fieldNotes` field (optional)
     pub fn field_notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `fieldNotes` field to an Option value (optional)
     pub fn maybe_field_notes(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -798,12 +801,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `geodeticDatum` field (optional)
     pub fn geodetic_datum(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `geodeticDatum` field to an Option value (optional)
     pub fn maybe_geodetic_datum(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -811,12 +814,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `habitat` field (optional)
     pub fn habitat(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `habitat` field to an Option value (optional)
     pub fn maybe_habitat(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -824,12 +827,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `locality` field (optional)
     pub fn locality(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `locality` field to an Option value (optional)
     pub fn maybe_locality(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -837,12 +840,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `locationID` field (optional)
     pub fn location_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `locationID` field to an Option value (optional)
     pub fn maybe_location_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -850,12 +853,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `locationRemarks` field (optional)
     pub fn location_remarks(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `locationRemarks` field to an Option value (optional)
     pub fn maybe_location_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -863,12 +866,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `maximumElevationInMeters` field (optional)
     pub fn maximum_elevation_in_meters(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `maximumElevationInMeters` field to an Option value (optional)
     pub fn maybe_maximum_elevation_in_meters(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -876,12 +879,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `minimumElevationInMeters` field (optional)
     pub fn minimum_elevation_in_meters(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `minimumElevationInMeters` field to an Option value (optional)
     pub fn maybe_minimum_elevation_in_meters(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -889,12 +892,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `municipality` field (optional)
     pub fn municipality(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `municipality` field to an Option value (optional)
     pub fn maybe_municipality(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -902,12 +905,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `parentEventID` field (optional)
     pub fn parent_event_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `parentEventID` field to an Option value (optional)
     pub fn maybe_parent_event_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -915,12 +918,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `parentEventRef` field (optional)
     pub fn parent_event_ref(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `parentEventRef` field to an Option value (optional)
     pub fn maybe_parent_event_ref(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -928,12 +931,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `sampleSizeUnit` field (optional)
     pub fn sample_size_unit(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `sampleSizeUnit` field to an Option value (optional)
     pub fn maybe_sample_size_unit(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -941,12 +944,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `sampleSizeValue` field (optional)
     pub fn sample_size_value(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.23 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `sampleSizeValue` field to an Option value (optional)
     pub fn maybe_sample_size_value(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.23 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -954,12 +957,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `samplingEffort` field (optional)
     pub fn sampling_effort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.24 = value.into();
+        self._fields.24 = value.into();
         self
     }
     /// Set the `samplingEffort` field to an Option value (optional)
     pub fn maybe_sampling_effort(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.24 = value;
+        self._fields.24 = value;
         self
     }
 }
@@ -967,12 +970,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `samplingProtocol` field (optional)
     pub fn sampling_protocol(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.25 = value.into();
+        self._fields.25 = value.into();
         self
     }
     /// Set the `samplingProtocol` field to an Option value (optional)
     pub fn maybe_sampling_protocol(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.25 = value;
+        self._fields.25 = value;
         self
     }
 }
@@ -980,12 +983,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `stateProvince` field (optional)
     pub fn state_province(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.26 = value.into();
+        self._fields.26 = value.into();
         self
     }
     /// Set the `stateProvince` field to an Option value (optional)
     pub fn maybe_state_province(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.26 = value;
+        self._fields.26 = value;
         self
     }
 }
@@ -993,40 +996,40 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
+    S::EventId: event_state::IsSet,
     S::EventDate: event_state::IsSet,
     S::CreatedAt: event_state::IsSet,
-    S::EventId: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
         Event {
-            coordinate_uncertainty_in_meters: self.__unsafe_private_named.0,
-            country: self.__unsafe_private_named.1,
-            country_code: self.__unsafe_private_named.2,
-            county: self.__unsafe_private_named.3,
-            created_at: self.__unsafe_private_named.4.unwrap(),
-            decimal_latitude: self.__unsafe_private_named.5,
-            decimal_longitude: self.__unsafe_private_named.6,
-            event_date: self.__unsafe_private_named.7.unwrap(),
-            event_id: self.__unsafe_private_named.8.unwrap(),
-            event_remarks: self.__unsafe_private_named.9,
-            event_time: self.__unsafe_private_named.10,
-            field_notes: self.__unsafe_private_named.11,
-            geodetic_datum: self.__unsafe_private_named.12,
-            habitat: self.__unsafe_private_named.13,
-            locality: self.__unsafe_private_named.14,
-            location_id: self.__unsafe_private_named.15,
-            location_remarks: self.__unsafe_private_named.16,
-            maximum_elevation_in_meters: self.__unsafe_private_named.17,
-            minimum_elevation_in_meters: self.__unsafe_private_named.18,
-            municipality: self.__unsafe_private_named.19,
-            parent_event_id: self.__unsafe_private_named.20,
-            parent_event_ref: self.__unsafe_private_named.21,
-            sample_size_unit: self.__unsafe_private_named.22,
-            sample_size_value: self.__unsafe_private_named.23,
-            sampling_effort: self.__unsafe_private_named.24,
-            sampling_protocol: self.__unsafe_private_named.25,
-            state_province: self.__unsafe_private_named.26,
+            coordinate_uncertainty_in_meters: self._fields.0,
+            country: self._fields.1,
+            country_code: self._fields.2,
+            county: self._fields.3,
+            created_at: self._fields.4.unwrap(),
+            decimal_latitude: self._fields.5,
+            decimal_longitude: self._fields.6,
+            event_date: self._fields.7.unwrap(),
+            event_id: self._fields.8.unwrap(),
+            event_remarks: self._fields.9,
+            event_time: self._fields.10,
+            field_notes: self._fields.11,
+            geodetic_datum: self._fields.12,
+            habitat: self._fields.13,
+            locality: self._fields.14,
+            location_id: self._fields.15,
+            location_remarks: self._fields.16,
+            maximum_elevation_in_meters: self._fields.17,
+            minimum_elevation_in_meters: self._fields.18,
+            municipality: self._fields.19,
+            parent_event_id: self._fields.20,
+            parent_event_ref: self._fields.21,
+            sample_size_unit: self._fields.22,
+            sample_size_value: self._fields.23,
+            sampling_effort: self._fields.24,
+            sampling_protocol: self._fields.25,
+            state_province: self._fields.26,
             extra_data: Default::default(),
         }
     }
@@ -1039,33 +1042,33 @@ where
         >,
     ) -> Event<'a> {
         Event {
-            coordinate_uncertainty_in_meters: self.__unsafe_private_named.0,
-            country: self.__unsafe_private_named.1,
-            country_code: self.__unsafe_private_named.2,
-            county: self.__unsafe_private_named.3,
-            created_at: self.__unsafe_private_named.4.unwrap(),
-            decimal_latitude: self.__unsafe_private_named.5,
-            decimal_longitude: self.__unsafe_private_named.6,
-            event_date: self.__unsafe_private_named.7.unwrap(),
-            event_id: self.__unsafe_private_named.8.unwrap(),
-            event_remarks: self.__unsafe_private_named.9,
-            event_time: self.__unsafe_private_named.10,
-            field_notes: self.__unsafe_private_named.11,
-            geodetic_datum: self.__unsafe_private_named.12,
-            habitat: self.__unsafe_private_named.13,
-            locality: self.__unsafe_private_named.14,
-            location_id: self.__unsafe_private_named.15,
-            location_remarks: self.__unsafe_private_named.16,
-            maximum_elevation_in_meters: self.__unsafe_private_named.17,
-            minimum_elevation_in_meters: self.__unsafe_private_named.18,
-            municipality: self.__unsafe_private_named.19,
-            parent_event_id: self.__unsafe_private_named.20,
-            parent_event_ref: self.__unsafe_private_named.21,
-            sample_size_unit: self.__unsafe_private_named.22,
-            sample_size_value: self.__unsafe_private_named.23,
-            sampling_effort: self.__unsafe_private_named.24,
-            sampling_protocol: self.__unsafe_private_named.25,
-            state_province: self.__unsafe_private_named.26,
+            coordinate_uncertainty_in_meters: self._fields.0,
+            country: self._fields.1,
+            country_code: self._fields.2,
+            county: self._fields.3,
+            created_at: self._fields.4.unwrap(),
+            decimal_latitude: self._fields.5,
+            decimal_longitude: self._fields.6,
+            event_date: self._fields.7.unwrap(),
+            event_id: self._fields.8.unwrap(),
+            event_remarks: self._fields.9,
+            event_time: self._fields.10,
+            field_notes: self._fields.11,
+            geodetic_datum: self._fields.12,
+            habitat: self._fields.13,
+            locality: self._fields.14,
+            location_id: self._fields.15,
+            location_remarks: self._fields.16,
+            maximum_elevation_in_meters: self._fields.17,
+            minimum_elevation_in_meters: self._fields.18,
+            municipality: self._fields.19,
+            parent_event_id: self._fields.20,
+            parent_event_ref: self._fields.21,
+            sample_size_unit: self._fields.22,
+            sample_size_value: self._fields.23,
+            sampling_effort: self._fields.24,
+            sampling_protocol: self._fields.25,
+            state_province: self._fields.26,
             extra_data: Some(extra_data),
         }
     }

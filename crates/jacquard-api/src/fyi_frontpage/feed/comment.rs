@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -128,49 +131,49 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Post;
         type CreatedAt;
+        type Post;
         type Blocks;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Post = Unset;
         type CreatedAt = Unset;
+        type Post = Unset;
         type Blocks = Unset;
-    }
-    ///State transition - sets the `post` field to Set
-    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPost<S> {}
-    impl<S: State> State for SetPost<S> {
-        type Post = Set<members::post>;
-        type CreatedAt = S::CreatedAt;
-        type Blocks = S::Blocks;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Post = S::Post;
         type CreatedAt = Set<members::created_at>;
+        type Post = S::Post;
+        type Blocks = S::Blocks;
+    }
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPost<S> {}
+    impl<S: State> State for SetPost<S> {
+        type CreatedAt = S::CreatedAt;
+        type Post = Set<members::post>;
         type Blocks = S::Blocks;
     }
     ///State transition - sets the `blocks` field to Set
     pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlocks<S> {}
     impl<S: State> State for SetBlocks<S> {
-        type Post = S::Post;
         type CreatedAt = S::CreatedAt;
+        type Post = S::Post;
         type Blocks = Set<members::blocks>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `post` field
-        pub struct post(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `post` field
+        pub struct post(());
         ///Marker type for the `blocks` field
         pub struct blocks(());
     }
@@ -178,14 +181,14 @@ pub mod comment_state {
 
 /// Builder for constructing an instance of this type
 pub struct CommentBuilder<'a, S: comment_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<Block<'a>>>,
         Option<Datetime>,
         Option<StrongRef<'a>>,
         Option<StrongRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Comment<'a> {
@@ -199,9 +202,9 @@ impl<'a> CommentBuilder<'a, comment_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -216,11 +219,11 @@ where
         mut self,
         value: impl Into<Vec<Block<'a>>>,
     ) -> CommentBuilder<'a, comment_state::SetBlocks<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -235,11 +238,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CommentBuilder<'a, comment_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -247,12 +250,12 @@ where
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
     pub fn maybe_parent(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -267,11 +270,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> CommentBuilder<'a, comment_state::SetPost<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -279,17 +282,17 @@ where
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::Post: comment_state::IsSet,
     S::CreatedAt: comment_state::IsSet,
+    S::Post: comment_state::IsSet,
     S::Blocks: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {
         Comment {
-            blocks: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            parent: self.__unsafe_private_named.2,
-            post: self.__unsafe_private_named.3.unwrap(),
+            blocks: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            parent: self._fields.2,
+            post: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -302,10 +305,10 @@ where
         >,
     ) -> Comment<'a> {
         Comment {
-            blocks: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            parent: self.__unsafe_private_named.2,
-            post: self.__unsafe_private_named.3.unwrap(),
+            blocks: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            parent: self._fields.2,
+            post: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -414,64 +417,64 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Platform;
         type CreatedAt;
         type Game;
-        type Platform;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Platform = Unset;
         type CreatedAt = Unset;
         type Game = Unset;
-        type Platform = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Game = S::Game;
-        type Platform = S::Platform;
-    }
-    ///State transition - sets the `game` field to Set
-    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGame<S> {}
-    impl<S: State> State for SetGame<S> {
-        type CreatedAt = S::CreatedAt;
-        type Game = Set<members::game>;
-        type Platform = S::Platform;
     }
     ///State transition - sets the `platform` field to Set
     pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlatform<S> {}
     impl<S: State> State for SetPlatform<S> {
+        type Platform = Set<members::platform>;
         type CreatedAt = S::CreatedAt;
         type Game = S::Game;
-        type Platform = Set<members::platform>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Platform = S::Platform;
+        type CreatedAt = Set<members::created_at>;
+        type Game = S::Game;
+    }
+    ///State transition - sets the `game` field to Set
+    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGame<S> {}
+    impl<S: State> State for SetGame<S> {
+        type Platform = S::Platform;
+        type CreatedAt = S::CreatedAt;
+        type Game = Set<members::game>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `platform` field
+        pub struct platform(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `game` field
         pub struct game(());
-        ///Marker type for the `platform` field
-        pub struct platform(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GameBuilder<'a, S: game_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<game::GameRef<'a>>,
         Option<GamePlatform<'a>>,
         Option<Vec<GameSignaturesItem<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Game<'a> {
@@ -485,9 +488,9 @@ impl<'a> GameBuilder<'a, game_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -502,11 +505,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> GameBuilder<'a, game_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -521,11 +524,11 @@ where
         mut self,
         value: impl Into<game::GameRef<'a>>,
     ) -> GameBuilder<'a, game_state::SetGame<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -540,11 +543,11 @@ where
         mut self,
         value: impl Into<GamePlatform<'a>>,
     ) -> GameBuilder<'a, game_state::SetPlatform<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         GameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -555,7 +558,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<GameSignaturesItem<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `signatures` field to an Option value (optional)
@@ -563,7 +566,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
         mut self,
         value: Option<Vec<GameSignaturesItem<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -571,17 +574,17 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
 impl<'a, S> GameBuilder<'a, S>
 where
     S: game_state::State,
+    S::Platform: game_state::IsSet,
     S::CreatedAt: game_state::IsSet,
     S::Game: game_state::IsSet,
-    S::Platform: game_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Game<'a> {
         Game {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            game: self.__unsafe_private_named.1.unwrap(),
-            platform: self.__unsafe_private_named.2.unwrap(),
-            signatures: self.__unsafe_private_named.3,
+            created_at: self._fields.0.unwrap(),
+            game: self._fields.1.unwrap(),
+            platform: self._fields.2.unwrap(),
+            signatures: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -591,10 +594,10 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Game<'a> {
         Game {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            game: self.__unsafe_private_named.1.unwrap(),
-            platform: self.__unsafe_private_named.2.unwrap(),
-            signatures: self.__unsafe_private_named.3,
+            created_at: self._fields.0.unwrap(),
+            game: self._fields.1.unwrap(),
+            platform: self._fields.2.unwrap(),
+            signatures: self._fields.3,
             extra_data: Some(extra_data),
         }
     }

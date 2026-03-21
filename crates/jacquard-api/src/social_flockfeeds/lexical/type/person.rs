@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -3454,8 +3457,8 @@ pub mod person_state {
 
 /// Builder for constructing an instance of this type
 pub struct PersonBuilder<'a, S: person_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<PersonAdditionalName<'a>>,
         Option<PersonAdditionalType<'a>>,
         Option<PersonAddress<'a>>,
@@ -3536,7 +3539,7 @@ pub struct PersonBuilder<'a, S: person_state::State> {
         Option<PersonWorkLocation<'a>>,
         Option<PersonWorksFor<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Person<'a> {
@@ -3550,8 +3553,8 @@ impl<'a> PersonBuilder<'a, person_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PersonBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -3632,7 +3635,7 @@ impl<'a> PersonBuilder<'a, person_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3643,7 +3646,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonAdditionalName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `additionalName` field to an Option value (optional)
@@ -3651,7 +3654,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: Option<PersonAdditionalName<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -3662,7 +3665,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonAdditionalType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
@@ -3670,7 +3673,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: Option<PersonAdditionalType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -3678,12 +3681,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `address` field (optional)
     pub fn address(mut self, value: impl Into<Option<PersonAddress<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `address` field to an Option value (optional)
     pub fn maybe_address(mut self, value: Option<PersonAddress<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -3694,12 +3697,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonAffiliation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `affiliation` field to an Option value (optional)
     pub fn maybe_affiliation(mut self, value: Option<PersonAffiliation<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -3710,7 +3713,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonAgentInteractionStatistic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `agentInteractionStatistic` field to an Option value (optional)
@@ -3718,7 +3721,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: Option<PersonAgentInteractionStatistic<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -3729,7 +3732,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonAlternateName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
@@ -3737,7 +3740,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: Option<PersonAlternateName<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -3745,12 +3748,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `alumniOf` field (optional)
     pub fn alumni_of(mut self, value: impl Into<Option<PersonAlumniOf<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `alumniOf` field to an Option value (optional)
     pub fn maybe_alumni_of(mut self, value: Option<PersonAlumniOf<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -3758,12 +3761,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<PersonAward<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
     pub fn maybe_award(mut self, value: Option<PersonAward<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -3771,12 +3774,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<PersonAwards<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
     pub fn maybe_awards(mut self, value: Option<PersonAwards<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -3784,12 +3787,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `birthDate` field (optional)
     pub fn birth_date(mut self, value: impl Into<Option<PersonBirthDate<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `birthDate` field to an Option value (optional)
     pub fn maybe_birth_date(mut self, value: Option<PersonBirthDate<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -3800,12 +3803,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonBirthPlace<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `birthPlace` field to an Option value (optional)
     pub fn maybe_birth_place(mut self, value: Option<PersonBirthPlace<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -3813,12 +3816,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `brand` field (optional)
     pub fn brand(mut self, value: impl Into<Option<PersonBrand<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `brand` field to an Option value (optional)
     pub fn maybe_brand(mut self, value: Option<PersonBrand<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -3826,12 +3829,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `callSign` field (optional)
     pub fn call_sign(mut self, value: impl Into<Option<PersonCallSign<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `callSign` field to an Option value (optional)
     pub fn maybe_call_sign(mut self, value: Option<PersonCallSign<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -3839,12 +3842,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `children` field (optional)
     pub fn children(mut self, value: impl Into<Option<PersonChildren<'a>>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `children` field to an Option value (optional)
     pub fn maybe_children(mut self, value: Option<PersonChildren<'a>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -3852,12 +3855,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `colleague` field (optional)
     pub fn colleague(mut self, value: impl Into<Option<PersonColleague<'a>>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `colleague` field to an Option value (optional)
     pub fn maybe_colleague(mut self, value: Option<PersonColleague<'a>>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -3865,12 +3868,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `colleagues` field (optional)
     pub fn colleagues(mut self, value: impl Into<Option<PersonColleagues<'a>>>) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `colleagues` field to an Option value (optional)
     pub fn maybe_colleagues(mut self, value: Option<PersonColleagues<'a>>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -3881,12 +3884,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonContactPoint<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `contactPoint` field to an Option value (optional)
     pub fn maybe_contact_point(mut self, value: Option<PersonContactPoint<'a>>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -3897,7 +3900,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonContactPoints<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `contactPoints` field to an Option value (optional)
@@ -3905,7 +3908,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: Option<PersonContactPoints<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -3913,12 +3916,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `deathDate` field (optional)
     pub fn death_date(mut self, value: impl Into<Option<PersonDeathDate<'a>>>) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `deathDate` field to an Option value (optional)
     pub fn maybe_death_date(mut self, value: Option<PersonDeathDate<'a>>) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -3929,12 +3932,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonDeathPlace<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `deathPlace` field to an Option value (optional)
     pub fn maybe_death_place(mut self, value: Option<PersonDeathPlace<'a>>) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -3945,12 +3948,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<PersonDescription<'a>>) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -3961,7 +3964,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonDisambiguatingDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `disambiguatingDescription` field to an Option value (optional)
@@ -3969,7 +3972,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: Option<PersonDisambiguatingDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -3977,12 +3980,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `duns` field (optional)
     pub fn duns(mut self, value: impl Into<Option<PersonDuns<'a>>>) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `duns` field to an Option value (optional)
     pub fn maybe_duns(mut self, value: Option<PersonDuns<'a>>) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -3990,12 +3993,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `email` field (optional)
     pub fn email(mut self, value: impl Into<Option<PersonEmail<'a>>>) -> Self {
-        self.__unsafe_private_named.23 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `email` field to an Option value (optional)
     pub fn maybe_email(mut self, value: Option<PersonEmail<'a>>) -> Self {
-        self.__unsafe_private_named.23 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -4006,12 +4009,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonFamilyName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.24 = value.into();
+        self._fields.24 = value.into();
         self
     }
     /// Set the `familyName` field to an Option value (optional)
     pub fn maybe_family_name(mut self, value: Option<PersonFamilyName<'a>>) -> Self {
-        self.__unsafe_private_named.24 = value;
+        self._fields.24 = value;
         self
     }
 }
@@ -4019,12 +4022,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `faxNumber` field (optional)
     pub fn fax_number(mut self, value: impl Into<Option<PersonFaxNumber<'a>>>) -> Self {
-        self.__unsafe_private_named.25 = value.into();
+        self._fields.25 = value.into();
         self
     }
     /// Set the `faxNumber` field to an Option value (optional)
     pub fn maybe_fax_number(mut self, value: Option<PersonFaxNumber<'a>>) -> Self {
-        self.__unsafe_private_named.25 = value;
+        self._fields.25 = value;
         self
     }
 }
@@ -4032,12 +4035,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `follows` field (optional)
     pub fn follows(mut self, value: impl Into<Option<PersonFollows<'a>>>) -> Self {
-        self.__unsafe_private_named.26 = value.into();
+        self._fields.26 = value.into();
         self
     }
     /// Set the `follows` field to an Option value (optional)
     pub fn maybe_follows(mut self, value: Option<PersonFollows<'a>>) -> Self {
-        self.__unsafe_private_named.26 = value;
+        self._fields.26 = value;
         self
     }
 }
@@ -4045,12 +4048,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `funder` field (optional)
     pub fn funder(mut self, value: impl Into<Option<PersonFunder<'a>>>) -> Self {
-        self.__unsafe_private_named.27 = value.into();
+        self._fields.27 = value.into();
         self
     }
     /// Set the `funder` field to an Option value (optional)
     pub fn maybe_funder(mut self, value: Option<PersonFunder<'a>>) -> Self {
-        self.__unsafe_private_named.27 = value;
+        self._fields.27 = value;
         self
     }
 }
@@ -4058,12 +4061,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<PersonFunding<'a>>>) -> Self {
-        self.__unsafe_private_named.28 = value.into();
+        self._fields.28 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
     pub fn maybe_funding(mut self, value: Option<PersonFunding<'a>>) -> Self {
-        self.__unsafe_private_named.28 = value;
+        self._fields.28 = value;
         self
     }
 }
@@ -4071,12 +4074,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `gender` field (optional)
     pub fn gender(mut self, value: impl Into<Option<PersonGender<'a>>>) -> Self {
-        self.__unsafe_private_named.29 = value.into();
+        self._fields.29 = value.into();
         self
     }
     /// Set the `gender` field to an Option value (optional)
     pub fn maybe_gender(mut self, value: Option<PersonGender<'a>>) -> Self {
-        self.__unsafe_private_named.29 = value;
+        self._fields.29 = value;
         self
     }
 }
@@ -4084,12 +4087,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `givenName` field (optional)
     pub fn given_name(mut self, value: impl Into<Option<PersonGivenName<'a>>>) -> Self {
-        self.__unsafe_private_named.30 = value.into();
+        self._fields.30 = value.into();
         self
     }
     /// Set the `givenName` field to an Option value (optional)
     pub fn maybe_given_name(mut self, value: Option<PersonGivenName<'a>>) -> Self {
-        self.__unsafe_private_named.30 = value;
+        self._fields.30 = value;
         self
     }
 }
@@ -4100,7 +4103,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonGlobalLocationNumber<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value.into();
+        self._fields.31 = value.into();
         self
     }
     /// Set the `globalLocationNumber` field to an Option value (optional)
@@ -4108,7 +4111,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: Option<PersonGlobalLocationNumber<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value;
+        self._fields.31 = value;
         self
     }
 }
@@ -4119,7 +4122,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonHasCertification<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value.into();
+        self._fields.32 = value.into();
         self
     }
     /// Set the `hasCertification` field to an Option value (optional)
@@ -4127,7 +4130,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: Option<PersonHasCertification<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value;
+        self._fields.32 = value;
         self
     }
 }
@@ -4138,7 +4141,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonHasCredential<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value.into();
+        self._fields.33 = value.into();
         self
     }
     /// Set the `hasCredential` field to an Option value (optional)
@@ -4146,7 +4149,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: Option<PersonHasCredential<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value;
+        self._fields.33 = value;
         self
     }
 }
@@ -4157,7 +4160,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonHasOccupation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.34 = value.into();
+        self._fields.34 = value.into();
         self
     }
     /// Set the `hasOccupation` field to an Option value (optional)
@@ -4165,7 +4168,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: Option<PersonHasOccupation<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.34 = value;
+        self._fields.34 = value;
         self
     }
 }
@@ -4176,7 +4179,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonHasOfferCatalog<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value.into();
+        self._fields.35 = value.into();
         self
     }
     /// Set the `hasOfferCatalog` field to an Option value (optional)
@@ -4184,7 +4187,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: Option<PersonHasOfferCatalog<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value;
+        self._fields.35 = value;
         self
     }
 }
@@ -4192,12 +4195,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `hasPOS` field (optional)
     pub fn has_pos(mut self, value: impl Into<Option<PersonHasPos<'a>>>) -> Self {
-        self.__unsafe_private_named.36 = value.into();
+        self._fields.36 = value.into();
         self
     }
     /// Set the `hasPOS` field to an Option value (optional)
     pub fn maybe_has_pos(mut self, value: Option<PersonHasPos<'a>>) -> Self {
-        self.__unsafe_private_named.36 = value;
+        self._fields.36 = value;
         self
     }
 }
@@ -4205,12 +4208,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `height` field (optional)
     pub fn height(mut self, value: impl Into<Option<PersonHeight<'a>>>) -> Self {
-        self.__unsafe_private_named.37 = value.into();
+        self._fields.37 = value.into();
         self
     }
     /// Set the `height` field to an Option value (optional)
     pub fn maybe_height(mut self, value: Option<PersonHeight<'a>>) -> Self {
-        self.__unsafe_private_named.37 = value;
+        self._fields.37 = value;
         self
     }
 }
@@ -4221,12 +4224,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonHomeLocation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.38 = value.into();
+        self._fields.38 = value.into();
         self
     }
     /// Set the `homeLocation` field to an Option value (optional)
     pub fn maybe_home_location(mut self, value: Option<PersonHomeLocation<'a>>) -> Self {
-        self.__unsafe_private_named.38 = value;
+        self._fields.38 = value;
         self
     }
 }
@@ -4237,7 +4240,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonHonorificPrefix<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value.into();
+        self._fields.39 = value.into();
         self
     }
     /// Set the `honorificPrefix` field to an Option value (optional)
@@ -4245,7 +4248,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: Option<PersonHonorificPrefix<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value;
+        self._fields.39 = value;
         self
     }
 }
@@ -4256,7 +4259,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonHonorificSuffix<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.40 = value.into();
+        self._fields.40 = value.into();
         self
     }
     /// Set the `honorificSuffix` field to an Option value (optional)
@@ -4264,7 +4267,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: Option<PersonHonorificSuffix<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.40 = value;
+        self._fields.40 = value;
         self
     }
 }
@@ -4272,12 +4275,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `identifier` field (optional)
     pub fn identifier(mut self, value: impl Into<Option<PersonIdentifier<'a>>>) -> Self {
-        self.__unsafe_private_named.41 = value.into();
+        self._fields.41 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
     pub fn maybe_identifier(mut self, value: Option<PersonIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.41 = value;
+        self._fields.41 = value;
         self
     }
 }
@@ -4285,12 +4288,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<PersonImage<'a>>>) -> Self {
-        self.__unsafe_private_named.42 = value.into();
+        self._fields.42 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<PersonImage<'a>>) -> Self {
-        self.__unsafe_private_named.42 = value;
+        self._fields.42 = value;
         self
     }
 }
@@ -4301,7 +4304,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonInteractionStatistic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.43 = value.into();
+        self._fields.43 = value.into();
         self
     }
     /// Set the `interactionStatistic` field to an Option value (optional)
@@ -4309,7 +4312,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: Option<PersonInteractionStatistic<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.43 = value;
+        self._fields.43 = value;
         self
     }
 }
@@ -4317,12 +4320,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `isicV4` field (optional)
     pub fn isic_v4(mut self, value: impl Into<Option<PersonIsicV4<'a>>>) -> Self {
-        self.__unsafe_private_named.44 = value.into();
+        self._fields.44 = value.into();
         self
     }
     /// Set the `isicV4` field to an Option value (optional)
     pub fn maybe_isic_v4(mut self, value: Option<PersonIsicV4<'a>>) -> Self {
-        self.__unsafe_private_named.44 = value;
+        self._fields.44 = value;
         self
     }
 }
@@ -4330,12 +4333,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `jobTitle` field (optional)
     pub fn job_title(mut self, value: impl Into<Option<PersonJobTitle<'a>>>) -> Self {
-        self.__unsafe_private_named.45 = value.into();
+        self._fields.45 = value.into();
         self
     }
     /// Set the `jobTitle` field to an Option value (optional)
     pub fn maybe_job_title(mut self, value: Option<PersonJobTitle<'a>>) -> Self {
-        self.__unsafe_private_named.45 = value;
+        self._fields.45 = value;
         self
     }
 }
@@ -4343,12 +4346,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `knows` field (optional)
     pub fn knows(mut self, value: impl Into<Option<PersonKnows<'a>>>) -> Self {
-        self.__unsafe_private_named.46 = value.into();
+        self._fields.46 = value.into();
         self
     }
     /// Set the `knows` field to an Option value (optional)
     pub fn maybe_knows(mut self, value: Option<PersonKnows<'a>>) -> Self {
-        self.__unsafe_private_named.46 = value;
+        self._fields.46 = value;
         self
     }
 }
@@ -4359,12 +4362,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonKnowsAbout<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.47 = value.into();
+        self._fields.47 = value.into();
         self
     }
     /// Set the `knowsAbout` field to an Option value (optional)
     pub fn maybe_knows_about(mut self, value: Option<PersonKnowsAbout<'a>>) -> Self {
-        self.__unsafe_private_named.47 = value;
+        self._fields.47 = value;
         self
     }
 }
@@ -4375,7 +4378,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonKnowsLanguage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value.into();
+        self._fields.48 = value.into();
         self
     }
     /// Set the `knowsLanguage` field to an Option value (optional)
@@ -4383,7 +4386,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: Option<PersonKnowsLanguage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value;
+        self._fields.48 = value;
         self
     }
 }
@@ -4394,7 +4397,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonMainEntityOfPage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.49 = value.into();
+        self._fields.49 = value.into();
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
@@ -4402,7 +4405,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: Option<PersonMainEntityOfPage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.49 = value;
+        self._fields.49 = value;
         self
     }
 }
@@ -4413,12 +4416,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonMakesOffer<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.50 = value.into();
+        self._fields.50 = value.into();
         self
     }
     /// Set the `makesOffer` field to an Option value (optional)
     pub fn maybe_makes_offer(mut self, value: Option<PersonMakesOffer<'a>>) -> Self {
-        self.__unsafe_private_named.50 = value;
+        self._fields.50 = value;
         self
     }
 }
@@ -4426,12 +4429,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `memberOf` field (optional)
     pub fn member_of(mut self, value: impl Into<Option<PersonMemberOf<'a>>>) -> Self {
-        self.__unsafe_private_named.51 = value.into();
+        self._fields.51 = value.into();
         self
     }
     /// Set the `memberOf` field to an Option value (optional)
     pub fn maybe_member_of(mut self, value: Option<PersonMemberOf<'a>>) -> Self {
-        self.__unsafe_private_named.51 = value;
+        self._fields.51 = value;
         self
     }
 }
@@ -4439,12 +4442,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `naics` field (optional)
     pub fn naics(mut self, value: impl Into<Option<PersonNaics<'a>>>) -> Self {
-        self.__unsafe_private_named.52 = value.into();
+        self._fields.52 = value.into();
         self
     }
     /// Set the `naics` field to an Option value (optional)
     pub fn maybe_naics(mut self, value: Option<PersonNaics<'a>>) -> Self {
-        self.__unsafe_private_named.52 = value;
+        self._fields.52 = value;
         self
     }
 }
@@ -4452,12 +4455,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<PersonName<'a>>>) -> Self {
-        self.__unsafe_private_named.53 = value.into();
+        self._fields.53 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<PersonName<'a>>) -> Self {
-        self.__unsafe_private_named.53 = value;
+        self._fields.53 = value;
         self
     }
 }
@@ -4468,12 +4471,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonNationality<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.54 = value.into();
+        self._fields.54 = value.into();
         self
     }
     /// Set the `nationality` field to an Option value (optional)
     pub fn maybe_nationality(mut self, value: Option<PersonNationality<'a>>) -> Self {
-        self.__unsafe_private_named.54 = value;
+        self._fields.54 = value;
         self
     }
 }
@@ -4481,12 +4484,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `netWorth` field (optional)
     pub fn net_worth(mut self, value: impl Into<Option<PersonNetWorth<'a>>>) -> Self {
-        self.__unsafe_private_named.55 = value.into();
+        self._fields.55 = value.into();
         self
     }
     /// Set the `netWorth` field to an Option value (optional)
     pub fn maybe_net_worth(mut self, value: Option<PersonNetWorth<'a>>) -> Self {
-        self.__unsafe_private_named.55 = value;
+        self._fields.55 = value;
         self
     }
 }
@@ -4494,12 +4497,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `owns` field (optional)
     pub fn owns(mut self, value: impl Into<Option<PersonOwns<'a>>>) -> Self {
-        self.__unsafe_private_named.56 = value.into();
+        self._fields.56 = value.into();
         self
     }
     /// Set the `owns` field to an Option value (optional)
     pub fn maybe_owns(mut self, value: Option<PersonOwns<'a>>) -> Self {
-        self.__unsafe_private_named.56 = value;
+        self._fields.56 = value;
         self
     }
 }
@@ -4507,12 +4510,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<PersonParent<'a>>>) -> Self {
-        self.__unsafe_private_named.57 = value.into();
+        self._fields.57 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
     pub fn maybe_parent(mut self, value: Option<PersonParent<'a>>) -> Self {
-        self.__unsafe_private_named.57 = value;
+        self._fields.57 = value;
         self
     }
 }
@@ -4520,12 +4523,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `parents` field (optional)
     pub fn parents(mut self, value: impl Into<Option<PersonParents<'a>>>) -> Self {
-        self.__unsafe_private_named.58 = value.into();
+        self._fields.58 = value.into();
         self
     }
     /// Set the `parents` field to an Option value (optional)
     pub fn maybe_parents(mut self, value: Option<PersonParents<'a>>) -> Self {
-        self.__unsafe_private_named.58 = value;
+        self._fields.58 = value;
         self
     }
 }
@@ -4536,12 +4539,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonPerformerIn<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.59 = value.into();
+        self._fields.59 = value.into();
         self
     }
     /// Set the `performerIn` field to an Option value (optional)
     pub fn maybe_performer_in(mut self, value: Option<PersonPerformerIn<'a>>) -> Self {
-        self.__unsafe_private_named.59 = value;
+        self._fields.59 = value;
         self
     }
 }
@@ -4552,7 +4555,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonPotentialAction<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.60 = value.into();
+        self._fields.60 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
@@ -4560,7 +4563,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: Option<PersonPotentialAction<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.60 = value;
+        self._fields.60 = value;
         self
     }
 }
@@ -4568,12 +4571,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `pronouns` field (optional)
     pub fn pronouns(mut self, value: impl Into<Option<PersonPronouns<'a>>>) -> Self {
-        self.__unsafe_private_named.61 = value.into();
+        self._fields.61 = value.into();
         self
     }
     /// Set the `pronouns` field to an Option value (optional)
     pub fn maybe_pronouns(mut self, value: Option<PersonPronouns<'a>>) -> Self {
-        self.__unsafe_private_named.61 = value;
+        self._fields.61 = value;
         self
     }
 }
@@ -4584,7 +4587,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonPublishingPrinciples<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.62 = value.into();
+        self._fields.62 = value.into();
         self
     }
     /// Set the `publishingPrinciples` field to an Option value (optional)
@@ -4592,7 +4595,7 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: Option<PersonPublishingPrinciples<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.62 = value;
+        self._fields.62 = value;
         self
     }
 }
@@ -4600,12 +4603,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `relatedTo` field (optional)
     pub fn related_to(mut self, value: impl Into<Option<PersonRelatedTo<'a>>>) -> Self {
-        self.__unsafe_private_named.63 = value.into();
+        self._fields.63 = value.into();
         self
     }
     /// Set the `relatedTo` field to an Option value (optional)
     pub fn maybe_related_to(mut self, value: Option<PersonRelatedTo<'a>>) -> Self {
-        self.__unsafe_private_named.63 = value;
+        self._fields.63 = value;
         self
     }
 }
@@ -4613,12 +4616,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<PersonSameAs<'a>>>) -> Self {
-        self.__unsafe_private_named.64 = value.into();
+        self._fields.64 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
     pub fn maybe_same_as(mut self, value: Option<PersonSameAs<'a>>) -> Self {
-        self.__unsafe_private_named.64 = value;
+        self._fields.64 = value;
         self
     }
 }
@@ -4626,12 +4629,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `seeks` field (optional)
     pub fn seeks(mut self, value: impl Into<Option<PersonSeeks<'a>>>) -> Self {
-        self.__unsafe_private_named.65 = value.into();
+        self._fields.65 = value.into();
         self
     }
     /// Set the `seeks` field to an Option value (optional)
     pub fn maybe_seeks(mut self, value: Option<PersonSeeks<'a>>) -> Self {
-        self.__unsafe_private_named.65 = value;
+        self._fields.65 = value;
         self
     }
 }
@@ -4639,12 +4642,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `sibling` field (optional)
     pub fn sibling(mut self, value: impl Into<Option<PersonSibling<'a>>>) -> Self {
-        self.__unsafe_private_named.66 = value.into();
+        self._fields.66 = value.into();
         self
     }
     /// Set the `sibling` field to an Option value (optional)
     pub fn maybe_sibling(mut self, value: Option<PersonSibling<'a>>) -> Self {
-        self.__unsafe_private_named.66 = value;
+        self._fields.66 = value;
         self
     }
 }
@@ -4652,12 +4655,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `siblings` field (optional)
     pub fn siblings(mut self, value: impl Into<Option<PersonSiblings<'a>>>) -> Self {
-        self.__unsafe_private_named.67 = value.into();
+        self._fields.67 = value.into();
         self
     }
     /// Set the `siblings` field to an Option value (optional)
     pub fn maybe_siblings(mut self, value: Option<PersonSiblings<'a>>) -> Self {
-        self.__unsafe_private_named.67 = value;
+        self._fields.67 = value;
         self
     }
 }
@@ -4665,12 +4668,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `skills` field (optional)
     pub fn skills(mut self, value: impl Into<Option<PersonSkills<'a>>>) -> Self {
-        self.__unsafe_private_named.68 = value.into();
+        self._fields.68 = value.into();
         self
     }
     /// Set the `skills` field to an Option value (optional)
     pub fn maybe_skills(mut self, value: Option<PersonSkills<'a>>) -> Self {
-        self.__unsafe_private_named.68 = value;
+        self._fields.68 = value;
         self
     }
 }
@@ -4678,12 +4681,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `sponsor` field (optional)
     pub fn sponsor(mut self, value: impl Into<Option<PersonSponsor<'a>>>) -> Self {
-        self.__unsafe_private_named.69 = value.into();
+        self._fields.69 = value.into();
         self
     }
     /// Set the `sponsor` field to an Option value (optional)
     pub fn maybe_sponsor(mut self, value: Option<PersonSponsor<'a>>) -> Self {
-        self.__unsafe_private_named.69 = value;
+        self._fields.69 = value;
         self
     }
 }
@@ -4691,12 +4694,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `spouse` field (optional)
     pub fn spouse(mut self, value: impl Into<Option<PersonSpouse<'a>>>) -> Self {
-        self.__unsafe_private_named.70 = value.into();
+        self._fields.70 = value.into();
         self
     }
     /// Set the `spouse` field to an Option value (optional)
     pub fn maybe_spouse(mut self, value: Option<PersonSpouse<'a>>) -> Self {
-        self.__unsafe_private_named.70 = value;
+        self._fields.70 = value;
         self
     }
 }
@@ -4704,12 +4707,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(mut self, value: impl Into<Option<PersonSubjectOf<'a>>>) -> Self {
-        self.__unsafe_private_named.71 = value.into();
+        self._fields.71 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
     pub fn maybe_subject_of(mut self, value: Option<PersonSubjectOf<'a>>) -> Self {
-        self.__unsafe_private_named.71 = value;
+        self._fields.71 = value;
         self
     }
 }
@@ -4717,12 +4720,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `taxID` field (optional)
     pub fn tax_id(mut self, value: impl Into<Option<PersonTaxId<'a>>>) -> Self {
-        self.__unsafe_private_named.72 = value.into();
+        self._fields.72 = value.into();
         self
     }
     /// Set the `taxID` field to an Option value (optional)
     pub fn maybe_tax_id(mut self, value: Option<PersonTaxId<'a>>) -> Self {
-        self.__unsafe_private_named.72 = value;
+        self._fields.72 = value;
         self
     }
 }
@@ -4730,12 +4733,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `telephone` field (optional)
     pub fn telephone(mut self, value: impl Into<Option<PersonTelephone<'a>>>) -> Self {
-        self.__unsafe_private_named.73 = value.into();
+        self._fields.73 = value.into();
         self
     }
     /// Set the `telephone` field to an Option value (optional)
     pub fn maybe_telephone(mut self, value: Option<PersonTelephone<'a>>) -> Self {
-        self.__unsafe_private_named.73 = value;
+        self._fields.73 = value;
         self
     }
 }
@@ -4743,12 +4746,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<PersonUrl<'a>>>) -> Self {
-        self.__unsafe_private_named.74 = value.into();
+        self._fields.74 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<PersonUrl<'a>>) -> Self {
-        self.__unsafe_private_named.74 = value;
+        self._fields.74 = value;
         self
     }
 }
@@ -4756,12 +4759,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `vatID` field (optional)
     pub fn vat_id(mut self, value: impl Into<Option<PersonVatId<'a>>>) -> Self {
-        self.__unsafe_private_named.75 = value.into();
+        self._fields.75 = value.into();
         self
     }
     /// Set the `vatID` field to an Option value (optional)
     pub fn maybe_vat_id(mut self, value: Option<PersonVatId<'a>>) -> Self {
-        self.__unsafe_private_named.75 = value;
+        self._fields.75 = value;
         self
     }
 }
@@ -4769,12 +4772,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `weight` field (optional)
     pub fn weight(mut self, value: impl Into<Option<PersonWeight<'a>>>) -> Self {
-        self.__unsafe_private_named.76 = value.into();
+        self._fields.76 = value.into();
         self
     }
     /// Set the `weight` field to an Option value (optional)
     pub fn maybe_weight(mut self, value: Option<PersonWeight<'a>>) -> Self {
-        self.__unsafe_private_named.76 = value;
+        self._fields.76 = value;
         self
     }
 }
@@ -4785,12 +4788,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<PersonWorkLocation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.77 = value.into();
+        self._fields.77 = value.into();
         self
     }
     /// Set the `workLocation` field to an Option value (optional)
     pub fn maybe_work_location(mut self, value: Option<PersonWorkLocation<'a>>) -> Self {
-        self.__unsafe_private_named.77 = value;
+        self._fields.77 = value;
         self
     }
 }
@@ -4798,12 +4801,12 @@ impl<'a, S: person_state::State> PersonBuilder<'a, S> {
 impl<'a, S: person_state::State> PersonBuilder<'a, S> {
     /// Set the `worksFor` field (optional)
     pub fn works_for(mut self, value: impl Into<Option<PersonWorksFor<'a>>>) -> Self {
-        self.__unsafe_private_named.78 = value.into();
+        self._fields.78 = value.into();
         self
     }
     /// Set the `worksFor` field to an Option value (optional)
     pub fn maybe_works_for(mut self, value: Option<PersonWorksFor<'a>>) -> Self {
-        self.__unsafe_private_named.78 = value;
+        self._fields.78 = value;
         self
     }
 }
@@ -4815,85 +4818,85 @@ where
     /// Build the final struct
     pub fn build(self) -> Person<'a> {
         Person {
-            additional_name: self.__unsafe_private_named.0,
-            additional_type: self.__unsafe_private_named.1,
-            address: self.__unsafe_private_named.2,
-            affiliation: self.__unsafe_private_named.3,
-            agent_interaction_statistic: self.__unsafe_private_named.4,
-            alternate_name: self.__unsafe_private_named.5,
-            alumni_of: self.__unsafe_private_named.6,
-            award: self.__unsafe_private_named.7,
-            awards: self.__unsafe_private_named.8,
-            birth_date: self.__unsafe_private_named.9,
-            birth_place: self.__unsafe_private_named.10,
-            brand: self.__unsafe_private_named.11,
-            call_sign: self.__unsafe_private_named.12,
-            children: self.__unsafe_private_named.13,
-            colleague: self.__unsafe_private_named.14,
-            colleagues: self.__unsafe_private_named.15,
-            contact_point: self.__unsafe_private_named.16,
-            contact_points: self.__unsafe_private_named.17,
-            death_date: self.__unsafe_private_named.18,
-            death_place: self.__unsafe_private_named.19,
-            description: self.__unsafe_private_named.20,
-            disambiguating_description: self.__unsafe_private_named.21,
-            duns: self.__unsafe_private_named.22,
-            email: self.__unsafe_private_named.23,
-            family_name: self.__unsafe_private_named.24,
-            fax_number: self.__unsafe_private_named.25,
-            follows: self.__unsafe_private_named.26,
-            funder: self.__unsafe_private_named.27,
-            funding: self.__unsafe_private_named.28,
-            gender: self.__unsafe_private_named.29,
-            given_name: self.__unsafe_private_named.30,
-            global_location_number: self.__unsafe_private_named.31,
-            has_certification: self.__unsafe_private_named.32,
-            has_credential: self.__unsafe_private_named.33,
-            has_occupation: self.__unsafe_private_named.34,
-            has_offer_catalog: self.__unsafe_private_named.35,
-            has_pos: self.__unsafe_private_named.36,
-            height: self.__unsafe_private_named.37,
-            home_location: self.__unsafe_private_named.38,
-            honorific_prefix: self.__unsafe_private_named.39,
-            honorific_suffix: self.__unsafe_private_named.40,
-            identifier: self.__unsafe_private_named.41,
-            image: self.__unsafe_private_named.42,
-            interaction_statistic: self.__unsafe_private_named.43,
-            isic_v4: self.__unsafe_private_named.44,
-            job_title: self.__unsafe_private_named.45,
-            knows: self.__unsafe_private_named.46,
-            knows_about: self.__unsafe_private_named.47,
-            knows_language: self.__unsafe_private_named.48,
-            main_entity_of_page: self.__unsafe_private_named.49,
-            makes_offer: self.__unsafe_private_named.50,
-            member_of: self.__unsafe_private_named.51,
-            naics: self.__unsafe_private_named.52,
-            name: self.__unsafe_private_named.53,
-            nationality: self.__unsafe_private_named.54,
-            net_worth: self.__unsafe_private_named.55,
-            owns: self.__unsafe_private_named.56,
-            parent: self.__unsafe_private_named.57,
-            parents: self.__unsafe_private_named.58,
-            performer_in: self.__unsafe_private_named.59,
-            potential_action: self.__unsafe_private_named.60,
-            pronouns: self.__unsafe_private_named.61,
-            publishing_principles: self.__unsafe_private_named.62,
-            related_to: self.__unsafe_private_named.63,
-            same_as: self.__unsafe_private_named.64,
-            seeks: self.__unsafe_private_named.65,
-            sibling: self.__unsafe_private_named.66,
-            siblings: self.__unsafe_private_named.67,
-            skills: self.__unsafe_private_named.68,
-            sponsor: self.__unsafe_private_named.69,
-            spouse: self.__unsafe_private_named.70,
-            subject_of: self.__unsafe_private_named.71,
-            tax_id: self.__unsafe_private_named.72,
-            telephone: self.__unsafe_private_named.73,
-            url: self.__unsafe_private_named.74,
-            vat_id: self.__unsafe_private_named.75,
-            weight: self.__unsafe_private_named.76,
-            work_location: self.__unsafe_private_named.77,
-            works_for: self.__unsafe_private_named.78,
+            additional_name: self._fields.0,
+            additional_type: self._fields.1,
+            address: self._fields.2,
+            affiliation: self._fields.3,
+            agent_interaction_statistic: self._fields.4,
+            alternate_name: self._fields.5,
+            alumni_of: self._fields.6,
+            award: self._fields.7,
+            awards: self._fields.8,
+            birth_date: self._fields.9,
+            birth_place: self._fields.10,
+            brand: self._fields.11,
+            call_sign: self._fields.12,
+            children: self._fields.13,
+            colleague: self._fields.14,
+            colleagues: self._fields.15,
+            contact_point: self._fields.16,
+            contact_points: self._fields.17,
+            death_date: self._fields.18,
+            death_place: self._fields.19,
+            description: self._fields.20,
+            disambiguating_description: self._fields.21,
+            duns: self._fields.22,
+            email: self._fields.23,
+            family_name: self._fields.24,
+            fax_number: self._fields.25,
+            follows: self._fields.26,
+            funder: self._fields.27,
+            funding: self._fields.28,
+            gender: self._fields.29,
+            given_name: self._fields.30,
+            global_location_number: self._fields.31,
+            has_certification: self._fields.32,
+            has_credential: self._fields.33,
+            has_occupation: self._fields.34,
+            has_offer_catalog: self._fields.35,
+            has_pos: self._fields.36,
+            height: self._fields.37,
+            home_location: self._fields.38,
+            honorific_prefix: self._fields.39,
+            honorific_suffix: self._fields.40,
+            identifier: self._fields.41,
+            image: self._fields.42,
+            interaction_statistic: self._fields.43,
+            isic_v4: self._fields.44,
+            job_title: self._fields.45,
+            knows: self._fields.46,
+            knows_about: self._fields.47,
+            knows_language: self._fields.48,
+            main_entity_of_page: self._fields.49,
+            makes_offer: self._fields.50,
+            member_of: self._fields.51,
+            naics: self._fields.52,
+            name: self._fields.53,
+            nationality: self._fields.54,
+            net_worth: self._fields.55,
+            owns: self._fields.56,
+            parent: self._fields.57,
+            parents: self._fields.58,
+            performer_in: self._fields.59,
+            potential_action: self._fields.60,
+            pronouns: self._fields.61,
+            publishing_principles: self._fields.62,
+            related_to: self._fields.63,
+            same_as: self._fields.64,
+            seeks: self._fields.65,
+            sibling: self._fields.66,
+            siblings: self._fields.67,
+            skills: self._fields.68,
+            sponsor: self._fields.69,
+            spouse: self._fields.70,
+            subject_of: self._fields.71,
+            tax_id: self._fields.72,
+            telephone: self._fields.73,
+            url: self._fields.74,
+            vat_id: self._fields.75,
+            weight: self._fields.76,
+            work_location: self._fields.77,
+            works_for: self._fields.78,
             extra_data: Default::default(),
         }
     }
@@ -4903,85 +4906,85 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Person<'a> {
         Person {
-            additional_name: self.__unsafe_private_named.0,
-            additional_type: self.__unsafe_private_named.1,
-            address: self.__unsafe_private_named.2,
-            affiliation: self.__unsafe_private_named.3,
-            agent_interaction_statistic: self.__unsafe_private_named.4,
-            alternate_name: self.__unsafe_private_named.5,
-            alumni_of: self.__unsafe_private_named.6,
-            award: self.__unsafe_private_named.7,
-            awards: self.__unsafe_private_named.8,
-            birth_date: self.__unsafe_private_named.9,
-            birth_place: self.__unsafe_private_named.10,
-            brand: self.__unsafe_private_named.11,
-            call_sign: self.__unsafe_private_named.12,
-            children: self.__unsafe_private_named.13,
-            colleague: self.__unsafe_private_named.14,
-            colleagues: self.__unsafe_private_named.15,
-            contact_point: self.__unsafe_private_named.16,
-            contact_points: self.__unsafe_private_named.17,
-            death_date: self.__unsafe_private_named.18,
-            death_place: self.__unsafe_private_named.19,
-            description: self.__unsafe_private_named.20,
-            disambiguating_description: self.__unsafe_private_named.21,
-            duns: self.__unsafe_private_named.22,
-            email: self.__unsafe_private_named.23,
-            family_name: self.__unsafe_private_named.24,
-            fax_number: self.__unsafe_private_named.25,
-            follows: self.__unsafe_private_named.26,
-            funder: self.__unsafe_private_named.27,
-            funding: self.__unsafe_private_named.28,
-            gender: self.__unsafe_private_named.29,
-            given_name: self.__unsafe_private_named.30,
-            global_location_number: self.__unsafe_private_named.31,
-            has_certification: self.__unsafe_private_named.32,
-            has_credential: self.__unsafe_private_named.33,
-            has_occupation: self.__unsafe_private_named.34,
-            has_offer_catalog: self.__unsafe_private_named.35,
-            has_pos: self.__unsafe_private_named.36,
-            height: self.__unsafe_private_named.37,
-            home_location: self.__unsafe_private_named.38,
-            honorific_prefix: self.__unsafe_private_named.39,
-            honorific_suffix: self.__unsafe_private_named.40,
-            identifier: self.__unsafe_private_named.41,
-            image: self.__unsafe_private_named.42,
-            interaction_statistic: self.__unsafe_private_named.43,
-            isic_v4: self.__unsafe_private_named.44,
-            job_title: self.__unsafe_private_named.45,
-            knows: self.__unsafe_private_named.46,
-            knows_about: self.__unsafe_private_named.47,
-            knows_language: self.__unsafe_private_named.48,
-            main_entity_of_page: self.__unsafe_private_named.49,
-            makes_offer: self.__unsafe_private_named.50,
-            member_of: self.__unsafe_private_named.51,
-            naics: self.__unsafe_private_named.52,
-            name: self.__unsafe_private_named.53,
-            nationality: self.__unsafe_private_named.54,
-            net_worth: self.__unsafe_private_named.55,
-            owns: self.__unsafe_private_named.56,
-            parent: self.__unsafe_private_named.57,
-            parents: self.__unsafe_private_named.58,
-            performer_in: self.__unsafe_private_named.59,
-            potential_action: self.__unsafe_private_named.60,
-            pronouns: self.__unsafe_private_named.61,
-            publishing_principles: self.__unsafe_private_named.62,
-            related_to: self.__unsafe_private_named.63,
-            same_as: self.__unsafe_private_named.64,
-            seeks: self.__unsafe_private_named.65,
-            sibling: self.__unsafe_private_named.66,
-            siblings: self.__unsafe_private_named.67,
-            skills: self.__unsafe_private_named.68,
-            sponsor: self.__unsafe_private_named.69,
-            spouse: self.__unsafe_private_named.70,
-            subject_of: self.__unsafe_private_named.71,
-            tax_id: self.__unsafe_private_named.72,
-            telephone: self.__unsafe_private_named.73,
-            url: self.__unsafe_private_named.74,
-            vat_id: self.__unsafe_private_named.75,
-            weight: self.__unsafe_private_named.76,
-            work_location: self.__unsafe_private_named.77,
-            works_for: self.__unsafe_private_named.78,
+            additional_name: self._fields.0,
+            additional_type: self._fields.1,
+            address: self._fields.2,
+            affiliation: self._fields.3,
+            agent_interaction_statistic: self._fields.4,
+            alternate_name: self._fields.5,
+            alumni_of: self._fields.6,
+            award: self._fields.7,
+            awards: self._fields.8,
+            birth_date: self._fields.9,
+            birth_place: self._fields.10,
+            brand: self._fields.11,
+            call_sign: self._fields.12,
+            children: self._fields.13,
+            colleague: self._fields.14,
+            colleagues: self._fields.15,
+            contact_point: self._fields.16,
+            contact_points: self._fields.17,
+            death_date: self._fields.18,
+            death_place: self._fields.19,
+            description: self._fields.20,
+            disambiguating_description: self._fields.21,
+            duns: self._fields.22,
+            email: self._fields.23,
+            family_name: self._fields.24,
+            fax_number: self._fields.25,
+            follows: self._fields.26,
+            funder: self._fields.27,
+            funding: self._fields.28,
+            gender: self._fields.29,
+            given_name: self._fields.30,
+            global_location_number: self._fields.31,
+            has_certification: self._fields.32,
+            has_credential: self._fields.33,
+            has_occupation: self._fields.34,
+            has_offer_catalog: self._fields.35,
+            has_pos: self._fields.36,
+            height: self._fields.37,
+            home_location: self._fields.38,
+            honorific_prefix: self._fields.39,
+            honorific_suffix: self._fields.40,
+            identifier: self._fields.41,
+            image: self._fields.42,
+            interaction_statistic: self._fields.43,
+            isic_v4: self._fields.44,
+            job_title: self._fields.45,
+            knows: self._fields.46,
+            knows_about: self._fields.47,
+            knows_language: self._fields.48,
+            main_entity_of_page: self._fields.49,
+            makes_offer: self._fields.50,
+            member_of: self._fields.51,
+            naics: self._fields.52,
+            name: self._fields.53,
+            nationality: self._fields.54,
+            net_worth: self._fields.55,
+            owns: self._fields.56,
+            parent: self._fields.57,
+            parents: self._fields.58,
+            performer_in: self._fields.59,
+            potential_action: self._fields.60,
+            pronouns: self._fields.61,
+            publishing_principles: self._fields.62,
+            related_to: self._fields.63,
+            same_as: self._fields.64,
+            seeks: self._fields.65,
+            sibling: self._fields.66,
+            siblings: self._fields.67,
+            skills: self._fields.68,
+            sponsor: self._fields.69,
+            spouse: self._fields.70,
+            subject_of: self._fields.71,
+            tax_id: self._fields.72,
+            telephone: self._fields.73,
+            url: self._fields.74,
+            vat_id: self._fields.75,
+            weight: self._fields.76,
+            work_location: self._fields.77,
+            works_for: self._fields.78,
             extra_data: Some(extra_data),
         }
     }

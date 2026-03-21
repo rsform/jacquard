@@ -7,7 +7,11 @@
 
 pub mod get_ingest_urls;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -60,45 +64,45 @@ pub mod ingest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type Type;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Type = S::Type;
+        type Url = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Url = S::Url;
         type Type = Set<members::r#type>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Type = S::Type;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct IngestBuilder<'a, S: ingest_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<UriValue<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Ingest<'a> {
@@ -112,9 +116,9 @@ impl<'a> IngestBuilder<'a, ingest_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         IngestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -129,11 +133,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> IngestBuilder<'a, ingest_state::SetType<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         IngestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -148,11 +152,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> IngestBuilder<'a, ingest_state::SetUrl<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         IngestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -160,14 +164,14 @@ where
 impl<'a, S> IngestBuilder<'a, S>
 where
     S: ingest_state::State,
-    S::Url: ingest_state::IsSet,
     S::Type: ingest_state::IsSet,
+    S::Url: ingest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Ingest<'a> {
         Ingest {
-            r#type: self.__unsafe_private_named.0.unwrap(),
-            url: self.__unsafe_private_named.1.unwrap(),
+            r#type: self._fields.0.unwrap(),
+            url: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -180,8 +184,8 @@ where
         >,
     ) -> Ingest<'a> {
         Ingest {
-            r#type: self.__unsafe_private_named.0.unwrap(),
-            url: self.__unsafe_private_named.1.unwrap(),
+            r#type: self._fields.0.unwrap(),
+            url: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

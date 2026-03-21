@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -425,8 +428,8 @@ pub mod room_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Purpose;
-        type CreatedAt;
         type Name;
+        type CreatedAt;
         type Topic;
     }
     /// Empty state - all required fields are unset
@@ -434,8 +437,8 @@ pub mod room_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Purpose = Unset;
-        type CreatedAt = Unset;
         type Name = Unset;
+        type CreatedAt = Unset;
         type Topic = Unset;
     }
     ///State transition - sets the `purpose` field to Set
@@ -443,17 +446,8 @@ pub mod room_state {
     impl<S: State> sealed::Sealed for SetPurpose<S> {}
     impl<S: State> State for SetPurpose<S> {
         type Purpose = Set<members::purpose>;
+        type Name = S::Name;
         type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Topic = S::Topic;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Purpose = S::Purpose;
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
         type Topic = S::Topic;
     }
     ///State transition - sets the `name` field to Set
@@ -461,8 +455,17 @@ pub mod room_state {
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Purpose = S::Purpose;
-        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+        type Topic = S::Topic;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Purpose = S::Purpose;
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
         type Topic = S::Topic;
     }
     ///State transition - sets the `topic` field to Set
@@ -470,8 +473,8 @@ pub mod room_state {
     impl<S: State> sealed::Sealed for SetTopic<S> {}
     impl<S: State> State for SetTopic<S> {
         type Purpose = S::Purpose;
-        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
         type Topic = Set<members::topic>;
     }
     /// Marker types for field names
@@ -479,10 +482,10 @@ pub mod room_state {
     pub mod members {
         ///Marker type for the `purpose` field
         pub struct purpose(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `topic` field
         pub struct topic(());
     }
@@ -490,8 +493,8 @@ pub mod room_state {
 
 /// Builder for constructing an instance of this type
 pub struct RoomBuilder<'a, S: room_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -500,7 +503,7 @@ pub struct RoomBuilder<'a, S: room_state::State> {
         Option<room::RoomSettings<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Room<'a> {
@@ -514,9 +517,9 @@ impl<'a> RoomBuilder<'a, room_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RoomBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -524,12 +527,12 @@ impl<'a> RoomBuilder<'a, room_state::Empty> {
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
     pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -544,11 +547,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> RoomBuilder<'a, room_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RoomBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -556,12 +559,12 @@ where
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -576,11 +579,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RoomBuilder<'a, room_state::SetName<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         RoomBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -595,11 +598,11 @@ where
         mut self,
         value: impl Into<RoomPurpose<'a>>,
     ) -> RoomBuilder<'a, room_state::SetPurpose<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         RoomBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -607,12 +610,12 @@ where
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `settings` field (optional)
     pub fn settings(mut self, value: impl Into<Option<room::RoomSettings<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `settings` field to an Option value (optional)
     pub fn maybe_settings(mut self, value: Option<room::RoomSettings<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -627,11 +630,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RoomBuilder<'a, room_state::SetTopic<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         RoomBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -640,20 +643,20 @@ impl<'a, S> RoomBuilder<'a, S>
 where
     S: room_state::State,
     S::Purpose: room_state::IsSet,
-    S::CreatedAt: room_state::IsSet,
     S::Name: room_state::IsSet,
+    S::CreatedAt: room_state::IsSet,
     S::Topic: room_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Room<'a> {
         Room {
-            category: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            name: self.__unsafe_private_named.3.unwrap(),
-            purpose: self.__unsafe_private_named.4.unwrap(),
-            settings: self.__unsafe_private_named.5,
-            topic: self.__unsafe_private_named.6.unwrap(),
+            category: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            name: self._fields.3.unwrap(),
+            purpose: self._fields.4.unwrap(),
+            settings: self._fields.5,
+            topic: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -666,13 +669,13 @@ where
         >,
     ) -> Room<'a> {
         Room {
-            category: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            name: self.__unsafe_private_named.3.unwrap(),
-            purpose: self.__unsafe_private_named.4.unwrap(),
-            settings: self.__unsafe_private_named.5,
-            topic: self.__unsafe_private_named.6.unwrap(),
+            category: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            name: self._fields.3.unwrap(),
+            purpose: self._fields.4.unwrap(),
+            settings: self._fields.5,
+            topic: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

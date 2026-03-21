@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -131,9 +134,9 @@ pub mod storage_http_state {
 
 /// Builder for constructing an instance of this type
 pub struct StorageHttpBuilder<'a, S: storage_http_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<storage_http::ShardEntry<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<storage_http::ShardEntry<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> StorageHttp<'a> {
@@ -147,9 +150,9 @@ impl<'a> StorageHttpBuilder<'a, storage_http_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StorageHttpBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -164,11 +167,11 @@ where
         mut self,
         value: impl Into<Vec<storage_http::ShardEntry<'a>>>,
     ) -> StorageHttpBuilder<'a, storage_http_state::SetShards<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         StorageHttpBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -181,7 +184,7 @@ where
     /// Build the final struct
     pub fn build(self) -> StorageHttp<'a> {
         StorageHttp {
-            shards: self.__unsafe_private_named.0.unwrap(),
+            shards: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -194,7 +197,7 @@ where
         >,
     ) -> StorageHttp<'a> {
         StorageHttp {
-            shards: self.__unsafe_private_named.0.unwrap(),
+            shards: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -300,45 +303,45 @@ pub mod shard_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type Checksum;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type Checksum = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Checksum = S::Checksum;
+        type Url = Unset;
     }
     ///State transition - sets the `checksum` field to Set
     pub struct SetChecksum<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetChecksum<S> {}
     impl<S: State> State for SetChecksum<S> {
-        type Url = S::Url;
         type Checksum = Set<members::checksum>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Checksum = S::Checksum;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `checksum` field
         pub struct checksum(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ShardEntryBuilder<'a, S: shard_entry_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<ShardChecksum<'a>>, Option<UriValue<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<ShardChecksum<'a>>, Option<UriValue<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ShardEntry<'a> {
@@ -352,9 +355,9 @@ impl<'a> ShardEntryBuilder<'a, shard_entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ShardEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -369,11 +372,11 @@ where
         mut self,
         value: impl Into<ShardChecksum<'a>>,
     ) -> ShardEntryBuilder<'a, shard_entry_state::SetChecksum<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ShardEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -388,11 +391,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ShardEntryBuilder<'a, shard_entry_state::SetUrl<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ShardEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -400,14 +403,14 @@ where
 impl<'a, S> ShardEntryBuilder<'a, S>
 where
     S: shard_entry_state::State,
-    S::Url: shard_entry_state::IsSet,
     S::Checksum: shard_entry_state::IsSet,
+    S::Url: shard_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ShardEntry<'a> {
         ShardEntry {
-            checksum: self.__unsafe_private_named.0.unwrap(),
-            url: self.__unsafe_private_named.1.unwrap(),
+            checksum: self._fields.0.unwrap(),
+            url: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -420,8 +423,8 @@ where
         >,
     ) -> ShardEntry<'a> {
         ShardEntry {
-            checksum: self.__unsafe_private_named.0.unwrap(),
-            url: self.__unsafe_private_named.1.unwrap(),
+            checksum: self._fields.0.unwrap(),
+            url: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

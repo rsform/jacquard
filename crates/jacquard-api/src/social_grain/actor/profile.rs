@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -214,14 +217,14 @@ pub mod profile_state {
 
 /// Builder for constructing an instance of this type
 pub struct ProfileBuilder<'a, S: profile_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<BlobRef<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Profile<'a> {
@@ -235,9 +238,9 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -245,12 +248,12 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
     pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -258,12 +261,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -271,12 +274,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -284,12 +287,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
     pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -301,10 +304,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
         Profile {
-            avatar: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            description: self.__unsafe_private_named.2,
-            display_name: self.__unsafe_private_named.3,
+            avatar: self._fields.0,
+            created_at: self._fields.1,
+            description: self._fields.2,
+            display_name: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -317,10 +320,10 @@ where
         >,
     ) -> Profile<'a> {
         Profile {
-            avatar: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            description: self.__unsafe_private_named.2,
-            display_name: self.__unsafe_private_named.3,
+            avatar: self._fields.0,
+            created_at: self._fields.1,
+            description: self._fields.2,
+            display_name: self._fields.3,
             extra_data: Some(extra_data),
         }
     }

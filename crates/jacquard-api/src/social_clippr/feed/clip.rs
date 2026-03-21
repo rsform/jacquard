@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -247,92 +250,92 @@ pub mod clip_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
-        type Title;
-        type Description;
-        type CreatedAt;
         type Unlisted;
+        type Url;
+        type CreatedAt;
+        type Description;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
-        type Title = Unset;
-        type Description = Unset;
-        type CreatedAt = Unset;
         type Unlisted = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Title = S::Title;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-        type Unlisted = S::Unlisted;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Url = S::Url;
-        type Title = Set<members::title>;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-        type Unlisted = S::Unlisted;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Url = S::Url;
-        type Title = S::Title;
-        type Description = Set<members::description>;
-        type CreatedAt = S::CreatedAt;
-        type Unlisted = S::Unlisted;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Url = S::Url;
-        type Title = S::Title;
-        type Description = S::Description;
-        type CreatedAt = Set<members::created_at>;
-        type Unlisted = S::Unlisted;
+        type Url = Unset;
+        type CreatedAt = Unset;
+        type Description = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `unlisted` field to Set
     pub struct SetUnlisted<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUnlisted<S> {}
     impl<S: State> State for SetUnlisted<S> {
-        type Url = S::Url;
-        type Title = S::Title;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
         type Unlisted = Set<members::unlisted>;
+        type Url = S::Url;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Unlisted = S::Unlisted;
+        type Url = Set<members::url>;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Unlisted = S::Unlisted;
+        type Url = S::Url;
+        type CreatedAt = Set<members::created_at>;
+        type Description = S::Description;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Unlisted = S::Unlisted;
+        type Url = S::Url;
+        type CreatedAt = S::CreatedAt;
+        type Description = Set<members::description>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Unlisted = S::Unlisted;
+        type Url = S::Url;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `description` field
-        pub struct description(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `unlisted` field
         pub struct unlisted(());
+        ///Marker type for the `url` field
+        pub struct url(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `description` field
+        pub struct description(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ClipBuilder<'a, S: clip_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<Vec<Language>>,
@@ -343,7 +346,7 @@ pub struct ClipBuilder<'a, S: clip_state::State> {
         Option<bool>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Clip<'a> {
@@ -357,19 +360,9 @@ impl<'a> ClipBuilder<'a, clip_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ClipBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -384,11 +377,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ClipBuilder<'a, clip_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ClipBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -403,11 +396,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ClipBuilder<'a, clip_state::SetDescription<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ClipBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -415,12 +408,12 @@ where
 impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
     /// Set the `languages` field (optional)
     pub fn languages(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `languages` field to an Option value (optional)
     pub fn maybe_languages(mut self, value: Option<Vec<Language>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -428,12 +421,12 @@ impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
 impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
     pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -441,12 +434,12 @@ impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
 impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -461,11 +454,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ClipBuilder<'a, clip_state::SetTitle<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ClipBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -480,11 +473,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ClipBuilder<'a, clip_state::SetUnlisted<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         ClipBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -492,12 +485,12 @@ where
 impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
     /// Set the `unread` field (optional)
     pub fn unread(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `unread` field to an Option value (optional)
     pub fn maybe_unread(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -512,11 +505,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ClipBuilder<'a, clip_state::SetUrl<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         ClipBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -524,24 +517,24 @@ where
 impl<'a, S> ClipBuilder<'a, S>
 where
     S: clip_state::State,
-    S::Url: clip_state::IsSet,
-    S::Title: clip_state::IsSet,
-    S::Description: clip_state::IsSet,
-    S::CreatedAt: clip_state::IsSet,
     S::Unlisted: clip_state::IsSet,
+    S::Url: clip_state::IsSet,
+    S::CreatedAt: clip_state::IsSet,
+    S::Description: clip_state::IsSet,
+    S::Title: clip_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Clip<'a> {
         Clip {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1.unwrap(),
-            languages: self.__unsafe_private_named.2,
-            notes: self.__unsafe_private_named.3,
-            tags: self.__unsafe_private_named.4,
-            title: self.__unsafe_private_named.5.unwrap(),
-            unlisted: self.__unsafe_private_named.6.unwrap(),
-            unread: self.__unsafe_private_named.7.or_else(|| Some(true)),
-            url: self.__unsafe_private_named.8.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1.unwrap(),
+            languages: self._fields.2,
+            notes: self._fields.3,
+            tags: self._fields.4,
+            title: self._fields.5.unwrap(),
+            unlisted: self._fields.6.unwrap(),
+            unread: self._fields.7.or_else(|| Some(true)),
+            url: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -554,15 +547,15 @@ where
         >,
     ) -> Clip<'a> {
         Clip {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1.unwrap(),
-            languages: self.__unsafe_private_named.2,
-            notes: self.__unsafe_private_named.3,
-            tags: self.__unsafe_private_named.4,
-            title: self.__unsafe_private_named.5.unwrap(),
-            unlisted: self.__unsafe_private_named.6.unwrap(),
-            unread: self.__unsafe_private_named.7.or_else(|| Some(true)),
-            url: self.__unsafe_private_named.8.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1.unwrap(),
+            languages: self._fields.2,
+            notes: self._fields.3,
+            tags: self._fields.4,
+            title: self._fields.5.unwrap(),
+            unlisted: self._fields.6.unwrap(),
+            unread: self._fields.7.or_else(|| Some(true)),
+            url: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -228,65 +231,65 @@ pub mod definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BadgeType;
-        type Icon;
         type CreatedAt;
+        type Icon;
+        type BadgeType;
         type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BadgeType = Unset;
-        type Icon = Unset;
         type CreatedAt = Unset;
+        type Icon = Unset;
+        type BadgeType = Unset;
         type Title = Unset;
     }
-    ///State transition - sets the `badge_type` field to Set
-    pub struct SetBadgeType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBadgeType<S> {}
-    impl<S: State> State for SetBadgeType<S> {
-        type BadgeType = Set<members::badge_type>;
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Icon = S::Icon;
-        type CreatedAt = S::CreatedAt;
+        type BadgeType = S::BadgeType;
         type Title = S::Title;
     }
     ///State transition - sets the `icon` field to Set
     pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIcon<S> {}
     impl<S: State> State for SetIcon<S> {
-        type BadgeType = S::BadgeType;
-        type Icon = Set<members::icon>;
         type CreatedAt = S::CreatedAt;
+        type Icon = Set<members::icon>;
+        type BadgeType = S::BadgeType;
         type Title = S::Title;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type BadgeType = S::BadgeType;
+    ///State transition - sets the `badge_type` field to Set
+    pub struct SetBadgeType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBadgeType<S> {}
+    impl<S: State> State for SetBadgeType<S> {
+        type CreatedAt = S::CreatedAt;
         type Icon = S::Icon;
-        type CreatedAt = Set<members::created_at>;
+        type BadgeType = Set<members::badge_type>;
         type Title = S::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type BadgeType = S::BadgeType;
-        type Icon = S::Icon;
         type CreatedAt = S::CreatedAt;
+        type Icon = S::Icon;
+        type BadgeType = S::BadgeType;
         type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `badge_type` field
-        pub struct badge_type(());
-        ///Marker type for the `icon` field
-        pub struct icon(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `icon` field
+        pub struct icon(());
+        ///Marker type for the `badge_type` field
+        pub struct badge_type(());
         ///Marker type for the `title` field
         pub struct title(());
     }
@@ -294,8 +297,8 @@ pub mod definition_state {
 
 /// Builder for constructing an instance of this type
 pub struct DefinitionBuilder<'a, S: definition_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<Did<'a>>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
@@ -303,7 +306,7 @@ pub struct DefinitionBuilder<'a, S: definition_state::State> {
         Option<BlobRef<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Definition<'a> {
@@ -317,9 +320,9 @@ impl<'a> DefinitionBuilder<'a, definition_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DefinitionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -327,12 +330,12 @@ impl<'a> DefinitionBuilder<'a, definition_state::Empty> {
 impl<'a, S: definition_state::State> DefinitionBuilder<'a, S> {
     /// Set the `allowedIssuers` field (optional)
     pub fn allowed_issuers(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `allowedIssuers` field to an Option value (optional)
     pub fn maybe_allowed_issuers(mut self, value: Option<Vec<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -347,11 +350,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DefinitionBuilder<'a, definition_state::SetBadgeType<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DefinitionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -366,11 +369,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> DefinitionBuilder<'a, definition_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         DefinitionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -378,12 +381,12 @@ where
 impl<'a, S: definition_state::State> DefinitionBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -398,11 +401,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> DefinitionBuilder<'a, definition_state::SetIcon<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         DefinitionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -417,11 +420,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DefinitionBuilder<'a, definition_state::SetTitle<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         DefinitionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -429,20 +432,20 @@ where
 impl<'a, S> DefinitionBuilder<'a, S>
 where
     S: definition_state::State,
-    S::BadgeType: definition_state::IsSet,
-    S::Icon: definition_state::IsSet,
     S::CreatedAt: definition_state::IsSet,
+    S::Icon: definition_state::IsSet,
+    S::BadgeType: definition_state::IsSet,
     S::Title: definition_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Definition<'a> {
         Definition {
-            allowed_issuers: self.__unsafe_private_named.0,
-            badge_type: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3,
-            icon: self.__unsafe_private_named.4.unwrap(),
-            title: self.__unsafe_private_named.5.unwrap(),
+            allowed_issuers: self._fields.0,
+            badge_type: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3,
+            icon: self._fields.4.unwrap(),
+            title: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -455,12 +458,12 @@ where
         >,
     ) -> Definition<'a> {
         Definition {
-            allowed_issuers: self.__unsafe_private_named.0,
-            badge_type: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3,
-            icon: self.__unsafe_private_named.4.unwrap(),
-            title: self.__unsafe_private_named.5.unwrap(),
+            allowed_issuers: self._fields.0,
+            badge_type: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3,
+            icon: self._fields.4.unwrap(),
+            title: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

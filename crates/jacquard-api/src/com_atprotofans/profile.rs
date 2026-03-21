@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -267,8 +270,8 @@ pub mod profile_state {
 
 /// Builder for constructing an instance of this type
 pub struct ProfileBuilder<'a, S: profile_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<bool>,
         Option<BlobRef<'a>>,
         Option<BlobRef<'a>>,
@@ -276,7 +279,7 @@ pub struct ProfileBuilder<'a, S: profile_state::State> {
         Option<CowStr<'a>>,
         Option<Vec<Facet<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Profile<'a> {
@@ -290,9 +293,9 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -300,12 +303,12 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `acceptingSupporters` field (optional)
     pub fn accepting_supporters(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `acceptingSupporters` field to an Option value (optional)
     pub fn maybe_accepting_supporters(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -313,12 +316,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
     pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -326,12 +329,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `banner` field (optional)
     pub fn banner(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `banner` field to an Option value (optional)
     pub fn maybe_banner(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -339,12 +342,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -352,12 +355,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
     pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -365,12 +368,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
     pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -382,12 +385,12 @@ where
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
         Profile {
-            accepting_supporters: self.__unsafe_private_named.0,
-            avatar: self.__unsafe_private_named.1,
-            banner: self.__unsafe_private_named.2,
-            description: self.__unsafe_private_named.3,
-            display_name: self.__unsafe_private_named.4,
-            facets: self.__unsafe_private_named.5,
+            accepting_supporters: self._fields.0,
+            avatar: self._fields.1,
+            banner: self._fields.2,
+            description: self._fields.3,
+            display_name: self._fields.4,
+            facets: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -400,12 +403,12 @@ where
         >,
     ) -> Profile<'a> {
         Profile {
-            accepting_supporters: self.__unsafe_private_named.0,
-            avatar: self.__unsafe_private_named.1,
-            banner: self.__unsafe_private_named.2,
-            description: self.__unsafe_private_named.3,
-            display_name: self.__unsafe_private_named.4,
-            facets: self.__unsafe_private_named.5,
+            accepting_supporters: self._fields.0,
+            avatar: self._fields.1,
+            banner: self._fields.2,
+            description: self._fields.3,
+            display_name: self._fields.4,
+            facets: self._fields.5,
             extra_data: Some(extra_data),
         }
     }

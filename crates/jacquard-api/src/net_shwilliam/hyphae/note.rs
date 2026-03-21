@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -162,50 +165,50 @@ pub mod note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Text;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Text = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Text = S::Text;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type CreatedAt = S::CreatedAt;
         type Text = Set<members::text>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Text = S::Text;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct NoteBuilder<'a, S: note_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Vec<StrongRef<'a>>>,
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Note<'a> {
@@ -219,9 +222,9 @@ impl<'a> NoteBuilder<'a, note_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -236,11 +239,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> NoteBuilder<'a, note_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         NoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -248,12 +251,12 @@ where
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `refs` field (optional)
     pub fn refs(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `refs` field to an Option value (optional)
     pub fn maybe_refs(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -261,12 +264,12 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -281,11 +284,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> NoteBuilder<'a, note_state::SetText<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         NoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -293,16 +296,16 @@ where
 impl<'a, S> NoteBuilder<'a, S>
 where
     S: note_state::State,
-    S::CreatedAt: note_state::IsSet,
     S::Text: note_state::IsSet,
+    S::CreatedAt: note_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Note<'a> {
         Note {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            refs: self.__unsafe_private_named.1,
-            tags: self.__unsafe_private_named.2,
-            text: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            refs: self._fields.1,
+            tags: self._fields.2,
+            text: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -315,10 +318,10 @@ where
         >,
     ) -> Note<'a> {
         Note {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            refs: self.__unsafe_private_named.1,
-            tags: self.__unsafe_private_named.2,
-            text: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            refs: self._fields.1,
+            tags: self._fields.2,
+            text: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

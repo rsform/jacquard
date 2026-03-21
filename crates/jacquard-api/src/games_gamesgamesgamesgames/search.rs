@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
@@ -165,8 +168,8 @@ pub mod search_state {
 
 /// Builder for constructing an instance of this type
 pub struct SearchBuilder<'a, S: search_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<CowStr<'a>>>,
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
@@ -181,7 +184,7 @@ pub struct SearchBuilder<'a, S: search_state::State> {
         Option<Vec<CowStr<'a>>>,
         Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Search<'a> {
@@ -195,8 +198,8 @@ impl<'a> SearchBuilder<'a, search_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SearchBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -211,7 +214,7 @@ impl<'a> SearchBuilder<'a, search_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -219,12 +222,12 @@ impl<'a> SearchBuilder<'a, search_state::Empty> {
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `ageRatings` field (optional)
     pub fn age_ratings(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `ageRatings` field to an Option value (optional)
     pub fn maybe_age_ratings(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -235,12 +238,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `applicationTypes` field to an Option value (optional)
     pub fn maybe_application_types(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -248,12 +251,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -261,12 +264,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `genres` field (optional)
     pub fn genres(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `genres` field to an Option value (optional)
     pub fn maybe_genres(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -274,12 +277,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `includeCancelled` field (optional)
     pub fn include_cancelled(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `includeCancelled` field to an Option value (optional)
     pub fn maybe_include_cancelled(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -287,12 +290,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `includeUnrated` field (optional)
     pub fn include_unrated(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `includeUnrated` field to an Option value (optional)
     pub fn maybe_include_unrated(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -300,12 +303,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -313,12 +316,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `modes` field (optional)
     pub fn modes(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `modes` field to an Option value (optional)
     pub fn maybe_modes(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -329,12 +332,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `playerPerspectives` field to an Option value (optional)
     pub fn maybe_player_perspectives(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -349,11 +352,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SearchBuilder<'a, search_state::SetQ<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         SearchBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -361,12 +364,12 @@ where
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `sort` field (optional)
     pub fn sort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
     pub fn maybe_sort(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -374,12 +377,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `themes` field (optional)
     pub fn themes(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `themes` field to an Option value (optional)
     pub fn maybe_themes(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -387,12 +390,12 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
 impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     /// Set the `types` field (optional)
     pub fn types(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `types` field to an Option value (optional)
     pub fn maybe_types(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -405,19 +408,19 @@ where
     /// Build the final struct
     pub fn build(self) -> Search<'a> {
         Search {
-            age_ratings: self.__unsafe_private_named.0,
-            application_types: self.__unsafe_private_named.1,
-            cursor: self.__unsafe_private_named.2,
-            genres: self.__unsafe_private_named.3,
-            include_cancelled: self.__unsafe_private_named.4,
-            include_unrated: self.__unsafe_private_named.5,
-            limit: self.__unsafe_private_named.6,
-            modes: self.__unsafe_private_named.7,
-            player_perspectives: self.__unsafe_private_named.8,
-            q: self.__unsafe_private_named.9.unwrap(),
-            sort: self.__unsafe_private_named.10,
-            themes: self.__unsafe_private_named.11,
-            types: self.__unsafe_private_named.12,
+            age_ratings: self._fields.0,
+            application_types: self._fields.1,
+            cursor: self._fields.2,
+            genres: self._fields.3,
+            include_cancelled: self._fields.4,
+            include_unrated: self._fields.5,
+            limit: self._fields.6,
+            modes: self._fields.7,
+            player_perspectives: self._fields.8,
+            q: self._fields.9.unwrap(),
+            sort: self._fields.10,
+            themes: self._fields.11,
+            types: self._fields.12,
         }
     }
 }

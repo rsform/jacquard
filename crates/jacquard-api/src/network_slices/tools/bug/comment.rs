@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -197,8 +200,8 @@ pub mod comment_state {
 
 /// Builder for constructing an instance of this type
 pub struct CommentBuilder<'a, S: comment_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Images<'a>>,
         Option<CowStr<'a>>,
         Option<Vec<Facet<'a>>>,
@@ -206,7 +209,7 @@ pub struct CommentBuilder<'a, S: comment_state::State> {
         Option<Datetime>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Comment<'a> {
@@ -220,9 +223,9 @@ impl<'a> CommentBuilder<'a, comment_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -230,12 +233,12 @@ impl<'a> CommentBuilder<'a, comment_state::Empty> {
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `attachments` field (optional)
     pub fn attachments(mut self, value: impl Into<Option<Images<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `attachments` field to an Option value (optional)
     pub fn maybe_attachments(mut self, value: Option<Images<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -250,11 +253,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CommentBuilder<'a, comment_state::SetBody<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -262,12 +265,12 @@ where
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `bodyFacets` field (optional)
     pub fn body_facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `bodyFacets` field to an Option value (optional)
     pub fn maybe_body_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -282,11 +285,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> CommentBuilder<'a, comment_state::SetBug<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -301,11 +304,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CommentBuilder<'a, comment_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -313,12 +316,12 @@ where
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
     pub fn maybe_parent(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -333,12 +336,12 @@ where
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {
         Comment {
-            attachments: self.__unsafe_private_named.0,
-            body: self.__unsafe_private_named.1.unwrap(),
-            body_facets: self.__unsafe_private_named.2,
-            bug: self.__unsafe_private_named.3.unwrap(),
-            created_at: self.__unsafe_private_named.4.unwrap(),
-            parent: self.__unsafe_private_named.5,
+            attachments: self._fields.0,
+            body: self._fields.1.unwrap(),
+            body_facets: self._fields.2,
+            bug: self._fields.3.unwrap(),
+            created_at: self._fields.4.unwrap(),
+            parent: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -351,12 +354,12 @@ where
         >,
     ) -> Comment<'a> {
         Comment {
-            attachments: self.__unsafe_private_named.0,
-            body: self.__unsafe_private_named.1.unwrap(),
-            body_facets: self.__unsafe_private_named.2,
-            bug: self.__unsafe_private_named.3.unwrap(),
-            created_at: self.__unsafe_private_named.4.unwrap(),
-            parent: self.__unsafe_private_named.5,
+            attachments: self._fields.0,
+            body: self._fields.1.unwrap(),
+            body_facets: self._fields.2,
+            bug: self._fields.3.unwrap(),
+            created_at: self._fields.4.unwrap(),
+            parent: self._fields.5,
             extra_data: Some(extra_data),
         }
     }

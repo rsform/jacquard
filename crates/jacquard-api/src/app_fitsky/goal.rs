@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -341,9 +344,9 @@ pub mod goal_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Metric;
-        type StartDate;
         type CreatedAt;
         type TargetValue;
+        type StartDate;
         type Period;
     }
     /// Empty state - all required fields are unset
@@ -351,9 +354,9 @@ pub mod goal_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Metric = Unset;
-        type StartDate = Unset;
         type CreatedAt = Unset;
         type TargetValue = Unset;
+        type StartDate = Unset;
         type Period = Unset;
     }
     ///State transition - sets the `metric` field to Set
@@ -361,19 +364,9 @@ pub mod goal_state {
     impl<S: State> sealed::Sealed for SetMetric<S> {}
     impl<S: State> State for SetMetric<S> {
         type Metric = Set<members::metric>;
+        type CreatedAt = S::CreatedAt;
+        type TargetValue = S::TargetValue;
         type StartDate = S::StartDate;
-        type CreatedAt = S::CreatedAt;
-        type TargetValue = S::TargetValue;
-        type Period = S::Period;
-    }
-    ///State transition - sets the `start_date` field to Set
-    pub struct SetStartDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartDate<S> {}
-    impl<S: State> State for SetStartDate<S> {
-        type Metric = S::Metric;
-        type StartDate = Set<members::start_date>;
-        type CreatedAt = S::CreatedAt;
-        type TargetValue = S::TargetValue;
         type Period = S::Period;
     }
     ///State transition - sets the `created_at` field to Set
@@ -381,9 +374,9 @@ pub mod goal_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Metric = S::Metric;
-        type StartDate = S::StartDate;
         type CreatedAt = Set<members::created_at>;
         type TargetValue = S::TargetValue;
+        type StartDate = S::StartDate;
         type Period = S::Period;
     }
     ///State transition - sets the `target_value` field to Set
@@ -391,9 +384,19 @@ pub mod goal_state {
     impl<S: State> sealed::Sealed for SetTargetValue<S> {}
     impl<S: State> State for SetTargetValue<S> {
         type Metric = S::Metric;
-        type StartDate = S::StartDate;
         type CreatedAt = S::CreatedAt;
         type TargetValue = Set<members::target_value>;
+        type StartDate = S::StartDate;
+        type Period = S::Period;
+    }
+    ///State transition - sets the `start_date` field to Set
+    pub struct SetStartDate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartDate<S> {}
+    impl<S: State> State for SetStartDate<S> {
+        type Metric = S::Metric;
+        type CreatedAt = S::CreatedAt;
+        type TargetValue = S::TargetValue;
+        type StartDate = Set<members::start_date>;
         type Period = S::Period;
     }
     ///State transition - sets the `period` field to Set
@@ -401,9 +404,9 @@ pub mod goal_state {
     impl<S: State> sealed::Sealed for SetPeriod<S> {}
     impl<S: State> State for SetPeriod<S> {
         type Metric = S::Metric;
-        type StartDate = S::StartDate;
         type CreatedAt = S::CreatedAt;
         type TargetValue = S::TargetValue;
+        type StartDate = S::StartDate;
         type Period = Set<members::period>;
     }
     /// Marker types for field names
@@ -411,12 +414,12 @@ pub mod goal_state {
     pub mod members {
         ///Marker type for the `metric` field
         pub struct metric(());
-        ///Marker type for the `start_date` field
-        pub struct start_date(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `target_value` field
         pub struct target_value(());
+        ///Marker type for the `start_date` field
+        pub struct start_date(());
         ///Marker type for the `period` field
         pub struct period(());
     }
@@ -424,8 +427,8 @@ pub mod goal_state {
 
 /// Builder for constructing an instance of this type
 pub struct GoalBuilder<'a, S: goal_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Datetime>,
         Option<GoalMetric<'a>>,
@@ -433,7 +436,7 @@ pub struct GoalBuilder<'a, S: goal_state::State> {
         Option<Datetime>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Goal<'a> {
@@ -447,9 +450,9 @@ impl<'a> GoalBuilder<'a, goal_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GoalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -464,11 +467,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> GoalBuilder<'a, goal_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GoalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -476,12 +479,12 @@ where
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `endDate` field (optional)
     pub fn end_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `endDate` field to an Option value (optional)
     pub fn maybe_end_date(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -496,11 +499,11 @@ where
         mut self,
         value: impl Into<GoalMetric<'a>>,
     ) -> GoalBuilder<'a, goal_state::SetMetric<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         GoalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -515,11 +518,11 @@ where
         mut self,
         value: impl Into<GoalPeriod<'a>>,
     ) -> GoalBuilder<'a, goal_state::SetPeriod<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         GoalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -534,11 +537,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> GoalBuilder<'a, goal_state::SetStartDate<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         GoalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -553,11 +556,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> GoalBuilder<'a, goal_state::SetTargetValue<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         GoalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -566,20 +569,20 @@ impl<'a, S> GoalBuilder<'a, S>
 where
     S: goal_state::State,
     S::Metric: goal_state::IsSet,
-    S::StartDate: goal_state::IsSet,
     S::CreatedAt: goal_state::IsSet,
     S::TargetValue: goal_state::IsSet,
+    S::StartDate: goal_state::IsSet,
     S::Period: goal_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Goal<'a> {
         Goal {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            end_date: self.__unsafe_private_named.1,
-            metric: self.__unsafe_private_named.2.unwrap(),
-            period: self.__unsafe_private_named.3.unwrap(),
-            start_date: self.__unsafe_private_named.4.unwrap(),
-            target_value: self.__unsafe_private_named.5.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            end_date: self._fields.1,
+            metric: self._fields.2.unwrap(),
+            period: self._fields.3.unwrap(),
+            start_date: self._fields.4.unwrap(),
+            target_value: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -592,12 +595,12 @@ where
         >,
     ) -> Goal<'a> {
         Goal {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            end_date: self.__unsafe_private_named.1,
-            metric: self.__unsafe_private_named.2.unwrap(),
-            period: self.__unsafe_private_named.3.unwrap(),
-            start_date: self.__unsafe_private_named.4.unwrap(),
-            target_value: self.__unsafe_private_named.5.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            end_date: self._fields.1,
+            metric: self._fields.2.unwrap(),
+            period: self._fields.3.unwrap(),
+            start_date: self._fields.4.unwrap(),
+            target_value: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

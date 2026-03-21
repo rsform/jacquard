@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -149,80 +152,80 @@ pub mod kidlisp_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ref;
+        type Source;
         type When;
         type Code;
-        type Source;
+        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ref = Unset;
+        type Source = Unset;
         type When = Unset;
         type Code = Unset;
-        type Source = Unset;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Ref = Set<members::r#ref>;
-        type When = S::When;
-        type Code = S::Code;
-        type Source = S::Source;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type Ref = S::Ref;
-        type When = Set<members::when>;
-        type Code = S::Code;
-        type Source = S::Source;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCode<S> {}
-    impl<S: State> State for SetCode<S> {
-        type Ref = S::Ref;
-        type When = S::When;
-        type Code = Set<members::code>;
-        type Source = S::Source;
+        type Ref = Unset;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSource<S> {}
     impl<S: State> State for SetSource<S> {
-        type Ref = S::Ref;
+        type Source = Set<members::source>;
         type When = S::When;
         type Code = S::Code;
-        type Source = Set<members::source>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Source = S::Source;
+        type When = Set<members::when>;
+        type Code = S::Code;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCode<S> {}
+    impl<S: State> State for SetCode<S> {
+        type Source = S::Source;
+        type When = S::When;
+        type Code = Set<members::code>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Source = S::Source;
+        type When = S::When;
+        type Code = S::Code;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
+        ///Marker type for the `source` field
+        pub struct source(());
         ///Marker type for the `when` field
         pub struct when(());
         ///Marker type for the `code` field
         pub struct code(());
-        ///Marker type for the `source` field
-        pub struct source(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct KidlispBuilder<'a, S: kidlisp_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Kidlisp<'a> {
@@ -236,9 +239,9 @@ impl<'a> KidlispBuilder<'a, kidlisp_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         KidlispBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -253,11 +256,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> KidlispBuilder<'a, kidlisp_state::SetCode<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         KidlispBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -272,11 +275,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> KidlispBuilder<'a, kidlisp_state::SetRef<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         KidlispBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -291,11 +294,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> KidlispBuilder<'a, kidlisp_state::SetSource<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         KidlispBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -310,11 +313,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> KidlispBuilder<'a, kidlisp_state::SetWhen<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         KidlispBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -322,18 +325,18 @@ where
 impl<'a, S> KidlispBuilder<'a, S>
 where
     S: kidlisp_state::State,
-    S::Ref: kidlisp_state::IsSet,
+    S::Source: kidlisp_state::IsSet,
     S::When: kidlisp_state::IsSet,
     S::Code: kidlisp_state::IsSet,
-    S::Source: kidlisp_state::IsSet,
+    S::Ref: kidlisp_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Kidlisp<'a> {
         Kidlisp {
-            code: self.__unsafe_private_named.0.unwrap(),
-            r#ref: self.__unsafe_private_named.1.unwrap(),
-            source: self.__unsafe_private_named.2.unwrap(),
-            when: self.__unsafe_private_named.3.unwrap(),
+            code: self._fields.0.unwrap(),
+            r#ref: self._fields.1.unwrap(),
+            source: self._fields.2.unwrap(),
+            when: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -346,10 +349,10 @@ where
         >,
     ) -> Kidlisp<'a> {
         Kidlisp {
-            code: self.__unsafe_private_named.0.unwrap(),
-            r#ref: self.__unsafe_private_named.1.unwrap(),
-            source: self.__unsafe_private_named.2.unwrap(),
-            when: self.__unsafe_private_named.3.unwrap(),
+            code: self._fields.0.unwrap(),
+            r#ref: self._fields.1.unwrap(),
+            source: self._fields.2.unwrap(),
+            when: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

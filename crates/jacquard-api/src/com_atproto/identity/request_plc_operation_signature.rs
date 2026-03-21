@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};

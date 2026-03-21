@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -135,59 +138,59 @@ pub mod piece_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ref;
         type Slug;
         type When;
+        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ref = Unset;
         type Slug = Unset;
         type When = Unset;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Ref = Set<members::r#ref>;
-        type Slug = S::Slug;
-        type When = S::When;
+        type Ref = Unset;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type Ref = S::Ref;
         type Slug = Set<members::slug>;
         type When = S::When;
+        type Ref = S::Ref;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
-        type Ref = S::Ref;
         type Slug = S::Slug;
         type When = Set<members::when>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Slug = S::Slug;
+        type When = S::When;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `slug` field
         pub struct slug(());
         ///Marker type for the `when` field
         pub struct when(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PieceBuilder<'a, S: piece_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Piece<'a> {
@@ -201,9 +204,9 @@ impl<'a> PieceBuilder<'a, piece_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PieceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -218,11 +221,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PieceBuilder<'a, piece_state::SetRef<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PieceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -237,11 +240,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PieceBuilder<'a, piece_state::SetSlug<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PieceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -256,11 +259,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PieceBuilder<'a, piece_state::SetWhen<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PieceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -268,16 +271,16 @@ where
 impl<'a, S> PieceBuilder<'a, S>
 where
     S: piece_state::State,
-    S::Ref: piece_state::IsSet,
     S::Slug: piece_state::IsSet,
     S::When: piece_state::IsSet,
+    S::Ref: piece_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Piece<'a> {
         Piece {
-            r#ref: self.__unsafe_private_named.0.unwrap(),
-            slug: self.__unsafe_private_named.1.unwrap(),
-            when: self.__unsafe_private_named.2.unwrap(),
+            r#ref: self._fields.0.unwrap(),
+            slug: self._fields.1.unwrap(),
+            when: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -290,9 +293,9 @@ where
         >,
     ) -> Piece<'a> {
         Piece {
-            r#ref: self.__unsafe_private_named.0.unwrap(),
-            slug: self.__unsafe_private_named.1.unwrap(),
-            when: self.__unsafe_private_named.2.unwrap(),
+            r#ref: self._fields.0.unwrap(),
+            slug: self._fields.1.unwrap(),
+            when: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

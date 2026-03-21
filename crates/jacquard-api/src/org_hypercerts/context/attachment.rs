@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -254,8 +257,8 @@ pub mod attachment_state {
 
 /// Builder for constructing an instance of this type
 pub struct AttachmentBuilder<'a, S: attachment_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<AttachmentContentItem<'a>>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
@@ -266,7 +269,7 @@ pub struct AttachmentBuilder<'a, S: attachment_state::State> {
         Option<Vec<StrongRef<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Attachment<'a> {
@@ -280,19 +283,9 @@ impl<'a> AttachmentBuilder<'a, attachment_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AttachmentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -303,7 +296,7 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<AttachmentContentItem<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `content` field to an Option value (optional)
@@ -311,7 +304,7 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
         mut self,
         value: Option<Vec<AttachmentContentItem<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -319,12 +312,12 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
 impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `contentType` field (optional)
     pub fn content_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `contentType` field to an Option value (optional)
     pub fn maybe_content_type(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -339,11 +332,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> AttachmentBuilder<'a, attachment_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         AttachmentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -351,12 +344,12 @@ where
 impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<LinearDocument<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<LinearDocument<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -364,12 +357,12 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
 impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
     pub fn maybe_location(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -377,12 +370,12 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
 impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `shortDescription` field (optional)
     pub fn short_description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `shortDescription` field to an Option value (optional)
     pub fn maybe_short_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -393,7 +386,7 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<Facet<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `shortDescriptionFacets` field to an Option value (optional)
@@ -401,7 +394,7 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
         mut self,
         value: Option<Vec<Facet<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -409,12 +402,12 @@ impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
 impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `subjects` field (optional)
     pub fn subjects(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `subjects` field to an Option value (optional)
     pub fn maybe_subjects(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -429,11 +422,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AttachmentBuilder<'a, attachment_state::SetTitle<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         AttachmentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -447,15 +440,15 @@ where
     /// Build the final struct
     pub fn build(self) -> Attachment<'a> {
         Attachment {
-            content: self.__unsafe_private_named.0,
-            content_type: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3,
-            location: self.__unsafe_private_named.4,
-            short_description: self.__unsafe_private_named.5,
-            short_description_facets: self.__unsafe_private_named.6,
-            subjects: self.__unsafe_private_named.7,
-            title: self.__unsafe_private_named.8.unwrap(),
+            content: self._fields.0,
+            content_type: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3,
+            location: self._fields.4,
+            short_description: self._fields.5,
+            short_description_facets: self._fields.6,
+            subjects: self._fields.7,
+            title: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -468,15 +461,15 @@ where
         >,
     ) -> Attachment<'a> {
         Attachment {
-            content: self.__unsafe_private_named.0,
-            content_type: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3,
-            location: self.__unsafe_private_named.4,
-            short_description: self.__unsafe_private_named.5,
-            short_description_facets: self.__unsafe_private_named.6,
-            subjects: self.__unsafe_private_named.7,
-            title: self.__unsafe_private_named.8.unwrap(),
+            content: self._fields.0,
+            content_type: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3,
+            location: self._fields.4,
+            short_description: self._fields.5,
+            short_description_facets: self._fields.6,
+            subjects: self._fields.7,
+            title: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -177,15 +180,15 @@ pub mod contribution_state {
 
 /// Builder for constructing an instance of this type
 pub struct ContributionBuilder<'a, S: contribution_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Contribution<'a> {
@@ -199,9 +202,9 @@ impl<'a> ContributionBuilder<'a, contribution_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ContributionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -212,12 +215,12 @@ impl<'a, S: contribution_state::State> ContributionBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `contributionDescription` field to an Option value (optional)
     pub fn maybe_contribution_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -232,11 +235,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ContributionBuilder<'a, contribution_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ContributionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -244,12 +247,12 @@ where
 impl<'a, S: contribution_state::State> ContributionBuilder<'a, S> {
     /// Set the `endDate` field (optional)
     pub fn end_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `endDate` field to an Option value (optional)
     pub fn maybe_end_date(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -257,12 +260,12 @@ impl<'a, S: contribution_state::State> ContributionBuilder<'a, S> {
 impl<'a, S: contribution_state::State> ContributionBuilder<'a, S> {
     /// Set the `role` field (optional)
     pub fn role(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `role` field to an Option value (optional)
     pub fn maybe_role(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -270,12 +273,12 @@ impl<'a, S: contribution_state::State> ContributionBuilder<'a, S> {
 impl<'a, S: contribution_state::State> ContributionBuilder<'a, S> {
     /// Set the `startDate` field (optional)
     pub fn start_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `startDate` field to an Option value (optional)
     pub fn maybe_start_date(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -288,11 +291,11 @@ where
     /// Build the final struct
     pub fn build(self) -> Contribution<'a> {
         Contribution {
-            contribution_description: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            end_date: self.__unsafe_private_named.2,
-            role: self.__unsafe_private_named.3,
-            start_date: self.__unsafe_private_named.4,
+            contribution_description: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            end_date: self._fields.2,
+            role: self._fields.3,
+            start_date: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -305,11 +308,11 @@ where
         >,
     ) -> Contribution<'a> {
         Contribution {
-            contribution_description: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            end_date: self.__unsafe_private_named.2,
-            role: self.__unsafe_private_named.3,
-            start_date: self.__unsafe_private_named.4,
+            contribution_description: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            end_date: self._fields.2,
+            role: self._fields.3,
+            start_date: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

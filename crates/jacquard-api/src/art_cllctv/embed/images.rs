@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -274,15 +277,15 @@ pub mod image_state {
 
 /// Builder for constructing an instance of this type
 pub struct ImageBuilder<'a, S: image_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<AspectRatio<'a>>,
         Option<BlobRef<'a>>,
         Option<CowStr<'a>>,
         Option<Tombstone<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Image<'a> {
@@ -296,9 +299,9 @@ impl<'a> ImageBuilder<'a, image_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -313,11 +316,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ImageBuilder<'a, image_state::SetAlt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -325,12 +328,12 @@ where
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
     pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
     pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -345,11 +348,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> ImageBuilder<'a, image_state::SetImage<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -357,12 +360,12 @@ where
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `imageHash` field (optional)
     pub fn image_hash(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `imageHash` field to an Option value (optional)
     pub fn maybe_image_hash(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -370,12 +373,12 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `tombstone` field (optional)
     pub fn tombstone(mut self, value: impl Into<Option<Tombstone<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `tombstone` field to an Option value (optional)
     pub fn maybe_tombstone(mut self, value: Option<Tombstone<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -389,11 +392,11 @@ where
     /// Build the final struct
     pub fn build(self) -> Image<'a> {
         Image {
-            alt: self.__unsafe_private_named.0.unwrap(),
-            aspect_ratio: self.__unsafe_private_named.1,
-            image: self.__unsafe_private_named.2.unwrap(),
-            image_hash: self.__unsafe_private_named.3,
-            tombstone: self.__unsafe_private_named.4,
+            alt: self._fields.0.unwrap(),
+            aspect_ratio: self._fields.1,
+            image: self._fields.2.unwrap(),
+            image_hash: self._fields.3,
+            tombstone: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -406,11 +409,11 @@ where
         >,
     ) -> Image<'a> {
         Image {
-            alt: self.__unsafe_private_named.0.unwrap(),
-            aspect_ratio: self.__unsafe_private_named.1,
-            image: self.__unsafe_private_named.2.unwrap(),
-            image_hash: self.__unsafe_private_named.3,
-            tombstone: self.__unsafe_private_named.4,
+            alt: self._fields.0.unwrap(),
+            aspect_ratio: self._fields.1,
+            image: self._fields.2.unwrap(),
+            image_hash: self._fields.3,
+            tombstone: self._fields.4,
             extra_data: Some(extra_data),
         }
     }
@@ -637,9 +640,9 @@ pub mod images_state {
 
 /// Builder for constructing an instance of this type
 pub struct ImagesBuilder<'a, S: images_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<images::Image<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<images::Image<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Images<'a> {
@@ -653,9 +656,9 @@ impl<'a> ImagesBuilder<'a, images_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ImagesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -670,11 +673,11 @@ where
         mut self,
         value: impl Into<Vec<images::Image<'a>>>,
     ) -> ImagesBuilder<'a, images_state::SetImages<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ImagesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -687,7 +690,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Images<'a> {
         Images {
-            images: self.__unsafe_private_named.0.unwrap(),
+            images: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -700,7 +703,7 @@ where
         >,
     ) -> Images<'a> {
         Images {
-            images: self.__unsafe_private_named.0.unwrap(),
+            images: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -740,9 +743,9 @@ pub mod view_state {
 
 /// Builder for constructing an instance of this type
 pub struct ViewBuilder<'a, S: view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<images::ViewImage<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<images::ViewImage<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> View<'a> {
@@ -756,9 +759,9 @@ impl<'a> ViewBuilder<'a, view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -773,11 +776,11 @@ where
         mut self,
         value: impl Into<Vec<images::ViewImage<'a>>>,
     ) -> ViewBuilder<'a, view_state::SetImages<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -790,7 +793,7 @@ where
     /// Build the final struct
     pub fn build(self) -> View<'a> {
         View {
-            images: self.__unsafe_private_named.0.unwrap(),
+            images: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -803,7 +806,7 @@ where
         >,
     ) -> View<'a> {
         View {
-            images: self.__unsafe_private_named.0.unwrap(),
+            images: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -819,65 +822,65 @@ pub mod view_image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Alt;
-        type Thumb;
         type Fullsize;
+        type Thumb;
+        type Alt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Alt = Unset;
-        type Thumb = Unset;
         type Fullsize = Unset;
-    }
-    ///State transition - sets the `alt` field to Set
-    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlt<S> {}
-    impl<S: State> State for SetAlt<S> {
-        type Alt = Set<members::alt>;
-        type Thumb = S::Thumb;
-        type Fullsize = S::Fullsize;
-    }
-    ///State transition - sets the `thumb` field to Set
-    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThumb<S> {}
-    impl<S: State> State for SetThumb<S> {
-        type Alt = S::Alt;
-        type Thumb = Set<members::thumb>;
-        type Fullsize = S::Fullsize;
+        type Thumb = Unset;
+        type Alt = Unset;
     }
     ///State transition - sets the `fullsize` field to Set
     pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFullsize<S> {}
     impl<S: State> State for SetFullsize<S> {
-        type Alt = S::Alt;
-        type Thumb = S::Thumb;
         type Fullsize = Set<members::fullsize>;
+        type Thumb = S::Thumb;
+        type Alt = S::Alt;
+    }
+    ///State transition - sets the `thumb` field to Set
+    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThumb<S> {}
+    impl<S: State> State for SetThumb<S> {
+        type Fullsize = S::Fullsize;
+        type Thumb = Set<members::thumb>;
+        type Alt = S::Alt;
+    }
+    ///State transition - sets the `alt` field to Set
+    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlt<S> {}
+    impl<S: State> State for SetAlt<S> {
+        type Fullsize = S::Fullsize;
+        type Thumb = S::Thumb;
+        type Alt = Set<members::alt>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `alt` field
-        pub struct alt(());
-        ///Marker type for the `thumb` field
-        pub struct thumb(());
         ///Marker type for the `fullsize` field
         pub struct fullsize(());
+        ///Marker type for the `thumb` field
+        pub struct thumb(());
+        ///Marker type for the `alt` field
+        pub struct alt(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ViewImageBuilder<'a, S: view_image_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<AspectRatio<'a>>,
         Option<UriValue<'a>>,
         Option<UriValue<'a>>,
         Option<Tombstone<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ViewImage<'a> {
@@ -891,9 +894,9 @@ impl<'a> ViewImageBuilder<'a, view_image_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ViewImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -908,11 +911,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ViewImageBuilder<'a, view_image_state::SetAlt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ViewImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -920,12 +923,12 @@ where
 impl<'a, S: view_image_state::State> ViewImageBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
     pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
     pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -940,11 +943,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ViewImageBuilder<'a, view_image_state::SetFullsize<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ViewImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -959,11 +962,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ViewImageBuilder<'a, view_image_state::SetThumb<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ViewImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -971,12 +974,12 @@ where
 impl<'a, S: view_image_state::State> ViewImageBuilder<'a, S> {
     /// Set the `tombstone` field (optional)
     pub fn tombstone(mut self, value: impl Into<Option<Tombstone<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `tombstone` field to an Option value (optional)
     pub fn maybe_tombstone(mut self, value: Option<Tombstone<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -984,18 +987,18 @@ impl<'a, S: view_image_state::State> ViewImageBuilder<'a, S> {
 impl<'a, S> ViewImageBuilder<'a, S>
 where
     S: view_image_state::State,
-    S::Alt: view_image_state::IsSet,
-    S::Thumb: view_image_state::IsSet,
     S::Fullsize: view_image_state::IsSet,
+    S::Thumb: view_image_state::IsSet,
+    S::Alt: view_image_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ViewImage<'a> {
         ViewImage {
-            alt: self.__unsafe_private_named.0.unwrap(),
-            aspect_ratio: self.__unsafe_private_named.1,
-            fullsize: self.__unsafe_private_named.2.unwrap(),
-            thumb: self.__unsafe_private_named.3.unwrap(),
-            tombstone: self.__unsafe_private_named.4,
+            alt: self._fields.0.unwrap(),
+            aspect_ratio: self._fields.1,
+            fullsize: self._fields.2.unwrap(),
+            thumb: self._fields.3.unwrap(),
+            tombstone: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -1008,11 +1011,11 @@ where
         >,
     ) -> ViewImage<'a> {
         ViewImage {
-            alt: self.__unsafe_private_named.0.unwrap(),
-            aspect_ratio: self.__unsafe_private_named.1,
-            fullsize: self.__unsafe_private_named.2.unwrap(),
-            thumb: self.__unsafe_private_named.3.unwrap(),
-            tombstone: self.__unsafe_private_named.4,
+            alt: self._fields.0.unwrap(),
+            aspect_ratio: self._fields.1,
+            fullsize: self._fields.2.unwrap(),
+            thumb: self._fields.3.unwrap(),
+            tombstone: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -133,45 +136,45 @@ pub mod slug_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slug;
         type Ref;
+        type Slug;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slug = Unset;
         type Ref = Unset;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type Slug = Set<members::slug>;
-        type Ref = S::Ref;
+        type Slug = Unset;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
-        type Slug = S::Slug;
         type Ref = Set<members::r#ref>;
+        type Slug = S::Slug;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlug<S> {}
+    impl<S: State> State for SetSlug<S> {
+        type Ref = S::Ref;
+        type Slug = Set<members::slug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slug` field
-        pub struct slug(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SlugBuilder<'a, S: slug_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Slug<'a> {
@@ -185,9 +188,9 @@ impl<'a> SlugBuilder<'a, slug_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SlugBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -202,11 +205,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> SlugBuilder<'a, slug_state::SetRef<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SlugBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -221,11 +224,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SlugBuilder<'a, slug_state::SetSlug<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SlugBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -233,14 +236,14 @@ where
 impl<'a, S> SlugBuilder<'a, S>
 where
     S: slug_state::State,
-    S::Slug: slug_state::IsSet,
     S::Ref: slug_state::IsSet,
+    S::Slug: slug_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Slug<'a> {
         Slug {
-            r#ref: self.__unsafe_private_named.0.unwrap(),
-            slug: self.__unsafe_private_named.1.unwrap(),
+            r#ref: self._fields.0.unwrap(),
+            slug: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -253,8 +256,8 @@ where
         >,
     ) -> Slug<'a> {
         Slug {
-            r#ref: self.__unsafe_private_named.0.unwrap(),
-            slug: self.__unsafe_private_named.1.unwrap(),
+            r#ref: self._fields.0.unwrap(),
+            slug: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

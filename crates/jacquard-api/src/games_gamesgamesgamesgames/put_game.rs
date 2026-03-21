@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::{AtUri, Datetime};
@@ -146,44 +149,44 @@ pub mod put_game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Uri;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Uri = S::Uri;
+        type Name = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Name = S::Name;
         type Uri = Set<members::uri>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Uri = S::Uri;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PutGameBuilder<'a, S: put_game_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<AgeRating<'a>>>,
         Option<Vec<AlternativeName<'a>>>,
         Option<ApplicationType<'a>>,
@@ -208,7 +211,7 @@ pub struct PutGameBuilder<'a, S: put_game_state::State> {
         Option<Vec<ExternalVideo<'a>>>,
         Option<Vec<Website<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> PutGame<'a> {
@@ -222,8 +225,8 @@ impl<'a> PutGameBuilder<'a, put_game_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PutGameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -248,7 +251,7 @@ impl<'a> PutGameBuilder<'a, put_game_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -256,12 +259,12 @@ impl<'a> PutGameBuilder<'a, put_game_state::Empty> {
 impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
     /// Set the `ageRatings` field (optional)
     pub fn age_ratings(mut self, value: impl Into<Option<Vec<AgeRating<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `ageRatings` field to an Option value (optional)
     pub fn maybe_age_ratings(mut self, value: Option<Vec<AgeRating<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -272,7 +275,7 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<AlternativeName<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `alternativeNames` field to an Option value (optional)
@@ -280,7 +283,7 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
         mut self,
         value: Option<Vec<AlternativeName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -291,12 +294,12 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApplicationType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `applicationType` field to an Option value (optional)
     pub fn maybe_application_type(mut self, value: Option<ApplicationType<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -304,12 +307,12 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
 impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -317,12 +320,12 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
 impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
     /// Set the `engines` field (optional)
     pub fn engines(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `engines` field to an Option value (optional)
     pub fn maybe_engines(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -330,12 +333,12 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
 impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
     /// Set the `genres` field (optional)
     pub fn genres(mut self, value: impl Into<Option<Vec<Genre<'a>>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `genres` field to an Option value (optional)
     pub fn maybe_genres(mut self, value: Option<Vec<Genre<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -343,12 +346,12 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
 impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
     pub fn maybe_keywords(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -359,7 +362,7 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<LanguageSupport<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `languageSupports` field to an Option value (optional)
@@ -367,7 +370,7 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
         mut self,
         value: Option<Vec<LanguageSupport<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -375,12 +378,12 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
 impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
     /// Set the `media` field (optional)
     pub fn media(mut self, value: impl Into<Option<Vec<MediaItem<'a>>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `media` field to an Option value (optional)
     pub fn maybe_media(mut self, value: Option<Vec<MediaItem<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -388,12 +391,12 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
 impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
     /// Set the `modes` field (optional)
     pub fn modes(mut self, value: impl Into<Option<Vec<Mode<'a>>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `modes` field to an Option value (optional)
     pub fn maybe_modes(mut self, value: Option<Vec<Mode<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -404,7 +407,7 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<MultiplayerMode<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `multiplayerModes` field to an Option value (optional)
@@ -412,7 +415,7 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
         mut self,
         value: Option<Vec<MultiplayerMode<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -427,11 +430,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PutGameBuilder<'a, put_game_state::SetName<S>> {
-        self.__unsafe_private_named.11 = Option::Some(value.into());
+        self._fields.11 = Option::Some(value.into());
         PutGameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -439,12 +442,12 @@ where
 impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
     pub fn maybe_parent(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -455,7 +458,7 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<PlayerPerspective<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `playerPerspectives` field to an Option value (optional)
@@ -463,7 +466,7 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
         mut self,
         value: Option<Vec<PlayerPerspective<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -471,12 +474,12 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
 impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
     /// Set the `releases` field (optional)
     pub fn releases(mut self, value: impl Into<Option<Vec<Release<'a>>>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `releases` field to an Option value (optional)
     pub fn maybe_releases(mut self, value: Option<Vec<Release<'a>>>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -484,12 +487,12 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
 impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
     /// Set the `shouldPublish` field (optional)
     pub fn should_publish(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `shouldPublish` field to an Option value (optional)
     pub fn maybe_should_publish(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -497,12 +500,12 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
 impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
     /// Set the `storyline` field (optional)
     pub fn storyline(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `storyline` field to an Option value (optional)
     pub fn maybe_storyline(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -510,12 +513,12 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
 impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
     /// Set the `summary` field (optional)
     pub fn summary(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `summary` field to an Option value (optional)
     pub fn maybe_summary(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -523,12 +526,12 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
 impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
     /// Set the `themes` field (optional)
     pub fn themes(mut self, value: impl Into<Option<Vec<Theme<'a>>>>) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `themes` field to an Option value (optional)
     pub fn maybe_themes(mut self, value: Option<Vec<Theme<'a>>>) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -536,12 +539,12 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
 impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
     /// Set the `timeToBeat` field (optional)
     pub fn time_to_beat(mut self, value: impl Into<Option<TimeToBeat<'a>>>) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `timeToBeat` field to an Option value (optional)
     pub fn maybe_time_to_beat(mut self, value: Option<TimeToBeat<'a>>) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -556,11 +559,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> PutGameBuilder<'a, put_game_state::SetUri<S>> {
-        self.__unsafe_private_named.20 = Option::Some(value.into());
+        self._fields.20 = Option::Some(value.into());
         PutGameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -568,12 +571,12 @@ where
 impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
     /// Set the `videos` field (optional)
     pub fn videos(mut self, value: impl Into<Option<Vec<ExternalVideo<'a>>>>) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `videos` field to an Option value (optional)
     pub fn maybe_videos(mut self, value: Option<Vec<ExternalVideo<'a>>>) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -581,12 +584,12 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
 impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
     /// Set the `websites` field (optional)
     pub fn websites(mut self, value: impl Into<Option<Vec<Website<'a>>>>) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `websites` field to an Option value (optional)
     pub fn maybe_websites(mut self, value: Option<Vec<Website<'a>>>) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -594,35 +597,35 @@ impl<'a, S: put_game_state::State> PutGameBuilder<'a, S> {
 impl<'a, S> PutGameBuilder<'a, S>
 where
     S: put_game_state::State,
-    S::Name: put_game_state::IsSet,
     S::Uri: put_game_state::IsSet,
+    S::Name: put_game_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PutGame<'a> {
         PutGame {
-            age_ratings: self.__unsafe_private_named.0,
-            alternative_names: self.__unsafe_private_named.1,
-            application_type: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3,
-            engines: self.__unsafe_private_named.4,
-            genres: self.__unsafe_private_named.5,
-            keywords: self.__unsafe_private_named.6,
-            language_supports: self.__unsafe_private_named.7,
-            media: self.__unsafe_private_named.8,
-            modes: self.__unsafe_private_named.9,
-            multiplayer_modes: self.__unsafe_private_named.10,
-            name: self.__unsafe_private_named.11.unwrap(),
-            parent: self.__unsafe_private_named.12,
-            player_perspectives: self.__unsafe_private_named.13,
-            releases: self.__unsafe_private_named.14,
-            should_publish: self.__unsafe_private_named.15,
-            storyline: self.__unsafe_private_named.16,
-            summary: self.__unsafe_private_named.17,
-            themes: self.__unsafe_private_named.18,
-            time_to_beat: self.__unsafe_private_named.19,
-            uri: self.__unsafe_private_named.20.unwrap(),
-            videos: self.__unsafe_private_named.21,
-            websites: self.__unsafe_private_named.22,
+            age_ratings: self._fields.0,
+            alternative_names: self._fields.1,
+            application_type: self._fields.2,
+            created_at: self._fields.3,
+            engines: self._fields.4,
+            genres: self._fields.5,
+            keywords: self._fields.6,
+            language_supports: self._fields.7,
+            media: self._fields.8,
+            modes: self._fields.9,
+            multiplayer_modes: self._fields.10,
+            name: self._fields.11.unwrap(),
+            parent: self._fields.12,
+            player_perspectives: self._fields.13,
+            releases: self._fields.14,
+            should_publish: self._fields.15,
+            storyline: self._fields.16,
+            summary: self._fields.17,
+            themes: self._fields.18,
+            time_to_beat: self._fields.19,
+            uri: self._fields.20.unwrap(),
+            videos: self._fields.21,
+            websites: self._fields.22,
             extra_data: Default::default(),
         }
     }
@@ -635,29 +638,29 @@ where
         >,
     ) -> PutGame<'a> {
         PutGame {
-            age_ratings: self.__unsafe_private_named.0,
-            alternative_names: self.__unsafe_private_named.1,
-            application_type: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3,
-            engines: self.__unsafe_private_named.4,
-            genres: self.__unsafe_private_named.5,
-            keywords: self.__unsafe_private_named.6,
-            language_supports: self.__unsafe_private_named.7,
-            media: self.__unsafe_private_named.8,
-            modes: self.__unsafe_private_named.9,
-            multiplayer_modes: self.__unsafe_private_named.10,
-            name: self.__unsafe_private_named.11.unwrap(),
-            parent: self.__unsafe_private_named.12,
-            player_perspectives: self.__unsafe_private_named.13,
-            releases: self.__unsafe_private_named.14,
-            should_publish: self.__unsafe_private_named.15,
-            storyline: self.__unsafe_private_named.16,
-            summary: self.__unsafe_private_named.17,
-            themes: self.__unsafe_private_named.18,
-            time_to_beat: self.__unsafe_private_named.19,
-            uri: self.__unsafe_private_named.20.unwrap(),
-            videos: self.__unsafe_private_named.21,
-            websites: self.__unsafe_private_named.22,
+            age_ratings: self._fields.0,
+            alternative_names: self._fields.1,
+            application_type: self._fields.2,
+            created_at: self._fields.3,
+            engines: self._fields.4,
+            genres: self._fields.5,
+            keywords: self._fields.6,
+            language_supports: self._fields.7,
+            media: self._fields.8,
+            modes: self._fields.9,
+            multiplayer_modes: self._fields.10,
+            name: self._fields.11.unwrap(),
+            parent: self._fields.12,
+            player_perspectives: self._fields.13,
+            releases: self._fields.14,
+            should_publish: self._fields.15,
+            storyline: self._fields.16,
+            summary: self._fields.17,
+            themes: self._fields.18,
+            time_to_beat: self._fields.19,
+            uri: self._fields.20.unwrap(),
+            videos: self._fields.21,
+            websites: self._fields.22,
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -175,45 +178,45 @@ pub mod linear_document_quote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Quote;
         type Document;
+        type Quote;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Quote = Unset;
         type Document = Unset;
-    }
-    ///State transition - sets the `quote` field to Set
-    pub struct SetQuote<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuote<S> {}
-    impl<S: State> State for SetQuote<S> {
-        type Quote = Set<members::quote>;
-        type Document = S::Document;
+        type Quote = Unset;
     }
     ///State transition - sets the `document` field to Set
     pub struct SetDocument<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDocument<S> {}
     impl<S: State> State for SetDocument<S> {
-        type Quote = S::Quote;
         type Document = Set<members::document>;
+        type Quote = S::Quote;
+    }
+    ///State transition - sets the `quote` field to Set
+    pub struct SetQuote<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuote<S> {}
+    impl<S: State> State for SetQuote<S> {
+        type Document = S::Document;
+        type Quote = Set<members::quote>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `quote` field
-        pub struct quote(());
         ///Marker type for the `document` field
         pub struct document(());
+        ///Marker type for the `quote` field
+        pub struct quote(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LinearDocumentQuoteBuilder<'a, S: linear_document_quote_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>, Option<Quote<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>, Option<Quote<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LinearDocumentQuote<'a> {
@@ -227,9 +230,9 @@ impl<'a> LinearDocumentQuoteBuilder<'a, linear_document_quote_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LinearDocumentQuoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -244,11 +247,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> LinearDocumentQuoteBuilder<'a, linear_document_quote_state::SetDocument<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LinearDocumentQuoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -263,11 +266,11 @@ where
         mut self,
         value: impl Into<Quote<'a>>,
     ) -> LinearDocumentQuoteBuilder<'a, linear_document_quote_state::SetQuote<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LinearDocumentQuoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -275,14 +278,14 @@ where
 impl<'a, S> LinearDocumentQuoteBuilder<'a, S>
 where
     S: linear_document_quote_state::State,
-    S::Quote: linear_document_quote_state::IsSet,
     S::Document: linear_document_quote_state::IsSet,
+    S::Quote: linear_document_quote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LinearDocumentQuote<'a> {
         LinearDocumentQuote {
-            document: self.__unsafe_private_named.0.unwrap(),
-            quote: self.__unsafe_private_named.1.unwrap(),
+            document: self._fields.0.unwrap(),
+            quote: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -295,8 +298,8 @@ where
         >,
     ) -> LinearDocumentQuote<'a> {
         LinearDocumentQuote {
-            document: self.__unsafe_private_named.0.unwrap(),
-            quote: self.__unsafe_private_named.1.unwrap(),
+            document: self._fields.0.unwrap(),
+            quote: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -452,49 +455,49 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type Plaintext;
+        type Subject;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type Plaintext = Unset;
+        type Subject = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Plaintext = S::Plaintext;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `plaintext` field to Set
     pub struct SetPlaintext<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlaintext<S> {}
     impl<S: State> State for SetPlaintext<S> {
-        type Subject = S::Subject;
         type Plaintext = Set<members::plaintext>;
+        type Subject = S::Subject;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Plaintext = S::Plaintext;
+        type Subject = Set<members::subject>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
         type Plaintext = S::Plaintext;
+        type Subject = S::Subject;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `plaintext` field
         pub struct plaintext(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -502,8 +505,8 @@ pub mod comment_state {
 
 /// Builder for constructing an instance of this type
 pub struct CommentBuilder<'a, S: comment_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<comment::LinearDocumentQuote<'a>>,
         Option<Datetime>,
         Option<Vec<Facet<'a>>>,
@@ -512,7 +515,7 @@ pub struct CommentBuilder<'a, S: comment_state::State> {
         Option<comment::ReplyRef<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Comment<'a> {
@@ -526,9 +529,9 @@ impl<'a> CommentBuilder<'a, comment_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -539,7 +542,7 @@ impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
         mut self,
         value: impl Into<Option<comment::LinearDocumentQuote<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `attachment` field to an Option value (optional)
@@ -547,7 +550,7 @@ impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
         mut self,
         value: Option<comment::LinearDocumentQuote<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -562,11 +565,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CommentBuilder<'a, comment_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -574,12 +577,12 @@ where
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
     pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -587,12 +590,12 @@ impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `onPage` field (optional)
     pub fn on_page(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `onPage` field to an Option value (optional)
     pub fn maybe_on_page(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -607,11 +610,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CommentBuilder<'a, comment_state::SetPlaintext<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -619,12 +622,12 @@ where
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `reply` field (optional)
     pub fn reply(mut self, value: impl Into<Option<comment::ReplyRef<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `reply` field to an Option value (optional)
     pub fn maybe_reply(mut self, value: Option<comment::ReplyRef<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -639,11 +642,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> CommentBuilder<'a, comment_state::SetSubject<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -651,20 +654,20 @@ where
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::Subject: comment_state::IsSet,
     S::Plaintext: comment_state::IsSet,
+    S::Subject: comment_state::IsSet,
     S::CreatedAt: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {
         Comment {
-            attachment: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            facets: self.__unsafe_private_named.2,
-            on_page: self.__unsafe_private_named.3,
-            plaintext: self.__unsafe_private_named.4.unwrap(),
-            reply: self.__unsafe_private_named.5,
-            subject: self.__unsafe_private_named.6.unwrap(),
+            attachment: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            facets: self._fields.2,
+            on_page: self._fields.3,
+            plaintext: self._fields.4.unwrap(),
+            reply: self._fields.5,
+            subject: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -677,13 +680,13 @@ where
         >,
     ) -> Comment<'a> {
         Comment {
-            attachment: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            facets: self.__unsafe_private_named.2,
-            on_page: self.__unsafe_private_named.3,
-            plaintext: self.__unsafe_private_named.4.unwrap(),
-            reply: self.__unsafe_private_named.5,
-            subject: self.__unsafe_private_named.6.unwrap(),
+            attachment: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            facets: self._fields.2,
+            on_page: self._fields.3,
+            plaintext: self._fields.4.unwrap(),
+            reply: self._fields.5,
+            subject: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -723,9 +726,9 @@ pub mod reply_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct ReplyRefBuilder<'a, S: reply_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ReplyRef<'a> {
@@ -739,9 +742,9 @@ impl<'a> ReplyRefBuilder<'a, reply_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ReplyRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -756,11 +759,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ReplyRefBuilder<'a, reply_ref_state::SetParent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ReplyRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -773,7 +776,7 @@ where
     /// Build the final struct
     pub fn build(self) -> ReplyRef<'a> {
         ReplyRef {
-            parent: self.__unsafe_private_named.0.unwrap(),
+            parent: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -786,7 +789,7 @@ where
         >,
     ) -> ReplyRef<'a> {
         ReplyRef {
-            parent: self.__unsafe_private_named.0.unwrap(),
+            parent: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

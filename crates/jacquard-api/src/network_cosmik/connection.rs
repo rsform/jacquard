@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -135,44 +138,44 @@ pub mod connection_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Target;
         type Source;
+        type Target;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Target = Unset;
         type Source = Unset;
-    }
-    ///State transition - sets the `target` field to Set
-    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTarget<S> {}
-    impl<S: State> State for SetTarget<S> {
-        type Target = Set<members::target>;
-        type Source = S::Source;
+        type Target = Unset;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSource<S> {}
     impl<S: State> State for SetSource<S> {
-        type Target = S::Target;
         type Source = Set<members::source>;
+        type Target = S::Target;
+    }
+    ///State transition - sets the `target` field to Set
+    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTarget<S> {}
+    impl<S: State> State for SetTarget<S> {
+        type Source = S::Source;
+        type Target = Set<members::target>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `target` field
-        pub struct target(());
         ///Marker type for the `source` field
         pub struct source(());
+        ///Marker type for the `target` field
+        pub struct target(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ConnectionBuilder<'a, S: connection_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -180,7 +183,7 @@ pub struct ConnectionBuilder<'a, S: connection_state::State> {
         Option<CowStr<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Connection<'a> {
@@ -194,9 +197,9 @@ impl<'a> ConnectionBuilder<'a, connection_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConnectionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -204,12 +207,12 @@ impl<'a> ConnectionBuilder<'a, connection_state::Empty> {
 impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
     /// Set the `connectionType` field (optional)
     pub fn connection_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `connectionType` field to an Option value (optional)
     pub fn maybe_connection_type(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -217,12 +220,12 @@ impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
 impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -230,12 +233,12 @@ impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
 impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
     pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -250,11 +253,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ConnectionBuilder<'a, connection_state::SetSource<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ConnectionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -269,11 +272,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ConnectionBuilder<'a, connection_state::SetTarget<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ConnectionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -281,12 +284,12 @@ where
 impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -294,18 +297,18 @@ impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
 impl<'a, S> ConnectionBuilder<'a, S>
 where
     S: connection_state::State,
-    S::Target: connection_state::IsSet,
     S::Source: connection_state::IsSet,
+    S::Target: connection_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Connection<'a> {
         Connection {
-            connection_type: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            note: self.__unsafe_private_named.2,
-            source: self.__unsafe_private_named.3.unwrap(),
-            target: self.__unsafe_private_named.4.unwrap(),
-            updated_at: self.__unsafe_private_named.5,
+            connection_type: self._fields.0,
+            created_at: self._fields.1,
+            note: self._fields.2,
+            source: self._fields.3.unwrap(),
+            target: self._fields.4.unwrap(),
+            updated_at: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -318,12 +321,12 @@ where
         >,
     ) -> Connection<'a> {
         Connection {
-            connection_type: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            note: self.__unsafe_private_named.2,
-            source: self.__unsafe_private_named.3.unwrap(),
-            target: self.__unsafe_private_named.4.unwrap(),
-            updated_at: self.__unsafe_private_named.5,
+            connection_type: self._fields.0,
+            created_at: self._fields.1,
+            note: self._fields.2,
+            source: self._fields.3.unwrap(),
+            target: self._fields.4.unwrap(),
+            updated_at: self._fields.5,
             extra_data: Some(extra_data),
         }
     }

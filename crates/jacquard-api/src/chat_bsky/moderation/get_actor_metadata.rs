@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -124,9 +127,9 @@ pub mod get_actor_metadata_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetActorMetadataBuilder<'a, S: get_actor_metadata_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetActorMetadata<'a> {
@@ -140,9 +143,9 @@ impl<'a> GetActorMetadataBuilder<'a, get_actor_metadata_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetActorMetadataBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -157,11 +160,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> GetActorMetadataBuilder<'a, get_actor_metadata_state::SetActor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetActorMetadataBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -174,7 +177,7 @@ where
     /// Build the final struct
     pub fn build(self) -> GetActorMetadata<'a> {
         GetActorMetadata {
-            actor: self.__unsafe_private_named.0.unwrap(),
+            actor: self._fields.0.unwrap(),
         }
     }
 }
@@ -255,9 +258,9 @@ pub mod metadata_state {
 
 /// Builder for constructing an instance of this type
 pub struct MetadataBuilder<'a, S: metadata_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>, Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>, Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Metadata<'a> {
@@ -271,9 +274,9 @@ impl<'a> MetadataBuilder<'a, metadata_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MetadataBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -288,11 +291,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> MetadataBuilder<'a, metadata_state::SetConvos<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MetadataBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -307,11 +310,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> MetadataBuilder<'a, metadata_state::SetConvosStarted<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MetadataBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -326,11 +329,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> MetadataBuilder<'a, metadata_state::SetMessagesReceived<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         MetadataBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -345,11 +348,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> MetadataBuilder<'a, metadata_state::SetMessagesSent<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         MetadataBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -365,10 +368,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Metadata<'a> {
         Metadata {
-            convos: self.__unsafe_private_named.0.unwrap(),
-            convos_started: self.__unsafe_private_named.1.unwrap(),
-            messages_received: self.__unsafe_private_named.2.unwrap(),
-            messages_sent: self.__unsafe_private_named.3.unwrap(),
+            convos: self._fields.0.unwrap(),
+            convos_started: self._fields.1.unwrap(),
+            messages_received: self._fields.2.unwrap(),
+            messages_sent: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -381,10 +384,10 @@ where
         >,
     ) -> Metadata<'a> {
         Metadata {
-            convos: self.__unsafe_private_named.0.unwrap(),
-            convos_started: self.__unsafe_private_named.1.unwrap(),
-            messages_received: self.__unsafe_private_named.2.unwrap(),
-            messages_sent: self.__unsafe_private_named.3.unwrap(),
+            convos: self._fields.0.unwrap(),
+            convos_started: self._fields.1.unwrap(),
+            messages_received: self._fields.2.unwrap(),
+            messages_sent: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

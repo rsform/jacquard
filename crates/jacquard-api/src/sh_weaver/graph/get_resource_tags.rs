@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::string::AtUri;
 use jacquard_derive::IntoStatic;
@@ -86,9 +87,9 @@ pub mod get_resource_tags_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetResourceTagsBuilder<'a, S: get_resource_tags_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetResourceTags<'a> {
@@ -102,9 +103,9 @@ impl<'a> GetResourceTagsBuilder<'a, get_resource_tags_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetResourceTagsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -119,11 +120,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> GetResourceTagsBuilder<'a, get_resource_tags_state::SetResource<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetResourceTagsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -136,7 +137,7 @@ where
     /// Build the final struct
     pub fn build(self) -> GetResourceTags<'a> {
         GetResourceTags {
-            resource: self.__unsafe_private_named.0.unwrap(),
+            resource: self._fields.0.unwrap(),
         }
     }
 }

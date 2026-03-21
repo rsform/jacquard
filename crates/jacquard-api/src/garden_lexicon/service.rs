@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -252,14 +255,14 @@ pub mod service_state {
 
 /// Builder for constructing an instance of this type
 pub struct ServiceBuilder<'a, S: service_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Vec<service::Method<'a>>>,
         Option<CowStr<'a>>,
         Option<Vec<service::UrlTemplate<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Service<'a> {
@@ -273,9 +276,9 @@ impl<'a> ServiceBuilder<'a, service_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ServiceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -283,12 +286,12 @@ impl<'a> ServiceBuilder<'a, service_state::Empty> {
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -299,12 +302,12 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<service::Method<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `methods` field to an Option value (optional)
     pub fn maybe_methods(mut self, value: Option<Vec<service::Method<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -319,11 +322,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ServiceBuilder<'a, service_state::SetServiceType<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ServiceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -334,7 +337,7 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<service::UrlTemplate<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `urlTemplates` field to an Option value (optional)
@@ -342,7 +345,7 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
         mut self,
         value: Option<Vec<service::UrlTemplate<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -355,10 +358,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Service<'a> {
         Service {
-            description: self.__unsafe_private_named.0,
-            methods: self.__unsafe_private_named.1,
-            service_type: self.__unsafe_private_named.2.unwrap(),
-            url_templates: self.__unsafe_private_named.3,
+            description: self._fields.0,
+            methods: self._fields.1,
+            service_type: self._fields.2.unwrap(),
+            url_templates: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -371,10 +374,10 @@ where
         >,
     ) -> Service<'a> {
         Service {
-            description: self.__unsafe_private_named.0,
-            methods: self.__unsafe_private_named.1,
-            service_type: self.__unsafe_private_named.2.unwrap(),
-            url_templates: self.__unsafe_private_named.3,
+            description: self._fields.0,
+            methods: self._fields.1,
+            service_type: self._fields.2.unwrap(),
+            url_templates: self._fields.3,
             extra_data: Some(extra_data),
         }
     }
@@ -597,9 +600,9 @@ pub mod method_state {
 
 /// Builder for constructing an instance of this type
 pub struct MethodBuilder<'a, S: method_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<CowStr<'a>>>, Option<bool>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<CowStr<'a>>>, Option<bool>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Method<'a> {
@@ -613,9 +616,9 @@ impl<'a> MethodBuilder<'a, method_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MethodBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -623,12 +626,12 @@ impl<'a> MethodBuilder<'a, method_state::Empty> {
 impl<'a, S: method_state::State> MethodBuilder<'a, S> {
     /// Set the `authMethods` field (optional)
     pub fn auth_methods(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `authMethods` field to an Option value (optional)
     pub fn maybe_auth_methods(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -636,12 +639,12 @@ impl<'a, S: method_state::State> MethodBuilder<'a, S> {
 impl<'a, S: method_state::State> MethodBuilder<'a, S> {
     /// Set the `deprecated` field (optional)
     pub fn deprecated(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `deprecated` field to an Option value (optional)
     pub fn maybe_deprecated(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -656,11 +659,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> MethodBuilder<'a, method_state::SetLexicon<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         MethodBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -673,9 +676,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Method<'a> {
         Method {
-            auth_methods: self.__unsafe_private_named.0,
-            deprecated: self.__unsafe_private_named.1,
-            lexicon: self.__unsafe_private_named.2.unwrap(),
+            auth_methods: self._fields.0,
+            deprecated: self._fields.1,
+            lexicon: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -688,9 +691,9 @@ where
         >,
     ) -> Method<'a> {
         Method {
-            auth_methods: self.__unsafe_private_named.0,
-            deprecated: self.__unsafe_private_named.1,
-            lexicon: self.__unsafe_private_named.2.unwrap(),
+            auth_methods: self._fields.0,
+            deprecated: self._fields.1,
+            lexicon: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

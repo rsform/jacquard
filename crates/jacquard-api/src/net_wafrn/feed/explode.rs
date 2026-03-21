@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -122,9 +125,9 @@ pub mod explode_state {
 
 /// Builder for constructing an instance of this type
 pub struct ExplodeBuilder<'a, S: explode_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<StrongRef<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<StrongRef<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Explode<'a> {
@@ -138,9 +141,9 @@ impl<'a> ExplodeBuilder<'a, explode_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ExplodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -148,12 +151,12 @@ impl<'a> ExplodeBuilder<'a, explode_state::Empty> {
 impl<'a, S: explode_state::State> ExplodeBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -161,12 +164,12 @@ impl<'a, S: explode_state::State> ExplodeBuilder<'a, S> {
 impl<'a, S: explode_state::State> ExplodeBuilder<'a, S> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
     pub fn maybe_subject(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -178,8 +181,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Explode<'a> {
         Explode {
-            created_at: self.__unsafe_private_named.0,
-            subject: self.__unsafe_private_named.1,
+            created_at: self._fields.0,
+            subject: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -192,8 +195,8 @@ where
         >,
     ) -> Explode<'a> {
         Explode {
-            created_at: self.__unsafe_private_named.0,
-            subject: self.__unsafe_private_named.1,
+            created_at: self._fields.0,
+            subject: self._fields.1,
             extra_data: Some(extra_data),
         }
     }

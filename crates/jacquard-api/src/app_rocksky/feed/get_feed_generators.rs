@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
@@ -73,8 +74,8 @@ pub mod get_feed_generators_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetFeedGeneratorsBuilder<S: get_feed_generators_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>,),
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>,),
 }
 
 impl GetFeedGenerators {
@@ -88,8 +89,8 @@ impl GetFeedGeneratorsBuilder<get_feed_generators_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetFeedGeneratorsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
+            _state: PhantomData,
+            _fields: (None,),
         }
     }
 }
@@ -97,12 +98,12 @@ impl GetFeedGeneratorsBuilder<get_feed_generators_state::Empty> {
 impl<S: get_feed_generators_state::State> GetFeedGeneratorsBuilder<S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
     pub fn maybe_size(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -114,7 +115,7 @@ where
     /// Build the final struct
     pub fn build(self) -> GetFeedGenerators {
         GetFeedGenerators {
-            size: self.__unsafe_private_named.0,
+            size: self._fields.0,
         }
     }
 }

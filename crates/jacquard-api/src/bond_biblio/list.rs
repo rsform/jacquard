@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -169,92 +172,92 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Duedate;
-        type Librarians;
-        type Books;
-        type Title;
         type CreatedAt;
+        type Title;
+        type Librarians;
+        type Duedate;
+        type Books;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Duedate = Unset;
-        type Librarians = Unset;
-        type Books = Unset;
-        type Title = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `duedate` field to Set
-    pub struct SetDuedate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuedate<S> {}
-    impl<S: State> State for SetDuedate<S> {
-        type Duedate = Set<members::duedate>;
-        type Librarians = S::Librarians;
-        type Books = S::Books;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `librarians` field to Set
-    pub struct SetLibrarians<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLibrarians<S> {}
-    impl<S: State> State for SetLibrarians<S> {
-        type Duedate = S::Duedate;
-        type Librarians = Set<members::librarians>;
-        type Books = S::Books;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `books` field to Set
-    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBooks<S> {}
-    impl<S: State> State for SetBooks<S> {
-        type Duedate = S::Duedate;
-        type Librarians = S::Librarians;
-        type Books = Set<members::books>;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Duedate = S::Duedate;
-        type Librarians = S::Librarians;
-        type Books = S::Books;
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
+        type Title = Unset;
+        type Librarians = Unset;
+        type Duedate = Unset;
+        type Books = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Duedate = S::Duedate;
-        type Librarians = S::Librarians;
-        type Books = S::Books;
-        type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+        type Librarians = S::Librarians;
+        type Duedate = S::Duedate;
+        type Books = S::Books;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
+        type Librarians = S::Librarians;
+        type Duedate = S::Duedate;
+        type Books = S::Books;
+    }
+    ///State transition - sets the `librarians` field to Set
+    pub struct SetLibrarians<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLibrarians<S> {}
+    impl<S: State> State for SetLibrarians<S> {
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type Librarians = Set<members::librarians>;
+        type Duedate = S::Duedate;
+        type Books = S::Books;
+    }
+    ///State transition - sets the `duedate` field to Set
+    pub struct SetDuedate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuedate<S> {}
+    impl<S: State> State for SetDuedate<S> {
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type Librarians = S::Librarians;
+        type Duedate = Set<members::duedate>;
+        type Books = S::Books;
+    }
+    ///State transition - sets the `books` field to Set
+    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBooks<S> {}
+    impl<S: State> State for SetBooks<S> {
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type Librarians = S::Librarians;
+        type Duedate = S::Duedate;
+        type Books = Set<members::books>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `duedate` field
-        pub struct duedate(());
-        ///Marker type for the `librarians` field
-        pub struct librarians(());
-        ///Marker type for the `books` field
-        pub struct books(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `librarians` field
+        pub struct librarians(());
+        ///Marker type for the `duedate` field
+        pub struct duedate(());
+        ///Marker type for the `books` field
+        pub struct books(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ListBuilder<'a, S: list_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<BookRequirement<'a>>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -262,7 +265,7 @@ pub struct ListBuilder<'a, S: list_state::State> {
         Option<Vec<Did<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> List<'a> {
@@ -276,9 +279,9 @@ impl<'a> ListBuilder<'a, list_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -293,11 +296,11 @@ where
         mut self,
         value: impl Into<Vec<BookRequirement<'a>>>,
     ) -> ListBuilder<'a, list_state::SetBooks<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -312,11 +315,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ListBuilder<'a, list_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -324,12 +327,12 @@ where
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -344,11 +347,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ListBuilder<'a, list_state::SetDuedate<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -363,11 +366,11 @@ where
         mut self,
         value: impl Into<Vec<Did<'a>>>,
     ) -> ListBuilder<'a, list_state::SetLibrarians<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -382,11 +385,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ListBuilder<'a, list_state::SetTitle<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -394,21 +397,21 @@ where
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
-    S::Duedate: list_state::IsSet,
-    S::Librarians: list_state::IsSet,
-    S::Books: list_state::IsSet,
-    S::Title: list_state::IsSet,
     S::CreatedAt: list_state::IsSet,
+    S::Title: list_state::IsSet,
+    S::Librarians: list_state::IsSet,
+    S::Duedate: list_state::IsSet,
+    S::Books: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
         List {
-            books: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            duedate: self.__unsafe_private_named.3.unwrap(),
-            librarians: self.__unsafe_private_named.4.unwrap(),
-            title: self.__unsafe_private_named.5.unwrap(),
+            books: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            duedate: self._fields.3.unwrap(),
+            librarians: self._fields.4.unwrap(),
+            title: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -421,12 +424,12 @@ where
         >,
     ) -> List<'a> {
         List {
-            books: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            duedate: self.__unsafe_private_named.3.unwrap(),
-            librarians: self.__unsafe_private_named.4.unwrap(),
-            title: self.__unsafe_private_named.5.unwrap(),
+            books: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            duedate: self._fields.3.unwrap(),
+            librarians: self._fields.4.unwrap(),
+            title: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

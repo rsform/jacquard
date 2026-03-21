@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -722,14 +725,14 @@ pub mod evaluator_policies_state {
 
 /// Builder for constructing an instance of this type
 pub struct EvaluatorPoliciesBuilder<'a, S: evaluator_policies_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<EvaluatorPoliciesAccessModel<'a>>,
         Option<Vec<service::EvaluationTypeDefinition<'a>>>,
         Option<Vec<CowStr<'a>>>,
         Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> EvaluatorPolicies<'a> {
@@ -743,9 +746,9 @@ impl<'a> EvaluatorPoliciesBuilder<'a, evaluator_policies_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EvaluatorPoliciesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -756,7 +759,7 @@ impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
         mut self,
         value: impl Into<Option<EvaluatorPoliciesAccessModel<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `accessModel` field to an Option value (optional)
@@ -764,7 +767,7 @@ impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
         mut self,
         value: Option<EvaluatorPoliciesAccessModel<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -775,7 +778,7 @@ impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<service::EvaluationTypeDefinition<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `evaluationTypeDefinitions` field to an Option value (optional)
@@ -783,7 +786,7 @@ impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
         mut self,
         value: Option<Vec<service::EvaluationTypeDefinition<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -798,11 +801,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> EvaluatorPoliciesBuilder<'a, evaluator_policies_state::SetEvaluationTypes<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         EvaluatorPoliciesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -813,12 +816,12 @@ impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `subjectCollections` field to an Option value (optional)
     pub fn maybe_subject_collections(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -831,10 +834,10 @@ where
     /// Build the final struct
     pub fn build(self) -> EvaluatorPolicies<'a> {
         EvaluatorPolicies {
-            access_model: self.__unsafe_private_named.0,
-            evaluation_type_definitions: self.__unsafe_private_named.1,
-            evaluation_types: self.__unsafe_private_named.2.unwrap(),
-            subject_collections: self.__unsafe_private_named.3,
+            access_model: self._fields.0,
+            evaluation_type_definitions: self._fields.1,
+            evaluation_types: self._fields.2.unwrap(),
+            subject_collections: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -847,10 +850,10 @@ where
         >,
     ) -> EvaluatorPolicies<'a> {
         EvaluatorPolicies {
-            access_model: self.__unsafe_private_named.0,
-            evaluation_type_definitions: self.__unsafe_private_named.1,
-            evaluation_types: self.__unsafe_private_named.2.unwrap(),
-            subject_collections: self.__unsafe_private_named.3,
+            access_model: self._fields.0,
+            evaluation_type_definitions: self._fields.1,
+            evaluation_types: self._fields.2.unwrap(),
+            subject_collections: self._fields.3,
             extra_data: Some(extra_data),
         }
     }
@@ -866,45 +869,45 @@ pub mod service_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Policies;
         type CreatedAt;
+        type Policies;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Policies = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `policies` field to Set
-    pub struct SetPolicies<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPolicies<S> {}
-    impl<S: State> State for SetPolicies<S> {
-        type Policies = Set<members::policies>;
-        type CreatedAt = S::CreatedAt;
+        type Policies = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Policies = S::Policies;
         type CreatedAt = Set<members::created_at>;
+        type Policies = S::Policies;
+    }
+    ///State transition - sets the `policies` field to Set
+    pub struct SetPolicies<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPolicies<S> {}
+    impl<S: State> State for SetPolicies<S> {
+        type CreatedAt = S::CreatedAt;
+        type Policies = Set<members::policies>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `policies` field
-        pub struct policies(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `policies` field
+        pub struct policies(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ServiceBuilder<'a, S: service_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<service::EvaluatorPolicies<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<service::EvaluatorPolicies<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Service<'a> {
@@ -918,9 +921,9 @@ impl<'a> ServiceBuilder<'a, service_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ServiceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -935,11 +938,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ServiceBuilder<'a, service_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ServiceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -954,11 +957,11 @@ where
         mut self,
         value: impl Into<service::EvaluatorPolicies<'a>>,
     ) -> ServiceBuilder<'a, service_state::SetPolicies<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ServiceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -966,14 +969,14 @@ where
 impl<'a, S> ServiceBuilder<'a, S>
 where
     S: service_state::State,
-    S::Policies: service_state::IsSet,
     S::CreatedAt: service_state::IsSet,
+    S::Policies: service_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Service<'a> {
         Service {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            policies: self.__unsafe_private_named.1.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            policies: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -986,8 +989,8 @@ where
         >,
     ) -> Service<'a> {
         Service {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            policies: self.__unsafe_private_named.1.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            policies: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

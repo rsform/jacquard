@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -324,8 +327,8 @@ pub mod profile_state {
 
 /// Builder for constructing an instance of this type
 pub struct ProfileBuilder<'a, S: profile_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<BlobRef<'a>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
@@ -335,7 +338,7 @@ pub struct ProfileBuilder<'a, S: profile_state::State> {
         Option<ProfileUnitSystem<'a>>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Profile<'a> {
@@ -349,9 +352,9 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -359,12 +362,12 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `banner` field (optional)
     pub fn banner(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `banner` field to an Option value (optional)
     pub fn maybe_banner(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -372,12 +375,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `bio` field (optional)
     pub fn bio(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `bio` field to an Option value (optional)
     pub fn maybe_bio(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -385,12 +388,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -398,12 +401,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `dateOfBirth` field (optional)
     pub fn date_of_birth(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `dateOfBirth` field to an Option value (optional)
     pub fn maybe_date_of_birth(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -411,12 +414,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `heightCm` field (optional)
     pub fn height_cm(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `heightCm` field to an Option value (optional)
     pub fn maybe_height_cm(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -424,12 +427,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `publicProfile` field (optional)
     pub fn public_profile(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `publicProfile` field to an Option value (optional)
     pub fn maybe_public_profile(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -440,12 +443,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProfileUnitSystem<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `unitSystem` field to an Option value (optional)
     pub fn maybe_unit_system(mut self, value: Option<ProfileUnitSystem<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -453,12 +456,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `weightGrams` field (optional)
     pub fn weight_grams(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `weightGrams` field to an Option value (optional)
     pub fn maybe_weight_grams(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -470,14 +473,14 @@ where
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
         Profile {
-            banner: self.__unsafe_private_named.0,
-            bio: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2,
-            date_of_birth: self.__unsafe_private_named.3,
-            height_cm: self.__unsafe_private_named.4,
-            public_profile: self.__unsafe_private_named.5,
-            unit_system: self.__unsafe_private_named.6,
-            weight_grams: self.__unsafe_private_named.7,
+            banner: self._fields.0,
+            bio: self._fields.1,
+            created_at: self._fields.2,
+            date_of_birth: self._fields.3,
+            height_cm: self._fields.4,
+            public_profile: self._fields.5,
+            unit_system: self._fields.6,
+            weight_grams: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -490,14 +493,14 @@ where
         >,
     ) -> Profile<'a> {
         Profile {
-            banner: self.__unsafe_private_named.0,
-            bio: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2,
-            date_of_birth: self.__unsafe_private_named.3,
-            height_cm: self.__unsafe_private_named.4,
-            public_profile: self.__unsafe_private_named.5,
-            unit_system: self.__unsafe_private_named.6,
-            weight_grams: self.__unsafe_private_named.7,
+            banner: self._fields.0,
+            bio: self._fields.1,
+            created_at: self._fields.2,
+            date_of_birth: self._fields.3,
+            height_cm: self._fields.4,
+            public_profile: self._fields.5,
+            unit_system: self._fields.6,
+            weight_grams: self._fields.7,
             extra_data: Some(extra_data),
         }
     }

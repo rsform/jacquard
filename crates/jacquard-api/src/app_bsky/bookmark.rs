@@ -9,7 +9,11 @@ pub mod create_bookmark;
 pub mod delete_bookmark;
 pub mod get_bookmarks;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -129,9 +133,9 @@ pub mod bookmark_state {
 
 /// Builder for constructing an instance of this type
 pub struct BookmarkBuilder<'a, S: bookmark_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<StrongRef<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<StrongRef<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Bookmark<'a> {
@@ -145,9 +149,9 @@ impl<'a> BookmarkBuilder<'a, bookmark_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BookmarkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -162,11 +166,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> BookmarkBuilder<'a, bookmark_state::SetSubject<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BookmarkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -179,7 +183,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Bookmark<'a> {
         Bookmark {
-            subject: self.__unsafe_private_named.0.unwrap(),
+            subject: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -192,7 +196,7 @@ where
         >,
     ) -> Bookmark<'a> {
         Bookmark {
-            subject: self.__unsafe_private_named.0.unwrap(),
+            subject: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -287,49 +291,45 @@ pub mod bookmark_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type Item;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type Item = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Item = S::Item;
+        type Subject = Unset;
     }
     ///State transition - sets the `item` field to Set
     pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetItem<S> {}
     impl<S: State> State for SetItem<S> {
-        type Subject = S::Subject;
         type Item = Set<members::item>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Item = S::Item;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `item` field
         pub struct item(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BookmarkViewBuilder<'a, S: bookmark_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Datetime>,
-        Option<BookmarkViewItem<'a>>,
-        Option<StrongRef<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<BookmarkViewItem<'a>>, Option<StrongRef<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> BookmarkView<'a> {
@@ -343,9 +343,9 @@ impl<'a> BookmarkViewBuilder<'a, bookmark_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BookmarkViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -353,12 +353,12 @@ impl<'a> BookmarkViewBuilder<'a, bookmark_view_state::Empty> {
 impl<'a, S: bookmark_view_state::State> BookmarkViewBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -373,11 +373,11 @@ where
         mut self,
         value: impl Into<BookmarkViewItem<'a>>,
     ) -> BookmarkViewBuilder<'a, bookmark_view_state::SetItem<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         BookmarkViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -392,11 +392,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> BookmarkViewBuilder<'a, bookmark_view_state::SetSubject<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         BookmarkViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -404,15 +404,15 @@ where
 impl<'a, S> BookmarkViewBuilder<'a, S>
 where
     S: bookmark_view_state::State,
-    S::Subject: bookmark_view_state::IsSet,
     S::Item: bookmark_view_state::IsSet,
+    S::Subject: bookmark_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BookmarkView<'a> {
         BookmarkView {
-            created_at: self.__unsafe_private_named.0,
-            item: self.__unsafe_private_named.1.unwrap(),
-            subject: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0,
+            item: self._fields.1.unwrap(),
+            subject: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -425,9 +425,9 @@ where
         >,
     ) -> BookmarkView<'a> {
         BookmarkView {
-            created_at: self.__unsafe_private_named.0,
-            item: self.__unsafe_private_named.1.unwrap(),
-            subject: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0,
+            item: self._fields.1.unwrap(),
+            subject: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

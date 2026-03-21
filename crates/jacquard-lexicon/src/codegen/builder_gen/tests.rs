@@ -212,9 +212,9 @@ fn test_build_method_generation() {
     assert!(code.contains("Collection") && code.contains("IsSet"));
 
     // Verify field extraction from tuple (fields ordered by BTreeMap key order)
-    assert!(code.contains("collection : self . __unsafe_private_named . 0 . unwrap ()"));
-    assert!(code.contains("repo : self . __unsafe_private_named . 1 . unwrap ()"));
-    assert!(code.contains("rkey : self . __unsafe_private_named . 2")); // optional, no unwrap
+    assert!(code.contains("collection : self . _fields . 0 . unwrap ()"));
+    assert!(code.contains("repo : self . _fields . 1 . unwrap ()"));
+    assert!(code.contains("rkey : self . _fields . 2")); // optional, no unwrap
 
     // Verify extra_data for LexObject
     assert!(code.contains("extra_data : Default :: default ()"));

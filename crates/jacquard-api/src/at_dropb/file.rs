@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -217,15 +220,15 @@ pub mod file_state {
 
 /// Builder for constructing an instance of this type
 pub struct FileBuilder<'a, S: file_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<BlobRef<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<BlobRef<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> File<'a> {
@@ -239,9 +242,9 @@ impl<'a> FileBuilder<'a, file_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -256,11 +259,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> FileBuilder<'a, file_state::SetBlob<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         FileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -268,12 +271,12 @@ where
 impl<'a, S: file_state::State> FileBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -281,12 +284,12 @@ impl<'a, S: file_state::State> FileBuilder<'a, S> {
 impl<'a, S: file_state::State> FileBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -294,12 +297,12 @@ impl<'a, S: file_state::State> FileBuilder<'a, S> {
 impl<'a, S: file_state::State> FileBuilder<'a, S> {
     /// Set the `thumbnail` field (optional)
     pub fn thumbnail(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
     pub fn maybe_thumbnail(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -307,12 +310,12 @@ impl<'a, S: file_state::State> FileBuilder<'a, S> {
 impl<'a, S: file_state::State> FileBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -325,11 +328,11 @@ where
     /// Build the final struct
     pub fn build(self) -> File<'a> {
         File {
-            blob: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1,
-            name: self.__unsafe_private_named.2,
-            thumbnail: self.__unsafe_private_named.3,
-            updated_at: self.__unsafe_private_named.4,
+            blob: self._fields.0.unwrap(),
+            created_at: self._fields.1,
+            name: self._fields.2,
+            thumbnail: self._fields.3,
+            updated_at: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -342,11 +345,11 @@ where
         >,
     ) -> File<'a> {
         File {
-            blob: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1,
-            name: self.__unsafe_private_named.2,
-            thumbnail: self.__unsafe_private_named.3,
-            updated_at: self.__unsafe_private_named.4,
+            blob: self._fields.0.unwrap(),
+            created_at: self._fields.1,
+            name: self._fields.2,
+            thumbnail: self._fields.3,
+            updated_at: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -154,51 +157,51 @@ pub mod testing_polis_statement_v1_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Poll;
         type Text;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Poll = Unset;
         type Text = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `poll` field to Set
-    pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPoll<S> {}
-    impl<S: State> State for SetPoll<S> {
-        type Poll = Set<members::poll>;
-        type Text = S::Text;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Poll = S::Poll;
-        type Text = Set<members::text>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Poll = S::Poll;
         type Text = S::Text;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `poll` field to Set
+    pub struct SetPoll<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPoll<S> {}
+    impl<S: State> State for SetPoll<S> {
+        type CreatedAt = S::CreatedAt;
+        type Poll = Set<members::poll>;
+        type Text = S::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type CreatedAt = S::CreatedAt;
+        type Poll = S::Poll;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `poll` field
         pub struct poll(());
         ///Marker type for the `text` field
         pub struct text(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -207,13 +210,13 @@ pub struct TestingPolisStatementV1Builder<
     'a,
     S: testing_polis_statement_v1_state::State,
 > {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<testing_polis_statement_v1::PollRef<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TestingPolisStatementV1<'a> {
@@ -230,9 +233,9 @@ impl<'a> TestingPolisStatementV1Builder<'a, testing_polis_statement_v1_state::Em
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TestingPolisStatementV1Builder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -250,11 +253,11 @@ where
         'a,
         testing_polis_statement_v1_state::SetCreatedAt<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TestingPolisStatementV1Builder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -272,11 +275,11 @@ where
         'a,
         testing_polis_statement_v1_state::SetPoll<S>,
     > {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TestingPolisStatementV1Builder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -294,11 +297,11 @@ where
         'a,
         testing_polis_statement_v1_state::SetText<S>,
     > {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         TestingPolisStatementV1Builder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -306,16 +309,16 @@ where
 impl<'a, S> TestingPolisStatementV1Builder<'a, S>
 where
     S: testing_polis_statement_v1_state::State,
+    S::CreatedAt: testing_polis_statement_v1_state::IsSet,
     S::Poll: testing_polis_statement_v1_state::IsSet,
     S::Text: testing_polis_statement_v1_state::IsSet,
-    S::CreatedAt: testing_polis_statement_v1_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TestingPolisStatementV1<'a> {
         TestingPolisStatementV1 {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            poll: self.__unsafe_private_named.1.unwrap(),
-            text: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            poll: self._fields.1.unwrap(),
+            text: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -328,9 +331,9 @@ where
         >,
     ) -> TestingPolisStatementV1<'a> {
         TestingPolisStatementV1 {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            poll: self.__unsafe_private_named.1.unwrap(),
-            text: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            poll: self._fields.1.unwrap(),
+            text: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -452,45 +455,45 @@ pub mod poll_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Uri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PollRefBuilder<'a, S: poll_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Cid<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Cid<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> PollRef<'a> {
@@ -504,9 +507,9 @@ impl<'a> PollRefBuilder<'a, poll_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PollRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -521,11 +524,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> PollRefBuilder<'a, poll_ref_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PollRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -540,11 +543,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> PollRefBuilder<'a, poll_ref_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PollRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -552,14 +555,14 @@ where
 impl<'a, S> PollRefBuilder<'a, S>
 where
     S: poll_ref_state::State,
-    S::Cid: poll_ref_state::IsSet,
     S::Uri: poll_ref_state::IsSet,
+    S::Cid: poll_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PollRef<'a> {
         PollRef {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -572,8 +575,8 @@ where
         >,
     ) -> PollRef<'a> {
         PollRef {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

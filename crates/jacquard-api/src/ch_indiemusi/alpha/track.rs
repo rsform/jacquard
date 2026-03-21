@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -189,8 +192,8 @@ pub mod track_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type EncryptedContentIv;
-        type Title;
         type CreatedAt;
+        type Title;
         type AudioBlob;
     }
     /// Empty state - all required fields are unset
@@ -198,8 +201,8 @@ pub mod track_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type EncryptedContentIv = Unset;
-        type Title = Unset;
         type CreatedAt = Unset;
+        type Title = Unset;
         type AudioBlob = Unset;
     }
     ///State transition - sets the `encrypted_content_iv` field to Set
@@ -207,17 +210,8 @@ pub mod track_state {
     impl<S: State> sealed::Sealed for SetEncryptedContentIv<S> {}
     impl<S: State> State for SetEncryptedContentIv<S> {
         type EncryptedContentIv = Set<members::encrypted_content_iv>;
+        type CreatedAt = S::CreatedAt;
         type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type AudioBlob = S::AudioBlob;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type EncryptedContentIv = S::EncryptedContentIv;
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
         type AudioBlob = S::AudioBlob;
     }
     ///State transition - sets the `created_at` field to Set
@@ -225,8 +219,17 @@ pub mod track_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type EncryptedContentIv = S::EncryptedContentIv;
-        type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+        type AudioBlob = S::AudioBlob;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type EncryptedContentIv = S::EncryptedContentIv;
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
         type AudioBlob = S::AudioBlob;
     }
     ///State transition - sets the `audio_blob` field to Set
@@ -234,8 +237,8 @@ pub mod track_state {
     impl<S: State> sealed::Sealed for SetAudioBlob<S> {}
     impl<S: State> State for SetAudioBlob<S> {
         type EncryptedContentIv = S::EncryptedContentIv;
-        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
         type AudioBlob = Set<members::audio_blob>;
     }
     /// Marker types for field names
@@ -243,10 +246,10 @@ pub mod track_state {
     pub mod members {
         ///Marker type for the `encrypted_content_iv` field
         pub struct encrypted_content_iv(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `audio_blob` field
         pub struct audio_blob(());
     }
@@ -254,15 +257,15 @@ pub mod track_state {
 
 /// Builder for constructing an instance of this type
 pub struct TrackBuilder<'a, S: track_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<BlobRef<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Track<'a> {
@@ -276,9 +279,9 @@ impl<'a> TrackBuilder<'a, track_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TrackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -293,11 +296,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> TrackBuilder<'a, track_state::SetAudioBlob<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TrackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -312,11 +315,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> TrackBuilder<'a, track_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TrackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -331,11 +334,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TrackBuilder<'a, track_state::SetEncryptedContentIv<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         TrackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -343,12 +346,12 @@ where
 impl<'a, S: track_state::State> TrackBuilder<'a, S> {
     /// Set the `encryptionAlgorithm` field (optional)
     pub fn encryption_algorithm(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `encryptionAlgorithm` field to an Option value (optional)
     pub fn maybe_encryption_algorithm(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -363,11 +366,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TrackBuilder<'a, track_state::SetTitle<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         TrackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -376,21 +379,21 @@ impl<'a, S> TrackBuilder<'a, S>
 where
     S: track_state::State,
     S::EncryptedContentIv: track_state::IsSet,
-    S::Title: track_state::IsSet,
     S::CreatedAt: track_state::IsSet,
+    S::Title: track_state::IsSet,
     S::AudioBlob: track_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Track<'a> {
         Track {
-            audio_blob: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            encrypted_content_iv: self.__unsafe_private_named.2.unwrap(),
+            audio_blob: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            encrypted_content_iv: self._fields.2.unwrap(),
             encryption_algorithm: self
-                .__unsafe_private_named
+                ._fields
                 .3
                 .or_else(|| Some(CowStr::from("AES-GCM-256"))),
-            title: self.__unsafe_private_named.4.unwrap(),
+            title: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -403,14 +406,14 @@ where
         >,
     ) -> Track<'a> {
         Track {
-            audio_blob: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            encrypted_content_iv: self.__unsafe_private_named.2.unwrap(),
+            audio_blob: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            encrypted_content_iv: self._fields.2.unwrap(),
             encryption_algorithm: self
-                .__unsafe_private_named
+                ._fields
                 .3
                 .or_else(|| Some(CowStr::from("AES-GCM-256"))),
-            title: self.__unsafe_private_named.4.unwrap(),
+            title: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

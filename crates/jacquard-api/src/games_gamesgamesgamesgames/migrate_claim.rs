@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -242,9 +245,9 @@ pub mod migrate_claim_state {
 
 /// Builder for constructing an instance of this type
 pub struct MigrateClaimBuilder<'a, S: migrate_claim_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> MigrateClaim<'a> {
@@ -258,9 +261,9 @@ impl<'a> MigrateClaimBuilder<'a, migrate_claim_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MigrateClaimBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -275,11 +278,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> MigrateClaimBuilder<'a, migrate_claim_state::SetClaim<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MigrateClaimBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -294,11 +297,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> MigrateClaimBuilder<'a, migrate_claim_state::SetClaimReview<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MigrateClaimBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -312,8 +315,8 @@ where
     /// Build the final struct
     pub fn build(self) -> MigrateClaim<'a> {
         MigrateClaim {
-            claim: self.__unsafe_private_named.0.unwrap(),
-            claim_review: self.__unsafe_private_named.1.unwrap(),
+            claim: self._fields.0.unwrap(),
+            claim_review: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -326,8 +329,8 @@ where
         >,
     ) -> MigrateClaim<'a> {
         MigrateClaim {
-            claim: self.__unsafe_private_named.0.unwrap(),
-            claim_review: self.__unsafe_private_named.1.unwrap(),
+            claim: self._fields.0.unwrap(),
+            claim_review: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -379,14 +382,14 @@ pub mod migration_result_state {
 
 /// Builder for constructing an instance of this type
 pub struct MigrationResultBuilder<'a, S: migration_result_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<AtUri<'a>>,
         Option<AtUri<'a>>,
         Option<MigrationResultStatus<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> MigrationResult<'a> {
@@ -400,9 +403,9 @@ impl<'a> MigrationResultBuilder<'a, migration_result_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MigrationResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -410,12 +413,12 @@ impl<'a> MigrationResultBuilder<'a, migration_result_state::Empty> {
 impl<'a, S: migration_result_state::State> MigrationResultBuilder<'a, S> {
     /// Set the `error` field (optional)
     pub fn error(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `error` field to an Option value (optional)
     pub fn maybe_error(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -430,11 +433,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> MigrationResultBuilder<'a, migration_result_state::SetGameUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MigrationResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -442,12 +445,12 @@ where
 impl<'a, S: migration_result_state::State> MigrationResultBuilder<'a, S> {
     /// Set the `newUri` field (optional)
     pub fn new_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `newUri` field to an Option value (optional)
     pub fn maybe_new_uri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -462,11 +465,11 @@ where
         mut self,
         value: impl Into<MigrationResultStatus<'a>>,
     ) -> MigrationResultBuilder<'a, migration_result_state::SetStatus<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         MigrationResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -480,10 +483,10 @@ where
     /// Build the final struct
     pub fn build(self) -> MigrationResult<'a> {
         MigrationResult {
-            error: self.__unsafe_private_named.0,
-            game_uri: self.__unsafe_private_named.1.unwrap(),
-            new_uri: self.__unsafe_private_named.2,
-            status: self.__unsafe_private_named.3.unwrap(),
+            error: self._fields.0,
+            game_uri: self._fields.1.unwrap(),
+            new_uri: self._fields.2,
+            status: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -496,10 +499,10 @@ where
         >,
     ) -> MigrationResult<'a> {
         MigrationResult {
-            error: self.__unsafe_private_named.0,
-            game_uri: self.__unsafe_private_named.1.unwrap(),
-            new_uri: self.__unsafe_private_named.2,
-            status: self.__unsafe_private_named.3.unwrap(),
+            error: self._fields.0,
+            game_uri: self._fields.1.unwrap(),
+            new_uri: self._fields.2,
+            status: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

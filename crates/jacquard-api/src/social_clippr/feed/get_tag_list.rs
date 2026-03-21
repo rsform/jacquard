@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -75,9 +78,9 @@ pub mod get_tag_list_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetTagListBuilder<'a, S: get_tag_list_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtIdentifier<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtIdentifier<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetTagList<'a> {
@@ -91,9 +94,9 @@ impl<'a> GetTagListBuilder<'a, get_tag_list_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetTagListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -101,12 +104,12 @@ impl<'a> GetTagListBuilder<'a, get_tag_list_state::Empty> {
 impl<'a, S: get_tag_list_state::State> GetTagListBuilder<'a, S> {
     /// Set the `actor` field (optional)
     pub fn actor(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `actor` field to an Option value (optional)
     pub fn maybe_actor(mut self, value: Option<AtIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -118,7 +121,7 @@ where
     /// Build the final struct
     pub fn build(self) -> GetTagList<'a> {
         GetTagList {
-            actor: self.__unsafe_private_named.0,
+            actor: self._fields.0,
         }
     }
 }

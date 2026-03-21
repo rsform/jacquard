@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -562,8 +565,8 @@ pub mod section_state {
 
 /// Builder for constructing an instance of this type
 pub struct SectionBuilder<'a, S: section_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<SectionFormat<'a>>,
@@ -576,7 +579,7 @@ pub struct SectionBuilder<'a, S: section_state::State> {
         Option<CowStr<'a>>,
         Option<SectionType<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Section<'a> {
@@ -590,21 +593,9 @@ impl<'a> SectionBuilder<'a, section_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SectionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -612,12 +603,12 @@ impl<'a> SectionBuilder<'a, section_state::Empty> {
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `collection` field (optional)
     pub fn collection(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `collection` field to an Option value (optional)
     pub fn maybe_collection(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -625,12 +616,12 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `content` field (optional)
     pub fn content(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `content` field to an Option value (optional)
     pub fn maybe_content(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -638,12 +629,12 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `format` field (optional)
     pub fn format(mut self, value: impl Into<Option<SectionFormat<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `format` field to an Option value (optional)
     pub fn maybe_format(mut self, value: Option<SectionFormat<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -651,12 +642,12 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `hideHeader` field (optional)
     pub fn hide_header(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `hideHeader` field to an Option value (optional)
     pub fn maybe_hide_header(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -664,12 +655,12 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `layout` field (optional)
     pub fn layout(mut self, value: impl Into<Option<SectionLayout<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `layout` field to an Option value (optional)
     pub fn maybe_layout(mut self, value: Option<SectionLayout<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -677,12 +668,12 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -690,12 +681,12 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `records` field (optional)
     pub fn records(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `records` field to an Option value (optional)
     pub fn maybe_records(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -703,12 +694,12 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `ref` field (optional)
     pub fn r#ref(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `ref` field to an Option value (optional)
     pub fn maybe_ref(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -716,12 +707,12 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `rkey` field (optional)
     pub fn rkey(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `rkey` field to an Option value (optional)
     pub fn maybe_rkey(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -729,12 +720,12 @@ impl<'a, S: section_state::State> SectionBuilder<'a, S> {
 impl<'a, S: section_state::State> SectionBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -749,11 +740,11 @@ where
         mut self,
         value: impl Into<SectionType<'a>>,
     ) -> SectionBuilder<'a, section_state::SetType<S>> {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         SectionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -766,17 +757,17 @@ where
     /// Build the final struct
     pub fn build(self) -> Section<'a> {
         Section {
-            collection: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1,
-            format: self.__unsafe_private_named.2,
-            hide_header: self.__unsafe_private_named.3,
-            layout: self.__unsafe_private_named.4,
-            limit: self.__unsafe_private_named.5,
-            records: self.__unsafe_private_named.6,
-            r#ref: self.__unsafe_private_named.7,
-            rkey: self.__unsafe_private_named.8,
-            title: self.__unsafe_private_named.9,
-            r#type: self.__unsafe_private_named.10.unwrap(),
+            collection: self._fields.0,
+            content: self._fields.1,
+            format: self._fields.2,
+            hide_header: self._fields.3,
+            layout: self._fields.4,
+            limit: self._fields.5,
+            records: self._fields.6,
+            r#ref: self._fields.7,
+            rkey: self._fields.8,
+            title: self._fields.9,
+            r#type: self._fields.10.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -789,17 +780,17 @@ where
         >,
     ) -> Section<'a> {
         Section {
-            collection: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1,
-            format: self.__unsafe_private_named.2,
-            hide_header: self.__unsafe_private_named.3,
-            layout: self.__unsafe_private_named.4,
-            limit: self.__unsafe_private_named.5,
-            records: self.__unsafe_private_named.6,
-            r#ref: self.__unsafe_private_named.7,
-            rkey: self.__unsafe_private_named.8,
-            title: self.__unsafe_private_named.9,
-            r#type: self.__unsafe_private_named.10.unwrap(),
+            collection: self._fields.0,
+            content: self._fields.1,
+            format: self._fields.2,
+            hide_header: self._fields.3,
+            layout: self._fields.4,
+            limit: self._fields.5,
+            records: self._fields.6,
+            r#ref: self._fields.7,
+            rkey: self._fields.8,
+            title: self._fields.9,
+            r#type: self._fields.10.unwrap(),
             extra_data: Some(extra_data),
         }
     }

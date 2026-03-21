@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -306,45 +309,45 @@ pub mod interval_schedule_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type Seconds;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type Seconds = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Seconds = S::Seconds;
+        type Type = Unset;
     }
     ///State transition - sets the `seconds` field to Set
     pub struct SetSeconds<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSeconds<S> {}
     impl<S: State> State for SetSeconds<S> {
-        type Type = S::Type;
         type Seconds = Set<members::seconds>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Seconds = S::Seconds;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `seconds` field
         pub struct seconds(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct IntervalScheduleBuilder<'a, S: interval_schedule_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> IntervalSchedule<'a> {
@@ -358,9 +361,9 @@ impl<'a> IntervalScheduleBuilder<'a, interval_schedule_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         IntervalScheduleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -375,11 +378,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> IntervalScheduleBuilder<'a, interval_schedule_state::SetSeconds<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         IntervalScheduleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -394,11 +397,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> IntervalScheduleBuilder<'a, interval_schedule_state::SetType<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         IntervalScheduleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -406,14 +409,14 @@ where
 impl<'a, S> IntervalScheduleBuilder<'a, S>
 where
     S: interval_schedule_state::State,
-    S::Type: interval_schedule_state::IsSet,
     S::Seconds: interval_schedule_state::IsSet,
+    S::Type: interval_schedule_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> IntervalSchedule<'a> {
         IntervalSchedule {
-            seconds: self.__unsafe_private_named.0.unwrap(),
-            r#type: self.__unsafe_private_named.1.unwrap(),
+            seconds: self._fields.0.unwrap(),
+            r#type: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -426,8 +429,8 @@ where
         >,
     ) -> IntervalSchedule<'a> {
         IntervalSchedule {
-            seconds: self.__unsafe_private_named.0.unwrap(),
-            r#type: self.__unsafe_private_named.1.unwrap(),
+            seconds: self._fields.0.unwrap(),
+            r#type: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -592,74 +595,74 @@ pub mod job_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
+        type Name;
         type Schedule;
         type Instructions;
-        type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
+        type Name = Unset;
         type Schedule = Unset;
         type Instructions = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Schedule = S::Schedule;
-        type Instructions = S::Instructions;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `schedule` field to Set
-    pub struct SetSchedule<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSchedule<S> {}
-    impl<S: State> State for SetSchedule<S> {
-        type CreatedAt = S::CreatedAt;
-        type Schedule = Set<members::schedule>;
-        type Instructions = S::Instructions;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `instructions` field to Set
-    pub struct SetInstructions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInstructions<S> {}
-    impl<S: State> State for SetInstructions<S> {
-        type CreatedAt = S::CreatedAt;
-        type Schedule = S::Schedule;
-        type Instructions = Set<members::instructions>;
-        type Name = S::Name;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
         type Schedule = S::Schedule;
         type Instructions = S::Instructions;
-        type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `schedule` field to Set
+    pub struct SetSchedule<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSchedule<S> {}
+    impl<S: State> State for SetSchedule<S> {
+        type Name = S::Name;
+        type Schedule = Set<members::schedule>;
+        type Instructions = S::Instructions;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `instructions` field to Set
+    pub struct SetInstructions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInstructions<S> {}
+    impl<S: State> State for SetInstructions<S> {
+        type Name = S::Name;
+        type Schedule = S::Schedule;
+        type Instructions = Set<members::instructions>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type Schedule = S::Schedule;
+        type Instructions = S::Instructions;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `schedule` field
         pub struct schedule(());
         ///Marker type for the `instructions` field
         pub struct instructions(());
-        ///Marker type for the `name` field
-        pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct JobBuilder<'a, S: job_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<i64>,
         Option<CowStr<'a>>,
@@ -669,7 +672,7 @@ pub struct JobBuilder<'a, S: job_state::State> {
         Option<JobSchedule<'a>>,
         Option<JobStatus<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Job<'a> {
@@ -683,9 +686,9 @@ impl<'a> JobBuilder<'a, job_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         JobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -700,11 +703,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> JobBuilder<'a, job_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         JobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -712,12 +715,12 @@ where
 impl<'a, S: job_state::State> JobBuilder<'a, S> {
     /// Set the `failureCount` field (optional)
     pub fn failure_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `failureCount` field to an Option value (optional)
     pub fn maybe_failure_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -732,11 +735,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> JobBuilder<'a, job_state::SetInstructions<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         JobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -744,12 +747,12 @@ where
 impl<'a, S: job_state::State> JobBuilder<'a, S> {
     /// Set the `lastRun` field (optional)
     pub fn last_run(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `lastRun` field to an Option value (optional)
     pub fn maybe_last_run(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -764,11 +767,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> JobBuilder<'a, job_state::SetName<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         JobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -776,12 +779,12 @@ where
 impl<'a, S: job_state::State> JobBuilder<'a, S> {
     /// Set the `nextRun` field (optional)
     pub fn next_run(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `nextRun` field to an Option value (optional)
     pub fn maybe_next_run(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -796,11 +799,11 @@ where
         mut self,
         value: impl Into<JobSchedule<'a>>,
     ) -> JobBuilder<'a, job_state::SetSchedule<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         JobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -808,12 +811,12 @@ where
 impl<'a, S: job_state::State> JobBuilder<'a, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<JobStatus<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<JobStatus<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -821,22 +824,22 @@ impl<'a, S: job_state::State> JobBuilder<'a, S> {
 impl<'a, S> JobBuilder<'a, S>
 where
     S: job_state::State,
-    S::CreatedAt: job_state::IsSet,
+    S::Name: job_state::IsSet,
     S::Schedule: job_state::IsSet,
     S::Instructions: job_state::IsSet,
-    S::Name: job_state::IsSet,
+    S::CreatedAt: job_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Job<'a> {
         Job {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            failure_count: self.__unsafe_private_named.1.or_else(|| Some(0i64)),
-            instructions: self.__unsafe_private_named.2.unwrap(),
-            last_run: self.__unsafe_private_named.3,
-            name: self.__unsafe_private_named.4.unwrap(),
-            next_run: self.__unsafe_private_named.5,
-            schedule: self.__unsafe_private_named.6.unwrap(),
-            status: self.__unsafe_private_named.7,
+            created_at: self._fields.0.unwrap(),
+            failure_count: self._fields.1.or_else(|| Some(0i64)),
+            instructions: self._fields.2.unwrap(),
+            last_run: self._fields.3,
+            name: self._fields.4.unwrap(),
+            next_run: self._fields.5,
+            schedule: self._fields.6.unwrap(),
+            status: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -849,14 +852,14 @@ where
         >,
     ) -> Job<'a> {
         Job {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            failure_count: self.__unsafe_private_named.1.or_else(|| Some(0i64)),
-            instructions: self.__unsafe_private_named.2.unwrap(),
-            last_run: self.__unsafe_private_named.3,
-            name: self.__unsafe_private_named.4.unwrap(),
-            next_run: self.__unsafe_private_named.5,
-            schedule: self.__unsafe_private_named.6.unwrap(),
-            status: self.__unsafe_private_named.7,
+            created_at: self._fields.0.unwrap(),
+            failure_count: self._fields.1.or_else(|| Some(0i64)),
+            instructions: self._fields.2.unwrap(),
+            last_run: self._fields.3,
+            name: self._fields.4.unwrap(),
+            next_run: self._fields.5,
+            schedule: self._fields.6.unwrap(),
+            status: self._fields.7,
             extra_data: Some(extra_data),
         }
     }
@@ -872,45 +875,45 @@ pub mod once_schedule_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type RunAt;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type RunAt = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type RunAt = S::RunAt;
+        type Type = Unset;
     }
     ///State transition - sets the `run_at` field to Set
     pub struct SetRunAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRunAt<S> {}
     impl<S: State> State for SetRunAt<S> {
-        type Type = S::Type;
         type RunAt = Set<members::run_at>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type RunAt = S::RunAt;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `run_at` field
         pub struct run_at(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct OnceScheduleBuilder<'a, S: once_schedule_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> OnceSchedule<'a> {
@@ -924,9 +927,9 @@ impl<'a> OnceScheduleBuilder<'a, once_schedule_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         OnceScheduleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -941,11 +944,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> OnceScheduleBuilder<'a, once_schedule_state::SetRunAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         OnceScheduleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -960,11 +963,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> OnceScheduleBuilder<'a, once_schedule_state::SetType<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         OnceScheduleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -972,14 +975,14 @@ where
 impl<'a, S> OnceScheduleBuilder<'a, S>
 where
     S: once_schedule_state::State,
-    S::Type: once_schedule_state::IsSet,
     S::RunAt: once_schedule_state::IsSet,
+    S::Type: once_schedule_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> OnceSchedule<'a> {
         OnceSchedule {
-            run_at: self.__unsafe_private_named.0.unwrap(),
-            r#type: self.__unsafe_private_named.1.unwrap(),
+            run_at: self._fields.0.unwrap(),
+            r#type: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -992,8 +995,8 @@ where
         >,
     ) -> OnceSchedule<'a> {
         OnceSchedule {
-            run_at: self.__unsafe_private_named.0.unwrap(),
-            r#type: self.__unsafe_private_named.1.unwrap(),
+            run_at: self._fields.0.unwrap(),
+            r#type: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -193,8 +196,8 @@ pub mod external_state {
 
 /// Builder for constructing an instance of this type
 pub struct ExternalBuilder<'a, S: external_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<SelfLabels<'a>>,
         Option<SelfLabels<'a>>,
@@ -205,7 +208,7 @@ pub struct ExternalBuilder<'a, S: external_state::State> {
         Option<UriValue<'a>>,
         Option<StrongRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> External<'a> {
@@ -219,19 +222,9 @@ impl<'a> ExternalBuilder<'a, external_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ExternalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -239,12 +232,12 @@ impl<'a> ExternalBuilder<'a, external_state::Empty> {
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -252,12 +245,12 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `genericLabels` field (optional)
     pub fn generic_labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `genericLabels` field to an Option value (optional)
     pub fn maybe_generic_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -265,12 +258,12 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -278,12 +271,12 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `record` field (optional)
     pub fn record(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `record` field to an Option value (optional)
     pub fn maybe_record(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -291,12 +284,12 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<Tag<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<Tag<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -304,12 +297,12 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `thumb` field (optional)
     pub fn thumb(mut self, value: impl Into<Option<external::Thumb<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `thumb` field to an Option value (optional)
     pub fn maybe_thumb(mut self, value: Option<external::Thumb<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -317,12 +310,12 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -330,12 +323,12 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `uri` field (optional)
     pub fn uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `uri` field to an Option value (optional)
     pub fn maybe_uri(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -343,12 +336,12 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `via` field (optional)
     pub fn via(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `via` field to an Option value (optional)
     pub fn maybe_via(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -360,15 +353,15 @@ where
     /// Build the final struct
     pub fn build(self) -> External<'a> {
         External {
-            description: self.__unsafe_private_named.0,
-            generic_labels: self.__unsafe_private_named.1,
-            labels: self.__unsafe_private_named.2,
-            record: self.__unsafe_private_named.3,
-            tags: self.__unsafe_private_named.4,
-            thumb: self.__unsafe_private_named.5,
-            title: self.__unsafe_private_named.6,
-            uri: self.__unsafe_private_named.7,
-            via: self.__unsafe_private_named.8,
+            description: self._fields.0,
+            generic_labels: self._fields.1,
+            labels: self._fields.2,
+            record: self._fields.3,
+            tags: self._fields.4,
+            thumb: self._fields.5,
+            title: self._fields.6,
+            uri: self._fields.7,
+            via: self._fields.8,
             extra_data: Default::default(),
         }
     }
@@ -381,15 +374,15 @@ where
         >,
     ) -> External<'a> {
         External {
-            description: self.__unsafe_private_named.0,
-            generic_labels: self.__unsafe_private_named.1,
-            labels: self.__unsafe_private_named.2,
-            record: self.__unsafe_private_named.3,
-            tags: self.__unsafe_private_named.4,
-            thumb: self.__unsafe_private_named.5,
-            title: self.__unsafe_private_named.6,
-            uri: self.__unsafe_private_named.7,
-            via: self.__unsafe_private_named.8,
+            description: self._fields.0,
+            generic_labels: self._fields.1,
+            labels: self._fields.2,
+            record: self._fields.3,
+            tags: self._fields.4,
+            thumb: self._fields.5,
+            title: self._fields.6,
+            uri: self._fields.7,
+            via: self._fields.8,
             extra_data: Some(extra_data),
         }
     }
@@ -588,9 +581,9 @@ pub mod thumb_state {
 
 /// Builder for constructing an instance of this type
 pub struct ThumbBuilder<'a, S: thumb_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Cid<'a>>, Option<UriValue<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Cid<'a>>, Option<UriValue<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Thumb<'a> {
@@ -604,9 +597,9 @@ impl<'a> ThumbBuilder<'a, thumb_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ThumbBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -614,12 +607,12 @@ impl<'a> ThumbBuilder<'a, thumb_state::Empty> {
 impl<'a, S: thumb_state::State> ThumbBuilder<'a, S> {
     /// Set the `cid` field (optional)
     pub fn cid(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cid` field to an Option value (optional)
     pub fn maybe_cid(mut self, value: Option<Cid<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -634,11 +627,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ThumbBuilder<'a, thumb_state::SetUrl<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ThumbBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -651,8 +644,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Thumb<'a> {
         Thumb {
-            cid: self.__unsafe_private_named.0,
-            url: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0,
+            url: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -665,8 +658,8 @@ where
         >,
     ) -> Thumb<'a> {
         Thumb {
-            cid: self.__unsafe_private_named.0,
-            url: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0,
+            url: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

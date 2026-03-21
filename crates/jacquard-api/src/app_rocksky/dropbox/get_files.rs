@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_derive::IntoStatic;
@@ -74,9 +75,9 @@ pub mod get_files_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetFilesBuilder<'a, S: get_files_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetFiles<'a> {
@@ -90,9 +91,9 @@ impl<'a> GetFilesBuilder<'a, get_files_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetFilesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -100,12 +101,12 @@ impl<'a> GetFilesBuilder<'a, get_files_state::Empty> {
 impl<'a, S: get_files_state::State> GetFilesBuilder<'a, S> {
     /// Set the `at` field (optional)
     pub fn at(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `at` field to an Option value (optional)
     pub fn maybe_at(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -116,8 +117,6 @@ where
 {
     /// Build the final struct
     pub fn build(self) -> GetFiles<'a> {
-        GetFiles {
-            at: self.__unsafe_private_named.0,
-        }
+        GetFiles { at: self._fields.0 }
     }
 }

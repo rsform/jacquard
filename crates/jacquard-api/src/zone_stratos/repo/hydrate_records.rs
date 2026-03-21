@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -136,9 +139,9 @@ pub mod hydrate_records_state {
 
 /// Builder for constructing an instance of this type
 pub struct HydrateRecordsBuilder<'a, S: hydrate_records_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<AtUri<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<AtUri<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> HydrateRecords<'a> {
@@ -152,9 +155,9 @@ impl<'a> HydrateRecordsBuilder<'a, hydrate_records_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         HydrateRecordsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -169,11 +172,11 @@ where
         mut self,
         value: impl Into<Vec<AtUri<'a>>>,
     ) -> HydrateRecordsBuilder<'a, hydrate_records_state::SetUris<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         HydrateRecordsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -186,7 +189,7 @@ where
     /// Build the final struct
     pub fn build(self) -> HydrateRecords<'a> {
         HydrateRecords {
-            uris: self.__unsafe_private_named.0.unwrap(),
+            uris: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -196,7 +199,7 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> HydrateRecords<'a> {
         HydrateRecords {
-            uris: self.__unsafe_private_named.0.unwrap(),
+            uris: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -213,58 +216,58 @@ pub mod record_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Cid;
-        type Uri;
         type Value;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Cid = Unset;
-        type Uri = Unset;
         type Value = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
         type Cid = Set<members::cid>;
+        type Value = S::Value;
         type Uri = S::Uri;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
-        type Uri = Set<members::uri>;
-        type Value = S::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
         type Cid = S::Cid;
-        type Uri = S::Uri;
         type Value = Set<members::value>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Value = S::Value;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RecordViewBuilder<'a, S: record_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Cid<'a>>, Option<AtUri<'a>>, Option<Data<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Cid<'a>>, Option<AtUri<'a>>, Option<Data<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RecordView<'a> {
@@ -278,9 +281,9 @@ impl<'a> RecordViewBuilder<'a, record_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RecordViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -295,11 +298,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> RecordViewBuilder<'a, record_view_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RecordViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -314,11 +317,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> RecordViewBuilder<'a, record_view_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RecordViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -333,11 +336,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> RecordViewBuilder<'a, record_view_state::SetValue<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RecordViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -346,15 +349,15 @@ impl<'a, S> RecordViewBuilder<'a, S>
 where
     S: record_view_state::State,
     S::Cid: record_view_state::IsSet,
-    S::Uri: record_view_state::IsSet,
     S::Value: record_view_state::IsSet,
+    S::Uri: record_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RecordView<'a> {
         RecordView {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
-            value: self.__unsafe_private_named.2.unwrap(),
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
+            value: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -364,9 +367,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> RecordView<'a> {
         RecordView {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
-            value: self.__unsafe_private_named.2.unwrap(),
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
+            value: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

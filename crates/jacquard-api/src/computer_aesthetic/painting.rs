@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -222,83 +225,83 @@ pub mod painting_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ref;
         type Slug;
         type Code;
         type When;
+        type Ref;
         type ImageUrl;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ref = Unset;
         type Slug = Unset;
         type Code = Unset;
         type When = Unset;
+        type Ref = Unset;
         type ImageUrl = Unset;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Ref = Set<members::r#ref>;
-        type Slug = S::Slug;
-        type Code = S::Code;
-        type When = S::When;
-        type ImageUrl = S::ImageUrl;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type Ref = S::Ref;
         type Slug = Set<members::slug>;
         type Code = S::Code;
         type When = S::When;
+        type Ref = S::Ref;
         type ImageUrl = S::ImageUrl;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCode<S> {}
     impl<S: State> State for SetCode<S> {
-        type Ref = S::Ref;
         type Slug = S::Slug;
         type Code = Set<members::code>;
         type When = S::When;
+        type Ref = S::Ref;
         type ImageUrl = S::ImageUrl;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
-        type Ref = S::Ref;
         type Slug = S::Slug;
         type Code = S::Code;
         type When = Set<members::when>;
+        type Ref = S::Ref;
+        type ImageUrl = S::ImageUrl;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type Slug = S::Slug;
+        type Code = S::Code;
+        type When = S::When;
+        type Ref = Set<members::r#ref>;
         type ImageUrl = S::ImageUrl;
     }
     ///State transition - sets the `image_url` field to Set
     pub struct SetImageUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImageUrl<S> {}
     impl<S: State> State for SetImageUrl<S> {
-        type Ref = S::Ref;
         type Slug = S::Slug;
         type Code = S::Code;
         type When = S::When;
+        type Ref = S::Ref;
         type ImageUrl = Set<members::image_url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `slug` field
         pub struct slug(());
         ///Marker type for the `code` field
         pub struct code(());
         ///Marker type for the `when` field
         pub struct when(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
         ///Marker type for the `image_url` field
         pub struct image_url(());
     }
@@ -306,8 +309,8 @@ pub mod painting_state {
 
 /// Builder for constructing an instance of this type
 pub struct PaintingBuilder<'a, S: painting_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
         Option<UriValue<'a>>,
@@ -316,7 +319,7 @@ pub struct PaintingBuilder<'a, S: painting_state::State> {
         Option<BlobRef<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Painting<'a> {
@@ -330,9 +333,9 @@ impl<'a> PaintingBuilder<'a, painting_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PaintingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -347,11 +350,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PaintingBuilder<'a, painting_state::SetCode<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PaintingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -366,11 +369,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> PaintingBuilder<'a, painting_state::SetImageUrl<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PaintingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -378,12 +381,12 @@ where
 impl<'a, S: painting_state::State> PaintingBuilder<'a, S> {
     /// Set the `recordingUrl` field (optional)
     pub fn recording_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `recordingUrl` field to an Option value (optional)
     pub fn maybe_recording_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -398,11 +401,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PaintingBuilder<'a, painting_state::SetRef<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         PaintingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -417,11 +420,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PaintingBuilder<'a, painting_state::SetSlug<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         PaintingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -429,12 +432,12 @@ where
 impl<'a, S: painting_state::State> PaintingBuilder<'a, S> {
     /// Set the `thumbnail` field (optional)
     pub fn thumbnail(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
     pub fn maybe_thumbnail(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -449,11 +452,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PaintingBuilder<'a, painting_state::SetWhen<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         PaintingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -461,22 +464,22 @@ where
 impl<'a, S> PaintingBuilder<'a, S>
 where
     S: painting_state::State,
-    S::Ref: painting_state::IsSet,
     S::Slug: painting_state::IsSet,
     S::Code: painting_state::IsSet,
     S::When: painting_state::IsSet,
+    S::Ref: painting_state::IsSet,
     S::ImageUrl: painting_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Painting<'a> {
         Painting {
-            code: self.__unsafe_private_named.0.unwrap(),
-            image_url: self.__unsafe_private_named.1.unwrap(),
-            recording_url: self.__unsafe_private_named.2,
-            r#ref: self.__unsafe_private_named.3.unwrap(),
-            slug: self.__unsafe_private_named.4.unwrap(),
-            thumbnail: self.__unsafe_private_named.5,
-            when: self.__unsafe_private_named.6.unwrap(),
+            code: self._fields.0.unwrap(),
+            image_url: self._fields.1.unwrap(),
+            recording_url: self._fields.2,
+            r#ref: self._fields.3.unwrap(),
+            slug: self._fields.4.unwrap(),
+            thumbnail: self._fields.5,
+            when: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -489,13 +492,13 @@ where
         >,
     ) -> Painting<'a> {
         Painting {
-            code: self.__unsafe_private_named.0.unwrap(),
-            image_url: self.__unsafe_private_named.1.unwrap(),
-            recording_url: self.__unsafe_private_named.2,
-            r#ref: self.__unsafe_private_named.3.unwrap(),
-            slug: self.__unsafe_private_named.4.unwrap(),
-            thumbnail: self.__unsafe_private_named.5,
-            when: self.__unsafe_private_named.6.unwrap(),
+            code: self._fields.0.unwrap(),
+            image_url: self._fields.1.unwrap(),
+            recording_url: self._fields.2,
+            r#ref: self._fields.3.unwrap(),
+            slug: self._fields.4.unwrap(),
+            thumbnail: self._fields.5,
+            when: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

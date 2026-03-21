@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::{AtUri, UriValue};
@@ -216,8 +219,8 @@ pub mod update_item_state {
 
 /// Builder for constructing an instance of this type
 pub struct UpdateItemBuilder<'a, S: update_item_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
@@ -228,7 +231,7 @@ pub struct UpdateItemBuilder<'a, S: update_item_state::State> {
         Option<AtUri<'a>>,
         Option<UpdateItemVisibility<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateItem<'a> {
@@ -242,19 +245,9 @@ impl<'a> UpdateItemBuilder<'a, update_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -262,12 +255,12 @@ impl<'a> UpdateItemBuilder<'a, update_item_state::Empty> {
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
     pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -275,12 +268,12 @@ impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -288,12 +281,12 @@ impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `externalLink` field (optional)
     pub fn external_link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `externalLink` field to an Option value (optional)
     pub fn maybe_external_link(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -301,12 +294,12 @@ impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `images` field (optional)
     pub fn images(mut self, value: impl Into<Option<Vec<ItemImage<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `images` field to an Option value (optional)
     pub fn maybe_images(mut self, value: Option<Vec<ItemImage<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -314,12 +307,12 @@ impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
     pub fn maybe_metadata(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -327,12 +320,12 @@ impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -340,12 +333,12 @@ impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
 impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -360,11 +353,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> UpdateItemBuilder<'a, update_item_state::SetUri<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         UpdateItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -375,12 +368,12 @@ impl<'a, S: update_item_state::State> UpdateItemBuilder<'a, S> {
         mut self,
         value: impl Into<Option<UpdateItemVisibility<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
     pub fn maybe_visibility(mut self, value: Option<UpdateItemVisibility<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -393,15 +386,15 @@ where
     /// Build the final struct
     pub fn build(self) -> UpdateItem<'a> {
         UpdateItem {
-            category: self.__unsafe_private_named.0,
-            description: self.__unsafe_private_named.1,
-            external_link: self.__unsafe_private_named.2,
-            images: self.__unsafe_private_named.3,
-            metadata: self.__unsafe_private_named.4,
-            tags: self.__unsafe_private_named.5,
-            title: self.__unsafe_private_named.6,
-            uri: self.__unsafe_private_named.7.unwrap(),
-            visibility: self.__unsafe_private_named.8,
+            category: self._fields.0,
+            description: self._fields.1,
+            external_link: self._fields.2,
+            images: self._fields.3,
+            metadata: self._fields.4,
+            tags: self._fields.5,
+            title: self._fields.6,
+            uri: self._fields.7.unwrap(),
+            visibility: self._fields.8,
             extra_data: Default::default(),
         }
     }
@@ -411,15 +404,15 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> UpdateItem<'a> {
         UpdateItem {
-            category: self.__unsafe_private_named.0,
-            description: self.__unsafe_private_named.1,
-            external_link: self.__unsafe_private_named.2,
-            images: self.__unsafe_private_named.3,
-            metadata: self.__unsafe_private_named.4,
-            tags: self.__unsafe_private_named.5,
-            title: self.__unsafe_private_named.6,
-            uri: self.__unsafe_private_named.7.unwrap(),
-            visibility: self.__unsafe_private_named.8,
+            category: self._fields.0,
+            description: self._fields.1,
+            external_link: self._fields.2,
+            images: self._fields.3,
+            metadata: self._fields.4,
+            tags: self._fields.5,
+            title: self._fields.6,
+            uri: self._fields.7.unwrap(),
+            visibility: self._fields.8,
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -127,45 +130,45 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Query;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Query = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Query = S::Query;
+        type Did = Unset;
     }
     ///State transition - sets the `query` field to Set
     pub struct SetQuery<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuery<S> {}
     impl<S: State> State for SetQuery<S> {
-        type Did = S::Did;
         type Query = Set<members::query>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Query = S::Query;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `query` field
         pub struct query(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ListBuilder<'a, S: list_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>, Option<Data<'a>>, Option<Nsid<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<Data<'a>>, Option<Nsid<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> List<'a> {
@@ -179,9 +182,9 @@ impl<'a> ListBuilder<'a, list_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -196,11 +199,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> ListBuilder<'a, list_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -208,12 +211,12 @@ where
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `input` field (optional)
     pub fn input(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `input` field to an Option value (optional)
     pub fn maybe_input(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -228,11 +231,11 @@ where
         mut self,
         value: impl Into<Nsid<'a>>,
     ) -> ListBuilder<'a, list_state::SetQuery<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -240,15 +243,15 @@ where
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
-    S::Did: list_state::IsSet,
     S::Query: list_state::IsSet,
+    S::Did: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
         List {
-            did: self.__unsafe_private_named.0.unwrap(),
-            input: self.__unsafe_private_named.1,
-            query: self.__unsafe_private_named.2.unwrap(),
+            did: self._fields.0.unwrap(),
+            input: self._fields.1,
+            query: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -258,9 +261,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> List<'a> {
         List {
-            did: self.__unsafe_private_named.0.unwrap(),
-            input: self.__unsafe_private_named.1,
-            query: self.__unsafe_private_named.2.unwrap(),
+            did: self._fields.0.unwrap(),
+            input: self._fields.1,
+            query: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -300,9 +303,9 @@ pub mod page_state {
 
 /// Builder for constructing an instance of this type
 pub struct PageBuilder<'a, S: page_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<Vec<Element<'a>>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Vec<Element<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Page<'a> {
@@ -316,9 +319,9 @@ impl<'a> PageBuilder<'a, page_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -326,12 +329,12 @@ impl<'a> PageBuilder<'a, page_state::Empty> {
 impl<'a, S: page_state::State> PageBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -346,11 +349,11 @@ where
         mut self,
         value: impl Into<Vec<Element<'a>>>,
     ) -> PageBuilder<'a, page_state::SetItems<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -363,8 +366,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Page<'a> {
         Page {
-            cursor: self.__unsafe_private_named.0,
-            items: self.__unsafe_private_named.1.unwrap(),
+            cursor: self._fields.0,
+            items: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -374,8 +377,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Page<'a> {
         Page {
-            cursor: self.__unsafe_private_named.0,
-            items: self.__unsafe_private_named.1.unwrap(),
+            cursor: self._fields.0,
+            items: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

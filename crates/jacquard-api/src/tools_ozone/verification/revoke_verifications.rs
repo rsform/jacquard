@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -138,9 +141,9 @@ pub mod revoke_verifications_state {
 
 /// Builder for constructing an instance of this type
 pub struct RevokeVerificationsBuilder<'a, S: revoke_verifications_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<Vec<AtUri<'a>>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Vec<AtUri<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RevokeVerifications<'a> {
@@ -154,9 +157,9 @@ impl<'a> RevokeVerificationsBuilder<'a, revoke_verifications_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RevokeVerificationsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -164,12 +167,12 @@ impl<'a> RevokeVerificationsBuilder<'a, revoke_verifications_state::Empty> {
 impl<'a, S: revoke_verifications_state::State> RevokeVerificationsBuilder<'a, S> {
     /// Set the `revokeReason` field (optional)
     pub fn revoke_reason(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `revokeReason` field to an Option value (optional)
     pub fn maybe_revoke_reason(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -184,11 +187,11 @@ where
         mut self,
         value: impl Into<Vec<AtUri<'a>>>,
     ) -> RevokeVerificationsBuilder<'a, revoke_verifications_state::SetUris<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RevokeVerificationsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -201,8 +204,8 @@ where
     /// Build the final struct
     pub fn build(self) -> RevokeVerifications<'a> {
         RevokeVerifications {
-            revoke_reason: self.__unsafe_private_named.0,
-            uris: self.__unsafe_private_named.1.unwrap(),
+            revoke_reason: self._fields.0,
+            uris: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -215,8 +218,8 @@ where
         >,
     ) -> RevokeVerifications<'a> {
         RevokeVerifications {
-            revoke_reason: self.__unsafe_private_named.0,
-            uris: self.__unsafe_private_named.1.unwrap(),
+            revoke_reason: self._fields.0,
+            uris: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -232,45 +235,45 @@ pub mod revoke_error_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Error;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Error = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Error = S::Error;
+        type Uri = Unset;
     }
     ///State transition - sets the `error` field to Set
     pub struct SetError<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetError<S> {}
     impl<S: State> State for SetError<S> {
-        type Uri = S::Uri;
         type Error = Set<members::error>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Error = S::Error;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `error` field
         pub struct error(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RevokeErrorBuilder<'a, S: revoke_error_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RevokeError<'a> {
@@ -284,9 +287,9 @@ impl<'a> RevokeErrorBuilder<'a, revoke_error_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RevokeErrorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -301,11 +304,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RevokeErrorBuilder<'a, revoke_error_state::SetError<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RevokeErrorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -320,11 +323,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> RevokeErrorBuilder<'a, revoke_error_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RevokeErrorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -332,14 +335,14 @@ where
 impl<'a, S> RevokeErrorBuilder<'a, S>
 where
     S: revoke_error_state::State,
-    S::Uri: revoke_error_state::IsSet,
     S::Error: revoke_error_state::IsSet,
+    S::Uri: revoke_error_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RevokeError<'a> {
         RevokeError {
-            error: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
+            error: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -352,8 +355,8 @@ where
         >,
     ) -> RevokeError<'a> {
         RevokeError {
-            error: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
+            error: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

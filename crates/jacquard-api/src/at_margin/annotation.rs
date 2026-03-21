@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -1390,44 +1393,44 @@ pub mod annotation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Target;
         type CreatedAt;
+        type Target;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Target = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `target` field to Set
-    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTarget<S> {}
-    impl<S: State> State for SetTarget<S> {
-        type Target = Set<members::target>;
-        type CreatedAt = S::CreatedAt;
+        type Target = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Target = S::Target;
         type CreatedAt = Set<members::created_at>;
+        type Target = S::Target;
+    }
+    ///State transition - sets the `target` field to Set
+    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTarget<S> {}
+    impl<S: State> State for SetTarget<S> {
+        type CreatedAt = S::CreatedAt;
+        type Target = Set<members::target>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `target` field
-        pub struct target(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `target` field
+        pub struct target(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AnnotationBuilder<'a, S: annotation_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<annotation::Body<'a>>,
         Option<Datetime>,
         Option<annotation::Generator<'a>>,
@@ -1437,7 +1440,7 @@ pub struct AnnotationBuilder<'a, S: annotation_state::State> {
         Option<Vec<CowStr<'a>>>,
         Option<annotation::Target<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Annotation<'a> {
@@ -1451,9 +1454,9 @@ impl<'a> AnnotationBuilder<'a, annotation_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AnnotationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1461,12 +1464,12 @@ impl<'a> AnnotationBuilder<'a, annotation_state::Empty> {
 impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `body` field (optional)
     pub fn body(mut self, value: impl Into<Option<annotation::Body<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `body` field to an Option value (optional)
     pub fn maybe_body(mut self, value: Option<annotation::Body<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1481,11 +1484,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> AnnotationBuilder<'a, annotation_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AnnotationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1496,12 +1499,12 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<annotation::Generator<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `generator` field to an Option value (optional)
     pub fn maybe_generator(mut self, value: Option<annotation::Generator<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1509,12 +1512,12 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
 impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1525,12 +1528,12 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<AnnotationMotivation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `motivation` field to an Option value (optional)
     pub fn maybe_motivation(mut self, value: Option<AnnotationMotivation<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1538,12 +1541,12 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
 impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `rights` field (optional)
     pub fn rights(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `rights` field to an Option value (optional)
     pub fn maybe_rights(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1551,12 +1554,12 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
 impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1571,11 +1574,11 @@ where
         mut self,
         value: impl Into<annotation::Target<'a>>,
     ) -> AnnotationBuilder<'a, annotation_state::SetTarget<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         AnnotationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1583,20 +1586,20 @@ where
 impl<'a, S> AnnotationBuilder<'a, S>
 where
     S: annotation_state::State,
-    S::Target: annotation_state::IsSet,
     S::CreatedAt: annotation_state::IsSet,
+    S::Target: annotation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Annotation<'a> {
         Annotation {
-            body: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            generator: self.__unsafe_private_named.2,
-            labels: self.__unsafe_private_named.3,
-            motivation: self.__unsafe_private_named.4,
-            rights: self.__unsafe_private_named.5,
-            tags: self.__unsafe_private_named.6,
-            target: self.__unsafe_private_named.7.unwrap(),
+            body: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            generator: self._fields.2,
+            labels: self._fields.3,
+            motivation: self._fields.4,
+            rights: self._fields.5,
+            tags: self._fields.6,
+            target: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1609,14 +1612,14 @@ where
         >,
     ) -> Annotation<'a> {
         Annotation {
-            body: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            generator: self.__unsafe_private_named.2,
-            labels: self.__unsafe_private_named.3,
-            motivation: self.__unsafe_private_named.4,
-            rights: self.__unsafe_private_named.5,
-            tags: self.__unsafe_private_named.6,
-            target: self.__unsafe_private_named.7.unwrap(),
+            body: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            generator: self._fields.2,
+            labels: self._fields.3,
+            motivation: self._fields.4,
+            rights: self._fields.5,
+            tags: self._fields.6,
+            target: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1632,49 +1635,49 @@ pub mod range_selector_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartSelector;
         type EndSelector;
+        type StartSelector;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartSelector = Unset;
         type EndSelector = Unset;
-    }
-    ///State transition - sets the `start_selector` field to Set
-    pub struct SetStartSelector<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartSelector<S> {}
-    impl<S: State> State for SetStartSelector<S> {
-        type StartSelector = Set<members::start_selector>;
-        type EndSelector = S::EndSelector;
+        type StartSelector = Unset;
     }
     ///State transition - sets the `end_selector` field to Set
     pub struct SetEndSelector<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEndSelector<S> {}
     impl<S: State> State for SetEndSelector<S> {
-        type StartSelector = S::StartSelector;
         type EndSelector = Set<members::end_selector>;
+        type StartSelector = S::StartSelector;
+    }
+    ///State transition - sets the `start_selector` field to Set
+    pub struct SetStartSelector<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartSelector<S> {}
+    impl<S: State> State for SetStartSelector<S> {
+        type EndSelector = S::EndSelector;
+        type StartSelector = Set<members::start_selector>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `start_selector` field
-        pub struct start_selector(());
         ///Marker type for the `end_selector` field
         pub struct end_selector(());
+        ///Marker type for the `start_selector` field
+        pub struct start_selector(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RangeSelectorBuilder<'a, S: range_selector_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<RangeSelectorEndSelector<'a>>,
         Option<RangeSelectorStartSelector<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RangeSelector<'a> {
@@ -1688,9 +1691,9 @@ impl<'a> RangeSelectorBuilder<'a, range_selector_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RangeSelectorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1705,11 +1708,11 @@ where
         mut self,
         value: impl Into<RangeSelectorEndSelector<'a>>,
     ) -> RangeSelectorBuilder<'a, range_selector_state::SetEndSelector<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RangeSelectorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1724,11 +1727,11 @@ where
         mut self,
         value: impl Into<RangeSelectorStartSelector<'a>>,
     ) -> RangeSelectorBuilder<'a, range_selector_state::SetStartSelector<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RangeSelectorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1736,12 +1739,12 @@ where
 impl<'a, S: range_selector_state::State> RangeSelectorBuilder<'a, S> {
     /// Set the `type` field (optional)
     pub fn r#type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `type` field to an Option value (optional)
     pub fn maybe_type(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1749,15 +1752,15 @@ impl<'a, S: range_selector_state::State> RangeSelectorBuilder<'a, S> {
 impl<'a, S> RangeSelectorBuilder<'a, S>
 where
     S: range_selector_state::State,
-    S::StartSelector: range_selector_state::IsSet,
     S::EndSelector: range_selector_state::IsSet,
+    S::StartSelector: range_selector_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RangeSelector<'a> {
         RangeSelector {
-            end_selector: self.__unsafe_private_named.0.unwrap(),
-            start_selector: self.__unsafe_private_named.1.unwrap(),
-            r#type: self.__unsafe_private_named.2,
+            end_selector: self._fields.0.unwrap(),
+            start_selector: self._fields.1.unwrap(),
+            r#type: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -1770,9 +1773,9 @@ where
         >,
     ) -> RangeSelector<'a> {
         RangeSelector {
-            end_selector: self.__unsafe_private_named.0.unwrap(),
-            start_selector: self.__unsafe_private_named.1.unwrap(),
-            r#type: self.__unsafe_private_named.2,
+            end_selector: self._fields.0.unwrap(),
+            start_selector: self._fields.1.unwrap(),
+            r#type: self._fields.2,
             extra_data: Some(extra_data),
         }
     }
@@ -1812,15 +1815,15 @@ pub mod target_state {
 
 /// Builder for constructing an instance of this type
 pub struct TargetBuilder<'a, S: target_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<TargetSelector<'a>>,
         Option<UriValue<'a>>,
         Option<CowStr<'a>>,
         Option<annotation::TimeState<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Target<'a> {
@@ -1834,9 +1837,9 @@ impl<'a> TargetBuilder<'a, target_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TargetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1844,12 +1847,12 @@ impl<'a> TargetBuilder<'a, target_state::Empty> {
 impl<'a, S: target_state::State> TargetBuilder<'a, S> {
     /// Set the `selector` field (optional)
     pub fn selector(mut self, value: impl Into<Option<TargetSelector<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `selector` field to an Option value (optional)
     pub fn maybe_selector(mut self, value: Option<TargetSelector<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1864,11 +1867,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> TargetBuilder<'a, target_state::SetSource<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TargetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1876,12 +1879,12 @@ where
 impl<'a, S: target_state::State> TargetBuilder<'a, S> {
     /// Set the `sourceHash` field (optional)
     pub fn source_hash(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `sourceHash` field to an Option value (optional)
     pub fn maybe_source_hash(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1889,12 +1892,12 @@ impl<'a, S: target_state::State> TargetBuilder<'a, S> {
 impl<'a, S: target_state::State> TargetBuilder<'a, S> {
     /// Set the `state` field (optional)
     pub fn state(mut self, value: impl Into<Option<annotation::TimeState<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `state` field to an Option value (optional)
     pub fn maybe_state(mut self, value: Option<annotation::TimeState<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1902,12 +1905,12 @@ impl<'a, S: target_state::State> TargetBuilder<'a, S> {
 impl<'a, S: target_state::State> TargetBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1920,11 +1923,11 @@ where
     /// Build the final struct
     pub fn build(self) -> Target<'a> {
         Target {
-            selector: self.__unsafe_private_named.0,
-            source: self.__unsafe_private_named.1.unwrap(),
-            source_hash: self.__unsafe_private_named.2,
-            state: self.__unsafe_private_named.3,
-            title: self.__unsafe_private_named.4,
+            selector: self._fields.0,
+            source: self._fields.1.unwrap(),
+            source_hash: self._fields.2,
+            state: self._fields.3,
+            title: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -1937,11 +1940,11 @@ where
         >,
     ) -> Target<'a> {
         Target {
-            selector: self.__unsafe_private_named.0,
-            source: self.__unsafe_private_named.1.unwrap(),
-            source_hash: self.__unsafe_private_named.2,
-            state: self.__unsafe_private_named.3,
-            title: self.__unsafe_private_named.4,
+            selector: self._fields.0,
+            source: self._fields.1.unwrap(),
+            source_hash: self._fields.2,
+            state: self._fields.3,
+            title: self._fields.4,
             extra_data: Some(extra_data),
         }
     }
@@ -1993,9 +1996,9 @@ pub mod text_position_selector_state {
 
 /// Builder for constructing an instance of this type
 pub struct TextPositionSelectorBuilder<'a, S: text_position_selector_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TextPositionSelector<'a> {
@@ -2012,9 +2015,9 @@ impl<'a> TextPositionSelectorBuilder<'a, text_position_selector_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TextPositionSelectorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2029,11 +2032,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> TextPositionSelectorBuilder<'a, text_position_selector_state::SetEnd<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TextPositionSelectorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2048,11 +2051,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> TextPositionSelectorBuilder<'a, text_position_selector_state::SetStart<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TextPositionSelectorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2060,12 +2063,12 @@ where
 impl<'a, S: text_position_selector_state::State> TextPositionSelectorBuilder<'a, S> {
     /// Set the `type` field (optional)
     pub fn r#type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `type` field to an Option value (optional)
     pub fn maybe_type(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -2079,9 +2082,9 @@ where
     /// Build the final struct
     pub fn build(self) -> TextPositionSelector<'a> {
         TextPositionSelector {
-            end: self.__unsafe_private_named.0.unwrap(),
-            start: self.__unsafe_private_named.1.unwrap(),
-            r#type: self.__unsafe_private_named.2,
+            end: self._fields.0.unwrap(),
+            start: self._fields.1.unwrap(),
+            r#type: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -2094,9 +2097,9 @@ where
         >,
     ) -> TextPositionSelector<'a> {
         TextPositionSelector {
-            end: self.__unsafe_private_named.0.unwrap(),
-            start: self.__unsafe_private_named.1.unwrap(),
-            r#type: self.__unsafe_private_named.2,
+            end: self._fields.0.unwrap(),
+            start: self._fields.1.unwrap(),
+            r#type: self._fields.2,
             extra_data: Some(extra_data),
         }
     }

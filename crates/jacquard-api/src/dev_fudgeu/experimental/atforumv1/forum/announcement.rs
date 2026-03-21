@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -156,79 +159,79 @@ pub mod announcement_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Title;
+        type Body;
         type CreatedAt;
         type ExpiresAt;
-        type Body;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Title = Unset;
+        type Body = Unset;
         type CreatedAt = Unset;
         type ExpiresAt = Unset;
-        type Body = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Title = Set<members::title>;
+        type Body = S::Body;
         type CreatedAt = S::CreatedAt;
         type ExpiresAt = S::ExpiresAt;
-        type Body = S::Body;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
-        type ExpiresAt = S::ExpiresAt;
-        type Body = S::Body;
-    }
-    ///State transition - sets the `expires_at` field to Set
-    pub struct SetExpiresAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExpiresAt<S> {}
-    impl<S: State> State for SetExpiresAt<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type ExpiresAt = Set<members::expires_at>;
-        type Body = S::Body;
     }
     ///State transition - sets the `body` field to Set
     pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBody<S> {}
     impl<S: State> State for SetBody<S> {
         type Title = S::Title;
+        type Body = Set<members::body>;
         type CreatedAt = S::CreatedAt;
         type ExpiresAt = S::ExpiresAt;
-        type Body = Set<members::body>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Body = S::Body;
+        type CreatedAt = Set<members::created_at>;
+        type ExpiresAt = S::ExpiresAt;
+    }
+    ///State transition - sets the `expires_at` field to Set
+    pub struct SetExpiresAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExpiresAt<S> {}
+    impl<S: State> State for SetExpiresAt<S> {
+        type Title = S::Title;
+        type Body = S::Body;
+        type CreatedAt = S::CreatedAt;
+        type ExpiresAt = Set<members::expires_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `body` field
+        pub struct body(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `expires_at` field
         pub struct expires_at(());
-        ///Marker type for the `body` field
-        pub struct body(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AnnouncementBuilder<'a, S: announcement_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<Datetime>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Announcement<'a> {
@@ -242,9 +245,9 @@ impl<'a> AnnouncementBuilder<'a, announcement_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AnnouncementBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -259,11 +262,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AnnouncementBuilder<'a, announcement_state::SetBody<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AnnouncementBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -278,11 +281,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> AnnouncementBuilder<'a, announcement_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AnnouncementBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -297,11 +300,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> AnnouncementBuilder<'a, announcement_state::SetExpiresAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         AnnouncementBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -316,11 +319,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AnnouncementBuilder<'a, announcement_state::SetTitle<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         AnnouncementBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -329,17 +332,17 @@ impl<'a, S> AnnouncementBuilder<'a, S>
 where
     S: announcement_state::State,
     S::Title: announcement_state::IsSet,
+    S::Body: announcement_state::IsSet,
     S::CreatedAt: announcement_state::IsSet,
     S::ExpiresAt: announcement_state::IsSet,
-    S::Body: announcement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Announcement<'a> {
         Announcement {
-            body: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            expires_at: self.__unsafe_private_named.2.unwrap(),
-            title: self.__unsafe_private_named.3.unwrap(),
+            body: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            expires_at: self._fields.2.unwrap(),
+            title: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -352,10 +355,10 @@ where
         >,
     ) -> Announcement<'a> {
         Announcement {
-            body: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            expires_at: self.__unsafe_private_named.2.unwrap(),
-            title: self.__unsafe_private_named.3.unwrap(),
+            body: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            expires_at: self._fields.2.unwrap(),
+            title: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

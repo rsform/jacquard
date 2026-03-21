@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -262,74 +265,74 @@ pub mod measurement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Unit;
         type Metric;
-        type Value;
+        type Unit;
         type CreatedAt;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Unit = Unset;
         type Metric = Unset;
-        type Value = Unset;
+        type Unit = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `unit` field to Set
-    pub struct SetUnit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUnit<S> {}
-    impl<S: State> State for SetUnit<S> {
-        type Unit = Set<members::unit>;
-        type Metric = S::Metric;
-        type Value = S::Value;
-        type CreatedAt = S::CreatedAt;
+        type Value = Unset;
     }
     ///State transition - sets the `metric` field to Set
     pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMetric<S> {}
     impl<S: State> State for SetMetric<S> {
-        type Unit = S::Unit;
         type Metric = Set<members::metric>;
-        type Value = S::Value;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
         type Unit = S::Unit;
-        type Metric = S::Metric;
-        type Value = Set<members::value>;
         type CreatedAt = S::CreatedAt;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `unit` field to Set
+    pub struct SetUnit<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUnit<S> {}
+    impl<S: State> State for SetUnit<S> {
+        type Metric = S::Metric;
+        type Unit = Set<members::unit>;
+        type CreatedAt = S::CreatedAt;
+        type Value = S::Value;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Unit = S::Unit;
         type Metric = S::Metric;
-        type Value = S::Value;
+        type Unit = S::Unit;
         type CreatedAt = Set<members::created_at>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Metric = S::Metric;
+        type Unit = S::Unit;
+        type CreatedAt = S::CreatedAt;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `unit` field
-        pub struct unit(());
         ///Marker type for the `metric` field
         pub struct metric(());
-        ///Marker type for the `value` field
-        pub struct value(());
+        ///Marker type for the `unit` field
+        pub struct unit(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MeasurementBuilder<'a, S: measurement_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Vec<Facet<'a>>>,
         Option<Datetime>,
@@ -345,7 +348,7 @@ pub struct MeasurementBuilder<'a, S: measurement_state::State> {
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Measurement<'a> {
@@ -359,8 +362,8 @@ impl<'a> MeasurementBuilder<'a, measurement_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MeasurementBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -376,7 +379,7 @@ impl<'a> MeasurementBuilder<'a, measurement_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -384,12 +387,12 @@ impl<'a> MeasurementBuilder<'a, measurement_state::Empty> {
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
     pub fn maybe_comment(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -397,12 +400,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `commentFacets` field (optional)
     pub fn comment_facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `commentFacets` field to an Option value (optional)
     pub fn maybe_comment_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -417,11 +420,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> MeasurementBuilder<'a, measurement_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         MeasurementBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -429,12 +432,12 @@ where
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `endDate` field (optional)
     pub fn end_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `endDate` field to an Option value (optional)
     pub fn maybe_end_date(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -442,12 +445,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `evidenceURI` field (optional)
     pub fn evidence_uri(mut self, value: impl Into<Option<Vec<UriValue<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `evidenceURI` field to an Option value (optional)
     pub fn maybe_evidence_uri(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -455,12 +458,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `locations` field (optional)
     pub fn locations(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `locations` field to an Option value (optional)
     pub fn maybe_locations(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -468,12 +471,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `measurers` field (optional)
     pub fn measurers(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `measurers` field to an Option value (optional)
     pub fn maybe_measurers(mut self, value: Option<Vec<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -481,12 +484,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `methodType` field (optional)
     pub fn method_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `methodType` field to an Option value (optional)
     pub fn maybe_method_type(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -494,12 +497,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `methodURI` field (optional)
     pub fn method_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `methodURI` field to an Option value (optional)
     pub fn maybe_method_uri(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -514,11 +517,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> MeasurementBuilder<'a, measurement_state::SetMetric<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         MeasurementBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -526,12 +529,12 @@ where
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `startDate` field (optional)
     pub fn start_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `startDate` field to an Option value (optional)
     pub fn maybe_start_date(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -539,12 +542,12 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
 impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     /// Set the `subjects` field (optional)
     pub fn subjects(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `subjects` field to an Option value (optional)
     pub fn maybe_subjects(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -559,11 +562,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> MeasurementBuilder<'a, measurement_state::SetUnit<S>> {
-        self.__unsafe_private_named.12 = Option::Some(value.into());
+        self._fields.12 = Option::Some(value.into());
         MeasurementBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -578,11 +581,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> MeasurementBuilder<'a, measurement_state::SetValue<S>> {
-        self.__unsafe_private_named.13 = Option::Some(value.into());
+        self._fields.13 = Option::Some(value.into());
         MeasurementBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -590,28 +593,28 @@ where
 impl<'a, S> MeasurementBuilder<'a, S>
 where
     S: measurement_state::State,
-    S::Unit: measurement_state::IsSet,
     S::Metric: measurement_state::IsSet,
-    S::Value: measurement_state::IsSet,
+    S::Unit: measurement_state::IsSet,
     S::CreatedAt: measurement_state::IsSet,
+    S::Value: measurement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Measurement<'a> {
         Measurement {
-            comment: self.__unsafe_private_named.0,
-            comment_facets: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            end_date: self.__unsafe_private_named.3,
-            evidence_uri: self.__unsafe_private_named.4,
-            locations: self.__unsafe_private_named.5,
-            measurers: self.__unsafe_private_named.6,
-            method_type: self.__unsafe_private_named.7,
-            method_uri: self.__unsafe_private_named.8,
-            metric: self.__unsafe_private_named.9.unwrap(),
-            start_date: self.__unsafe_private_named.10,
-            subjects: self.__unsafe_private_named.11,
-            unit: self.__unsafe_private_named.12.unwrap(),
-            value: self.__unsafe_private_named.13.unwrap(),
+            comment: self._fields.0,
+            comment_facets: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            end_date: self._fields.3,
+            evidence_uri: self._fields.4,
+            locations: self._fields.5,
+            measurers: self._fields.6,
+            method_type: self._fields.7,
+            method_uri: self._fields.8,
+            metric: self._fields.9.unwrap(),
+            start_date: self._fields.10,
+            subjects: self._fields.11,
+            unit: self._fields.12.unwrap(),
+            value: self._fields.13.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -624,20 +627,20 @@ where
         >,
     ) -> Measurement<'a> {
         Measurement {
-            comment: self.__unsafe_private_named.0,
-            comment_facets: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            end_date: self.__unsafe_private_named.3,
-            evidence_uri: self.__unsafe_private_named.4,
-            locations: self.__unsafe_private_named.5,
-            measurers: self.__unsafe_private_named.6,
-            method_type: self.__unsafe_private_named.7,
-            method_uri: self.__unsafe_private_named.8,
-            metric: self.__unsafe_private_named.9.unwrap(),
-            start_date: self.__unsafe_private_named.10,
-            subjects: self.__unsafe_private_named.11,
-            unit: self.__unsafe_private_named.12.unwrap(),
-            value: self.__unsafe_private_named.13.unwrap(),
+            comment: self._fields.0,
+            comment_facets: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            end_date: self._fields.3,
+            evidence_uri: self._fields.4,
+            locations: self._fields.5,
+            measurers: self._fields.6,
+            method_type: self._fields.7,
+            method_uri: self._fields.8,
+            metric: self._fields.9.unwrap(),
+            start_date: self._fields.10,
+            subjects: self._fields.11,
+            unit: self._fields.12.unwrap(),
+            value: self._fields.13.unwrap(),
             extra_data: Some(extra_data),
         }
     }

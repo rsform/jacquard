@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -151,74 +154,74 @@ pub mod lexicon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slice;
         type Nsid;
-        type Definitions;
+        type Slice;
         type CreatedAt;
+        type Definitions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slice = Unset;
         type Nsid = Unset;
-        type Definitions = Unset;
+        type Slice = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `slice` field to Set
-    pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlice<S> {}
-    impl<S: State> State for SetSlice<S> {
-        type Slice = Set<members::slice>;
-        type Nsid = S::Nsid;
-        type Definitions = S::Definitions;
-        type CreatedAt = S::CreatedAt;
+        type Definitions = Unset;
     }
     ///State transition - sets the `nsid` field to Set
     pub struct SetNsid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNsid<S> {}
     impl<S: State> State for SetNsid<S> {
-        type Slice = S::Slice;
         type Nsid = Set<members::nsid>;
-        type Definitions = S::Definitions;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `definitions` field to Set
-    pub struct SetDefinitions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDefinitions<S> {}
-    impl<S: State> State for SetDefinitions<S> {
         type Slice = S::Slice;
-        type Nsid = S::Nsid;
-        type Definitions = Set<members::definitions>;
         type CreatedAt = S::CreatedAt;
+        type Definitions = S::Definitions;
+    }
+    ///State transition - sets the `slice` field to Set
+    pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlice<S> {}
+    impl<S: State> State for SetSlice<S> {
+        type Nsid = S::Nsid;
+        type Slice = Set<members::slice>;
+        type CreatedAt = S::CreatedAt;
+        type Definitions = S::Definitions;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Slice = S::Slice;
         type Nsid = S::Nsid;
-        type Definitions = S::Definitions;
+        type Slice = S::Slice;
         type CreatedAt = Set<members::created_at>;
+        type Definitions = S::Definitions;
+    }
+    ///State transition - sets the `definitions` field to Set
+    pub struct SetDefinitions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDefinitions<S> {}
+    impl<S: State> State for SetDefinitions<S> {
+        type Nsid = S::Nsid;
+        type Slice = S::Slice;
+        type CreatedAt = S::CreatedAt;
+        type Definitions = Set<members::definitions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slice` field
-        pub struct slice(());
         ///Marker type for the `nsid` field
         pub struct nsid(());
-        ///Marker type for the `definitions` field
-        pub struct definitions(());
+        ///Marker type for the `slice` field
+        pub struct slice(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `definitions` field
+        pub struct definitions(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LexiconBuilder<'a, S: lexicon_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
@@ -227,7 +230,7 @@ pub struct LexiconBuilder<'a, S: lexicon_state::State> {
         Option<AtUri<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Lexicon<'a> {
@@ -241,9 +244,9 @@ impl<'a> LexiconBuilder<'a, lexicon_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LexiconBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -258,11 +261,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LexiconBuilder<'a, lexicon_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LexiconBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -277,11 +280,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LexiconBuilder<'a, lexicon_state::SetDefinitions<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LexiconBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -289,12 +292,12 @@ where
 impl<'a, S: lexicon_state::State> LexiconBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -302,12 +305,12 @@ impl<'a, S: lexicon_state::State> LexiconBuilder<'a, S> {
 impl<'a, S: lexicon_state::State> LexiconBuilder<'a, S> {
     /// Set the `excludedFromSync` field (optional)
     pub fn excluded_from_sync(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `excludedFromSync` field to an Option value (optional)
     pub fn maybe_excluded_from_sync(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -322,11 +325,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LexiconBuilder<'a, lexicon_state::SetNsid<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         LexiconBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -341,11 +344,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> LexiconBuilder<'a, lexicon_state::SetSlice<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         LexiconBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -353,12 +356,12 @@ where
 impl<'a, S: lexicon_state::State> LexiconBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -366,21 +369,21 @@ impl<'a, S: lexicon_state::State> LexiconBuilder<'a, S> {
 impl<'a, S> LexiconBuilder<'a, S>
 where
     S: lexicon_state::State,
-    S::Slice: lexicon_state::IsSet,
     S::Nsid: lexicon_state::IsSet,
-    S::Definitions: lexicon_state::IsSet,
+    S::Slice: lexicon_state::IsSet,
     S::CreatedAt: lexicon_state::IsSet,
+    S::Definitions: lexicon_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lexicon<'a> {
         Lexicon {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            definitions: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            excluded_from_sync: self.__unsafe_private_named.3.or_else(|| Some(false)),
-            nsid: self.__unsafe_private_named.4.unwrap(),
-            slice: self.__unsafe_private_named.5.unwrap(),
-            updated_at: self.__unsafe_private_named.6,
+            created_at: self._fields.0.unwrap(),
+            definitions: self._fields.1.unwrap(),
+            description: self._fields.2,
+            excluded_from_sync: self._fields.3.or_else(|| Some(false)),
+            nsid: self._fields.4.unwrap(),
+            slice: self._fields.5.unwrap(),
+            updated_at: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -393,13 +396,13 @@ where
         >,
     ) -> Lexicon<'a> {
         Lexicon {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            definitions: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            excluded_from_sync: self.__unsafe_private_named.3.or_else(|| Some(false)),
-            nsid: self.__unsafe_private_named.4.unwrap(),
-            slice: self.__unsafe_private_named.5.unwrap(),
-            updated_at: self.__unsafe_private_named.6,
+            created_at: self._fields.0.unwrap(),
+            definitions: self._fields.1.unwrap(),
+            description: self._fields.2,
+            excluded_from_sync: self._fields.3.or_else(|| Some(false)),
+            nsid: self._fields.4.unwrap(),
+            slice: self._fields.5.unwrap(),
+            updated_at: self._fields.6,
             extra_data: Some(extra_data),
         }
     }

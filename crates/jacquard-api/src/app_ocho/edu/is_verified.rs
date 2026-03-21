@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -85,9 +88,9 @@ pub mod is_verified_state {
 
 /// Builder for constructing an instance of this type
 pub struct IsVerifiedBuilder<'a, S: is_verified_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> IsVerified<'a> {
@@ -101,9 +104,9 @@ impl<'a> IsVerifiedBuilder<'a, is_verified_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         IsVerifiedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -118,11 +121,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> IsVerifiedBuilder<'a, is_verified_state::SetDomain<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         IsVerifiedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -135,7 +138,7 @@ where
     /// Build the final struct
     pub fn build(self) -> IsVerified<'a> {
         IsVerified {
-            domain: self.__unsafe_private_named.0.unwrap(),
+            domain: self._fields.0.unwrap(),
         }
     }
 }

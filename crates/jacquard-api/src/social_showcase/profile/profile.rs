@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -350,74 +353,74 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
-        type Tags;
         type Handle;
+        type Did;
         type CreatedAt;
+        type Tags;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
-        type Tags = Unset;
         type Handle = Unset;
+        type Did = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Tags = S::Tags;
-        type Handle = S::Handle;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type Did = S::Did;
-        type Tags = Set<members::tags>;
-        type Handle = S::Handle;
-        type CreatedAt = S::CreatedAt;
+        type Tags = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type Did = S::Did;
-        type Tags = S::Tags;
         type Handle = Set<members::handle>;
+        type Did = S::Did;
         type CreatedAt = S::CreatedAt;
+        type Tags = S::Tags;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Handle = S::Handle;
+        type Did = Set<members::did>;
+        type CreatedAt = S::CreatedAt;
+        type Tags = S::Tags;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Did = S::Did;
-        type Tags = S::Tags;
         type Handle = S::Handle;
+        type Did = S::Did;
         type CreatedAt = Set<members::created_at>;
+        type Tags = S::Tags;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTags<S> {}
+    impl<S: State> State for SetTags<S> {
+        type Handle = S::Handle;
+        type Did = S::Did;
+        type CreatedAt = S::CreatedAt;
+        type Tags = Set<members::tags>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `tags` field
-        pub struct tags(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ProfileBuilder<'a, S: profile_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<BlobRef<'a>>,
         Option<BlobRef<'a>>,
@@ -435,7 +438,7 @@ pub struct ProfileBuilder<'a, S: profile_state::State> {
         Option<Datetime>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Profile<'a> {
@@ -449,8 +452,8 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -468,7 +471,7 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -476,12 +479,12 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `accentColor` field (optional)
     pub fn accent_color(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `accentColor` field to an Option value (optional)
     pub fn maybe_accent_color(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -489,12 +492,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
     pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -502,12 +505,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `banner` field (optional)
     pub fn banner(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `banner` field to an Option value (optional)
     pub fn maybe_banner(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -515,12 +518,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `bio` field (optional)
     pub fn bio(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `bio` field to an Option value (optional)
     pub fn maybe_bio(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -528,12 +531,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `collectionCount` field (optional)
     pub fn collection_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `collectionCount` field to an Option value (optional)
     pub fn maybe_collection_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -548,11 +551,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ProfileBuilder<'a, profile_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -567,11 +570,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ProfileBuilder<'a, profile_state::SetDid<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -579,12 +582,12 @@ where
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
     pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -599,11 +602,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ProfileBuilder<'a, profile_state::SetHandle<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -611,12 +614,12 @@ where
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `itemCount` field (optional)
     pub fn item_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `itemCount` field to an Option value (optional)
     pub fn maybe_item_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -624,12 +627,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `schemaVersion` field (optional)
     pub fn schema_version(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `schemaVersion` field to an Option value (optional)
     pub fn maybe_schema_version(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -637,12 +640,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `showcase` field (optional)
     pub fn showcase(mut self, value: impl Into<Option<Vec<ShowcaseItem<'a>>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `showcase` field to an Option value (optional)
     pub fn maybe_showcase(mut self, value: Option<Vec<ShowcaseItem<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -657,11 +660,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> ProfileBuilder<'a, profile_state::SetTags<S>> {
-        self.__unsafe_private_named.12 = Option::Some(value.into());
+        self._fields.12 = Option::Some(value.into());
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -669,12 +672,12 @@ where
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `theme` field to an Option value (optional)
     pub fn maybe_theme(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -682,12 +685,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -695,12 +698,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `website` field (optional)
     pub fn website(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `website` field to an Option value (optional)
     pub fn maybe_website(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -708,30 +711,30 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S> ProfileBuilder<'a, S>
 where
     S: profile_state::State,
-    S::Did: profile_state::IsSet,
-    S::Tags: profile_state::IsSet,
     S::Handle: profile_state::IsSet,
+    S::Did: profile_state::IsSet,
     S::CreatedAt: profile_state::IsSet,
+    S::Tags: profile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
         Profile {
-            accent_color: self.__unsafe_private_named.0,
-            avatar: self.__unsafe_private_named.1,
-            banner: self.__unsafe_private_named.2,
-            bio: self.__unsafe_private_named.3,
-            collection_count: self.__unsafe_private_named.4.or_else(|| Some(0i64)),
-            created_at: self.__unsafe_private_named.5.unwrap(),
-            did: self.__unsafe_private_named.6.unwrap(),
-            display_name: self.__unsafe_private_named.7,
-            handle: self.__unsafe_private_named.8.unwrap(),
-            item_count: self.__unsafe_private_named.9.or_else(|| Some(0i64)),
-            schema_version: self.__unsafe_private_named.10.or_else(|| Some(1i64)),
-            showcase: self.__unsafe_private_named.11,
-            tags: self.__unsafe_private_named.12.unwrap(),
-            theme: self.__unsafe_private_named.13,
-            updated_at: self.__unsafe_private_named.14,
-            website: self.__unsafe_private_named.15,
+            accent_color: self._fields.0,
+            avatar: self._fields.1,
+            banner: self._fields.2,
+            bio: self._fields.3,
+            collection_count: self._fields.4.or_else(|| Some(0i64)),
+            created_at: self._fields.5.unwrap(),
+            did: self._fields.6.unwrap(),
+            display_name: self._fields.7,
+            handle: self._fields.8.unwrap(),
+            item_count: self._fields.9.or_else(|| Some(0i64)),
+            schema_version: self._fields.10.or_else(|| Some(1i64)),
+            showcase: self._fields.11,
+            tags: self._fields.12.unwrap(),
+            theme: self._fields.13,
+            updated_at: self._fields.14,
+            website: self._fields.15,
             extra_data: Default::default(),
         }
     }
@@ -744,22 +747,22 @@ where
         >,
     ) -> Profile<'a> {
         Profile {
-            accent_color: self.__unsafe_private_named.0,
-            avatar: self.__unsafe_private_named.1,
-            banner: self.__unsafe_private_named.2,
-            bio: self.__unsafe_private_named.3,
-            collection_count: self.__unsafe_private_named.4.or_else(|| Some(0i64)),
-            created_at: self.__unsafe_private_named.5.unwrap(),
-            did: self.__unsafe_private_named.6.unwrap(),
-            display_name: self.__unsafe_private_named.7,
-            handle: self.__unsafe_private_named.8.unwrap(),
-            item_count: self.__unsafe_private_named.9.or_else(|| Some(0i64)),
-            schema_version: self.__unsafe_private_named.10.or_else(|| Some(1i64)),
-            showcase: self.__unsafe_private_named.11,
-            tags: self.__unsafe_private_named.12.unwrap(),
-            theme: self.__unsafe_private_named.13,
-            updated_at: self.__unsafe_private_named.14,
-            website: self.__unsafe_private_named.15,
+            accent_color: self._fields.0,
+            avatar: self._fields.1,
+            banner: self._fields.2,
+            bio: self._fields.3,
+            collection_count: self._fields.4.or_else(|| Some(0i64)),
+            created_at: self._fields.5.unwrap(),
+            did: self._fields.6.unwrap(),
+            display_name: self._fields.7,
+            handle: self._fields.8.unwrap(),
+            item_count: self._fields.9.or_else(|| Some(0i64)),
+            schema_version: self._fields.10.or_else(|| Some(1i64)),
+            showcase: self._fields.11,
+            tags: self._fields.12.unwrap(),
+            theme: self._fields.13,
+            updated_at: self._fields.14,
+            website: self._fields.15,
             extra_data: Some(extra_data),
         }
     }

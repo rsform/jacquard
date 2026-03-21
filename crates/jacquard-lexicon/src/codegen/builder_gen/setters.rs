@@ -101,7 +101,7 @@ fn generate_required_setter(
     };
 
     let phantom_lifetime = if has_lifetime {
-        quote! { _phantom: #phantom, }
+        quote! { _lifetime: #phantom, }
     } else {
         quote! {}
     };
@@ -119,10 +119,10 @@ fn generate_required_setter(
                 mut self,
                 value: impl Into<#rust_type>,
             ) -> #builder_name<#lifetime_param #state_mod_name::#transition_type<S>> {
-                self.__unsafe_private_named.#index = #option_some(value.into());
+                self._fields.#index = #option_some(value.into());
                 #builder_name {
-                    _phantom_state: #phantom,
-                    __unsafe_private_named: self.__unsafe_private_named,
+                    _state: #phantom,
+                    _fields: self._fields,
                     #phantom_lifetime
                 }
             }
@@ -166,13 +166,13 @@ fn generate_optional_setter(
         impl<#lifetime_param S: #state_mod_name::State> #builder_name<#lifetime_param S> {
             #[doc = #doc_field]
             pub fn #field_snake(mut self, value: impl Into<Option<#rust_type>>) -> Self {
-                self.__unsafe_private_named.#index = value.into();
+                self._fields.#index = value.into();
                 self
             }
 
             #[doc = #doc_maybe]
             pub fn #maybe_field_snake(mut self, value: Option<#rust_type>) -> Self {
-                self.__unsafe_private_named.#index = value;
+                self._fields.#index = value;
                 self
             }
         }

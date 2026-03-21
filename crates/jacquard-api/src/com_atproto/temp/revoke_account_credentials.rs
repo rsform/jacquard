@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -84,9 +87,9 @@ pub struct RevokeAccountCredentialsBuilder<
     'a,
     S: revoke_account_credentials_state::State,
 > {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtIdentifier<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtIdentifier<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RevokeAccountCredentials<'a> {
@@ -103,9 +106,9 @@ impl<'a> RevokeAccountCredentialsBuilder<'a, revoke_account_credentials_state::E
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RevokeAccountCredentialsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -123,11 +126,11 @@ where
         'a,
         revoke_account_credentials_state::SetAccount<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RevokeAccountCredentialsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -140,7 +143,7 @@ where
     /// Build the final struct
     pub fn build(self) -> RevokeAccountCredentials<'a> {
         RevokeAccountCredentials {
-            account: self.__unsafe_private_named.0.unwrap(),
+            account: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -153,7 +156,7 @@ where
         >,
     ) -> RevokeAccountCredentials<'a> {
         RevokeAccountCredentials {
-            account: self.__unsafe_private_named.0.unwrap(),
+            account: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

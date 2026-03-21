@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -228,51 +231,51 @@ pub mod button_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PostedAt;
         type Blob;
+        type PostedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PostedAt = Unset;
         type Blob = Unset;
-    }
-    ///State transition - sets the `posted_at` field to Set
-    pub struct SetPostedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPostedAt<S> {}
-    impl<S: State> State for SetPostedAt<S> {
-        type PostedAt = Set<members::posted_at>;
-        type Blob = S::Blob;
+        type PostedAt = Unset;
     }
     ///State transition - sets the `blob` field to Set
     pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlob<S> {}
     impl<S: State> State for SetBlob<S> {
-        type PostedAt = S::PostedAt;
         type Blob = Set<members::blob>;
+        type PostedAt = S::PostedAt;
+    }
+    ///State transition - sets the `posted_at` field to Set
+    pub struct SetPostedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPostedAt<S> {}
+    impl<S: State> State for SetPostedAt<S> {
+        type Blob = S::Blob;
+        type PostedAt = Set<members::posted_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `posted_at` field
-        pub struct posted_at(());
         ///Marker type for the `blob` field
         pub struct blob(());
+        ///Marker type for the `posted_at` field
+        pub struct posted_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ButtonBuilder<'a, S: button_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<BlobRef<'a>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Button<'a> {
@@ -286,9 +289,9 @@ impl<'a> ButtonBuilder<'a, button_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ButtonBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -296,12 +299,12 @@ impl<'a> ButtonBuilder<'a, button_state::Empty> {
 impl<'a, S: button_state::State> ButtonBuilder<'a, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
     pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -316,11 +319,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> ButtonBuilder<'a, button_state::SetBlob<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ButtonBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -328,12 +331,12 @@ where
 impl<'a, S: button_state::State> ButtonBuilder<'a, S> {
     /// Set the `href` field (optional)
     pub fn href(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `href` field to an Option value (optional)
     pub fn maybe_href(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -348,11 +351,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ButtonBuilder<'a, button_state::SetPostedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ButtonBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -360,12 +363,12 @@ where
 impl<'a, S: button_state::State> ButtonBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -373,17 +376,17 @@ impl<'a, S: button_state::State> ButtonBuilder<'a, S> {
 impl<'a, S> ButtonBuilder<'a, S>
 where
     S: button_state::State,
-    S::PostedAt: button_state::IsSet,
     S::Blob: button_state::IsSet,
+    S::PostedAt: button_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Button<'a> {
         Button {
-            alt: self.__unsafe_private_named.0,
-            blob: self.__unsafe_private_named.1.unwrap(),
-            href: self.__unsafe_private_named.2,
-            posted_at: self.__unsafe_private_named.3.unwrap(),
-            title: self.__unsafe_private_named.4,
+            alt: self._fields.0,
+            blob: self._fields.1.unwrap(),
+            href: self._fields.2,
+            posted_at: self._fields.3.unwrap(),
+            title: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -396,11 +399,11 @@ where
         >,
     ) -> Button<'a> {
         Button {
-            alt: self.__unsafe_private_named.0,
-            blob: self.__unsafe_private_named.1.unwrap(),
-            href: self.__unsafe_private_named.2,
-            posted_at: self.__unsafe_private_named.3.unwrap(),
-            title: self.__unsafe_private_named.4,
+            alt: self._fields.0,
+            blob: self._fields.1.unwrap(),
+            href: self._fields.2,
+            posted_at: self._fields.3.unwrap(),
+            title: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -172,13 +175,9 @@ pub mod collection_state {
 
 /// Builder for constructing an instance of this type
 pub struct CollectionBuilder<'a, S: collection_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Datetime>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<Vec<CowStr<'a>>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Collection<'a> {
@@ -192,9 +191,9 @@ impl<'a> CollectionBuilder<'a, collection_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CollectionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -209,11 +208,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CollectionBuilder<'a, collection_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CollectionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -221,12 +220,12 @@ where
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -241,11 +240,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CollectionBuilder<'a, collection_state::SetName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CollectionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -259,9 +258,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Collection<'a> {
         Collection {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            labels: self.__unsafe_private_named.1,
-            name: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            labels: self._fields.1,
+            name: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -274,9 +273,9 @@ where
         >,
     ) -> Collection<'a> {
         Collection {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            labels: self.__unsafe_private_named.1,
-            name: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            labels: self._fields.1,
+            name: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

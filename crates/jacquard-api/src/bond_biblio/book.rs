@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -152,64 +155,64 @@ pub mod book_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Authors;
-        type Title;
         type CreatedAt;
+        type Title;
+        type Authors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Authors = Unset;
-        type Title = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthors<S> {}
-    impl<S: State> State for SetAuthors<S> {
-        type Authors = Set<members::authors>;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Authors = S::Authors;
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
+        type Title = Unset;
+        type Authors = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Authors = S::Authors;
-        type Title = S::Title;
         type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+        type Authors = S::Authors;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
+        type Authors = S::Authors;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthors<S> {}
+    impl<S: State> State for SetAuthors<S> {
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type Authors = Set<members::authors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `authors` field
-        pub struct authors(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `authors` field
+        pub struct authors(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BookBuilder<'a, S: book_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<Vec<AtUri<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Book<'a> {
@@ -223,9 +226,9 @@ impl<'a> BookBuilder<'a, book_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BookBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -240,11 +243,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BookBuilder<'a, book_state::SetAuthors<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BookBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -259,11 +262,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> BookBuilder<'a, book_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         BookBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -271,12 +274,12 @@ where
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `lists` field (optional)
     pub fn lists(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `lists` field to an Option value (optional)
     pub fn maybe_lists(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -291,11 +294,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BookBuilder<'a, book_state::SetTitle<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         BookBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -303,17 +306,17 @@ where
 impl<'a, S> BookBuilder<'a, S>
 where
     S: book_state::State,
-    S::Authors: book_state::IsSet,
-    S::Title: book_state::IsSet,
     S::CreatedAt: book_state::IsSet,
+    S::Title: book_state::IsSet,
+    S::Authors: book_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Book<'a> {
         Book {
-            authors: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            lists: self.__unsafe_private_named.2,
-            title: self.__unsafe_private_named.3.unwrap(),
+            authors: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            lists: self._fields.2,
+            title: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -326,10 +329,10 @@ where
         >,
     ) -> Book<'a> {
         Book {
-            authors: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            lists: self.__unsafe_private_named.2,
-            title: self.__unsafe_private_named.3.unwrap(),
+            authors: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            lists: self._fields.2,
+            title: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -90,9 +93,9 @@ pub mod table_row_state {
 
 /// Builder for constructing an instance of this type
 pub struct TableRowBuilder<'a, S: table_row_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<TableRowContentItem<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<TableRowContentItem<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TableRow<'a> {
@@ -106,9 +109,9 @@ impl<'a> TableRowBuilder<'a, table_row_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TableRowBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -123,11 +126,11 @@ where
         mut self,
         value: impl Into<Vec<TableRowContentItem<'a>>>,
     ) -> TableRowBuilder<'a, table_row_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TableRowBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -140,7 +143,7 @@ where
     /// Build the final struct
     pub fn build(self) -> TableRow<'a> {
         TableRow {
-            content: self.__unsafe_private_named.0.unwrap(),
+            content: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -153,7 +156,7 @@ where
         >,
     ) -> TableRow<'a> {
         TableRow {
-            content: self.__unsafe_private_named.0.unwrap(),
+            content: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

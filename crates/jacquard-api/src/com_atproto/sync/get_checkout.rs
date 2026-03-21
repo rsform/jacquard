@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::types::string::Did;
@@ -98,9 +99,9 @@ pub mod get_checkout_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetCheckoutBuilder<'a, S: get_checkout_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetCheckout<'a> {
@@ -114,9 +115,9 @@ impl<'a> GetCheckoutBuilder<'a, get_checkout_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetCheckoutBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -131,11 +132,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> GetCheckoutBuilder<'a, get_checkout_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetCheckoutBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -148,7 +149,7 @@ where
     /// Build the final struct
     pub fn build(self) -> GetCheckout<'a> {
         GetCheckout {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
         }
     }
 }

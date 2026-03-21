@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -182,58 +185,58 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Composer;
         type Game;
         type Title;
+        type Composer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Composer = Unset;
         type Game = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `composer` field to Set
-    pub struct SetComposer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetComposer<S> {}
-    impl<S: State> State for SetComposer<S> {
-        type Composer = Set<members::composer>;
-        type Game = S::Game;
-        type Title = S::Title;
+        type Composer = Unset;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGame<S> {}
     impl<S: State> State for SetGame<S> {
-        type Composer = S::Composer;
         type Game = Set<members::game>;
         type Title = S::Title;
+        type Composer = S::Composer;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Composer = S::Composer;
         type Game = S::Game;
         type Title = Set<members::title>;
+        type Composer = S::Composer;
+    }
+    ///State transition - sets the `composer` field to Set
+    pub struct SetComposer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetComposer<S> {}
+    impl<S: State> State for SetComposer<S> {
+        type Game = S::Game;
+        type Title = S::Title;
+        type Composer = Set<members::composer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `composer` field
-        pub struct composer(());
         ///Marker type for the `game` field
         pub struct game(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `composer` field
+        pub struct composer(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SongBuilder<'a, S: song_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Data<'a>>,
         Option<Vec<AtUri<'a>>>,
         Option<Data<'a>>,
@@ -243,7 +246,7 @@ pub struct SongBuilder<'a, S: song_state::State> {
         Option<Data<'a>>,
         Option<Data<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Song<'a> {
@@ -257,9 +260,9 @@ impl<'a> SongBuilder<'a, song_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SongBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -274,11 +277,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> SongBuilder<'a, song_state::SetComposer<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SongBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -293,11 +296,11 @@ where
         mut self,
         value: impl Into<Vec<AtUri<'a>>>,
     ) -> SongBuilder<'a, song_state::SetGame<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SongBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -305,12 +308,12 @@ where
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
     pub fn maybe_genre(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -318,12 +321,12 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `jacket` field (optional)
     pub fn jacket(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `jacket` field to an Option value (optional)
     pub fn maybe_jacket(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -331,12 +334,12 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `jacketArtist` field (optional)
     pub fn jacket_artist(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `jacketArtist` field to an Option value (optional)
     pub fn maybe_jacket_artist(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -344,12 +347,12 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
     pub fn maybe_source(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -357,12 +360,12 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
 impl<'a, S: song_state::State> SongBuilder<'a, S> {
     /// Set the `subtitle` field (optional)
     pub fn subtitle(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `subtitle` field to an Option value (optional)
     pub fn maybe_subtitle(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -377,11 +380,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> SongBuilder<'a, song_state::SetTitle<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         SongBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -389,21 +392,21 @@ where
 impl<'a, S> SongBuilder<'a, S>
 where
     S: song_state::State,
-    S::Composer: song_state::IsSet,
     S::Game: song_state::IsSet,
     S::Title: song_state::IsSet,
+    S::Composer: song_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Song<'a> {
         Song {
-            composer: self.__unsafe_private_named.0.unwrap(),
-            game: self.__unsafe_private_named.1.unwrap(),
-            genre: self.__unsafe_private_named.2,
-            jacket: self.__unsafe_private_named.3,
-            jacket_artist: self.__unsafe_private_named.4,
-            source: self.__unsafe_private_named.5,
-            subtitle: self.__unsafe_private_named.6,
-            title: self.__unsafe_private_named.7.unwrap(),
+            composer: self._fields.0.unwrap(),
+            game: self._fields.1.unwrap(),
+            genre: self._fields.2,
+            jacket: self._fields.3,
+            jacket_artist: self._fields.4,
+            source: self._fields.5,
+            subtitle: self._fields.6,
+            title: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -413,14 +416,14 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Song<'a> {
         Song {
-            composer: self.__unsafe_private_named.0.unwrap(),
-            game: self.__unsafe_private_named.1.unwrap(),
-            genre: self.__unsafe_private_named.2,
-            jacket: self.__unsafe_private_named.3,
-            jacket_artist: self.__unsafe_private_named.4,
-            source: self.__unsafe_private_named.5,
-            subtitle: self.__unsafe_private_named.6,
-            title: self.__unsafe_private_named.7.unwrap(),
+            composer: self._fields.0.unwrap(),
+            game: self._fields.1.unwrap(),
+            genre: self._fields.2,
+            jacket: self._fields.3,
+            jacket_artist: self._fields.4,
+            source: self._fields.5,
+            subtitle: self._fields.6,
+            title: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }

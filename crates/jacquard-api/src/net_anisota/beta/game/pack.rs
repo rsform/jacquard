@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -230,65 +233,65 @@ pub mod pack_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LastOpenTime;
         type Streak;
         type CreatedAt;
+        type LastOpenTime;
         type TotalOpens;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LastOpenTime = Unset;
         type Streak = Unset;
         type CreatedAt = Unset;
+        type LastOpenTime = Unset;
         type TotalOpens = Unset;
-    }
-    ///State transition - sets the `last_open_time` field to Set
-    pub struct SetLastOpenTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastOpenTime<S> {}
-    impl<S: State> State for SetLastOpenTime<S> {
-        type LastOpenTime = Set<members::last_open_time>;
-        type Streak = S::Streak;
-        type CreatedAt = S::CreatedAt;
-        type TotalOpens = S::TotalOpens;
     }
     ///State transition - sets the `streak` field to Set
     pub struct SetStreak<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStreak<S> {}
     impl<S: State> State for SetStreak<S> {
-        type LastOpenTime = S::LastOpenTime;
         type Streak = Set<members::streak>;
         type CreatedAt = S::CreatedAt;
+        type LastOpenTime = S::LastOpenTime;
         type TotalOpens = S::TotalOpens;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type LastOpenTime = S::LastOpenTime;
         type Streak = S::Streak;
         type CreatedAt = Set<members::created_at>;
+        type LastOpenTime = S::LastOpenTime;
+        type TotalOpens = S::TotalOpens;
+    }
+    ///State transition - sets the `last_open_time` field to Set
+    pub struct SetLastOpenTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastOpenTime<S> {}
+    impl<S: State> State for SetLastOpenTime<S> {
+        type Streak = S::Streak;
+        type CreatedAt = S::CreatedAt;
+        type LastOpenTime = Set<members::last_open_time>;
         type TotalOpens = S::TotalOpens;
     }
     ///State transition - sets the `total_opens` field to Set
     pub struct SetTotalOpens<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotalOpens<S> {}
     impl<S: State> State for SetTotalOpens<S> {
-        type LastOpenTime = S::LastOpenTime;
         type Streak = S::Streak;
         type CreatedAt = S::CreatedAt;
+        type LastOpenTime = S::LastOpenTime;
         type TotalOpens = Set<members::total_opens>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `last_open_time` field
-        pub struct last_open_time(());
         ///Marker type for the `streak` field
         pub struct streak(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `last_open_time` field
+        pub struct last_open_time(());
         ///Marker type for the `total_opens` field
         pub struct total_opens(());
     }
@@ -296,8 +299,8 @@ pub mod pack_state {
 
 /// Builder for constructing an instance of this type
 pub struct PackBuilder<'a, S: pack_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Datetime>,
         Option<Datetime>,
@@ -306,7 +309,7 @@ pub struct PackBuilder<'a, S: pack_state::State> {
         Option<i64>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Pack<'a> {
@@ -320,9 +323,9 @@ impl<'a> PackBuilder<'a, pack_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -337,11 +340,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PackBuilder<'a, pack_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -349,12 +352,12 @@ where
 impl<'a, S: pack_state::State> PackBuilder<'a, S> {
     /// Set the `lastModified` field (optional)
     pub fn last_modified(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `lastModified` field to an Option value (optional)
     pub fn maybe_last_modified(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -369,11 +372,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PackBuilder<'a, pack_state::SetLastOpenTime<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -381,12 +384,12 @@ where
 impl<'a, S: pack_state::State> PackBuilder<'a, S> {
     /// Set the `longestStreak` field (optional)
     pub fn longest_streak(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `longestStreak` field to an Option value (optional)
     pub fn maybe_longest_streak(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -397,7 +400,7 @@ impl<'a, S: pack_state::State> PackBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<pack::PackHistoryEntry<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `packHistory` field to an Option value (optional)
@@ -405,7 +408,7 @@ impl<'a, S: pack_state::State> PackBuilder<'a, S> {
         mut self,
         value: Option<Vec<pack::PackHistoryEntry<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -420,11 +423,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PackBuilder<'a, pack_state::SetStreak<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         PackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -439,11 +442,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PackBuilder<'a, pack_state::SetTotalOpens<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         PackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -451,21 +454,21 @@ where
 impl<'a, S> PackBuilder<'a, S>
 where
     S: pack_state::State,
-    S::LastOpenTime: pack_state::IsSet,
     S::Streak: pack_state::IsSet,
     S::CreatedAt: pack_state::IsSet,
+    S::LastOpenTime: pack_state::IsSet,
     S::TotalOpens: pack_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pack<'a> {
         Pack {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            last_modified: self.__unsafe_private_named.1,
-            last_open_time: self.__unsafe_private_named.2.unwrap(),
-            longest_streak: self.__unsafe_private_named.3,
-            pack_history: self.__unsafe_private_named.4,
-            streak: self.__unsafe_private_named.5.unwrap(),
-            total_opens: self.__unsafe_private_named.6.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            last_modified: self._fields.1,
+            last_open_time: self._fields.2.unwrap(),
+            longest_streak: self._fields.3,
+            pack_history: self._fields.4,
+            streak: self._fields.5.unwrap(),
+            total_opens: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -478,13 +481,13 @@ where
         >,
     ) -> Pack<'a> {
         Pack {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            last_modified: self.__unsafe_private_named.1,
-            last_open_time: self.__unsafe_private_named.2.unwrap(),
-            longest_streak: self.__unsafe_private_named.3,
-            pack_history: self.__unsafe_private_named.4,
-            streak: self.__unsafe_private_named.5.unwrap(),
-            total_opens: self.__unsafe_private_named.6.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            last_modified: self._fields.1,
+            last_open_time: self._fields.2.unwrap(),
+            longest_streak: self._fields.3,
+            pack_history: self._fields.4,
+            streak: self._fields.5.unwrap(),
+            total_opens: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

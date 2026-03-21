@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -113,59 +116,59 @@ pub mod indexable_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Index;
         type Id;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Index = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Index = S::Index;
-        type Id = S::Id;
+        type Name = Unset;
     }
     ///State transition - sets the `index` field to Set
     pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndex<S> {}
     impl<S: State> State for SetIndex<S> {
-        type Name = S::Name;
         type Index = Set<members::index>;
         type Id = S::Id;
+        type Name = S::Name;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Name = S::Name;
         type Index = S::Index;
         type Id = Set<members::id>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Index = S::Index;
+        type Id = S::Id;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `index` field
         pub struct index(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct IndexableBuilder<'a, S: indexable_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<RecordKey<Rkey<'a>>>, Option<i64>, Option<Data<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<RecordKey<Rkey<'a>>>, Option<i64>, Option<Data<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Indexable<'a> {
@@ -179,9 +182,9 @@ impl<'a> IndexableBuilder<'a, indexable_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         IndexableBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -196,11 +199,11 @@ where
         mut self,
         value: impl Into<RecordKey<Rkey<'a>>>,
     ) -> IndexableBuilder<'a, indexable_state::SetId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         IndexableBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -215,11 +218,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> IndexableBuilder<'a, indexable_state::SetIndex<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         IndexableBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -234,11 +237,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> IndexableBuilder<'a, indexable_state::SetName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         IndexableBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -246,16 +249,16 @@ where
 impl<'a, S> IndexableBuilder<'a, S>
 where
     S: indexable_state::State,
-    S::Name: indexable_state::IsSet,
     S::Index: indexable_state::IsSet,
     S::Id: indexable_state::IsSet,
+    S::Name: indexable_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Indexable<'a> {
         Indexable {
-            id: self.__unsafe_private_named.0.unwrap(),
-            index: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
+            id: self._fields.0.unwrap(),
+            index: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -265,9 +268,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Indexable<'a> {
         Indexable {
-            id: self.__unsafe_private_named.0.unwrap(),
-            index: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
+            id: self._fields.0.unwrap(),
+            index: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -421,8 +424,8 @@ pub mod settings_state {
 
 /// Builder for constructing an instance of this type
 pub struct SettingsBuilder<'a, S: settings_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<bool>,
         Option<CowStr<'a>>,
         Option<bool>,
@@ -430,7 +433,7 @@ pub struct SettingsBuilder<'a, S: settings_state::State> {
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Settings<'a> {
@@ -444,9 +447,9 @@ impl<'a> SettingsBuilder<'a, settings_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SettingsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -454,12 +457,12 @@ impl<'a> SettingsBuilder<'a, settings_state::Empty> {
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `cleanUrls` field (optional)
     pub fn clean_urls(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cleanUrls` field to an Option value (optional)
     pub fn maybe_clean_urls(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -467,12 +470,12 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `custom404` field (optional)
     pub fn custom404(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `custom404` field to an Option value (optional)
     pub fn maybe_custom404(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -480,12 +483,12 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `directoryListing` field (optional)
     pub fn directory_listing(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `directoryListing` field to an Option value (optional)
     pub fn maybe_directory_listing(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -496,7 +499,7 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<settings::CustomHeader<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `headers` field to an Option value (optional)
@@ -504,7 +507,7 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
         mut self,
         value: Option<Vec<settings::CustomHeader<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -512,12 +515,12 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `indexFiles` field (optional)
     pub fn index_files(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `indexFiles` field to an Option value (optional)
     pub fn maybe_index_files(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -525,12 +528,12 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `spaMode` field (optional)
     pub fn spa_mode(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `spaMode` field to an Option value (optional)
     pub fn maybe_spa_mode(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -542,12 +545,12 @@ where
     /// Build the final struct
     pub fn build(self) -> Settings<'a> {
         Settings {
-            clean_urls: self.__unsafe_private_named.0.or_else(|| Some(false)),
-            custom404: self.__unsafe_private_named.1,
-            directory_listing: self.__unsafe_private_named.2.or_else(|| Some(false)),
-            headers: self.__unsafe_private_named.3,
-            index_files: self.__unsafe_private_named.4,
-            spa_mode: self.__unsafe_private_named.5,
+            clean_urls: self._fields.0.or_else(|| Some(false)),
+            custom404: self._fields.1,
+            directory_listing: self._fields.2.or_else(|| Some(false)),
+            headers: self._fields.3,
+            index_files: self._fields.4,
+            spa_mode: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -560,12 +563,12 @@ where
         >,
     ) -> Settings<'a> {
         Settings {
-            clean_urls: self.__unsafe_private_named.0.or_else(|| Some(false)),
-            custom404: self.__unsafe_private_named.1,
-            directory_listing: self.__unsafe_private_named.2.or_else(|| Some(false)),
-            headers: self.__unsafe_private_named.3,
-            index_files: self.__unsafe_private_named.4,
-            spa_mode: self.__unsafe_private_named.5,
+            clean_urls: self._fields.0.or_else(|| Some(false)),
+            custom404: self._fields.1,
+            directory_listing: self._fields.2.or_else(|| Some(false)),
+            headers: self._fields.3,
+            index_files: self._fields.4,
+            spa_mode: self._fields.5,
             extra_data: Some(extra_data),
         }
     }

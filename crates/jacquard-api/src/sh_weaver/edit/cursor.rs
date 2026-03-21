@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -273,9 +276,9 @@ pub mod container_id_state {
 
 /// Builder for constructing an instance of this type
 pub struct ContainerIdBuilder<'a, S: container_id_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<ContainerIdValue<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<ContainerIdValue<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ContainerId<'a> {
@@ -289,9 +292,9 @@ impl<'a> ContainerIdBuilder<'a, container_id_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ContainerIdBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -306,11 +309,11 @@ where
         mut self,
         value: impl Into<ContainerIdValue<'a>>,
     ) -> ContainerIdBuilder<'a, container_id_state::SetValue<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ContainerIdBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -323,7 +326,7 @@ where
     /// Build the final struct
     pub fn build(self) -> ContainerId<'a> {
         ContainerId {
-            value: self.__unsafe_private_named.0.unwrap(),
+            value: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -336,7 +339,7 @@ where
         >,
     ) -> ContainerId<'a> {
         ContainerId {
-            value: self.__unsafe_private_named.0.unwrap(),
+            value: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -560,9 +563,9 @@ pub mod cursor_side_state {
 
 /// Builder for constructing an instance of this type
 pub struct CursorSideBuilder<'a, S: cursor_side_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CursorSide<'a> {
@@ -576,9 +579,9 @@ impl<'a> CursorSideBuilder<'a, cursor_side_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CursorSideBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -593,11 +596,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CursorSideBuilder<'a, cursor_side_state::SetValue<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CursorSideBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -610,7 +613,7 @@ where
     /// Build the final struct
     pub fn build(self) -> CursorSide<'a> {
         CursorSide {
-            value: self.__unsafe_private_named.0.unwrap(),
+            value: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -623,7 +626,7 @@ where
         >,
     ) -> CursorSide<'a> {
         CursorSide {
-            value: self.__unsafe_private_named.0.unwrap(),
+            value: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -639,45 +642,45 @@ pub mod id_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Peer;
         type Counter;
+        type Peer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Peer = Unset;
         type Counter = Unset;
-    }
-    ///State transition - sets the `peer` field to Set
-    pub struct SetPeer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPeer<S> {}
-    impl<S: State> State for SetPeer<S> {
-        type Peer = Set<members::peer>;
-        type Counter = S::Counter;
+        type Peer = Unset;
     }
     ///State transition - sets the `counter` field to Set
     pub struct SetCounter<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCounter<S> {}
     impl<S: State> State for SetCounter<S> {
-        type Peer = S::Peer;
         type Counter = Set<members::counter>;
+        type Peer = S::Peer;
+    }
+    ///State transition - sets the `peer` field to Set
+    pub struct SetPeer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPeer<S> {}
+    impl<S: State> State for SetPeer<S> {
+        type Counter = S::Counter;
+        type Peer = Set<members::peer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `peer` field
-        pub struct peer(());
         ///Marker type for the `counter` field
         pub struct counter(());
+        ///Marker type for the `peer` field
+        pub struct peer(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct IdBuilder<'a, S: id_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Id<'a> {
@@ -691,9 +694,9 @@ impl<'a> IdBuilder<'a, id_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         IdBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -708,11 +711,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> IdBuilder<'a, id_state::SetCounter<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         IdBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -724,11 +727,11 @@ where
 {
     /// Set the `peer` field (required)
     pub fn peer(mut self, value: impl Into<i64>) -> IdBuilder<'a, id_state::SetPeer<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         IdBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -736,14 +739,14 @@ where
 impl<'a, S> IdBuilder<'a, S>
 where
     S: id_state::State,
-    S::Peer: id_state::IsSet,
     S::Counter: id_state::IsSet,
+    S::Peer: id_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Id<'a> {
         Id {
-            counter: self.__unsafe_private_named.0.unwrap(),
-            peer: self.__unsafe_private_named.1.unwrap(),
+            counter: self._fields.0.unwrap(),
+            peer: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -756,8 +759,8 @@ where
         >,
     ) -> Id<'a> {
         Id {
-            counter: self.__unsafe_private_named.0.unwrap(),
-            peer: self.__unsafe_private_named.1.unwrap(),
+            counter: self._fields.0.unwrap(),
+            peer: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -809,13 +812,13 @@ pub mod cursor_state {
 
 /// Builder for constructing an instance of this type
 pub struct CursorBuilder<'a, S: cursor_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<cursor::ContainerId<'a>>,
         Option<cursor::Id<'a>>,
         Option<cursor::CursorSide<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Cursor<'a> {
@@ -829,9 +832,9 @@ impl<'a> CursorBuilder<'a, cursor_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CursorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -846,11 +849,11 @@ where
         mut self,
         value: impl Into<cursor::ContainerId<'a>>,
     ) -> CursorBuilder<'a, cursor_state::SetContainer<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CursorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -865,11 +868,11 @@ where
         mut self,
         value: impl Into<cursor::Id<'a>>,
     ) -> CursorBuilder<'a, cursor_state::SetId<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CursorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -877,12 +880,12 @@ where
 impl<'a, S: cursor_state::State> CursorBuilder<'a, S> {
     /// Set the `side` field (optional)
     pub fn side(mut self, value: impl Into<Option<cursor::CursorSide<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `side` field to an Option value (optional)
     pub fn maybe_side(mut self, value: Option<cursor::CursorSide<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -896,9 +899,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Cursor<'a> {
         Cursor {
-            container: self.__unsafe_private_named.0.unwrap(),
-            id: self.__unsafe_private_named.1.unwrap(),
-            side: self.__unsafe_private_named.2,
+            container: self._fields.0.unwrap(),
+            id: self._fields.1.unwrap(),
+            side: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -911,9 +914,9 @@ where
         >,
     ) -> Cursor<'a> {
         Cursor {
-            container: self.__unsafe_private_named.0.unwrap(),
-            id: self.__unsafe_private_named.1.unwrap(),
-            side: self.__unsafe_private_named.2,
+            container: self._fields.0.unwrap(),
+            id: self._fields.1.unwrap(),
+            side: self._fields.2,
             extra_data: Some(extra_data),
         }
     }
@@ -979,9 +982,9 @@ pub mod normal_container_id_state {
 
 /// Builder for constructing an instance of this type
 pub struct NormalContainerIdBuilder<'a, S: normal_container_id_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> NormalContainerId<'a> {
@@ -995,9 +998,9 @@ impl<'a> NormalContainerIdBuilder<'a, normal_container_id_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NormalContainerIdBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1012,11 +1015,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> NormalContainerIdBuilder<'a, normal_container_id_state::SetContainerType<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         NormalContainerIdBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1031,11 +1034,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> NormalContainerIdBuilder<'a, normal_container_id_state::SetCounter<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         NormalContainerIdBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1050,11 +1053,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> NormalContainerIdBuilder<'a, normal_container_id_state::SetPeer<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         NormalContainerIdBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1069,9 +1072,9 @@ where
     /// Build the final struct
     pub fn build(self) -> NormalContainerId<'a> {
         NormalContainerId {
-            container_type: self.__unsafe_private_named.0.unwrap(),
-            counter: self.__unsafe_private_named.1.unwrap(),
-            peer: self.__unsafe_private_named.2.unwrap(),
+            container_type: self._fields.0.unwrap(),
+            counter: self._fields.1.unwrap(),
+            peer: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1084,9 +1087,9 @@ where
         >,
     ) -> NormalContainerId<'a> {
         NormalContainerId {
-            container_type: self.__unsafe_private_named.0.unwrap(),
-            counter: self.__unsafe_private_named.1.unwrap(),
-            peer: self.__unsafe_private_named.2.unwrap(),
+            container_type: self._fields.0.unwrap(),
+            counter: self._fields.1.unwrap(),
+            peer: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

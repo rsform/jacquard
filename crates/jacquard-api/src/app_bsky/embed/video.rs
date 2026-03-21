@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -485,9 +488,9 @@ pub mod caption_state {
 
 /// Builder for constructing an instance of this type
 pub struct CaptionBuilder<'a, S: caption_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<BlobRef<'a>>, Option<Language>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<BlobRef<'a>>, Option<Language>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Caption<'a> {
@@ -501,9 +504,9 @@ impl<'a> CaptionBuilder<'a, caption_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CaptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -518,11 +521,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> CaptionBuilder<'a, caption_state::SetFile<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CaptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -537,11 +540,11 @@ where
         mut self,
         value: impl Into<Language>,
     ) -> CaptionBuilder<'a, caption_state::SetLang<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CaptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -555,8 +558,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Caption<'a> {
         Caption {
-            file: self.__unsafe_private_named.0.unwrap(),
-            lang: self.__unsafe_private_named.1.unwrap(),
+            file: self._fields.0.unwrap(),
+            lang: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -569,8 +572,8 @@ where
         >,
     ) -> Caption<'a> {
         Caption {
-            file: self.__unsafe_private_named.0.unwrap(),
-            lang: self.__unsafe_private_named.1.unwrap(),
+            file: self._fields.0.unwrap(),
+            lang: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -774,15 +777,15 @@ pub mod video_state {
 
 /// Builder for constructing an instance of this type
 pub struct VideoBuilder<'a, S: video_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<AspectRatio<'a>>,
         Option<Vec<video::Caption<'a>>>,
         Option<VideoPresentation<'a>>,
         Option<BlobRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Video<'a> {
@@ -796,9 +799,9 @@ impl<'a> VideoBuilder<'a, video_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         VideoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -806,12 +809,12 @@ impl<'a> VideoBuilder<'a, video_state::Empty> {
 impl<'a, S: video_state::State> VideoBuilder<'a, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
     pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -819,12 +822,12 @@ impl<'a, S: video_state::State> VideoBuilder<'a, S> {
 impl<'a, S: video_state::State> VideoBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
     pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
     pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -835,12 +838,12 @@ impl<'a, S: video_state::State> VideoBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<video::Caption<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `captions` field to an Option value (optional)
     pub fn maybe_captions(mut self, value: Option<Vec<video::Caption<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -851,12 +854,12 @@ impl<'a, S: video_state::State> VideoBuilder<'a, S> {
         mut self,
         value: impl Into<Option<VideoPresentation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `presentation` field to an Option value (optional)
     pub fn maybe_presentation(mut self, value: Option<VideoPresentation<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -871,11 +874,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> VideoBuilder<'a, video_state::SetVideo<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         VideoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -888,11 +891,11 @@ where
     /// Build the final struct
     pub fn build(self) -> Video<'a> {
         Video {
-            alt: self.__unsafe_private_named.0,
-            aspect_ratio: self.__unsafe_private_named.1,
-            captions: self.__unsafe_private_named.2,
-            presentation: self.__unsafe_private_named.3,
-            video: self.__unsafe_private_named.4.unwrap(),
+            alt: self._fields.0,
+            aspect_ratio: self._fields.1,
+            captions: self._fields.2,
+            presentation: self._fields.3,
+            video: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -905,11 +908,11 @@ where
         >,
     ) -> Video<'a> {
         Video {
-            alt: self.__unsafe_private_named.0,
-            aspect_ratio: self.__unsafe_private_named.1,
-            captions: self.__unsafe_private_named.2,
-            presentation: self.__unsafe_private_named.3,
-            video: self.__unsafe_private_named.4.unwrap(),
+            alt: self._fields.0,
+            aspect_ratio: self._fields.1,
+            captions: self._fields.2,
+            presentation: self._fields.3,
+            video: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -961,8 +964,8 @@ pub mod view_state {
 
 /// Builder for constructing an instance of this type
 pub struct ViewBuilder<'a, S: view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<AspectRatio<'a>>,
         Option<Cid<'a>>,
@@ -970,7 +973,7 @@ pub struct ViewBuilder<'a, S: view_state::State> {
         Option<ViewPresentation<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> View<'a> {
@@ -984,9 +987,9 @@ impl<'a> ViewBuilder<'a, view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -994,12 +997,12 @@ impl<'a> ViewBuilder<'a, view_state::Empty> {
 impl<'a, S: view_state::State> ViewBuilder<'a, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
     pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1007,12 +1010,12 @@ impl<'a, S: view_state::State> ViewBuilder<'a, S> {
 impl<'a, S: view_state::State> ViewBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
     pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
     pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1027,11 +1030,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> ViewBuilder<'a, view_state::SetCid<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1046,11 +1049,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ViewBuilder<'a, view_state::SetPlaylist<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1061,12 +1064,12 @@ impl<'a, S: view_state::State> ViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ViewPresentation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `presentation` field to an Option value (optional)
     pub fn maybe_presentation(mut self, value: Option<ViewPresentation<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1074,12 +1077,12 @@ impl<'a, S: view_state::State> ViewBuilder<'a, S> {
 impl<'a, S: view_state::State> ViewBuilder<'a, S> {
     /// Set the `thumbnail` field (optional)
     pub fn thumbnail(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
     pub fn maybe_thumbnail(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1093,12 +1096,12 @@ where
     /// Build the final struct
     pub fn build(self) -> View<'a> {
         View {
-            alt: self.__unsafe_private_named.0,
-            aspect_ratio: self.__unsafe_private_named.1,
-            cid: self.__unsafe_private_named.2.unwrap(),
-            playlist: self.__unsafe_private_named.3.unwrap(),
-            presentation: self.__unsafe_private_named.4,
-            thumbnail: self.__unsafe_private_named.5,
+            alt: self._fields.0,
+            aspect_ratio: self._fields.1,
+            cid: self._fields.2.unwrap(),
+            playlist: self._fields.3.unwrap(),
+            presentation: self._fields.4,
+            thumbnail: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -1111,12 +1114,12 @@ where
         >,
     ) -> View<'a> {
         View {
-            alt: self.__unsafe_private_named.0,
-            aspect_ratio: self.__unsafe_private_named.1,
-            cid: self.__unsafe_private_named.2.unwrap(),
-            playlist: self.__unsafe_private_named.3.unwrap(),
-            presentation: self.__unsafe_private_named.4,
-            thumbnail: self.__unsafe_private_named.5,
+            alt: self._fields.0,
+            aspect_ratio: self._fields.1,
+            cid: self._fields.2.unwrap(),
+            playlist: self._fields.3.unwrap(),
+            presentation: self._fields.4,
+            thumbnail: self._fields.5,
             extra_data: Some(extra_data),
         }
     }

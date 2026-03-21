@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -556,8 +559,8 @@ pub mod event_state {
 
 /// Builder for constructing an instance of this type
 pub struct EventBuilder<'a, S: event_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<Datetime>,
@@ -568,7 +571,7 @@ pub struct EventBuilder<'a, S: event_state::State> {
         Option<event::Status<'a>>,
         Option<Vec<event::Uri<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Event<'a> {
@@ -582,19 +585,9 @@ impl<'a> EventBuilder<'a, event_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -609,11 +602,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> EventBuilder<'a, event_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -621,12 +614,12 @@ where
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -634,12 +627,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `endsAt` field (optional)
     pub fn ends_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `endsAt` field to an Option value (optional)
     pub fn maybe_ends_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -650,7 +643,7 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<EventLocationsItem<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `locations` field to an Option value (optional)
@@ -658,7 +651,7 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
         mut self,
         value: Option<Vec<EventLocationsItem<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -666,12 +659,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `mode` field (optional)
     pub fn mode(mut self, value: impl Into<Option<event::Mode<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `mode` field to an Option value (optional)
     pub fn maybe_mode(mut self, value: Option<event::Mode<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -686,11 +679,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EventBuilder<'a, event_state::SetName<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -698,12 +691,12 @@ where
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `startsAt` field (optional)
     pub fn starts_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `startsAt` field to an Option value (optional)
     pub fn maybe_starts_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -711,12 +704,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<event::Status<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<event::Status<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -724,12 +717,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `uris` field (optional)
     pub fn uris(mut self, value: impl Into<Option<Vec<event::Uri<'a>>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `uris` field to an Option value (optional)
     pub fn maybe_uris(mut self, value: Option<Vec<event::Uri<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -743,15 +736,15 @@ where
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
         Event {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            ends_at: self.__unsafe_private_named.2,
-            locations: self.__unsafe_private_named.3,
-            mode: self.__unsafe_private_named.4,
-            name: self.__unsafe_private_named.5.unwrap(),
-            starts_at: self.__unsafe_private_named.6,
-            status: self.__unsafe_private_named.7,
-            uris: self.__unsafe_private_named.8,
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1,
+            ends_at: self._fields.2,
+            locations: self._fields.3,
+            mode: self._fields.4,
+            name: self._fields.5.unwrap(),
+            starts_at: self._fields.6,
+            status: self._fields.7,
+            uris: self._fields.8,
             extra_data: Default::default(),
         }
     }
@@ -764,15 +757,15 @@ where
         >,
     ) -> Event<'a> {
         Event {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            ends_at: self.__unsafe_private_named.2,
-            locations: self.__unsafe_private_named.3,
-            mode: self.__unsafe_private_named.4,
-            name: self.__unsafe_private_named.5.unwrap(),
-            starts_at: self.__unsafe_private_named.6,
-            status: self.__unsafe_private_named.7,
-            uris: self.__unsafe_private_named.8,
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1,
+            ends_at: self._fields.2,
+            locations: self._fields.3,
+            mode: self._fields.4,
+            name: self._fields.5.unwrap(),
+            starts_at: self._fields.6,
+            status: self._fields.7,
+            uris: self._fields.8,
             extra_data: Some(extra_data),
         }
     }
@@ -1035,9 +1028,9 @@ pub mod uri_state {
 
 /// Builder for constructing an instance of this type
 pub struct UriBuilder<'a, S: uri_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<UriValue<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Uri<'a> {
@@ -1051,9 +1044,9 @@ impl<'a> UriBuilder<'a, uri_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UriBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1061,12 +1054,12 @@ impl<'a> UriBuilder<'a, uri_state::Empty> {
 impl<'a, S: uri_state::State> UriBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1081,11 +1074,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> UriBuilder<'a, uri_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         UriBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1098,8 +1091,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Uri<'a> {
         Uri {
-            name: self.__unsafe_private_named.0,
-            uri: self.__unsafe_private_named.1.unwrap(),
+            name: self._fields.0,
+            uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1112,8 +1105,8 @@ where
         >,
     ) -> Uri<'a> {
         Uri {
-            name: self.__unsafe_private_named.0,
-            uri: self.__unsafe_private_named.1.unwrap(),
+            name: self._fields.0,
+            uri: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

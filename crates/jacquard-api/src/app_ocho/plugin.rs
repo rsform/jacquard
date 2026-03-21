@@ -10,7 +10,11 @@ pub mod get_manifest;
 pub mod put_hosting_url;
 pub mod service;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -1174,14 +1178,14 @@ pub mod asset_state {
 
 /// Builder for constructing an instance of this type
 pub struct AssetBuilder<'a, S: asset_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<BlobRef<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Asset<'a> {
@@ -1195,9 +1199,9 @@ impl<'a> AssetBuilder<'a, asset_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AssetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1212,11 +1216,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> AssetBuilder<'a, asset_state::SetBlob<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AssetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1231,11 +1235,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AssetBuilder<'a, asset_state::SetHash<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AssetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1250,11 +1254,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AssetBuilder<'a, asset_state::SetType<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         AssetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1262,12 +1266,12 @@ where
 impl<'a, S: asset_state::State> AssetBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1282,10 +1286,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Asset<'a> {
         Asset {
-            blob: self.__unsafe_private_named.0.unwrap(),
-            hash: self.__unsafe_private_named.1.unwrap(),
-            r#type: self.__unsafe_private_named.2.unwrap(),
-            updated_at: self.__unsafe_private_named.3,
+            blob: self._fields.0.unwrap(),
+            hash: self._fields.1.unwrap(),
+            r#type: self._fields.2.unwrap(),
+            updated_at: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -1295,10 +1299,10 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Asset<'a> {
         Asset {
-            blob: self.__unsafe_private_named.0.unwrap(),
-            hash: self.__unsafe_private_named.1.unwrap(),
-            r#type: self.__unsafe_private_named.2.unwrap(),
-            updated_at: self.__unsafe_private_named.3,
+            blob: self._fields.0.unwrap(),
+            hash: self._fields.1.unwrap(),
+            r#type: self._fields.2.unwrap(),
+            updated_at: self._fields.3,
             extra_data: Some(extra_data),
         }
     }
@@ -1338,9 +1342,9 @@ pub mod expo_go_state {
 
 /// Builder for constructing an instance of this type
 pub struct ExpoGoBuilder<'a, S: expo_go_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<plugin::Developer<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<plugin::Developer<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ExpoGo<'a> {
@@ -1354,9 +1358,9 @@ impl<'a> ExpoGoBuilder<'a, expo_go_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ExpoGoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1371,11 +1375,11 @@ where
         mut self,
         value: impl Into<plugin::Developer<'a>>,
     ) -> ExpoGoBuilder<'a, expo_go_state::SetDeveloper<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ExpoGoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1388,7 +1392,7 @@ where
     /// Build the final struct
     pub fn build(self) -> ExpoGo<'a> {
         ExpoGo {
-            developer: self.__unsafe_private_named.0.unwrap(),
+            developer: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1398,7 +1402,7 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ExpoGo<'a> {
         ExpoGo {
-            developer: self.__unsafe_private_named.0.unwrap(),
+            developer: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1415,62 +1419,58 @@ pub mod launch_asset_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Url;
-        type ContentType;
         type Key;
+        type ContentType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Url = Unset;
-        type ContentType = Unset;
         type Key = Unset;
+        type ContentType = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
         type Url = Set<members::url>;
+        type Key = S::Key;
         type ContentType = S::ContentType;
-        type Key = S::Key;
-    }
-    ///State transition - sets the `content_type` field to Set
-    pub struct SetContentType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContentType<S> {}
-    impl<S: State> State for SetContentType<S> {
-        type Url = S::Url;
-        type ContentType = Set<members::content_type>;
-        type Key = S::Key;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKey<S> {}
     impl<S: State> State for SetKey<S> {
         type Url = S::Url;
-        type ContentType = S::ContentType;
         type Key = Set<members::key>;
+        type ContentType = S::ContentType;
+    }
+    ///State transition - sets the `content_type` field to Set
+    pub struct SetContentType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContentType<S> {}
+    impl<S: State> State for SetContentType<S> {
+        type Url = S::Url;
+        type Key = S::Key;
+        type ContentType = Set<members::content_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `url` field
         pub struct url(());
-        ///Marker type for the `content_type` field
-        pub struct content_type(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `content_type` field
+        pub struct content_type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LaunchAssetBuilder<'a, S: launch_asset_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LaunchAsset<'a> {
@@ -1484,9 +1484,9 @@ impl<'a> LaunchAssetBuilder<'a, launch_asset_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LaunchAssetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1501,11 +1501,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LaunchAssetBuilder<'a, launch_asset_state::SetContentType<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LaunchAssetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1520,11 +1520,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LaunchAssetBuilder<'a, launch_asset_state::SetKey<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LaunchAssetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1539,11 +1539,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> LaunchAssetBuilder<'a, launch_asset_state::SetUrl<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LaunchAssetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1552,15 +1552,15 @@ impl<'a, S> LaunchAssetBuilder<'a, S>
 where
     S: launch_asset_state::State,
     S::Url: launch_asset_state::IsSet,
-    S::ContentType: launch_asset_state::IsSet,
     S::Key: launch_asset_state::IsSet,
+    S::ContentType: launch_asset_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LaunchAsset<'a> {
         LaunchAsset {
-            content_type: self.__unsafe_private_named.0.unwrap(),
-            key: self.__unsafe_private_named.1.unwrap(),
-            url: self.__unsafe_private_named.2.unwrap(),
+            content_type: self._fields.0.unwrap(),
+            key: self._fields.1.unwrap(),
+            url: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1570,9 +1570,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> LaunchAsset<'a> {
         LaunchAsset {
-            content_type: self.__unsafe_private_named.0.unwrap(),
-            key: self.__unsafe_private_named.1.unwrap(),
-            url: self.__unsafe_private_named.2.unwrap(),
+            content_type: self._fields.0.unwrap(),
+            key: self._fields.1.unwrap(),
+            url: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1588,112 +1588,112 @@ pub mod manifest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Metadata;
-        type Extra;
-        type RuntimeVersion;
         type Id;
+        type Metadata;
+        type CreatedAt;
+        type RuntimeVersion;
         type LaunchAsset;
+        type Extra;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Metadata = Unset;
-        type Extra = Unset;
-        type RuntimeVersion = Unset;
         type Id = Unset;
+        type Metadata = Unset;
+        type CreatedAt = Unset;
+        type RuntimeVersion = Unset;
         type LaunchAsset = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Metadata = S::Metadata;
-        type Extra = S::Extra;
-        type RuntimeVersion = S::RuntimeVersion;
-        type Id = S::Id;
-        type LaunchAsset = S::LaunchAsset;
-    }
-    ///State transition - sets the `metadata` field to Set
-    pub struct SetMetadata<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMetadata<S> {}
-    impl<S: State> State for SetMetadata<S> {
-        type CreatedAt = S::CreatedAt;
-        type Metadata = Set<members::metadata>;
-        type Extra = S::Extra;
-        type RuntimeVersion = S::RuntimeVersion;
-        type Id = S::Id;
-        type LaunchAsset = S::LaunchAsset;
-    }
-    ///State transition - sets the `extra` field to Set
-    pub struct SetExtra<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExtra<S> {}
-    impl<S: State> State for SetExtra<S> {
-        type CreatedAt = S::CreatedAt;
-        type Metadata = S::Metadata;
-        type Extra = Set<members::extra>;
-        type RuntimeVersion = S::RuntimeVersion;
-        type Id = S::Id;
-        type LaunchAsset = S::LaunchAsset;
-    }
-    ///State transition - sets the `runtime_version` field to Set
-    pub struct SetRuntimeVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRuntimeVersion<S> {}
-    impl<S: State> State for SetRuntimeVersion<S> {
-        type CreatedAt = S::CreatedAt;
-        type Metadata = S::Metadata;
-        type Extra = S::Extra;
-        type RuntimeVersion = Set<members::runtime_version>;
-        type Id = S::Id;
-        type LaunchAsset = S::LaunchAsset;
+        type Extra = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type CreatedAt = S::CreatedAt;
-        type Metadata = S::Metadata;
-        type Extra = S::Extra;
-        type RuntimeVersion = S::RuntimeVersion;
         type Id = Set<members::id>;
+        type Metadata = S::Metadata;
+        type CreatedAt = S::CreatedAt;
+        type RuntimeVersion = S::RuntimeVersion;
         type LaunchAsset = S::LaunchAsset;
+        type Extra = S::Extra;
+    }
+    ///State transition - sets the `metadata` field to Set
+    pub struct SetMetadata<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMetadata<S> {}
+    impl<S: State> State for SetMetadata<S> {
+        type Id = S::Id;
+        type Metadata = Set<members::metadata>;
+        type CreatedAt = S::CreatedAt;
+        type RuntimeVersion = S::RuntimeVersion;
+        type LaunchAsset = S::LaunchAsset;
+        type Extra = S::Extra;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Id = S::Id;
+        type Metadata = S::Metadata;
+        type CreatedAt = Set<members::created_at>;
+        type RuntimeVersion = S::RuntimeVersion;
+        type LaunchAsset = S::LaunchAsset;
+        type Extra = S::Extra;
+    }
+    ///State transition - sets the `runtime_version` field to Set
+    pub struct SetRuntimeVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRuntimeVersion<S> {}
+    impl<S: State> State for SetRuntimeVersion<S> {
+        type Id = S::Id;
+        type Metadata = S::Metadata;
+        type CreatedAt = S::CreatedAt;
+        type RuntimeVersion = Set<members::runtime_version>;
+        type LaunchAsset = S::LaunchAsset;
+        type Extra = S::Extra;
     }
     ///State transition - sets the `launch_asset` field to Set
     pub struct SetLaunchAsset<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLaunchAsset<S> {}
     impl<S: State> State for SetLaunchAsset<S> {
-        type CreatedAt = S::CreatedAt;
-        type Metadata = S::Metadata;
-        type Extra = S::Extra;
-        type RuntimeVersion = S::RuntimeVersion;
         type Id = S::Id;
+        type Metadata = S::Metadata;
+        type CreatedAt = S::CreatedAt;
+        type RuntimeVersion = S::RuntimeVersion;
         type LaunchAsset = Set<members::launch_asset>;
+        type Extra = S::Extra;
+    }
+    ///State transition - sets the `extra` field to Set
+    pub struct SetExtra<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExtra<S> {}
+    impl<S: State> State for SetExtra<S> {
+        type Id = S::Id;
+        type Metadata = S::Metadata;
+        type CreatedAt = S::CreatedAt;
+        type RuntimeVersion = S::RuntimeVersion;
+        type LaunchAsset = S::LaunchAsset;
+        type Extra = Set<members::extra>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `metadata` field
-        pub struct metadata(());
-        ///Marker type for the `extra` field
-        pub struct extra(());
-        ///Marker type for the `runtime_version` field
-        pub struct runtime_version(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `metadata` field
+        pub struct metadata(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `runtime_version` field
+        pub struct runtime_version(());
         ///Marker type for the `launch_asset` field
         pub struct launch_asset(());
+        ///Marker type for the `extra` field
+        pub struct extra(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ManifestBuilder<'a, S: manifest_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<plugin::ManifestExtra<'a>>,
         Option<CowStr<'a>>,
@@ -1701,7 +1701,7 @@ pub struct ManifestBuilder<'a, S: manifest_state::State> {
         Option<Data<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Manifest<'a> {
@@ -1715,9 +1715,9 @@ impl<'a> ManifestBuilder<'a, manifest_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1732,11 +1732,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ManifestBuilder<'a, manifest_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1751,11 +1751,11 @@ where
         mut self,
         value: impl Into<plugin::ManifestExtra<'a>>,
     ) -> ManifestBuilder<'a, manifest_state::SetExtra<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1770,11 +1770,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ManifestBuilder<'a, manifest_state::SetId<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1789,11 +1789,11 @@ where
         mut self,
         value: impl Into<plugin::LaunchAsset<'a>>,
     ) -> ManifestBuilder<'a, manifest_state::SetLaunchAsset<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1808,11 +1808,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> ManifestBuilder<'a, manifest_state::SetMetadata<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1827,11 +1827,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ManifestBuilder<'a, manifest_state::SetRuntimeVersion<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1839,22 +1839,22 @@ where
 impl<'a, S> ManifestBuilder<'a, S>
 where
     S: manifest_state::State,
-    S::CreatedAt: manifest_state::IsSet,
-    S::Metadata: manifest_state::IsSet,
-    S::Extra: manifest_state::IsSet,
-    S::RuntimeVersion: manifest_state::IsSet,
     S::Id: manifest_state::IsSet,
+    S::Metadata: manifest_state::IsSet,
+    S::CreatedAt: manifest_state::IsSet,
+    S::RuntimeVersion: manifest_state::IsSet,
     S::LaunchAsset: manifest_state::IsSet,
+    S::Extra: manifest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Manifest<'a> {
         Manifest {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            extra: self.__unsafe_private_named.1.unwrap(),
-            id: self.__unsafe_private_named.2.unwrap(),
-            launch_asset: self.__unsafe_private_named.3.unwrap(),
-            metadata: self.__unsafe_private_named.4.unwrap(),
-            runtime_version: self.__unsafe_private_named.5.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            extra: self._fields.1.unwrap(),
+            id: self._fields.2.unwrap(),
+            launch_asset: self._fields.3.unwrap(),
+            metadata: self._fields.4.unwrap(),
+            runtime_version: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1864,12 +1864,12 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Manifest<'a> {
         Manifest {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            extra: self.__unsafe_private_named.1.unwrap(),
-            id: self.__unsafe_private_named.2.unwrap(),
-            launch_asset: self.__unsafe_private_named.3.unwrap(),
-            metadata: self.__unsafe_private_named.4.unwrap(),
-            runtime_version: self.__unsafe_private_named.5.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            extra: self._fields.1.unwrap(),
+            id: self._fields.2.unwrap(),
+            launch_asset: self._fields.3.unwrap(),
+            metadata: self._fields.4.unwrap(),
+            runtime_version: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1921,9 +1921,9 @@ pub mod manifest_extra_state {
 
 /// Builder for constructing an instance of this type
 pub struct ManifestExtraBuilder<'a, S: manifest_extra_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<plugin::ExpoClient<'a>>, Option<plugin::ExpoGo<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<plugin::ExpoClient<'a>>, Option<plugin::ExpoGo<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ManifestExtra<'a> {
@@ -1937,9 +1937,9 @@ impl<'a> ManifestExtraBuilder<'a, manifest_extra_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ManifestExtraBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1954,11 +1954,11 @@ where
         mut self,
         value: impl Into<plugin::ExpoClient<'a>>,
     ) -> ManifestExtraBuilder<'a, manifest_extra_state::SetExpoClient<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ManifestExtraBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1973,11 +1973,11 @@ where
         mut self,
         value: impl Into<plugin::ExpoGo<'a>>,
     ) -> ManifestExtraBuilder<'a, manifest_extra_state::SetExpoGo<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ManifestExtraBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1991,8 +1991,8 @@ where
     /// Build the final struct
     pub fn build(self) -> ManifestExtra<'a> {
         ManifestExtra {
-            expo_client: self.__unsafe_private_named.0.unwrap(),
-            expo_go: self.__unsafe_private_named.1.unwrap(),
+            expo_client: self._fields.0.unwrap(),
+            expo_go: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2002,8 +2002,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ManifestExtra<'a> {
         ManifestExtra {
-            expo_client: self.__unsafe_private_named.0.unwrap(),
-            expo_go: self.__unsafe_private_named.1.unwrap(),
+            expo_client: self._fields.0.unwrap(),
+            expo_go: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

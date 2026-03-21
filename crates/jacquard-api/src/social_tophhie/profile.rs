@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -195,9 +198,9 @@ pub struct CommunicationPreferencesBuilder<
     'a,
     S: communication_preferences_state::State,
 > {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CommunicationPreferences<'a> {
@@ -214,9 +217,9 @@ impl<'a> CommunicationPreferencesBuilder<'a, communication_preferences_state::Em
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CommunicationPreferencesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -234,11 +237,11 @@ where
         'a,
         communication_preferences_state::SetMarketing<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CommunicationPreferencesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -251,7 +254,7 @@ where
     /// Build the final struct
     pub fn build(self) -> CommunicationPreferences<'a> {
         CommunicationPreferences {
-            marketing: self.__unsafe_private_named.0.unwrap(),
+            marketing: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -264,7 +267,7 @@ where
         >,
     ) -> CommunicationPreferences<'a> {
         CommunicationPreferences {
-            marketing: self.__unsafe_private_named.0.unwrap(),
+            marketing: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -411,63 +414,63 @@ pub mod profile_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type PdsPreferences;
         type CommunicationPreferences;
+        type PdsPreferences;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type PdsPreferences = Unset;
         type CommunicationPreferences = Unset;
+        type PdsPreferences = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type CommunicationPreferences = S::CommunicationPreferences;
         type PdsPreferences = S::PdsPreferences;
-        type CommunicationPreferences = S::CommunicationPreferences;
-    }
-    ///State transition - sets the `pds_preferences` field to Set
-    pub struct SetPdsPreferences<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPdsPreferences<S> {}
-    impl<S: State> State for SetPdsPreferences<S> {
-        type CreatedAt = S::CreatedAt;
-        type PdsPreferences = Set<members::pds_preferences>;
-        type CommunicationPreferences = S::CommunicationPreferences;
     }
     ///State transition - sets the `communication_preferences` field to Set
     pub struct SetCommunicationPreferences<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCommunicationPreferences<S> {}
     impl<S: State> State for SetCommunicationPreferences<S> {
         type CreatedAt = S::CreatedAt;
-        type PdsPreferences = S::PdsPreferences;
         type CommunicationPreferences = Set<members::communication_preferences>;
+        type PdsPreferences = S::PdsPreferences;
+    }
+    ///State transition - sets the `pds_preferences` field to Set
+    pub struct SetPdsPreferences<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPdsPreferences<S> {}
+    impl<S: State> State for SetPdsPreferences<S> {
+        type CreatedAt = S::CreatedAt;
+        type CommunicationPreferences = S::CommunicationPreferences;
+        type PdsPreferences = Set<members::pds_preferences>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `pds_preferences` field
-        pub struct pds_preferences(());
         ///Marker type for the `communication_preferences` field
         pub struct communication_preferences(());
+        ///Marker type for the `pds_preferences` field
+        pub struct pds_preferences(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ProfileBuilder<'a, S: profile_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<profile::CommunicationPreferences<'a>>,
         Option<Datetime>,
         Option<profile::PdsPreferences<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Profile<'a> {
@@ -481,9 +484,9 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -498,11 +501,11 @@ where
         mut self,
         value: impl Into<profile::CommunicationPreferences<'a>>,
     ) -> ProfileBuilder<'a, profile_state::SetCommunicationPreferences<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -517,11 +520,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ProfileBuilder<'a, profile_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -536,11 +539,11 @@ where
         mut self,
         value: impl Into<profile::PdsPreferences<'a>>,
     ) -> ProfileBuilder<'a, profile_state::SetPdsPreferences<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -548,12 +551,12 @@ where
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -562,16 +565,16 @@ impl<'a, S> ProfileBuilder<'a, S>
 where
     S: profile_state::State,
     S::CreatedAt: profile_state::IsSet,
-    S::PdsPreferences: profile_state::IsSet,
     S::CommunicationPreferences: profile_state::IsSet,
+    S::PdsPreferences: profile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
         Profile {
-            communication_preferences: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            pds_preferences: self.__unsafe_private_named.2.unwrap(),
-            updated_at: self.__unsafe_private_named.3,
+            communication_preferences: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            pds_preferences: self._fields.2.unwrap(),
+            updated_at: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -584,10 +587,10 @@ where
         >,
     ) -> Profile<'a> {
         Profile {
-            communication_preferences: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            pds_preferences: self.__unsafe_private_named.2.unwrap(),
-            updated_at: self.__unsafe_private_named.3,
+            communication_preferences: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            pds_preferences: self._fields.2.unwrap(),
+            updated_at: self._fields.3,
             extra_data: Some(extra_data),
         }
     }
@@ -639,9 +642,9 @@ pub mod pds_preferences_state {
 
 /// Builder for constructing an instance of this type
 pub struct PdsPreferencesBuilder<'a, S: pds_preferences_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>, Option<bool>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<bool>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> PdsPreferences<'a> {
@@ -655,9 +658,9 @@ impl<'a> PdsPreferencesBuilder<'a, pds_preferences_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PdsPreferencesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -672,11 +675,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> PdsPreferencesBuilder<'a, pds_preferences_state::SetAccessibilityScoring<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PdsPreferencesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -691,11 +694,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> PdsPreferencesBuilder<'a, pds_preferences_state::SetShowOnHomepage<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PdsPreferencesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -709,8 +712,8 @@ where
     /// Build the final struct
     pub fn build(self) -> PdsPreferences<'a> {
         PdsPreferences {
-            accessibility_scoring: self.__unsafe_private_named.0.unwrap(),
-            show_on_homepage: self.__unsafe_private_named.1.unwrap(),
+            accessibility_scoring: self._fields.0.unwrap(),
+            show_on_homepage: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -723,8 +726,8 @@ where
         >,
     ) -> PdsPreferences<'a> {
         PdsPreferences {
-            accessibility_scoring: self.__unsafe_private_named.0.unwrap(),
-            show_on_homepage: self.__unsafe_private_named.1.unwrap(),
+            accessibility_scoring: self._fields.0.unwrap(),
+            show_on_homepage: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -10,7 +10,11 @@ pub mod key;
 pub mod player;
 pub mod verification;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -69,80 +73,75 @@ pub mod sync_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Hash;
-        type CreatedAt;
         type SyncedWithAtRepo;
         type UpdatedAt;
+        type Hash;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Hash = Unset;
-        type CreatedAt = Unset;
         type SyncedWithAtRepo = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `hash` field to Set
-    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHash<S> {}
-    impl<S: State> State for SetHash<S> {
-        type Hash = Set<members::hash>;
-        type CreatedAt = S::CreatedAt;
-        type SyncedWithAtRepo = S::SyncedWithAtRepo;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Hash = S::Hash;
-        type CreatedAt = Set<members::created_at>;
-        type SyncedWithAtRepo = S::SyncedWithAtRepo;
-        type UpdatedAt = S::UpdatedAt;
+        type Hash = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `synced_with_at_repo` field to Set
     pub struct SetSyncedWithAtRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSyncedWithAtRepo<S> {}
     impl<S: State> State for SetSyncedWithAtRepo<S> {
-        type Hash = S::Hash;
-        type CreatedAt = S::CreatedAt;
         type SyncedWithAtRepo = Set<members::synced_with_at_repo>;
         type UpdatedAt = S::UpdatedAt;
+        type Hash = S::Hash;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
-        type Hash = S::Hash;
-        type CreatedAt = S::CreatedAt;
         type SyncedWithAtRepo = S::SyncedWithAtRepo;
         type UpdatedAt = Set<members::updated_at>;
+        type Hash = S::Hash;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `hash` field to Set
+    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHash<S> {}
+    impl<S: State> State for SetHash<S> {
+        type SyncedWithAtRepo = S::SyncedWithAtRepo;
+        type UpdatedAt = S::UpdatedAt;
+        type Hash = Set<members::hash>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type SyncedWithAtRepo = S::SyncedWithAtRepo;
+        type UpdatedAt = S::UpdatedAt;
+        type Hash = S::Hash;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `hash` field
-        pub struct hash(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `synced_with_at_repo` field
         pub struct synced_with_at_repo(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `hash` field
+        pub struct hash(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SyncStatusBuilder<'a, S: sync_status_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<bool>,
-        Option<Datetime>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<CowStr<'a>>, Option<bool>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SyncStatus<'a> {
@@ -156,9 +155,9 @@ impl<'a> SyncStatusBuilder<'a, sync_status_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SyncStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -173,11 +172,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SyncStatusBuilder<'a, sync_status_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SyncStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -192,11 +191,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SyncStatusBuilder<'a, sync_status_state::SetHash<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SyncStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -211,11 +210,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> SyncStatusBuilder<'a, sync_status_state::SetSyncedWithAtRepo<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SyncStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -230,11 +229,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SyncStatusBuilder<'a, sync_status_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         SyncStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -242,18 +241,18 @@ where
 impl<'a, S> SyncStatusBuilder<'a, S>
 where
     S: sync_status_state::State,
-    S::Hash: sync_status_state::IsSet,
-    S::CreatedAt: sync_status_state::IsSet,
     S::SyncedWithAtRepo: sync_status_state::IsSet,
     S::UpdatedAt: sync_status_state::IsSet,
+    S::Hash: sync_status_state::IsSet,
+    S::CreatedAt: sync_status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SyncStatus<'a> {
         SyncStatus {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            hash: self.__unsafe_private_named.1.unwrap(),
-            synced_with_at_repo: self.__unsafe_private_named.2.unwrap(),
-            updated_at: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            hash: self._fields.1.unwrap(),
+            synced_with_at_repo: self._fields.2.unwrap(),
+            updated_at: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -266,10 +265,10 @@ where
         >,
     ) -> SyncStatus<'a> {
         SyncStatus {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            hash: self.__unsafe_private_named.1.unwrap(),
-            synced_with_at_repo: self.__unsafe_private_named.2.unwrap(),
-            updated_at: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            hash: self._fields.1.unwrap(),
+            synced_with_at_repo: self._fields.2.unwrap(),
+            updated_at: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

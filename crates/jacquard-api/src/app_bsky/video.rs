@@ -9,7 +9,11 @@ pub mod get_job_status;
 pub mod get_upload_limits;
 pub mod upload_video;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -183,49 +187,49 @@ pub mod job_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type JobId;
+        type Did;
         type State;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type JobId = Unset;
+        type Did = Unset;
         type State = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type JobId = S::JobId;
-        type State = S::State;
     }
     ///State transition - sets the `job_id` field to Set
     pub struct SetJobId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetJobId<S> {}
     impl<S: State> State for SetJobId<S> {
-        type Did = S::Did;
         type JobId = Set<members::job_id>;
+        type Did = S::Did;
+        type State = S::State;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type JobId = S::JobId;
+        type Did = Set<members::did>;
         type State = S::State;
     }
     ///State transition - sets the `state` field to Set
     pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetState<S> {}
     impl<S: State> State for SetState<S> {
-        type Did = S::Did;
         type JobId = S::JobId;
+        type Did = S::Did;
         type State = Set<members::state>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `job_id` field
         pub struct job_id(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `state` field
         pub struct state(());
     }
@@ -233,8 +237,8 @@ pub mod job_status_state {
 
 /// Builder for constructing an instance of this type
 pub struct JobStatusBuilder<'a, S: job_status_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<BlobRef<'a>>,
         Option<Did<'a>>,
         Option<CowStr<'a>>,
@@ -243,7 +247,7 @@ pub struct JobStatusBuilder<'a, S: job_status_state::State> {
         Option<i64>,
         Option<JobStatusState<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> JobStatus<'a> {
@@ -257,9 +261,9 @@ impl<'a> JobStatusBuilder<'a, job_status_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         JobStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -267,12 +271,12 @@ impl<'a> JobStatusBuilder<'a, job_status_state::Empty> {
 impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
     /// Set the `blob` field (optional)
     pub fn blob(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `blob` field to an Option value (optional)
     pub fn maybe_blob(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -287,11 +291,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> JobStatusBuilder<'a, job_status_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         JobStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -299,12 +303,12 @@ where
 impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
     /// Set the `error` field (optional)
     pub fn error(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `error` field to an Option value (optional)
     pub fn maybe_error(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -319,11 +323,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> JobStatusBuilder<'a, job_status_state::SetJobId<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         JobStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -331,12 +335,12 @@ where
 impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
     pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -344,12 +348,12 @@ impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
 impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
     /// Set the `progress` field (optional)
     pub fn progress(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `progress` field to an Option value (optional)
     pub fn maybe_progress(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -364,11 +368,11 @@ where
         mut self,
         value: impl Into<JobStatusState<'a>>,
     ) -> JobStatusBuilder<'a, job_status_state::SetState<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         JobStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -376,20 +380,20 @@ where
 impl<'a, S> JobStatusBuilder<'a, S>
 where
     S: job_status_state::State,
-    S::Did: job_status_state::IsSet,
     S::JobId: job_status_state::IsSet,
+    S::Did: job_status_state::IsSet,
     S::State: job_status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> JobStatus<'a> {
         JobStatus {
-            blob: self.__unsafe_private_named.0,
-            did: self.__unsafe_private_named.1.unwrap(),
-            error: self.__unsafe_private_named.2,
-            job_id: self.__unsafe_private_named.3.unwrap(),
-            message: self.__unsafe_private_named.4,
-            progress: self.__unsafe_private_named.5,
-            state: self.__unsafe_private_named.6.unwrap(),
+            blob: self._fields.0,
+            did: self._fields.1.unwrap(),
+            error: self._fields.2,
+            job_id: self._fields.3.unwrap(),
+            message: self._fields.4,
+            progress: self._fields.5,
+            state: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -402,13 +406,13 @@ where
         >,
     ) -> JobStatus<'a> {
         JobStatus {
-            blob: self.__unsafe_private_named.0,
-            did: self.__unsafe_private_named.1.unwrap(),
-            error: self.__unsafe_private_named.2,
-            job_id: self.__unsafe_private_named.3.unwrap(),
-            message: self.__unsafe_private_named.4,
-            progress: self.__unsafe_private_named.5,
-            state: self.__unsafe_private_named.6.unwrap(),
+            blob: self._fields.0,
+            did: self._fields.1.unwrap(),
+            error: self._fields.2,
+            job_id: self._fields.3.unwrap(),
+            message: self._fields.4,
+            progress: self._fields.5,
+            state: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

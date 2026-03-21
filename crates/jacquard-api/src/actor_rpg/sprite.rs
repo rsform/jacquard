@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -456,58 +459,58 @@ pub mod sprite_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SpriteSheet;
         type Engine;
         type CreatedAt;
+        type SpriteSheet;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SpriteSheet = Unset;
         type Engine = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `sprite_sheet` field to Set
-    pub struct SetSpriteSheet<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSpriteSheet<S> {}
-    impl<S: State> State for SetSpriteSheet<S> {
-        type SpriteSheet = Set<members::sprite_sheet>;
-        type Engine = S::Engine;
-        type CreatedAt = S::CreatedAt;
+        type SpriteSheet = Unset;
     }
     ///State transition - sets the `engine` field to Set
     pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEngine<S> {}
     impl<S: State> State for SetEngine<S> {
-        type SpriteSheet = S::SpriteSheet;
         type Engine = Set<members::engine>;
         type CreatedAt = S::CreatedAt;
+        type SpriteSheet = S::SpriteSheet;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type SpriteSheet = S::SpriteSheet;
         type Engine = S::Engine;
         type CreatedAt = Set<members::created_at>;
+        type SpriteSheet = S::SpriteSheet;
+    }
+    ///State transition - sets the `sprite_sheet` field to Set
+    pub struct SetSpriteSheet<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSpriteSheet<S> {}
+    impl<S: State> State for SetSpriteSheet<S> {
+        type Engine = S::Engine;
+        type CreatedAt = S::CreatedAt;
+        type SpriteSheet = Set<members::sprite_sheet>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `sprite_sheet` field
-        pub struct sprite_sheet(());
         ///Marker type for the `engine` field
         pub struct engine(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `sprite_sheet` field
+        pub struct sprite_sheet(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SpriteBuilder<'a, S: sprite_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<i64>,
         Option<i64>,
         Option<Datetime>,
@@ -522,7 +525,7 @@ pub struct SpriteBuilder<'a, S: sprite_state::State> {
         Option<Datetime>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Sprite<'a> {
@@ -536,8 +539,8 @@ impl<'a> SpriteBuilder<'a, sprite_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SpriteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -552,7 +555,7 @@ impl<'a> SpriteBuilder<'a, sprite_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -560,12 +563,12 @@ impl<'a> SpriteBuilder<'a, sprite_state::Empty> {
 impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     /// Set the `animationSpeed` field (optional)
     pub fn animation_speed(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `animationSpeed` field to an Option value (optional)
     pub fn maybe_animation_speed(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -573,12 +576,12 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
 impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     /// Set the `columns` field (optional)
     pub fn columns(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `columns` field to an Option value (optional)
     pub fn maybe_columns(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -593,11 +596,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SpriteBuilder<'a, sprite_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SpriteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -612,11 +615,11 @@ where
         mut self,
         value: impl Into<SpriteEngine<'a>>,
     ) -> SpriteBuilder<'a, sprite_state::SetEngine<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         SpriteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -624,12 +627,12 @@ where
 impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     /// Set the `frameHeight` field (optional)
     pub fn frame_height(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `frameHeight` field to an Option value (optional)
     pub fn maybe_frame_height(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -637,12 +640,12 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
 impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     /// Set the `frameWidth` field (optional)
     pub fn frame_width(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `frameWidth` field to an Option value (optional)
     pub fn maybe_frame_width(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -650,12 +653,12 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
 impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     /// Set the `frames` field (optional)
     pub fn frames(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `frames` field to an Option value (optional)
     pub fn maybe_frames(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -663,12 +666,12 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
 impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     /// Set the `height` field (optional)
     pub fn height(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `height` field to an Option value (optional)
     pub fn maybe_height(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -676,12 +679,12 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
 impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -689,12 +692,12 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
 impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     /// Set the `rows` field (optional)
     pub fn rows(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `rows` field to an Option value (optional)
     pub fn maybe_rows(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -709,11 +712,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> SpriteBuilder<'a, sprite_state::SetSpriteSheet<S>> {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         SpriteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -721,12 +724,12 @@ where
 impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -734,12 +737,12 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
 impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     /// Set the `width` field (optional)
     pub fn width(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `width` field to an Option value (optional)
     pub fn maybe_width(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -747,26 +750,26 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
 impl<'a, S> SpriteBuilder<'a, S>
 where
     S: sprite_state::State,
-    S::SpriteSheet: sprite_state::IsSet,
     S::Engine: sprite_state::IsSet,
     S::CreatedAt: sprite_state::IsSet,
+    S::SpriteSheet: sprite_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Sprite<'a> {
         Sprite {
-            animation_speed: self.__unsafe_private_named.0.or_else(|| Some(200i64)),
-            columns: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            engine: self.__unsafe_private_named.3.unwrap(),
-            frame_height: self.__unsafe_private_named.4,
-            frame_width: self.__unsafe_private_named.5,
-            frames: self.__unsafe_private_named.6,
-            height: self.__unsafe_private_named.7,
-            name: self.__unsafe_private_named.8,
-            rows: self.__unsafe_private_named.9,
-            sprite_sheet: self.__unsafe_private_named.10.unwrap(),
-            updated_at: self.__unsafe_private_named.11,
-            width: self.__unsafe_private_named.12,
+            animation_speed: self._fields.0.or_else(|| Some(200i64)),
+            columns: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            engine: self._fields.3.unwrap(),
+            frame_height: self._fields.4,
+            frame_width: self._fields.5,
+            frames: self._fields.6,
+            height: self._fields.7,
+            name: self._fields.8,
+            rows: self._fields.9,
+            sprite_sheet: self._fields.10.unwrap(),
+            updated_at: self._fields.11,
+            width: self._fields.12,
             extra_data: Default::default(),
         }
     }
@@ -779,19 +782,19 @@ where
         >,
     ) -> Sprite<'a> {
         Sprite {
-            animation_speed: self.__unsafe_private_named.0.or_else(|| Some(200i64)),
-            columns: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            engine: self.__unsafe_private_named.3.unwrap(),
-            frame_height: self.__unsafe_private_named.4,
-            frame_width: self.__unsafe_private_named.5,
-            frames: self.__unsafe_private_named.6,
-            height: self.__unsafe_private_named.7,
-            name: self.__unsafe_private_named.8,
-            rows: self.__unsafe_private_named.9,
-            sprite_sheet: self.__unsafe_private_named.10.unwrap(),
-            updated_at: self.__unsafe_private_named.11,
-            width: self.__unsafe_private_named.12,
+            animation_speed: self._fields.0.or_else(|| Some(200i64)),
+            columns: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            engine: self._fields.3.unwrap(),
+            frame_height: self._fields.4,
+            frame_width: self._fields.5,
+            frames: self._fields.6,
+            height: self._fields.7,
+            name: self._fields.8,
+            rows: self._fields.9,
+            sprite_sheet: self._fields.10.unwrap(),
+            updated_at: self._fields.11,
+            width: self._fields.12,
             extra_data: Some(extra_data),
         }
     }

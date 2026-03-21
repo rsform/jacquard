@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::Did;
@@ -148,9 +151,9 @@ pub mod push_notify_state {
 
 /// Builder for constructing an instance of this type
 pub struct PushNotifyBuilder<'a, S: push_notify_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<NotifyBody<'a>>, Option<Did<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<NotifyBody<'a>>, Option<Did<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> PushNotify<'a> {
@@ -164,9 +167,9 @@ impl<'a> PushNotifyBuilder<'a, push_notify_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PushNotifyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -181,11 +184,11 @@ where
         mut self,
         value: impl Into<NotifyBody<'a>>,
     ) -> PushNotifyBuilder<'a, push_notify_state::SetBody<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PushNotifyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -200,11 +203,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> PushNotifyBuilder<'a, push_notify_state::SetTarget<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PushNotifyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -218,8 +221,8 @@ where
     /// Build the final struct
     pub fn build(self) -> PushNotify<'a> {
         PushNotify {
-            body: self.__unsafe_private_named.0.unwrap(),
-            target: self.__unsafe_private_named.1.unwrap(),
+            body: self._fields.0.unwrap(),
+            target: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -232,8 +235,8 @@ where
         >,
     ) -> PushNotify<'a> {
         PushNotify {
-            body: self.__unsafe_private_named.0.unwrap(),
-            target: self.__unsafe_private_named.1.unwrap(),
+            body: self._fields.0.unwrap(),
+            target: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

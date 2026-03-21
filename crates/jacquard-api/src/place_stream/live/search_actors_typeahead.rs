@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -104,45 +107,45 @@ pub mod actor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Did;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type Did = S::Did;
+        type Handle = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Handle = S::Handle;
         type Did = Set<members::did>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type Did = S::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ActorBuilder<'a, S: actor_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>, Option<Handle<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<Handle<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Actor<'a> {
@@ -156,9 +159,9 @@ impl<'a> ActorBuilder<'a, actor_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ActorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -173,11 +176,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> ActorBuilder<'a, actor_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ActorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -192,11 +195,11 @@ where
         mut self,
         value: impl Into<Handle<'a>>,
     ) -> ActorBuilder<'a, actor_state::SetHandle<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ActorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -204,14 +207,14 @@ where
 impl<'a, S> ActorBuilder<'a, S>
 where
     S: actor_state::State,
-    S::Handle: actor_state::IsSet,
     S::Did: actor_state::IsSet,
+    S::Handle: actor_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Actor<'a> {
         Actor {
-            did: self.__unsafe_private_named.0.unwrap(),
-            handle: self.__unsafe_private_named.1.unwrap(),
+            did: self._fields.0.unwrap(),
+            handle: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -224,8 +227,8 @@ where
         >,
     ) -> Actor<'a> {
         Actor {
-            did: self.__unsafe_private_named.0.unwrap(),
-            handle: self.__unsafe_private_named.1.unwrap(),
+            did: self._fields.0.unwrap(),
+            handle: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -335,9 +338,9 @@ pub mod search_actors_typeahead_state {
 
 /// Builder for constructing an instance of this type
 pub struct SearchActorsTypeaheadBuilder<'a, S: search_actors_typeahead_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SearchActorsTypeahead<'a> {
@@ -354,9 +357,9 @@ impl<'a> SearchActorsTypeaheadBuilder<'a, search_actors_typeahead_state::Empty> 
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SearchActorsTypeaheadBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -364,12 +367,12 @@ impl<'a> SearchActorsTypeaheadBuilder<'a, search_actors_typeahead_state::Empty> 
 impl<'a, S: search_actors_typeahead_state::State> SearchActorsTypeaheadBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -377,12 +380,12 @@ impl<'a, S: search_actors_typeahead_state::State> SearchActorsTypeaheadBuilder<'
 impl<'a, S: search_actors_typeahead_state::State> SearchActorsTypeaheadBuilder<'a, S> {
     /// Set the `q` field (optional)
     pub fn q(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `q` field to an Option value (optional)
     pub fn maybe_q(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -394,8 +397,8 @@ where
     /// Build the final struct
     pub fn build(self) -> SearchActorsTypeahead<'a> {
         SearchActorsTypeahead {
-            limit: self.__unsafe_private_named.0,
-            q: self.__unsafe_private_named.1,
+            limit: self._fields.0,
+            q: self._fields.1,
         }
     }
 }

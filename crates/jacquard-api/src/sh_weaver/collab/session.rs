@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -170,15 +173,15 @@ pub mod session_state {
 
 /// Builder for constructing an instance of this type
 pub struct SessionBuilder<'a, S: session_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
         Option<StrongRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Session<'a> {
@@ -192,9 +195,9 @@ impl<'a> SessionBuilder<'a, session_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SessionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -209,11 +212,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SessionBuilder<'a, session_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SessionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -221,12 +224,12 @@ where
 impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `expiresAt` field to an Option value (optional)
     pub fn maybe_expires_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -241,11 +244,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SessionBuilder<'a, session_state::SetNodeId<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SessionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -253,12 +256,12 @@ where
 impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `relayUrl` field (optional)
     pub fn relay_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `relayUrl` field to an Option value (optional)
     pub fn maybe_relay_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -273,11 +276,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> SessionBuilder<'a, session_state::SetResource<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         SessionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -292,11 +295,11 @@ where
     /// Build the final struct
     pub fn build(self) -> Session<'a> {
         Session {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            expires_at: self.__unsafe_private_named.1,
-            node_id: self.__unsafe_private_named.2.unwrap(),
-            relay_url: self.__unsafe_private_named.3,
-            resource: self.__unsafe_private_named.4.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            expires_at: self._fields.1,
+            node_id: self._fields.2.unwrap(),
+            relay_url: self._fields.3,
+            resource: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -309,11 +312,11 @@ where
         >,
     ) -> Session<'a> {
         Session {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            expires_at: self.__unsafe_private_named.1,
-            node_id: self.__unsafe_private_named.2.unwrap(),
-            relay_url: self.__unsafe_private_named.3,
-            resource: self.__unsafe_private_named.4.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            expires_at: self._fields.1,
+            node_id: self._fields.2.unwrap(),
+            relay_url: self._fields.3,
+            resource: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -731,8 +734,8 @@ pub mod recipe_state {
 
 /// Builder for constructing an instance of this type
 pub struct RecipeBuilder<'a, S: recipe_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<i64>,
         Option<Datetime>,
         Option<StrongRef<'a>>,
@@ -752,7 +755,7 @@ pub struct RecipeBuilder<'a, S: recipe_state::State> {
         Option<UriValue<'a>>,
         Option<StrongRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Recipe<'a> {
@@ -766,8 +769,8 @@ impl<'a> RecipeBuilder<'a, recipe_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RecipeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -787,7 +790,7 @@ impl<'a> RecipeBuilder<'a, recipe_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -795,12 +798,12 @@ impl<'a> RecipeBuilder<'a, recipe_state::Empty> {
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `cookTimeMinutes` field (optional)
     pub fn cook_time_minutes(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cookTimeMinutes` field to an Option value (optional)
     pub fn maybe_cook_time_minutes(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -815,11 +818,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> RecipeBuilder<'a, recipe_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RecipeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -827,12 +830,12 @@ where
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `createdBy` field (optional)
     pub fn created_by(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `createdBy` field to an Option value (optional)
     pub fn maybe_created_by(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -840,12 +843,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -853,12 +856,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `embedding` field (optional)
     pub fn embedding(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `embedding` field to an Option value (optional)
     pub fn maybe_embedding(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -866,12 +869,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `imageUrl` field (optional)
     pub fn image_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `imageUrl` field to an Option value (optional)
     pub fn maybe_image_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -879,12 +882,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `images` field (optional)
     pub fn images(mut self, value: impl Into<Option<Vec<BlobRef<'a>>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `images` field to an Option value (optional)
     pub fn maybe_images(mut self, value: Option<Vec<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -895,7 +898,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<recipe::Ingredient<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `ingredients` field to an Option value (optional)
@@ -903,7 +906,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
         mut self,
         value: Option<Vec<recipe::Ingredient<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -914,7 +917,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<recipe::InstructionStep<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `instructions` field to an Option value (optional)
@@ -922,7 +925,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
         mut self,
         value: Option<Vec<recipe::InstructionStep<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -930,12 +933,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `isPrivate` field (optional)
     pub fn is_private(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `isPrivate` field to an Option value (optional)
     pub fn maybe_is_private(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -950,11 +953,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RecipeBuilder<'a, recipe_state::SetName<S>> {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         RecipeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -962,12 +965,12 @@ where
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `prepTimeMinutes` field (optional)
     pub fn prep_time_minutes(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `prepTimeMinutes` field to an Option value (optional)
     pub fn maybe_prep_time_minutes(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -982,11 +985,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> RecipeBuilder<'a, recipe_state::SetServings<S>> {
-        self.__unsafe_private_named.12 = Option::Some(value.into());
+        self._fields.12 = Option::Some(value.into());
         RecipeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -994,12 +997,12 @@ where
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
     pub fn maybe_source(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -1007,12 +1010,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<recipe::Tag<'a>>>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<recipe::Tag<'a>>>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -1020,12 +1023,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -1033,12 +1036,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -1046,12 +1049,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `variationOf` field (optional)
     pub fn variation_of(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `variationOf` field to an Option value (optional)
     pub fn maybe_variation_of(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -1066,24 +1069,24 @@ where
     /// Build the final struct
     pub fn build(self) -> Recipe<'a> {
         Recipe {
-            cook_time_minutes: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            created_by: self.__unsafe_private_named.2,
-            description: self.__unsafe_private_named.3,
-            embedding: self.__unsafe_private_named.4,
-            image_url: self.__unsafe_private_named.5,
-            images: self.__unsafe_private_named.6,
-            ingredients: self.__unsafe_private_named.7,
-            instructions: self.__unsafe_private_named.8,
-            is_private: self.__unsafe_private_named.9.or_else(|| Some(false)),
-            name: self.__unsafe_private_named.10.unwrap(),
-            prep_time_minutes: self.__unsafe_private_named.11,
-            servings: self.__unsafe_private_named.12.unwrap(),
-            source: self.__unsafe_private_named.13,
-            tags: self.__unsafe_private_named.14,
-            updated_at: self.__unsafe_private_named.15,
-            url: self.__unsafe_private_named.16,
-            variation_of: self.__unsafe_private_named.17,
+            cook_time_minutes: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            created_by: self._fields.2,
+            description: self._fields.3,
+            embedding: self._fields.4,
+            image_url: self._fields.5,
+            images: self._fields.6,
+            ingredients: self._fields.7,
+            instructions: self._fields.8,
+            is_private: self._fields.9.or_else(|| Some(false)),
+            name: self._fields.10.unwrap(),
+            prep_time_minutes: self._fields.11,
+            servings: self._fields.12.unwrap(),
+            source: self._fields.13,
+            tags: self._fields.14,
+            updated_at: self._fields.15,
+            url: self._fields.16,
+            variation_of: self._fields.17,
             extra_data: Default::default(),
         }
     }
@@ -1096,24 +1099,24 @@ where
         >,
     ) -> Recipe<'a> {
         Recipe {
-            cook_time_minutes: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            created_by: self.__unsafe_private_named.2,
-            description: self.__unsafe_private_named.3,
-            embedding: self.__unsafe_private_named.4,
-            image_url: self.__unsafe_private_named.5,
-            images: self.__unsafe_private_named.6,
-            ingredients: self.__unsafe_private_named.7,
-            instructions: self.__unsafe_private_named.8,
-            is_private: self.__unsafe_private_named.9.or_else(|| Some(false)),
-            name: self.__unsafe_private_named.10.unwrap(),
-            prep_time_minutes: self.__unsafe_private_named.11,
-            servings: self.__unsafe_private_named.12.unwrap(),
-            source: self.__unsafe_private_named.13,
-            tags: self.__unsafe_private_named.14,
-            updated_at: self.__unsafe_private_named.15,
-            url: self.__unsafe_private_named.16,
-            variation_of: self.__unsafe_private_named.17,
+            cook_time_minutes: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            created_by: self._fields.2,
+            description: self._fields.3,
+            embedding: self._fields.4,
+            image_url: self._fields.5,
+            images: self._fields.6,
+            ingredients: self._fields.7,
+            instructions: self._fields.8,
+            is_private: self._fields.9.or_else(|| Some(false)),
+            name: self._fields.10.unwrap(),
+            prep_time_minutes: self._fields.11,
+            servings: self._fields.12.unwrap(),
+            source: self._fields.13,
+            tags: self._fields.14,
+            updated_at: self._fields.15,
+            url: self._fields.16,
+            variation_of: self._fields.17,
             extra_data: Some(extra_data),
         }
     }

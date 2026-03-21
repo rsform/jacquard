@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -294,73 +297,73 @@ pub mod episode_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Show;
-        type CreatedAt;
-        type AudioUrl;
         type Title;
+        type AudioUrl;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Show = Unset;
-        type CreatedAt = Unset;
-        type AudioUrl = Unset;
         type Title = Unset;
+        type AudioUrl = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `show` field to Set
     pub struct SetShow<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShow<S> {}
     impl<S: State> State for SetShow<S> {
         type Show = Set<members::show>;
-        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
         type AudioUrl = S::AudioUrl;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Show = S::Show;
-        type CreatedAt = Set<members::created_at>;
-        type AudioUrl = S::AudioUrl;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `audio_url` field to Set
-    pub struct SetAudioUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAudioUrl<S> {}
-    impl<S: State> State for SetAudioUrl<S> {
-        type Show = S::Show;
         type CreatedAt = S::CreatedAt;
-        type AudioUrl = Set<members::audio_url>;
-        type Title = S::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Show = S::Show;
-        type CreatedAt = S::CreatedAt;
-        type AudioUrl = S::AudioUrl;
         type Title = Set<members::title>;
+        type AudioUrl = S::AudioUrl;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `audio_url` field to Set
+    pub struct SetAudioUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAudioUrl<S> {}
+    impl<S: State> State for SetAudioUrl<S> {
+        type Show = S::Show;
+        type Title = S::Title;
+        type AudioUrl = Set<members::audio_url>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Show = S::Show;
+        type Title = S::Title;
+        type AudioUrl = S::AudioUrl;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `show` field
         pub struct show(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `audio_url` field
-        pub struct audio_url(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `audio_url` field
+        pub struct audio_url(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EpisodeBuilder<'a, S: episode_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<UriValue<'a>>,
         Option<BlobRef<'a>>,
         Option<Datetime>,
@@ -373,7 +376,7 @@ pub struct EpisodeBuilder<'a, S: episode_state::State> {
         Option<StrongRef<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Episode<'a> {
@@ -387,21 +390,9 @@ impl<'a> EpisodeBuilder<'a, episode_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EpisodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -416,11 +407,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> EpisodeBuilder<'a, episode_state::SetAudioUrl<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -428,12 +419,12 @@ where
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `coverArt` field (optional)
     pub fn cover_art(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `coverArt` field to an Option value (optional)
     pub fn maybe_cover_art(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -448,11 +439,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> EpisodeBuilder<'a, episode_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -460,12 +451,12 @@ where
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -473,12 +464,12 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `durationSeconds` field (optional)
     pub fn duration_seconds(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `durationSeconds` field to an Option value (optional)
     pub fn maybe_duration_seconds(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -486,12 +477,12 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `episodeNumber` field (optional)
     pub fn episode_number(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `episodeNumber` field to an Option value (optional)
     pub fn maybe_episode_number(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -502,12 +493,12 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
         mut self,
         value: impl Into<Option<EpisodeEpisodeType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `episodeType` field to an Option value (optional)
     pub fn maybe_episode_type(mut self, value: Option<EpisodeEpisodeType<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -515,12 +506,12 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `explicit` field (optional)
     pub fn explicit(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `explicit` field to an Option value (optional)
     pub fn maybe_explicit(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -528,12 +519,12 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `seasonNumber` field (optional)
     pub fn season_number(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `seasonNumber` field to an Option value (optional)
     pub fn maybe_season_number(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -548,11 +539,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> EpisodeBuilder<'a, episode_state::SetShow<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -567,11 +558,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EpisodeBuilder<'a, episode_state::SetTitle<S>> {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -580,24 +571,24 @@ impl<'a, S> EpisodeBuilder<'a, S>
 where
     S: episode_state::State,
     S::Show: episode_state::IsSet,
-    S::CreatedAt: episode_state::IsSet,
-    S::AudioUrl: episode_state::IsSet,
     S::Title: episode_state::IsSet,
+    S::AudioUrl: episode_state::IsSet,
+    S::CreatedAt: episode_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Episode<'a> {
         Episode {
-            audio_url: self.__unsafe_private_named.0.unwrap(),
-            cover_art: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3,
-            duration_seconds: self.__unsafe_private_named.4,
-            episode_number: self.__unsafe_private_named.5,
-            episode_type: self.__unsafe_private_named.6,
-            explicit: self.__unsafe_private_named.7,
-            season_number: self.__unsafe_private_named.8,
-            show: self.__unsafe_private_named.9.unwrap(),
-            title: self.__unsafe_private_named.10.unwrap(),
+            audio_url: self._fields.0.unwrap(),
+            cover_art: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3,
+            duration_seconds: self._fields.4,
+            episode_number: self._fields.5,
+            episode_type: self._fields.6,
+            explicit: self._fields.7,
+            season_number: self._fields.8,
+            show: self._fields.9.unwrap(),
+            title: self._fields.10.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -610,17 +601,17 @@ where
         >,
     ) -> Episode<'a> {
         Episode {
-            audio_url: self.__unsafe_private_named.0.unwrap(),
-            cover_art: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3,
-            duration_seconds: self.__unsafe_private_named.4,
-            episode_number: self.__unsafe_private_named.5,
-            episode_type: self.__unsafe_private_named.6,
-            explicit: self.__unsafe_private_named.7,
-            season_number: self.__unsafe_private_named.8,
-            show: self.__unsafe_private_named.9.unwrap(),
-            title: self.__unsafe_private_named.10.unwrap(),
+            audio_url: self._fields.0.unwrap(),
+            cover_art: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3,
+            duration_seconds: self._fields.4,
+            episode_number: self._fields.5,
+            episode_type: self._fields.6,
+            explicit: self._fields.7,
+            season_number: self._fields.8,
+            show: self._fields.9.unwrap(),
+            title: self._fields.10.unwrap(),
             extra_data: Some(extra_data),
         }
     }

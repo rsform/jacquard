@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -693,45 +696,45 @@ pub mod data_point_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Date;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Date = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Date = S::Date;
+        type Value = Unset;
     }
     ///State transition - sets the `date` field to Set
     pub struct SetDate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDate<S> {}
     impl<S: State> State for SetDate<S> {
-        type Value = S::Value;
         type Date = Set<members::date>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Date = S::Date;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `date` field
         pub struct date(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DataPointBuilder<'a, S: data_point_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DataPoint<'a> {
@@ -745,9 +748,9 @@ impl<'a> DataPointBuilder<'a, data_point_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DataPointBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -762,11 +765,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> DataPointBuilder<'a, data_point_state::SetDate<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DataPointBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -781,11 +784,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> DataPointBuilder<'a, data_point_state::SetValue<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DataPointBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -793,14 +796,14 @@ where
 impl<'a, S> DataPointBuilder<'a, S>
 where
     S: data_point_state::State,
-    S::Value: data_point_state::IsSet,
     S::Date: data_point_state::IsSet,
+    S::Value: data_point_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DataPoint<'a> {
         DataPoint {
-            date: self.__unsafe_private_named.0.unwrap(),
-            value: self.__unsafe_private_named.1.unwrap(),
+            date: self._fields.0.unwrap(),
+            value: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -813,8 +816,8 @@ where
         >,
     ) -> DataPoint<'a> {
         DataPoint {
-            date: self.__unsafe_private_named.0.unwrap(),
-            value: self.__unsafe_private_named.1.unwrap(),
+            date: self._fields.0.unwrap(),
+            value: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1007,91 +1010,91 @@ pub mod trend_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Metric;
-        type Period;
-        type Summary;
-        type CreatedAt;
         type WidgetType;
+        type CreatedAt;
+        type Summary;
+        type Period;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Metric = Unset;
-        type Period = Unset;
-        type Summary = Unset;
-        type CreatedAt = Unset;
         type WidgetType = Unset;
+        type CreatedAt = Unset;
+        type Summary = Unset;
+        type Period = Unset;
     }
     ///State transition - sets the `metric` field to Set
     pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMetric<S> {}
     impl<S: State> State for SetMetric<S> {
         type Metric = Set<members::metric>;
-        type Period = S::Period;
-        type Summary = S::Summary;
+        type WidgetType = S::WidgetType;
         type CreatedAt = S::CreatedAt;
-        type WidgetType = S::WidgetType;
-    }
-    ///State transition - sets the `period` field to Set
-    pub struct SetPeriod<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPeriod<S> {}
-    impl<S: State> State for SetPeriod<S> {
-        type Metric = S::Metric;
-        type Period = Set<members::period>;
         type Summary = S::Summary;
-        type CreatedAt = S::CreatedAt;
-        type WidgetType = S::WidgetType;
-    }
-    ///State transition - sets the `summary` field to Set
-    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSummary<S> {}
-    impl<S: State> State for SetSummary<S> {
-        type Metric = S::Metric;
         type Period = S::Period;
-        type Summary = Set<members::summary>;
-        type CreatedAt = S::CreatedAt;
-        type WidgetType = S::WidgetType;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Metric = S::Metric;
-        type Period = S::Period;
-        type Summary = S::Summary;
-        type CreatedAt = Set<members::created_at>;
-        type WidgetType = S::WidgetType;
     }
     ///State transition - sets the `widget_type` field to Set
     pub struct SetWidgetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWidgetType<S> {}
     impl<S: State> State for SetWidgetType<S> {
         type Metric = S::Metric;
-        type Period = S::Period;
-        type Summary = S::Summary;
-        type CreatedAt = S::CreatedAt;
         type WidgetType = Set<members::widget_type>;
+        type CreatedAt = S::CreatedAt;
+        type Summary = S::Summary;
+        type Period = S::Period;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Metric = S::Metric;
+        type WidgetType = S::WidgetType;
+        type CreatedAt = Set<members::created_at>;
+        type Summary = S::Summary;
+        type Period = S::Period;
+    }
+    ///State transition - sets the `summary` field to Set
+    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSummary<S> {}
+    impl<S: State> State for SetSummary<S> {
+        type Metric = S::Metric;
+        type WidgetType = S::WidgetType;
+        type CreatedAt = S::CreatedAt;
+        type Summary = Set<members::summary>;
+        type Period = S::Period;
+    }
+    ///State transition - sets the `period` field to Set
+    pub struct SetPeriod<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPeriod<S> {}
+    impl<S: State> State for SetPeriod<S> {
+        type Metric = S::Metric;
+        type WidgetType = S::WidgetType;
+        type CreatedAt = S::CreatedAt;
+        type Summary = S::Summary;
+        type Period = Set<members::period>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `metric` field
         pub struct metric(());
-        ///Marker type for the `period` field
-        pub struct period(());
-        ///Marker type for the `summary` field
-        pub struct summary(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `widget_type` field
         pub struct widget_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `summary` field
+        pub struct summary(());
+        ///Marker type for the `period` field
+        pub struct period(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TrendBuilder<'a, S: trend_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<TrendChartStyle<'a>>,
         Option<Datetime>,
@@ -1102,7 +1105,7 @@ pub struct TrendBuilder<'a, S: trend_state::State> {
         Option<trend::TrendSummary<'a>>,
         Option<TrendWidgetType<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Trend<'a> {
@@ -1116,19 +1119,9 @@ impl<'a> TrendBuilder<'a, trend_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TrendBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1136,12 +1129,12 @@ impl<'a> TrendBuilder<'a, trend_state::Empty> {
 impl<'a, S: trend_state::State> TrendBuilder<'a, S> {
     /// Set the `caption` field (optional)
     pub fn caption(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `caption` field to an Option value (optional)
     pub fn maybe_caption(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1149,12 +1142,12 @@ impl<'a, S: trend_state::State> TrendBuilder<'a, S> {
 impl<'a, S: trend_state::State> TrendBuilder<'a, S> {
     /// Set the `chartStyle` field (optional)
     pub fn chart_style(mut self, value: impl Into<Option<TrendChartStyle<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `chartStyle` field to an Option value (optional)
     pub fn maybe_chart_style(mut self, value: Option<TrendChartStyle<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1169,11 +1162,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> TrendBuilder<'a, trend_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         TrendBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1184,7 +1177,7 @@ impl<'a, S: trend_state::State> TrendBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<trend::DataPoint<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `dataPoints` field to an Option value (optional)
@@ -1192,7 +1185,7 @@ impl<'a, S: trend_state::State> TrendBuilder<'a, S> {
         mut self,
         value: Option<Vec<trend::DataPoint<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1200,12 +1193,12 @@ impl<'a, S: trend_state::State> TrendBuilder<'a, S> {
 impl<'a, S: trend_state::State> TrendBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1220,11 +1213,11 @@ where
         mut self,
         value: impl Into<TrendMetric<'a>>,
     ) -> TrendBuilder<'a, trend_state::SetMetric<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         TrendBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1239,11 +1232,11 @@ where
         mut self,
         value: impl Into<TrendPeriod<'a>>,
     ) -> TrendBuilder<'a, trend_state::SetPeriod<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         TrendBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1258,11 +1251,11 @@ where
         mut self,
         value: impl Into<trend::TrendSummary<'a>>,
     ) -> TrendBuilder<'a, trend_state::SetSummary<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         TrendBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1277,11 +1270,11 @@ where
         mut self,
         value: impl Into<TrendWidgetType<'a>>,
     ) -> TrendBuilder<'a, trend_state::SetWidgetType<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         TrendBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1290,23 +1283,23 @@ impl<'a, S> TrendBuilder<'a, S>
 where
     S: trend_state::State,
     S::Metric: trend_state::IsSet,
-    S::Period: trend_state::IsSet,
-    S::Summary: trend_state::IsSet,
-    S::CreatedAt: trend_state::IsSet,
     S::WidgetType: trend_state::IsSet,
+    S::CreatedAt: trend_state::IsSet,
+    S::Summary: trend_state::IsSet,
+    S::Period: trend_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Trend<'a> {
         Trend {
-            caption: self.__unsafe_private_named.0,
-            chart_style: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            data_points: self.__unsafe_private_named.3,
-            image: self.__unsafe_private_named.4,
-            metric: self.__unsafe_private_named.5.unwrap(),
-            period: self.__unsafe_private_named.6.unwrap(),
-            summary: self.__unsafe_private_named.7.unwrap(),
-            widget_type: self.__unsafe_private_named.8.unwrap(),
+            caption: self._fields.0,
+            chart_style: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            data_points: self._fields.3,
+            image: self._fields.4,
+            metric: self._fields.5.unwrap(),
+            period: self._fields.6.unwrap(),
+            summary: self._fields.7.unwrap(),
+            widget_type: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1319,15 +1312,15 @@ where
         >,
     ) -> Trend<'a> {
         Trend {
-            caption: self.__unsafe_private_named.0,
-            chart_style: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            data_points: self.__unsafe_private_named.3,
-            image: self.__unsafe_private_named.4,
-            metric: self.__unsafe_private_named.5.unwrap(),
-            period: self.__unsafe_private_named.6.unwrap(),
-            summary: self.__unsafe_private_named.7.unwrap(),
-            widget_type: self.__unsafe_private_named.8.unwrap(),
+            caption: self._fields.0,
+            chart_style: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            data_points: self._fields.3,
+            image: self._fields.4,
+            metric: self._fields.5.unwrap(),
+            period: self._fields.6.unwrap(),
+            summary: self._fields.7.unwrap(),
+            widget_type: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }

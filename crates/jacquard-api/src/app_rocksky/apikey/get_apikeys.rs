@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -75,8 +78,8 @@ pub mod get_apikeys_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetApikeysBuilder<S: get_apikeys_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>),
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>),
 }
 
 impl GetApikeys {
@@ -90,8 +93,8 @@ impl GetApikeysBuilder<get_apikeys_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetApikeysBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
+            _state: PhantomData,
+            _fields: (None, None),
         }
     }
 }
@@ -99,12 +102,12 @@ impl GetApikeysBuilder<get_apikeys_state::Empty> {
 impl<S: get_apikeys_state::State> GetApikeysBuilder<S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -112,12 +115,12 @@ impl<S: get_apikeys_state::State> GetApikeysBuilder<S> {
 impl<S: get_apikeys_state::State> GetApikeysBuilder<S> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `offset` field to an Option value (optional)
     pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -129,8 +132,8 @@ where
     /// Build the final struct
     pub fn build(self) -> GetApikeys {
         GetApikeys {
-            limit: self.__unsafe_private_named.0,
-            offset: self.__unsafe_private_named.1,
+            limit: self._fields.0,
+            offset: self._fields.1,
         }
     }
 }

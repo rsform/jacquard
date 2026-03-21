@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::ident::AtIdentifier;
@@ -163,15 +166,15 @@ pub mod get_author_feed_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetAuthorFeedBuilder<'a, S: get_author_feed_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AtIdentifier<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<bool>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetAuthorFeed<'a> {
@@ -185,9 +188,9 @@ impl<'a> GetAuthorFeedBuilder<'a, get_author_feed_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetAuthorFeedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -202,11 +205,11 @@ where
         mut self,
         value: impl Into<AtIdentifier<'a>>,
     ) -> GetAuthorFeedBuilder<'a, get_author_feed_state::SetActor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetAuthorFeedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -214,12 +217,12 @@ where
 impl<'a, S: get_author_feed_state::State> GetAuthorFeedBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -227,12 +230,12 @@ impl<'a, S: get_author_feed_state::State> GetAuthorFeedBuilder<'a, S> {
 impl<'a, S: get_author_feed_state::State> GetAuthorFeedBuilder<'a, S> {
     /// Set the `filter` field (optional)
     pub fn filter(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `filter` field to an Option value (optional)
     pub fn maybe_filter(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -240,12 +243,12 @@ impl<'a, S: get_author_feed_state::State> GetAuthorFeedBuilder<'a, S> {
 impl<'a, S: get_author_feed_state::State> GetAuthorFeedBuilder<'a, S> {
     /// Set the `includePins` field (optional)
     pub fn include_pins(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `includePins` field to an Option value (optional)
     pub fn maybe_include_pins(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -253,12 +256,12 @@ impl<'a, S: get_author_feed_state::State> GetAuthorFeedBuilder<'a, S> {
 impl<'a, S: get_author_feed_state::State> GetAuthorFeedBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -271,11 +274,11 @@ where
     /// Build the final struct
     pub fn build(self) -> GetAuthorFeed<'a> {
         GetAuthorFeed {
-            actor: self.__unsafe_private_named.0.unwrap(),
-            cursor: self.__unsafe_private_named.1,
-            filter: self.__unsafe_private_named.2,
-            include_pins: self.__unsafe_private_named.3,
-            limit: self.__unsafe_private_named.4,
+            actor: self._fields.0.unwrap(),
+            cursor: self._fields.1,
+            filter: self._fields.2,
+            include_pins: self._fields.3,
+            limit: self._fields.4,
         }
     }
 }

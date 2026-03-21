@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::deps::bytes::Bytes;
@@ -164,44 +167,44 @@ pub mod diff_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Root;
         type Doc;
+        type Root;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Root = Unset;
         type Doc = Unset;
-    }
-    ///State transition - sets the `root` field to Set
-    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoot<S> {}
-    impl<S: State> State for SetRoot<S> {
-        type Root = Set<members::root>;
-        type Doc = S::Doc;
+        type Root = Unset;
     }
     ///State transition - sets the `doc` field to Set
     pub struct SetDoc<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDoc<S> {}
     impl<S: State> State for SetDoc<S> {
-        type Root = S::Root;
         type Doc = Set<members::doc>;
+        type Root = S::Root;
+    }
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoot<S> {}
+    impl<S: State> State for SetRoot<S> {
+        type Doc = S::Doc;
+        type Root = Set<members::root>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `root` field
-        pub struct root(());
         ///Marker type for the `doc` field
         pub struct doc(());
+        ///Marker type for the `root` field
+        pub struct root(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DiffBuilder<'a, S: diff_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<DocRef<'a>>,
         Option<Bytes>,
@@ -209,7 +212,7 @@ pub struct DiffBuilder<'a, S: diff_state::State> {
         Option<StrongRef<'a>>,
         Option<BlobRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Diff<'a> {
@@ -223,9 +226,9 @@ impl<'a> DiffBuilder<'a, diff_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DiffBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -233,12 +236,12 @@ impl<'a> DiffBuilder<'a, diff_state::Empty> {
 impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -253,11 +256,11 @@ where
         mut self,
         value: impl Into<DocRef<'a>>,
     ) -> DiffBuilder<'a, diff_state::SetDoc<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DiffBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -265,12 +268,12 @@ where
 impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
     /// Set the `inlineDiff` field (optional)
     pub fn inline_diff(mut self, value: impl Into<Option<Bytes>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `inlineDiff` field to an Option value (optional)
     pub fn maybe_inline_diff(mut self, value: Option<Bytes>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -278,12 +281,12 @@ impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
 impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
     /// Set the `prev` field (optional)
     pub fn prev(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `prev` field to an Option value (optional)
     pub fn maybe_prev(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -298,11 +301,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> DiffBuilder<'a, diff_state::SetRoot<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         DiffBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -310,12 +313,12 @@ where
 impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
     /// Set the `snapshot` field (optional)
     pub fn snapshot(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `snapshot` field to an Option value (optional)
     pub fn maybe_snapshot(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -323,18 +326,18 @@ impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
 impl<'a, S> DiffBuilder<'a, S>
 where
     S: diff_state::State,
-    S::Root: diff_state::IsSet,
     S::Doc: diff_state::IsSet,
+    S::Root: diff_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Diff<'a> {
         Diff {
-            created_at: self.__unsafe_private_named.0,
-            doc: self.__unsafe_private_named.1.unwrap(),
-            inline_diff: self.__unsafe_private_named.2,
-            prev: self.__unsafe_private_named.3,
-            root: self.__unsafe_private_named.4.unwrap(),
-            snapshot: self.__unsafe_private_named.5,
+            created_at: self._fields.0,
+            doc: self._fields.1.unwrap(),
+            inline_diff: self._fields.2,
+            prev: self._fields.3,
+            root: self._fields.4.unwrap(),
+            snapshot: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -347,12 +350,12 @@ where
         >,
     ) -> Diff<'a> {
         Diff {
-            created_at: self.__unsafe_private_named.0,
-            doc: self.__unsafe_private_named.1.unwrap(),
-            inline_diff: self.__unsafe_private_named.2,
-            prev: self.__unsafe_private_named.3,
-            root: self.__unsafe_private_named.4.unwrap(),
-            snapshot: self.__unsafe_private_named.5,
+            created_at: self._fields.0,
+            doc: self._fields.1.unwrap(),
+            inline_diff: self._fields.2,
+            prev: self._fields.3,
+            root: self._fields.4.unwrap(),
+            snapshot: self._fields.5,
             extra_data: Some(extra_data),
         }
     }

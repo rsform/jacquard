@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -458,8 +461,8 @@ pub mod chat_state {
 
 /// Builder for constructing an instance of this type
 pub struct ChatBuilder<'a, S: chat_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<StrongRef<'a>>,
         Option<chat::Markdown<'a>>,
         Option<BlobRef<'a>>,
@@ -476,7 +479,7 @@ pub struct ChatBuilder<'a, S: chat_state::State> {
         Option<chat::TranslationMap<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Chat<'a> {
@@ -490,8 +493,8 @@ impl<'a> ChatBuilder<'a, chat_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ChatBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -508,7 +511,7 @@ impl<'a> ChatBuilder<'a, chat_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -516,12 +519,12 @@ impl<'a> ChatBuilder<'a, chat_state::Empty> {
 impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     /// Set the `bskyPostRef` field (optional)
     pub fn bsky_post_ref(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `bskyPostRef` field to an Option value (optional)
     pub fn maybe_bsky_post_ref(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -529,12 +532,12 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
 impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     /// Set the `content` field (optional)
     pub fn content(mut self, value: impl Into<Option<chat::Markdown<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `content` field to an Option value (optional)
     pub fn maybe_content(mut self, value: Option<chat::Markdown<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -542,12 +545,12 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
 impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     /// Set the `coverImage` field (optional)
     pub fn cover_image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `coverImage` field to an Option value (optional)
     pub fn maybe_cover_image(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -555,12 +558,12 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
 impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -568,12 +571,12 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
 impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     /// Set the `langs` field (optional)
     pub fn langs(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `langs` field to an Option value (optional)
     pub fn maybe_langs(mut self, value: Option<Vec<Language>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -581,12 +584,12 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
 impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
     pub fn maybe_parent(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -594,12 +597,12 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
 impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     /// Set the `path` field (optional)
     pub fn path(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `path` field to an Option value (optional)
     pub fn maybe_path(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -614,11 +617,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ChatBuilder<'a, chat_state::SetPublishedAt<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         ChatBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -626,12 +629,12 @@ where
 impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     /// Set the `root` field (optional)
     pub fn root(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `root` field to an Option value (optional)
     pub fn maybe_root(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -646,11 +649,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ChatBuilder<'a, chat_state::SetSite<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         ChatBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -658,12 +661,12 @@ where
 impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -671,12 +674,12 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
 impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     /// Set the `textContent` field (optional)
     pub fn text_content(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `textContent` field to an Option value (optional)
     pub fn maybe_text_content(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -691,11 +694,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ChatBuilder<'a, chat_state::SetTitle<S>> {
-        self.__unsafe_private_named.12 = Option::Some(value.into());
+        self._fields.12 = Option::Some(value.into());
         ChatBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -706,7 +709,7 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
         mut self,
         value: impl Into<Option<chat::TranslationMap<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `translations` field to an Option value (optional)
@@ -714,7 +717,7 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
         mut self,
         value: Option<chat::TranslationMap<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -722,12 +725,12 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
 impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -742,21 +745,21 @@ where
     /// Build the final struct
     pub fn build(self) -> Chat<'a> {
         Chat {
-            bsky_post_ref: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1,
-            cover_image: self.__unsafe_private_named.2,
-            description: self.__unsafe_private_named.3,
-            langs: self.__unsafe_private_named.4,
-            parent: self.__unsafe_private_named.5,
-            path: self.__unsafe_private_named.6,
-            published_at: self.__unsafe_private_named.7.unwrap(),
-            root: self.__unsafe_private_named.8,
-            site: self.__unsafe_private_named.9.unwrap(),
-            tags: self.__unsafe_private_named.10,
-            text_content: self.__unsafe_private_named.11,
-            title: self.__unsafe_private_named.12.unwrap(),
-            translations: self.__unsafe_private_named.13,
-            updated_at: self.__unsafe_private_named.14,
+            bsky_post_ref: self._fields.0,
+            content: self._fields.1,
+            cover_image: self._fields.2,
+            description: self._fields.3,
+            langs: self._fields.4,
+            parent: self._fields.5,
+            path: self._fields.6,
+            published_at: self._fields.7.unwrap(),
+            root: self._fields.8,
+            site: self._fields.9.unwrap(),
+            tags: self._fields.10,
+            text_content: self._fields.11,
+            title: self._fields.12.unwrap(),
+            translations: self._fields.13,
+            updated_at: self._fields.14,
             extra_data: Default::default(),
         }
     }
@@ -769,21 +772,21 @@ where
         >,
     ) -> Chat<'a> {
         Chat {
-            bsky_post_ref: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1,
-            cover_image: self.__unsafe_private_named.2,
-            description: self.__unsafe_private_named.3,
-            langs: self.__unsafe_private_named.4,
-            parent: self.__unsafe_private_named.5,
-            path: self.__unsafe_private_named.6,
-            published_at: self.__unsafe_private_named.7.unwrap(),
-            root: self.__unsafe_private_named.8,
-            site: self.__unsafe_private_named.9.unwrap(),
-            tags: self.__unsafe_private_named.10,
-            text_content: self.__unsafe_private_named.11,
-            title: self.__unsafe_private_named.12.unwrap(),
-            translations: self.__unsafe_private_named.13,
-            updated_at: self.__unsafe_private_named.14,
+            bsky_post_ref: self._fields.0,
+            content: self._fields.1,
+            cover_image: self._fields.2,
+            description: self._fields.3,
+            langs: self._fields.4,
+            parent: self._fields.5,
+            path: self._fields.6,
+            published_at: self._fields.7.unwrap(),
+            root: self._fields.8,
+            site: self._fields.9.unwrap(),
+            tags: self._fields.10,
+            text_content: self._fields.11,
+            title: self._fields.12.unwrap(),
+            translations: self._fields.13,
+            updated_at: self._fields.14,
             extra_data: Some(extra_data),
         }
     }

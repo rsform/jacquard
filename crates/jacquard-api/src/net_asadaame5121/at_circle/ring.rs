@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -369,49 +372,49 @@ pub mod ring_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type CreatedAt;
+        type Status;
         type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type CreatedAt = Unset;
+        type Status = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Status = S::Status;
         type CreatedAt = Set<members::created_at>;
+        type Status = S::Status;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type CreatedAt = S::CreatedAt;
+        type Status = Set<members::status>;
         type Title = S::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Status = S::Status;
         type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
         type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `status` field
+        pub struct status(());
         ///Marker type for the `title` field
         pub struct title(());
     }
@@ -419,15 +422,15 @@ pub mod ring_state {
 
 /// Builder for constructing an instance of this type
 pub struct RingBuilder<'a, S: ring_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<RingAcceptancePolicy<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<RingStatus<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Ring<'a> {
@@ -441,9 +444,9 @@ impl<'a> RingBuilder<'a, ring_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -454,7 +457,7 @@ impl<'a, S: ring_state::State> RingBuilder<'a, S> {
         mut self,
         value: impl Into<Option<RingAcceptancePolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `acceptancePolicy` field to an Option value (optional)
@@ -462,7 +465,7 @@ impl<'a, S: ring_state::State> RingBuilder<'a, S> {
         mut self,
         value: Option<RingAcceptancePolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -477,11 +480,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> RingBuilder<'a, ring_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -489,12 +492,12 @@ where
 impl<'a, S: ring_state::State> RingBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -509,11 +512,11 @@ where
         mut self,
         value: impl Into<RingStatus<'a>>,
     ) -> RingBuilder<'a, ring_state::SetStatus<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         RingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -528,11 +531,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RingBuilder<'a, ring_state::SetTitle<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         RingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -540,18 +543,18 @@ where
 impl<'a, S> RingBuilder<'a, S>
 where
     S: ring_state::State,
-    S::Status: ring_state::IsSet,
     S::CreatedAt: ring_state::IsSet,
+    S::Status: ring_state::IsSet,
     S::Title: ring_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Ring<'a> {
         Ring {
-            acceptance_policy: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            status: self.__unsafe_private_named.3.unwrap(),
-            title: self.__unsafe_private_named.4.unwrap(),
+            acceptance_policy: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            status: self._fields.3.unwrap(),
+            title: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -564,11 +567,11 @@ where
         >,
     ) -> Ring<'a> {
         Ring {
-            acceptance_policy: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            status: self.__unsafe_private_named.3.unwrap(),
-            title: self.__unsafe_private_named.4.unwrap(),
+            acceptance_policy: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            status: self._fields.3.unwrap(),
+            title: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -110,45 +113,45 @@ pub mod fauna_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GbifTaxonKeys;
         type CreatedAt;
+        type GbifTaxonKeys;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GbifTaxonKeys = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `gbif_taxon_keys` field to Set
-    pub struct SetGbifTaxonKeys<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGbifTaxonKeys<S> {}
-    impl<S: State> State for SetGbifTaxonKeys<S> {
-        type GbifTaxonKeys = Set<members::gbif_taxon_keys>;
-        type CreatedAt = S::CreatedAt;
+        type GbifTaxonKeys = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type GbifTaxonKeys = S::GbifTaxonKeys;
         type CreatedAt = Set<members::created_at>;
+        type GbifTaxonKeys = S::GbifTaxonKeys;
+    }
+    ///State transition - sets the `gbif_taxon_keys` field to Set
+    pub struct SetGbifTaxonKeys<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGbifTaxonKeys<S> {}
+    impl<S: State> State for SetGbifTaxonKeys<S> {
+        type CreatedAt = S::CreatedAt;
+        type GbifTaxonKeys = Set<members::gbif_taxon_keys>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `gbif_taxon_keys` field
-        pub struct gbif_taxon_keys(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `gbif_taxon_keys` field
+        pub struct gbif_taxon_keys(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FaunaBuilder<'a, S: fauna_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<Vec<CowStr<'a>>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<Vec<CowStr<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Fauna<'a> {
@@ -162,9 +165,9 @@ impl<'a> FaunaBuilder<'a, fauna_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FaunaBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -179,11 +182,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> FaunaBuilder<'a, fauna_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         FaunaBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -198,11 +201,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> FaunaBuilder<'a, fauna_state::SetGbifTaxonKeys<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         FaunaBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -210,14 +213,14 @@ where
 impl<'a, S> FaunaBuilder<'a, S>
 where
     S: fauna_state::State,
-    S::GbifTaxonKeys: fauna_state::IsSet,
     S::CreatedAt: fauna_state::IsSet,
+    S::GbifTaxonKeys: fauna_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Fauna<'a> {
         Fauna {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            gbif_taxon_keys: self.__unsafe_private_named.1.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            gbif_taxon_keys: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -230,8 +233,8 @@ where
         >,
     ) -> Fauna<'a> {
         Fauna {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            gbif_taxon_keys: self.__unsafe_private_named.1.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            gbif_taxon_keys: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

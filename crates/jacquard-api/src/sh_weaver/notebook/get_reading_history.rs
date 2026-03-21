@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -135,9 +138,9 @@ pub mod get_reading_history_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetReadingHistoryBuilder<'a, S: get_reading_history_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<i64>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetReadingHistory<'a> {
@@ -151,9 +154,9 @@ impl<'a> GetReadingHistoryBuilder<'a, get_reading_history_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetReadingHistoryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -161,12 +164,12 @@ impl<'a> GetReadingHistoryBuilder<'a, get_reading_history_state::Empty> {
 impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -174,12 +177,12 @@ impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
 impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -187,12 +190,12 @@ impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
 impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -204,9 +207,9 @@ where
     /// Build the final struct
     pub fn build(self) -> GetReadingHistory<'a> {
         GetReadingHistory {
-            cursor: self.__unsafe_private_named.0,
-            limit: self.__unsafe_private_named.1,
-            status: self.__unsafe_private_named.2,
+            cursor: self._fields.0,
+            limit: self._fields.1,
+            status: self._fields.2,
         }
     }
 }
@@ -221,49 +224,49 @@ pub mod reading_history_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Progress;
         type Notebook;
+        type Progress;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Progress = Unset;
         type Notebook = Unset;
-    }
-    ///State transition - sets the `progress` field to Set
-    pub struct SetProgress<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetProgress<S> {}
-    impl<S: State> State for SetProgress<S> {
-        type Progress = Set<members::progress>;
-        type Notebook = S::Notebook;
+        type Progress = Unset;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotebook<S> {}
     impl<S: State> State for SetNotebook<S> {
-        type Progress = S::Progress;
         type Notebook = Set<members::notebook>;
+        type Progress = S::Progress;
+    }
+    ///State transition - sets the `progress` field to Set
+    pub struct SetProgress<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetProgress<S> {}
+    impl<S: State> State for SetProgress<S> {
+        type Notebook = S::Notebook;
+        type Progress = Set<members::progress>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `progress` field
-        pub struct progress(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
+        ///Marker type for the `progress` field
+        pub struct progress(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ReadingHistoryItemBuilder<'a, S: reading_history_item_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<EntryView<'a>>,
         Option<NotebookView<'a>>,
         Option<ReadingProgress<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ReadingHistoryItem<'a> {
@@ -277,9 +280,9 @@ impl<'a> ReadingHistoryItemBuilder<'a, reading_history_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ReadingHistoryItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -287,12 +290,12 @@ impl<'a> ReadingHistoryItemBuilder<'a, reading_history_item_state::Empty> {
 impl<'a, S: reading_history_item_state::State> ReadingHistoryItemBuilder<'a, S> {
     /// Set the `currentEntry` field (optional)
     pub fn current_entry(mut self, value: impl Into<Option<EntryView<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `currentEntry` field to an Option value (optional)
     pub fn maybe_current_entry(mut self, value: Option<EntryView<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -307,11 +310,11 @@ where
         mut self,
         value: impl Into<NotebookView<'a>>,
     ) -> ReadingHistoryItemBuilder<'a, reading_history_item_state::SetNotebook<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ReadingHistoryItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -326,11 +329,11 @@ where
         mut self,
         value: impl Into<ReadingProgress<'a>>,
     ) -> ReadingHistoryItemBuilder<'a, reading_history_item_state::SetProgress<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ReadingHistoryItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -338,15 +341,15 @@ where
 impl<'a, S> ReadingHistoryItemBuilder<'a, S>
 where
     S: reading_history_item_state::State,
-    S::Progress: reading_history_item_state::IsSet,
     S::Notebook: reading_history_item_state::IsSet,
+    S::Progress: reading_history_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReadingHistoryItem<'a> {
         ReadingHistoryItem {
-            current_entry: self.__unsafe_private_named.0,
-            notebook: self.__unsafe_private_named.1.unwrap(),
-            progress: self.__unsafe_private_named.2.unwrap(),
+            current_entry: self._fields.0,
+            notebook: self._fields.1.unwrap(),
+            progress: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -359,9 +362,9 @@ where
         >,
     ) -> ReadingHistoryItem<'a> {
         ReadingHistoryItem {
-            current_entry: self.__unsafe_private_named.0,
-            notebook: self.__unsafe_private_named.1.unwrap(),
-            progress: self.__unsafe_private_named.2.unwrap(),
+            current_entry: self._fields.0,
+            notebook: self._fields.1.unwrap(),
+            progress: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

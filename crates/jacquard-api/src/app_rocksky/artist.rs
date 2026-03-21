@@ -10,7 +10,11 @@ pub mod get_artist_albums;
 pub mod get_artist_tracks;
 pub mod get_artists;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -560,8 +564,8 @@ pub mod artist_state {
 
 /// Builder for constructing an instance of this type
 pub struct ArtistBuilder<'a, S: artist_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -572,7 +576,7 @@ pub struct ArtistBuilder<'a, S: artist_state::State> {
         Option<UriValue<'a>>,
         Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Artist<'a> {
@@ -586,19 +590,9 @@ impl<'a> ArtistBuilder<'a, artist_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ArtistBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -606,12 +600,12 @@ impl<'a> ArtistBuilder<'a, artist_state::Empty> {
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `bio` field (optional)
     pub fn bio(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `bio` field to an Option value (optional)
     pub fn maybe_bio(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -619,12 +613,12 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `born` field (optional)
     pub fn born(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `born` field to an Option value (optional)
     pub fn maybe_born(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -632,12 +626,12 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `bornIn` field (optional)
     pub fn born_in(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `bornIn` field to an Option value (optional)
     pub fn maybe_born_in(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -652,11 +646,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ArtistBuilder<'a, artist_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ArtistBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -664,12 +658,12 @@ where
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `died` field (optional)
     pub fn died(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `died` field to an Option value (optional)
     pub fn maybe_died(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -684,11 +678,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ArtistBuilder<'a, artist_state::SetName<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ArtistBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -696,12 +690,12 @@ where
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `picture` field (optional)
     pub fn picture(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `picture` field to an Option value (optional)
     pub fn maybe_picture(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -709,12 +703,12 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `pictureUrl` field (optional)
     pub fn picture_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `pictureUrl` field to an Option value (optional)
     pub fn maybe_picture_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -722,12 +716,12 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -741,15 +735,15 @@ where
     /// Build the final struct
     pub fn build(self) -> Artist<'a> {
         Artist {
-            bio: self.__unsafe_private_named.0,
-            born: self.__unsafe_private_named.1,
-            born_in: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            died: self.__unsafe_private_named.4,
-            name: self.__unsafe_private_named.5.unwrap(),
-            picture: self.__unsafe_private_named.6,
-            picture_url: self.__unsafe_private_named.7,
-            tags: self.__unsafe_private_named.8,
+            bio: self._fields.0,
+            born: self._fields.1,
+            born_in: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            died: self._fields.4,
+            name: self._fields.5.unwrap(),
+            picture: self._fields.6,
+            picture_url: self._fields.7,
+            tags: self._fields.8,
             extra_data: Default::default(),
         }
     }
@@ -762,15 +756,15 @@ where
         >,
     ) -> Artist<'a> {
         Artist {
-            bio: self.__unsafe_private_named.0,
-            born: self.__unsafe_private_named.1,
-            born_in: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            died: self.__unsafe_private_named.4,
-            name: self.__unsafe_private_named.5.unwrap(),
-            picture: self.__unsafe_private_named.6,
-            picture_url: self.__unsafe_private_named.7,
-            tags: self.__unsafe_private_named.8,
+            bio: self._fields.0,
+            born: self._fields.1,
+            born_in: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            died: self._fields.4,
+            name: self._fields.5.unwrap(),
+            picture: self._fields.6,
+            picture_url: self._fields.7,
+            tags: self._fields.8,
             extra_data: Some(extra_data),
         }
     }

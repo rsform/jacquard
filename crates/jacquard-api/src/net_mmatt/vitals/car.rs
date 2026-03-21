@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -127,92 +130,92 @@ pub mod car_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CarTraveledDistance;
-        type CreatedAt;
-        type CarPercentFuelRemaining;
-        type AmountRemaining;
         type CarFuelRange;
+        type AmountRemaining;
+        type CarTraveledDistance;
+        type CarPercentFuelRemaining;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CarTraveledDistance = Unset;
-        type CreatedAt = Unset;
-        type CarPercentFuelRemaining = Unset;
-        type AmountRemaining = Unset;
         type CarFuelRange = Unset;
-    }
-    ///State transition - sets the `car_traveled_distance` field to Set
-    pub struct SetCarTraveledDistance<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCarTraveledDistance<S> {}
-    impl<S: State> State for SetCarTraveledDistance<S> {
-        type CarTraveledDistance = Set<members::car_traveled_distance>;
-        type CreatedAt = S::CreatedAt;
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
-        type AmountRemaining = S::AmountRemaining;
-        type CarFuelRange = S::CarFuelRange;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CarTraveledDistance = S::CarTraveledDistance;
-        type CreatedAt = Set<members::created_at>;
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
-        type AmountRemaining = S::AmountRemaining;
-        type CarFuelRange = S::CarFuelRange;
-    }
-    ///State transition - sets the `car_percent_fuel_remaining` field to Set
-    pub struct SetCarPercentFuelRemaining<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCarPercentFuelRemaining<S> {}
-    impl<S: State> State for SetCarPercentFuelRemaining<S> {
-        type CarTraveledDistance = S::CarTraveledDistance;
-        type CreatedAt = S::CreatedAt;
-        type CarPercentFuelRemaining = Set<members::car_percent_fuel_remaining>;
-        type AmountRemaining = S::AmountRemaining;
-        type CarFuelRange = S::CarFuelRange;
-    }
-    ///State transition - sets the `amount_remaining` field to Set
-    pub struct SetAmountRemaining<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAmountRemaining<S> {}
-    impl<S: State> State for SetAmountRemaining<S> {
-        type CarTraveledDistance = S::CarTraveledDistance;
-        type CreatedAt = S::CreatedAt;
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
-        type AmountRemaining = Set<members::amount_remaining>;
-        type CarFuelRange = S::CarFuelRange;
+        type AmountRemaining = Unset;
+        type CarTraveledDistance = Unset;
+        type CarPercentFuelRemaining = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `car_fuel_range` field to Set
     pub struct SetCarFuelRange<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCarFuelRange<S> {}
     impl<S: State> State for SetCarFuelRange<S> {
-        type CarTraveledDistance = S::CarTraveledDistance;
-        type CreatedAt = S::CreatedAt;
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
-        type AmountRemaining = S::AmountRemaining;
         type CarFuelRange = Set<members::car_fuel_range>;
+        type AmountRemaining = S::AmountRemaining;
+        type CarTraveledDistance = S::CarTraveledDistance;
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `amount_remaining` field to Set
+    pub struct SetAmountRemaining<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAmountRemaining<S> {}
+    impl<S: State> State for SetAmountRemaining<S> {
+        type CarFuelRange = S::CarFuelRange;
+        type AmountRemaining = Set<members::amount_remaining>;
+        type CarTraveledDistance = S::CarTraveledDistance;
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `car_traveled_distance` field to Set
+    pub struct SetCarTraveledDistance<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCarTraveledDistance<S> {}
+    impl<S: State> State for SetCarTraveledDistance<S> {
+        type CarFuelRange = S::CarFuelRange;
+        type AmountRemaining = S::AmountRemaining;
+        type CarTraveledDistance = Set<members::car_traveled_distance>;
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `car_percent_fuel_remaining` field to Set
+    pub struct SetCarPercentFuelRemaining<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCarPercentFuelRemaining<S> {}
+    impl<S: State> State for SetCarPercentFuelRemaining<S> {
+        type CarFuelRange = S::CarFuelRange;
+        type AmountRemaining = S::AmountRemaining;
+        type CarTraveledDistance = S::CarTraveledDistance;
+        type CarPercentFuelRemaining = Set<members::car_percent_fuel_remaining>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type CarFuelRange = S::CarFuelRange;
+        type AmountRemaining = S::AmountRemaining;
+        type CarTraveledDistance = S::CarTraveledDistance;
+        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `car_traveled_distance` field
-        pub struct car_traveled_distance(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `car_percent_fuel_remaining` field
-        pub struct car_percent_fuel_remaining(());
-        ///Marker type for the `amount_remaining` field
-        pub struct amount_remaining(());
         ///Marker type for the `car_fuel_range` field
         pub struct car_fuel_range(());
+        ///Marker type for the `amount_remaining` field
+        pub struct amount_remaining(());
+        ///Marker type for the `car_traveled_distance` field
+        pub struct car_traveled_distance(());
+        ///Marker type for the `car_percent_fuel_remaining` field
+        pub struct car_percent_fuel_remaining(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CarBuilder<'a, S: car_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<i64>,
         Option<CowStr<'a>>,
@@ -222,7 +225,7 @@ pub struct CarBuilder<'a, S: car_state::State> {
         Option<i64>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Car<'a> {
@@ -236,9 +239,9 @@ impl<'a> CarBuilder<'a, car_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CarBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -253,11 +256,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CarBuilder<'a, car_state::SetAmountRemaining<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CarBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -272,11 +275,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CarBuilder<'a, car_state::SetCarFuelRange<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CarBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -284,12 +287,12 @@ where
 impl<'a, S: car_state::State> CarBuilder<'a, S> {
     /// Set the `carMake` field (optional)
     pub fn car_make(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `carMake` field to an Option value (optional)
     pub fn maybe_car_make(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -297,12 +300,12 @@ impl<'a, S: car_state::State> CarBuilder<'a, S> {
 impl<'a, S: car_state::State> CarBuilder<'a, S> {
     /// Set the `carModel` field (optional)
     pub fn car_model(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `carModel` field to an Option value (optional)
     pub fn maybe_car_model(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -317,11 +320,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CarBuilder<'a, car_state::SetCarPercentFuelRemaining<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         CarBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -336,11 +339,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CarBuilder<'a, car_state::SetCarTraveledDistance<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         CarBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -348,12 +351,12 @@ where
 impl<'a, S: car_state::State> CarBuilder<'a, S> {
     /// Set the `carYear` field (optional)
     pub fn car_year(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `carYear` field to an Option value (optional)
     pub fn maybe_car_year(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -368,11 +371,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CarBuilder<'a, car_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         CarBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -380,23 +383,23 @@ where
 impl<'a, S> CarBuilder<'a, S>
 where
     S: car_state::State,
-    S::CarTraveledDistance: car_state::IsSet,
-    S::CreatedAt: car_state::IsSet,
-    S::CarPercentFuelRemaining: car_state::IsSet,
-    S::AmountRemaining: car_state::IsSet,
     S::CarFuelRange: car_state::IsSet,
+    S::AmountRemaining: car_state::IsSet,
+    S::CarTraveledDistance: car_state::IsSet,
+    S::CarPercentFuelRemaining: car_state::IsSet,
+    S::CreatedAt: car_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Car<'a> {
         Car {
-            amount_remaining: self.__unsafe_private_named.0.unwrap(),
-            car_fuel_range: self.__unsafe_private_named.1.unwrap(),
-            car_make: self.__unsafe_private_named.2,
-            car_model: self.__unsafe_private_named.3,
-            car_percent_fuel_remaining: self.__unsafe_private_named.4.unwrap(),
-            car_traveled_distance: self.__unsafe_private_named.5.unwrap(),
-            car_year: self.__unsafe_private_named.6,
-            created_at: self.__unsafe_private_named.7.unwrap(),
+            amount_remaining: self._fields.0.unwrap(),
+            car_fuel_range: self._fields.1.unwrap(),
+            car_make: self._fields.2,
+            car_model: self._fields.3,
+            car_percent_fuel_remaining: self._fields.4.unwrap(),
+            car_traveled_distance: self._fields.5.unwrap(),
+            car_year: self._fields.6,
+            created_at: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -409,14 +412,14 @@ where
         >,
     ) -> Car<'a> {
         Car {
-            amount_remaining: self.__unsafe_private_named.0.unwrap(),
-            car_fuel_range: self.__unsafe_private_named.1.unwrap(),
-            car_make: self.__unsafe_private_named.2,
-            car_model: self.__unsafe_private_named.3,
-            car_percent_fuel_remaining: self.__unsafe_private_named.4.unwrap(),
-            car_traveled_distance: self.__unsafe_private_named.5.unwrap(),
-            car_year: self.__unsafe_private_named.6,
-            created_at: self.__unsafe_private_named.7.unwrap(),
+            amount_remaining: self._fields.0.unwrap(),
+            car_fuel_range: self._fields.1.unwrap(),
+            car_make: self._fields.2,
+            car_model: self._fields.3,
+            car_percent_fuel_remaining: self._fields.4.unwrap(),
+            car_traveled_distance: self._fields.5.unwrap(),
+            car_year: self._fields.6,
+            created_at: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }

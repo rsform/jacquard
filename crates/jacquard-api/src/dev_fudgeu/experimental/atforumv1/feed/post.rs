@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -177,112 +180,112 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Category;
         type Content;
         type Title;
-        type Tags;
         type Forum;
+        type Tags;
         type CreatedAt;
-        type Category;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Category = Unset;
         type Content = Unset;
         type Title = Unset;
-        type Tags = Unset;
         type Forum = Unset;
+        type Tags = Unset;
         type CreatedAt = Unset;
-        type Category = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Title = S::Title;
-        type Tags = S::Tags;
-        type Forum = S::Forum;
-        type CreatedAt = S::CreatedAt;
-        type Category = S::Category;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Content = S::Content;
-        type Title = Set<members::title>;
-        type Tags = S::Tags;
-        type Forum = S::Forum;
-        type CreatedAt = S::CreatedAt;
-        type Category = S::Category;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type Content = S::Content;
-        type Title = S::Title;
-        type Tags = Set<members::tags>;
-        type Forum = S::Forum;
-        type CreatedAt = S::CreatedAt;
-        type Category = S::Category;
-    }
-    ///State transition - sets the `forum` field to Set
-    pub struct SetForum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetForum<S> {}
-    impl<S: State> State for SetForum<S> {
-        type Content = S::Content;
-        type Title = S::Title;
-        type Tags = S::Tags;
-        type Forum = Set<members::forum>;
-        type CreatedAt = S::CreatedAt;
-        type Category = S::Category;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Content = S::Content;
-        type Title = S::Title;
-        type Tags = S::Tags;
-        type Forum = S::Forum;
-        type CreatedAt = Set<members::created_at>;
-        type Category = S::Category;
     }
     ///State transition - sets the `category` field to Set
     pub struct SetCategory<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCategory<S> {}
     impl<S: State> State for SetCategory<S> {
+        type Category = Set<members::category>;
         type Content = S::Content;
         type Title = S::Title;
-        type Tags = S::Tags;
         type Forum = S::Forum;
+        type Tags = S::Tags;
         type CreatedAt = S::CreatedAt;
-        type Category = Set<members::category>;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Category = S::Category;
+        type Content = Set<members::content>;
+        type Title = S::Title;
+        type Forum = S::Forum;
+        type Tags = S::Tags;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Category = S::Category;
+        type Content = S::Content;
+        type Title = Set<members::title>;
+        type Forum = S::Forum;
+        type Tags = S::Tags;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `forum` field to Set
+    pub struct SetForum<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetForum<S> {}
+    impl<S: State> State for SetForum<S> {
+        type Category = S::Category;
+        type Content = S::Content;
+        type Title = S::Title;
+        type Forum = Set<members::forum>;
+        type Tags = S::Tags;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTags<S> {}
+    impl<S: State> State for SetTags<S> {
+        type Category = S::Category;
+        type Content = S::Content;
+        type Title = S::Title;
+        type Forum = S::Forum;
+        type Tags = Set<members::tags>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Category = S::Category;
+        type Content = S::Content;
+        type Title = S::Title;
+        type Forum = S::Forum;
+        type Tags = S::Tags;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `category` field
+        pub struct category(());
         ///Marker type for the `content` field
         pub struct content(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `tags` field
-        pub struct tags(());
         ///Marker type for the `forum` field
         pub struct forum(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `category` field
-        pub struct category(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PostBuilder<'a, S: post_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AtUri<'a>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
@@ -292,7 +295,7 @@ pub struct PostBuilder<'a, S: post_state::State> {
         Option<CowStr<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Post<'a> {
@@ -306,9 +309,9 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -323,11 +326,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> PostBuilder<'a, post_state::SetCategory<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -342,11 +345,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PostBuilder<'a, post_state::SetContent<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -361,11 +364,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PostBuilder<'a, post_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -380,11 +383,11 @@ where
         mut self,
         value: impl Into<AtIdentifier<'a>>,
     ) -> PostBuilder<'a, post_state::SetForum<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -392,12 +395,12 @@ where
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `solution` field (optional)
     pub fn solution(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `solution` field to an Option value (optional)
     pub fn maybe_solution(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -412,11 +415,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> PostBuilder<'a, post_state::SetTags<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -431,11 +434,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PostBuilder<'a, post_state::SetTitle<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -443,12 +446,12 @@ where
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -456,24 +459,24 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
+    S::Category: post_state::IsSet,
     S::Content: post_state::IsSet,
     S::Title: post_state::IsSet,
-    S::Tags: post_state::IsSet,
     S::Forum: post_state::IsSet,
+    S::Tags: post_state::IsSet,
     S::CreatedAt: post_state::IsSet,
-    S::Category: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
         Post {
-            category: self.__unsafe_private_named.0.unwrap(),
-            content: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            forum: self.__unsafe_private_named.3.unwrap(),
-            solution: self.__unsafe_private_named.4,
-            tags: self.__unsafe_private_named.5.unwrap(),
-            title: self.__unsafe_private_named.6.unwrap(),
-            updated_at: self.__unsafe_private_named.7,
+            category: self._fields.0.unwrap(),
+            content: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            forum: self._fields.3.unwrap(),
+            solution: self._fields.4,
+            tags: self._fields.5.unwrap(),
+            title: self._fields.6.unwrap(),
+            updated_at: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -486,14 +489,14 @@ where
         >,
     ) -> Post<'a> {
         Post {
-            category: self.__unsafe_private_named.0.unwrap(),
-            content: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            forum: self.__unsafe_private_named.3.unwrap(),
-            solution: self.__unsafe_private_named.4,
-            tags: self.__unsafe_private_named.5.unwrap(),
-            title: self.__unsafe_private_named.6.unwrap(),
-            updated_at: self.__unsafe_private_named.7,
+            category: self._fields.0.unwrap(),
+            content: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            forum: self._fields.3.unwrap(),
+            solution: self._fields.4,
+            tags: self._fields.5.unwrap(),
+            title: self._fields.6.unwrap(),
+            updated_at: self._fields.7,
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -350,49 +353,49 @@ pub mod release_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artists;
         type Title;
+        type Artists;
         type Recordings;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artists = Unset;
         type Title = Unset;
+        type Artists = Unset;
         type Recordings = Unset;
-    }
-    ///State transition - sets the `artists` field to Set
-    pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtists<S> {}
-    impl<S: State> State for SetArtists<S> {
-        type Artists = Set<members::artists>;
-        type Title = S::Title;
-        type Recordings = S::Recordings;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Artists = S::Artists;
         type Title = Set<members::title>;
+        type Artists = S::Artists;
+        type Recordings = S::Recordings;
+    }
+    ///State transition - sets the `artists` field to Set
+    pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtists<S> {}
+    impl<S: State> State for SetArtists<S> {
+        type Title = S::Title;
+        type Artists = Set<members::artists>;
         type Recordings = S::Recordings;
     }
     ///State transition - sets the `recordings` field to Set
     pub struct SetRecordings<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecordings<S> {}
     impl<S: State> State for SetRecordings<S> {
-        type Artists = S::Artists;
         type Title = S::Title;
+        type Artists = S::Artists;
         type Recordings = Set<members::recordings>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artists` field
-        pub struct artists(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `artists` field
+        pub struct artists(());
         ///Marker type for the `recordings` field
         pub struct recordings(());
     }
@@ -400,8 +403,8 @@ pub mod release_state {
 
 /// Builder for constructing an instance of this type
 pub struct ReleaseBuilder<'a, S: release_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<release::Artist<'a>>>,
         Option<BlobRef<'a>>,
         Option<CowStr<'a>>,
@@ -409,7 +412,7 @@ pub struct ReleaseBuilder<'a, S: release_state::State> {
         Option<Datetime>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Release<'a> {
@@ -423,9 +426,9 @@ impl<'a> ReleaseBuilder<'a, release_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ReleaseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -440,11 +443,11 @@ where
         mut self,
         value: impl Into<Vec<release::Artist<'a>>>,
     ) -> ReleaseBuilder<'a, release_state::SetArtists<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ReleaseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -452,12 +455,12 @@ where
 impl<'a, S: release_state::State> ReleaseBuilder<'a, S> {
     /// Set the `artworkImage` field (optional)
     pub fn artwork_image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `artworkImage` field to an Option value (optional)
     pub fn maybe_artwork_image(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -465,12 +468,12 @@ impl<'a, S: release_state::State> ReleaseBuilder<'a, S> {
 impl<'a, S: release_state::State> ReleaseBuilder<'a, S> {
     /// Set the `gtin` field (optional)
     pub fn gtin(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `gtin` field to an Option value (optional)
     pub fn maybe_gtin(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -485,11 +488,11 @@ where
         mut self,
         value: impl Into<Vec<Recording<'a>>>,
     ) -> ReleaseBuilder<'a, release_state::SetRecordings<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ReleaseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -497,12 +500,12 @@ where
 impl<'a, S: release_state::State> ReleaseBuilder<'a, S> {
     /// Set the `releaseDate` field (optional)
     pub fn release_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `releaseDate` field to an Option value (optional)
     pub fn maybe_release_date(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -517,11 +520,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ReleaseBuilder<'a, release_state::SetTitle<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ReleaseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -529,19 +532,19 @@ where
 impl<'a, S> ReleaseBuilder<'a, S>
 where
     S: release_state::State,
-    S::Artists: release_state::IsSet,
     S::Title: release_state::IsSet,
+    S::Artists: release_state::IsSet,
     S::Recordings: release_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Release<'a> {
         Release {
-            artists: self.__unsafe_private_named.0.unwrap(),
-            artwork_image: self.__unsafe_private_named.1,
-            gtin: self.__unsafe_private_named.2,
-            recordings: self.__unsafe_private_named.3.unwrap(),
-            release_date: self.__unsafe_private_named.4,
-            title: self.__unsafe_private_named.5.unwrap(),
+            artists: self._fields.0.unwrap(),
+            artwork_image: self._fields.1,
+            gtin: self._fields.2,
+            recordings: self._fields.3.unwrap(),
+            release_date: self._fields.4,
+            title: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -554,12 +557,12 @@ where
         >,
     ) -> Release<'a> {
         Release {
-            artists: self.__unsafe_private_named.0.unwrap(),
-            artwork_image: self.__unsafe_private_named.1,
-            gtin: self.__unsafe_private_named.2,
-            recordings: self.__unsafe_private_named.3.unwrap(),
-            release_date: self.__unsafe_private_named.4,
-            title: self.__unsafe_private_named.5.unwrap(),
+            artists: self._fields.0.unwrap(),
+            artwork_image: self._fields.1,
+            gtin: self._fields.2,
+            recordings: self._fields.3.unwrap(),
+            release_date: self._fields.4,
+            title: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

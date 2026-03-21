@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -138,9 +141,9 @@ pub mod find_related_accounts_state {
 
 /// Builder for constructing an instance of this type
 pub struct FindRelatedAccountsBuilder<'a, S: find_related_accounts_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<Did<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Did<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> FindRelatedAccounts<'a> {
@@ -154,9 +157,9 @@ impl<'a> FindRelatedAccountsBuilder<'a, find_related_accounts_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FindRelatedAccountsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -164,12 +167,12 @@ impl<'a> FindRelatedAccountsBuilder<'a, find_related_accounts_state::Empty> {
 impl<'a, S: find_related_accounts_state::State> FindRelatedAccountsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -184,11 +187,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> FindRelatedAccountsBuilder<'a, find_related_accounts_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         FindRelatedAccountsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -196,12 +199,12 @@ where
 impl<'a, S: find_related_accounts_state::State> FindRelatedAccountsBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -214,9 +217,9 @@ where
     /// Build the final struct
     pub fn build(self) -> FindRelatedAccounts<'a> {
         FindRelatedAccounts {
-            cursor: self.__unsafe_private_named.0,
-            did: self.__unsafe_private_named.1.unwrap(),
-            limit: self.__unsafe_private_named.2,
+            cursor: self._fields.0,
+            did: self._fields.1.unwrap(),
+            limit: self._fields.2,
         }
     }
 }
@@ -255,9 +258,9 @@ pub mod related_account_state {
 
 /// Builder for constructing an instance of this type
 pub struct RelatedAccountBuilder<'a, S: related_account_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AccountView<'a>>, Option<Vec<SigDetail<'a>>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AccountView<'a>>, Option<Vec<SigDetail<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RelatedAccount<'a> {
@@ -271,9 +274,9 @@ impl<'a> RelatedAccountBuilder<'a, related_account_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RelatedAccountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -288,11 +291,11 @@ where
         mut self,
         value: impl Into<AccountView<'a>>,
     ) -> RelatedAccountBuilder<'a, related_account_state::SetAccount<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RelatedAccountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -300,12 +303,12 @@ where
 impl<'a, S: related_account_state::State> RelatedAccountBuilder<'a, S> {
     /// Set the `similarities` field (optional)
     pub fn similarities(mut self, value: impl Into<Option<Vec<SigDetail<'a>>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `similarities` field to an Option value (optional)
     pub fn maybe_similarities(mut self, value: Option<Vec<SigDetail<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -318,8 +321,8 @@ where
     /// Build the final struct
     pub fn build(self) -> RelatedAccount<'a> {
         RelatedAccount {
-            account: self.__unsafe_private_named.0.unwrap(),
-            similarities: self.__unsafe_private_named.1,
+            account: self._fields.0.unwrap(),
+            similarities: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -332,8 +335,8 @@ where
         >,
     ) -> RelatedAccount<'a> {
         RelatedAccount {
-            account: self.__unsafe_private_named.0.unwrap(),
-            similarities: self.__unsafe_private_named.1,
+            account: self._fields.0.unwrap(),
+            similarities: self._fields.1,
             extra_data: Some(extra_data),
         }
     }

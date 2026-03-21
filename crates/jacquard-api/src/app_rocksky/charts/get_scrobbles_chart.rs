@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::ident::AtIdentifier;
@@ -88,15 +89,15 @@ pub mod get_scrobbles_chart_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetScrobblesChartBuilder<'a, S: get_scrobbles_chart_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AtUri<'a>>,
         Option<AtUri<'a>>,
         Option<AtIdentifier<'a>>,
         Option<CowStr<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetScrobblesChart<'a> {
@@ -110,9 +111,9 @@ impl<'a> GetScrobblesChartBuilder<'a, get_scrobbles_chart_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetScrobblesChartBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -120,12 +121,12 @@ impl<'a> GetScrobblesChartBuilder<'a, get_scrobbles_chart_state::Empty> {
 impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
     /// Set the `albumuri` field (optional)
     pub fn albumuri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `albumuri` field to an Option value (optional)
     pub fn maybe_albumuri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -133,12 +134,12 @@ impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
 impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
     /// Set the `artisturi` field (optional)
     pub fn artisturi(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `artisturi` field to an Option value (optional)
     pub fn maybe_artisturi(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -146,12 +147,12 @@ impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
 impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
     /// Set the `did` field (optional)
     pub fn did(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `did` field to an Option value (optional)
     pub fn maybe_did(mut self, value: Option<AtIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -159,12 +160,12 @@ impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
 impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
     pub fn maybe_genre(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -172,12 +173,12 @@ impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
 impl<'a, S: get_scrobbles_chart_state::State> GetScrobblesChartBuilder<'a, S> {
     /// Set the `songuri` field (optional)
     pub fn songuri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `songuri` field to an Option value (optional)
     pub fn maybe_songuri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -189,11 +190,11 @@ where
     /// Build the final struct
     pub fn build(self) -> GetScrobblesChart<'a> {
         GetScrobblesChart {
-            albumuri: self.__unsafe_private_named.0,
-            artisturi: self.__unsafe_private_named.1,
-            did: self.__unsafe_private_named.2,
-            genre: self.__unsafe_private_named.3,
-            songuri: self.__unsafe_private_named.4,
+            albumuri: self._fields.0,
+            artisturi: self._fields.1,
+            did: self._fields.2,
+            genre: self._fields.3,
+            songuri: self._fields.4,
         }
     }
 }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -1250,74 +1253,74 @@ pub mod occurrence_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
+        type BasisOfRecord;
         type ScientificName;
         type EventDate;
-        type BasisOfRecord;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
+        type BasisOfRecord = Unset;
         type ScientificName = Unset;
         type EventDate = Unset;
-        type BasisOfRecord = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type ScientificName = S::ScientificName;
-        type EventDate = S::EventDate;
-        type BasisOfRecord = S::BasisOfRecord;
-    }
-    ///State transition - sets the `scientific_name` field to Set
-    pub struct SetScientificName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScientificName<S> {}
-    impl<S: State> State for SetScientificName<S> {
-        type CreatedAt = S::CreatedAt;
-        type ScientificName = Set<members::scientific_name>;
-        type EventDate = S::EventDate;
-        type BasisOfRecord = S::BasisOfRecord;
-    }
-    ///State transition - sets the `event_date` field to Set
-    pub struct SetEventDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEventDate<S> {}
-    impl<S: State> State for SetEventDate<S> {
-        type CreatedAt = S::CreatedAt;
-        type ScientificName = S::ScientificName;
-        type EventDate = Set<members::event_date>;
-        type BasisOfRecord = S::BasisOfRecord;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `basis_of_record` field to Set
     pub struct SetBasisOfRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBasisOfRecord<S> {}
     impl<S: State> State for SetBasisOfRecord<S> {
-        type CreatedAt = S::CreatedAt;
+        type BasisOfRecord = Set<members::basis_of_record>;
         type ScientificName = S::ScientificName;
         type EventDate = S::EventDate;
-        type BasisOfRecord = Set<members::basis_of_record>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `scientific_name` field to Set
+    pub struct SetScientificName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScientificName<S> {}
+    impl<S: State> State for SetScientificName<S> {
+        type BasisOfRecord = S::BasisOfRecord;
+        type ScientificName = Set<members::scientific_name>;
+        type EventDate = S::EventDate;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `event_date` field to Set
+    pub struct SetEventDate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEventDate<S> {}
+    impl<S: State> State for SetEventDate<S> {
+        type BasisOfRecord = S::BasisOfRecord;
+        type ScientificName = S::ScientificName;
+        type EventDate = Set<members::event_date>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type BasisOfRecord = S::BasisOfRecord;
+        type ScientificName = S::ScientificName;
+        type EventDate = S::EventDate;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `basis_of_record` field
+        pub struct basis_of_record(());
         ///Marker type for the `scientific_name` field
         pub struct scientific_name(());
         ///Marker type for the `event_date` field
         pub struct event_date(());
-        ///Marker type for the `basis_of_record` field
-        pub struct basis_of_record(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct OccurrenceBuilder<'a, S: occurrence_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
@@ -1398,7 +1401,7 @@ pub struct OccurrenceBuilder<'a, S: occurrence_state::State> {
         Option<CowStr<'a>>,
         Option<Data<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Occurrence<'a> {
@@ -1412,8 +1415,8 @@ impl<'a> OccurrenceBuilder<'a, occurrence_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         OccurrenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -1494,7 +1497,7 @@ impl<'a> OccurrenceBuilder<'a, occurrence_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1502,12 +1505,12 @@ impl<'a> OccurrenceBuilder<'a, occurrence_state::Empty> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `associatedMedia` field (optional)
     pub fn associated_media(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `associatedMedia` field to an Option value (optional)
     pub fn maybe_associated_media(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1518,12 +1521,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `associatedOccurrences` field to an Option value (optional)
     pub fn maybe_associated_occurrences(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1534,12 +1537,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `associatedReferences` field to an Option value (optional)
     pub fn maybe_associated_references(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1547,12 +1550,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `associatedSequences` field (optional)
     pub fn associated_sequences(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `associatedSequences` field to an Option value (optional)
     pub fn maybe_associated_sequences(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1560,12 +1563,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `audioEvidence` field (optional)
     pub fn audio_evidence(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `audioEvidence` field to an Option value (optional)
     pub fn maybe_audio_evidence(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1580,11 +1583,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> OccurrenceBuilder<'a, occurrence_state::SetBasisOfRecord<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         OccurrenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1592,12 +1595,12 @@ where
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `behavior` field (optional)
     pub fn behavior(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `behavior` field to an Option value (optional)
     pub fn maybe_behavior(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1605,12 +1608,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `class` field (optional)
     pub fn class(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `class` field to an Option value (optional)
     pub fn maybe_class(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -1618,12 +1621,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `collectionCode` field (optional)
     pub fn collection_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `collectionCode` field to an Option value (optional)
     pub fn maybe_collection_code(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -1634,12 +1637,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<i64>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `coordinateUncertaintyInMeters` field to an Option value (optional)
     pub fn maybe_coordinate_uncertainty_in_meters(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -1647,12 +1650,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `country` field (optional)
     pub fn country(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `country` field to an Option value (optional)
     pub fn maybe_country(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -1660,12 +1663,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `countryCode` field (optional)
     pub fn country_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `countryCode` field to an Option value (optional)
     pub fn maybe_country_code(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -1673,12 +1676,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `county` field (optional)
     pub fn county(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `county` field to an Option value (optional)
     pub fn maybe_county(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -1693,11 +1696,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> OccurrenceBuilder<'a, occurrence_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.13 = Option::Some(value.into());
+        self._fields.13 = Option::Some(value.into());
         OccurrenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1705,12 +1708,12 @@ where
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `dataGeneralizations` field (optional)
     pub fn data_generalizations(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `dataGeneralizations` field to an Option value (optional)
     pub fn maybe_data_generalizations(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -1718,12 +1721,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `datasetName` field (optional)
     pub fn dataset_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `datasetName` field to an Option value (optional)
     pub fn maybe_dataset_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -1731,12 +1734,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `dateIdentified` field (optional)
     pub fn date_identified(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `dateIdentified` field to an Option value (optional)
     pub fn maybe_date_identified(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -1744,12 +1747,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `dcType` field (optional)
     pub fn dc_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `dcType` field to an Option value (optional)
     pub fn maybe_dc_type(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -1757,12 +1760,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `decimalLatitude` field (optional)
     pub fn decimal_latitude(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `decimalLatitude` field to an Option value (optional)
     pub fn maybe_decimal_latitude(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -1770,12 +1773,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `decimalLongitude` field (optional)
     pub fn decimal_longitude(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `decimalLongitude` field to an Option value (optional)
     pub fn maybe_decimal_longitude(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -1783,12 +1786,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `dynamicProperties` field (optional)
     pub fn dynamic_properties(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `dynamicProperties` field to an Option value (optional)
     pub fn maybe_dynamic_properties(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -1803,11 +1806,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> OccurrenceBuilder<'a, occurrence_state::SetEventDate<S>> {
-        self.__unsafe_private_named.21 = Option::Some(value.into());
+        self._fields.21 = Option::Some(value.into());
         OccurrenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1815,12 +1818,12 @@ where
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `eventID` field (optional)
     pub fn event_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `eventID` field to an Option value (optional)
     pub fn maybe_event_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -1828,12 +1831,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `eventRef` field (optional)
     pub fn event_ref(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.23 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `eventRef` field to an Option value (optional)
     pub fn maybe_event_ref(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.23 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -1841,12 +1844,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `eventTime` field (optional)
     pub fn event_time(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.24 = value.into();
+        self._fields.24 = value.into();
         self
     }
     /// Set the `eventTime` field to an Option value (optional)
     pub fn maybe_event_time(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.24 = value;
+        self._fields.24 = value;
         self
     }
 }
@@ -1854,12 +1857,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `family` field (optional)
     pub fn family(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.25 = value.into();
+        self._fields.25 = value.into();
         self
     }
     /// Set the `family` field to an Option value (optional)
     pub fn maybe_family(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.25 = value;
+        self._fields.25 = value;
         self
     }
 }
@@ -1867,12 +1870,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `fieldNotes` field (optional)
     pub fn field_notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.26 = value.into();
+        self._fields.26 = value.into();
         self
     }
     /// Set the `fieldNotes` field to an Option value (optional)
     pub fn maybe_field_notes(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.26 = value;
+        self._fields.26 = value;
         self
     }
 }
@@ -1880,12 +1883,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `gbifTaxonKey` field (optional)
     pub fn gbif_taxon_key(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.27 = value.into();
+        self._fields.27 = value.into();
         self
     }
     /// Set the `gbifTaxonKey` field to an Option value (optional)
     pub fn maybe_gbif_taxon_key(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.27 = value;
+        self._fields.27 = value;
         self
     }
 }
@@ -1893,12 +1896,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `genus` field (optional)
     pub fn genus(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.28 = value.into();
+        self._fields.28 = value.into();
         self
     }
     /// Set the `genus` field to an Option value (optional)
     pub fn maybe_genus(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.28 = value;
+        self._fields.28 = value;
         self
     }
 }
@@ -1906,12 +1909,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `geodeticDatum` field (optional)
     pub fn geodetic_datum(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.29 = value.into();
+        self._fields.29 = value.into();
         self
     }
     /// Set the `geodeticDatum` field to an Option value (optional)
     pub fn maybe_geodetic_datum(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.29 = value;
+        self._fields.29 = value;
         self
     }
 }
@@ -1919,12 +1922,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `habitat` field (optional)
     pub fn habitat(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.30 = value.into();
+        self._fields.30 = value.into();
         self
     }
     /// Set the `habitat` field to an Option value (optional)
     pub fn maybe_habitat(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.30 = value;
+        self._fields.30 = value;
         self
     }
 }
@@ -1935,12 +1938,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value.into();
+        self._fields.31 = value.into();
         self
     }
     /// Set the `higherClassification` field to an Option value (optional)
     pub fn maybe_higher_classification(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.31 = value;
+        self._fields.31 = value;
         self
     }
 }
@@ -1951,12 +1954,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value.into();
+        self._fields.32 = value.into();
         self
     }
     /// Set the `identificationQualifier` field to an Option value (optional)
     pub fn maybe_identification_qualifier(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.32 = value;
+        self._fields.32 = value;
         self
     }
 }
@@ -1967,12 +1970,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value.into();
+        self._fields.33 = value.into();
         self
     }
     /// Set the `identificationRemarks` field to an Option value (optional)
     pub fn maybe_identification_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.33 = value;
+        self._fields.33 = value;
         self
     }
 }
@@ -1980,12 +1983,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `identifiedBy` field (optional)
     pub fn identified_by(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.34 = value.into();
+        self._fields.34 = value.into();
         self
     }
     /// Set the `identifiedBy` field to an Option value (optional)
     pub fn maybe_identified_by(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.34 = value;
+        self._fields.34 = value;
         self
     }
 }
@@ -1993,12 +1996,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `identifiedByID` field (optional)
     pub fn identified_by_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.35 = value.into();
+        self._fields.35 = value.into();
         self
     }
     /// Set the `identifiedByID` field to an Option value (optional)
     pub fn maybe_identified_by_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.35 = value;
+        self._fields.35 = value;
         self
     }
 }
@@ -2006,12 +2009,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `imageEvidence` field (optional)
     pub fn image_evidence(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.36 = value.into();
+        self._fields.36 = value.into();
         self
     }
     /// Set the `imageEvidence` field to an Option value (optional)
     pub fn maybe_image_evidence(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.36 = value;
+        self._fields.36 = value;
         self
     }
 }
@@ -2019,12 +2022,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `individualCount` field (optional)
     pub fn individual_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.37 = value.into();
+        self._fields.37 = value.into();
         self
     }
     /// Set the `individualCount` field to an Option value (optional)
     pub fn maybe_individual_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.37 = value;
+        self._fields.37 = value;
         self
     }
 }
@@ -2032,12 +2035,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `informationWithheld` field (optional)
     pub fn information_withheld(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.38 = value.into();
+        self._fields.38 = value.into();
         self
     }
     /// Set the `informationWithheld` field to an Option value (optional)
     pub fn maybe_information_withheld(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.38 = value;
+        self._fields.38 = value;
         self
     }
 }
@@ -2048,12 +2051,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value.into();
+        self._fields.39 = value.into();
         self
     }
     /// Set the `infraspecificEpithet` field to an Option value (optional)
     pub fn maybe_infraspecific_epithet(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.39 = value;
+        self._fields.39 = value;
         self
     }
 }
@@ -2061,12 +2064,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `institutionCode` field (optional)
     pub fn institution_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.40 = value.into();
+        self._fields.40 = value.into();
         self
     }
     /// Set the `institutionCode` field to an Option value (optional)
     pub fn maybe_institution_code(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.40 = value;
+        self._fields.40 = value;
         self
     }
 }
@@ -2074,12 +2077,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `kingdom` field (optional)
     pub fn kingdom(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.41 = value.into();
+        self._fields.41 = value.into();
         self
     }
     /// Set the `kingdom` field to an Option value (optional)
     pub fn maybe_kingdom(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.41 = value;
+        self._fields.41 = value;
         self
     }
 }
@@ -2087,12 +2090,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `license` field (optional)
     pub fn license(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.42 = value.into();
+        self._fields.42 = value.into();
         self
     }
     /// Set the `license` field to an Option value (optional)
     pub fn maybe_license(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.42 = value;
+        self._fields.42 = value;
         self
     }
 }
@@ -2100,12 +2103,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `lifeStage` field (optional)
     pub fn life_stage(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.43 = value.into();
+        self._fields.43 = value.into();
         self
     }
     /// Set the `lifeStage` field to an Option value (optional)
     pub fn maybe_life_stage(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.43 = value;
+        self._fields.43 = value;
         self
     }
 }
@@ -2113,12 +2116,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `locality` field (optional)
     pub fn locality(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.44 = value.into();
+        self._fields.44 = value.into();
         self
     }
     /// Set the `locality` field to an Option value (optional)
     pub fn maybe_locality(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.44 = value;
+        self._fields.44 = value;
         self
     }
 }
@@ -2126,12 +2129,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `locationID` field (optional)
     pub fn location_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.45 = value.into();
+        self._fields.45 = value.into();
         self
     }
     /// Set the `locationID` field to an Option value (optional)
     pub fn maybe_location_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.45 = value;
+        self._fields.45 = value;
         self
     }
 }
@@ -2139,12 +2142,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `locationRemarks` field (optional)
     pub fn location_remarks(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.46 = value.into();
+        self._fields.46 = value.into();
         self
     }
     /// Set the `locationRemarks` field to an Option value (optional)
     pub fn maybe_location_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.46 = value;
+        self._fields.46 = value;
         self
     }
 }
@@ -2152,12 +2155,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `maximumDepthInMeters` field (optional)
     pub fn maximum_depth_in_meters(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.47 = value.into();
+        self._fields.47 = value.into();
         self
     }
     /// Set the `maximumDepthInMeters` field to an Option value (optional)
     pub fn maybe_maximum_depth_in_meters(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.47 = value;
+        self._fields.47 = value;
         self
     }
 }
@@ -2165,12 +2168,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `maximumElevationInMeters` field (optional)
     pub fn maximum_elevation_in_meters(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.48 = value.into();
+        self._fields.48 = value.into();
         self
     }
     /// Set the `maximumElevationInMeters` field to an Option value (optional)
     pub fn maybe_maximum_elevation_in_meters(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.48 = value;
+        self._fields.48 = value;
         self
     }
 }
@@ -2178,12 +2181,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `minimumDepthInMeters` field (optional)
     pub fn minimum_depth_in_meters(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.49 = value.into();
+        self._fields.49 = value.into();
         self
     }
     /// Set the `minimumDepthInMeters` field to an Option value (optional)
     pub fn maybe_minimum_depth_in_meters(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.49 = value;
+        self._fields.49 = value;
         self
     }
 }
@@ -2191,12 +2194,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `minimumElevationInMeters` field (optional)
     pub fn minimum_elevation_in_meters(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.50 = value.into();
+        self._fields.50 = value.into();
         self
     }
     /// Set the `minimumElevationInMeters` field to an Option value (optional)
     pub fn maybe_minimum_elevation_in_meters(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.50 = value;
+        self._fields.50 = value;
         self
     }
 }
@@ -2204,12 +2207,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `municipality` field (optional)
     pub fn municipality(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.51 = value.into();
+        self._fields.51 = value.into();
         self
     }
     /// Set the `municipality` field to an Option value (optional)
     pub fn maybe_municipality(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.51 = value;
+        self._fields.51 = value;
         self
     }
 }
@@ -2217,12 +2220,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `nomenclaturalCode` field (optional)
     pub fn nomenclatural_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.52 = value.into();
+        self._fields.52 = value.into();
         self
     }
     /// Set the `nomenclaturalCode` field to an Option value (optional)
     pub fn maybe_nomenclatural_code(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.52 = value;
+        self._fields.52 = value;
         self
     }
 }
@@ -2230,12 +2233,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `occurrenceID` field (optional)
     pub fn occurrence_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.53 = value.into();
+        self._fields.53 = value.into();
         self
     }
     /// Set the `occurrenceID` field to an Option value (optional)
     pub fn maybe_occurrence_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.53 = value;
+        self._fields.53 = value;
         self
     }
 }
@@ -2243,12 +2246,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `occurrenceRemarks` field (optional)
     pub fn occurrence_remarks(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.54 = value.into();
+        self._fields.54 = value.into();
         self
     }
     /// Set the `occurrenceRemarks` field to an Option value (optional)
     pub fn maybe_occurrence_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.54 = value;
+        self._fields.54 = value;
         self
     }
 }
@@ -2256,12 +2259,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `occurrenceStatus` field (optional)
     pub fn occurrence_status(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.55 = value.into();
+        self._fields.55 = value.into();
         self
     }
     /// Set the `occurrenceStatus` field to an Option value (optional)
     pub fn maybe_occurrence_status(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.55 = value;
+        self._fields.55 = value;
         self
     }
 }
@@ -2269,12 +2272,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `order` field (optional)
     pub fn order(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.56 = value.into();
+        self._fields.56 = value.into();
         self
     }
     /// Set the `order` field to an Option value (optional)
     pub fn maybe_order(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.56 = value;
+        self._fields.56 = value;
         self
     }
 }
@@ -2282,12 +2285,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `organismQuantity` field (optional)
     pub fn organism_quantity(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.57 = value.into();
+        self._fields.57 = value.into();
         self
     }
     /// Set the `organismQuantity` field to an Option value (optional)
     pub fn maybe_organism_quantity(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.57 = value;
+        self._fields.57 = value;
         self
     }
 }
@@ -2298,12 +2301,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.58 = value.into();
+        self._fields.58 = value.into();
         self
     }
     /// Set the `organismQuantityType` field to an Option value (optional)
     pub fn maybe_organism_quantity_type(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.58 = value;
+        self._fields.58 = value;
         self
     }
 }
@@ -2311,12 +2314,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `phylum` field (optional)
     pub fn phylum(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.59 = value.into();
+        self._fields.59 = value.into();
         self
     }
     /// Set the `phylum` field to an Option value (optional)
     pub fn maybe_phylum(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.59 = value;
+        self._fields.59 = value;
         self
     }
 }
@@ -2327,12 +2330,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.60 = value.into();
+        self._fields.60 = value.into();
         self
     }
     /// Set the `previousIdentifications` field to an Option value (optional)
     pub fn maybe_previous_identifications(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.60 = value;
+        self._fields.60 = value;
         self
     }
 }
@@ -2340,12 +2343,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `recordedBy` field (optional)
     pub fn recorded_by(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.61 = value.into();
+        self._fields.61 = value.into();
         self
     }
     /// Set the `recordedBy` field to an Option value (optional)
     pub fn maybe_recorded_by(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.61 = value;
+        self._fields.61 = value;
         self
     }
 }
@@ -2353,12 +2356,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `recordedByID` field (optional)
     pub fn recorded_by_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.62 = value.into();
+        self._fields.62 = value.into();
         self
     }
     /// Set the `recordedByID` field to an Option value (optional)
     pub fn maybe_recorded_by_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.62 = value;
+        self._fields.62 = value;
         self
     }
 }
@@ -2366,12 +2369,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `references` field (optional)
     pub fn references(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.63 = value.into();
+        self._fields.63 = value.into();
         self
     }
     /// Set the `references` field to an Option value (optional)
     pub fn maybe_references(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.63 = value;
+        self._fields.63 = value;
         self
     }
 }
@@ -2382,12 +2385,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.64 = value.into();
+        self._fields.64 = value.into();
         self
     }
     /// Set the `reproductiveCondition` field to an Option value (optional)
     pub fn maybe_reproductive_condition(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.64 = value;
+        self._fields.64 = value;
         self
     }
 }
@@ -2395,12 +2398,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `rightsHolder` field (optional)
     pub fn rights_holder(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.65 = value.into();
+        self._fields.65 = value.into();
         self
     }
     /// Set the `rightsHolder` field to an Option value (optional)
     pub fn maybe_rights_holder(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.65 = value;
+        self._fields.65 = value;
         self
     }
 }
@@ -2408,12 +2411,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `samplingEffort` field (optional)
     pub fn sampling_effort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.66 = value.into();
+        self._fields.66 = value.into();
         self
     }
     /// Set the `samplingEffort` field to an Option value (optional)
     pub fn maybe_sampling_effort(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.66 = value;
+        self._fields.66 = value;
         self
     }
 }
@@ -2421,12 +2424,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `samplingProtocol` field (optional)
     pub fn sampling_protocol(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.67 = value.into();
+        self._fields.67 = value.into();
         self
     }
     /// Set the `samplingProtocol` field to an Option value (optional)
     pub fn maybe_sampling_protocol(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.67 = value;
+        self._fields.67 = value;
         self
     }
 }
@@ -2441,11 +2444,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> OccurrenceBuilder<'a, occurrence_state::SetScientificName<S>> {
-        self.__unsafe_private_named.68 = Option::Some(value.into());
+        self._fields.68 = Option::Some(value.into());
         OccurrenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2456,7 +2459,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.69 = value.into();
+        self._fields.69 = value.into();
         self
     }
     /// Set the `scientificNameAuthorship` field to an Option value (optional)
@@ -2464,7 +2467,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
         mut self,
         value: Option<CowStr<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.69 = value;
+        self._fields.69 = value;
         self
     }
 }
@@ -2472,12 +2475,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `sex` field (optional)
     pub fn sex(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.70 = value.into();
+        self._fields.70 = value.into();
         self
     }
     /// Set the `sex` field to an Option value (optional)
     pub fn maybe_sex(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.70 = value;
+        self._fields.70 = value;
         self
     }
 }
@@ -2485,12 +2488,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `specificEpithet` field (optional)
     pub fn specific_epithet(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.71 = value.into();
+        self._fields.71 = value.into();
         self
     }
     /// Set the `specificEpithet` field to an Option value (optional)
     pub fn maybe_specific_epithet(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.71 = value;
+        self._fields.71 = value;
         self
     }
 }
@@ -2498,12 +2501,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `spectrogramEvidence` field (optional)
     pub fn spectrogram_evidence(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.72 = value.into();
+        self._fields.72 = value.into();
         self
     }
     /// Set the `spectrogramEvidence` field to an Option value (optional)
     pub fn maybe_spectrogram_evidence(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.72 = value;
+        self._fields.72 = value;
         self
     }
 }
@@ -2511,12 +2514,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `stateProvince` field (optional)
     pub fn state_province(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.73 = value.into();
+        self._fields.73 = value.into();
         self
     }
     /// Set the `stateProvince` field to an Option value (optional)
     pub fn maybe_state_province(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.73 = value;
+        self._fields.73 = value;
         self
     }
 }
@@ -2524,12 +2527,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `taxonRank` field (optional)
     pub fn taxon_rank(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.74 = value.into();
+        self._fields.74 = value.into();
         self
     }
     /// Set the `taxonRank` field to an Option value (optional)
     pub fn maybe_taxon_rank(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.74 = value;
+        self._fields.74 = value;
         self
     }
 }
@@ -2537,12 +2540,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `taxonomicStatus` field (optional)
     pub fn taxonomic_status(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.75 = value.into();
+        self._fields.75 = value.into();
         self
     }
     /// Set the `taxonomicStatus` field to an Option value (optional)
     pub fn maybe_taxonomic_status(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.75 = value;
+        self._fields.75 = value;
         self
     }
 }
@@ -2550,12 +2553,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `verbatimLocality` field (optional)
     pub fn verbatim_locality(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.76 = value.into();
+        self._fields.76 = value.into();
         self
     }
     /// Set the `verbatimLocality` field to an Option value (optional)
     pub fn maybe_verbatim_locality(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.76 = value;
+        self._fields.76 = value;
         self
     }
 }
@@ -2563,12 +2566,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `vernacularName` field (optional)
     pub fn vernacular_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.77 = value.into();
+        self._fields.77 = value.into();
         self
     }
     /// Set the `vernacularName` field to an Option value (optional)
     pub fn maybe_vernacular_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.77 = value;
+        self._fields.77 = value;
         self
     }
 }
@@ -2576,12 +2579,12 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     /// Set the `videoEvidence` field (optional)
     pub fn video_evidence(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.78 = value.into();
+        self._fields.78 = value.into();
         self
     }
     /// Set the `videoEvidence` field to an Option value (optional)
     pub fn maybe_video_evidence(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.78 = value;
+        self._fields.78 = value;
         self
     }
 }
@@ -2589,93 +2592,93 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
 impl<'a, S> OccurrenceBuilder<'a, S>
 where
     S: occurrence_state::State,
-    S::CreatedAt: occurrence_state::IsSet,
+    S::BasisOfRecord: occurrence_state::IsSet,
     S::ScientificName: occurrence_state::IsSet,
     S::EventDate: occurrence_state::IsSet,
-    S::BasisOfRecord: occurrence_state::IsSet,
+    S::CreatedAt: occurrence_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Occurrence<'a> {
         Occurrence {
-            associated_media: self.__unsafe_private_named.0,
-            associated_occurrences: self.__unsafe_private_named.1,
-            associated_references: self.__unsafe_private_named.2,
-            associated_sequences: self.__unsafe_private_named.3,
-            audio_evidence: self.__unsafe_private_named.4,
-            basis_of_record: self.__unsafe_private_named.5.unwrap(),
-            behavior: self.__unsafe_private_named.6,
-            class: self.__unsafe_private_named.7,
-            collection_code: self.__unsafe_private_named.8,
-            coordinate_uncertainty_in_meters: self.__unsafe_private_named.9,
-            country: self.__unsafe_private_named.10,
-            country_code: self.__unsafe_private_named.11,
-            county: self.__unsafe_private_named.12,
-            created_at: self.__unsafe_private_named.13.unwrap(),
-            data_generalizations: self.__unsafe_private_named.14,
-            dataset_name: self.__unsafe_private_named.15,
-            date_identified: self.__unsafe_private_named.16,
-            dc_type: self.__unsafe_private_named.17,
-            decimal_latitude: self.__unsafe_private_named.18,
-            decimal_longitude: self.__unsafe_private_named.19,
-            dynamic_properties: self.__unsafe_private_named.20,
-            event_date: self.__unsafe_private_named.21.unwrap(),
-            event_id: self.__unsafe_private_named.22,
-            event_ref: self.__unsafe_private_named.23,
-            event_time: self.__unsafe_private_named.24,
-            family: self.__unsafe_private_named.25,
-            field_notes: self.__unsafe_private_named.26,
-            gbif_taxon_key: self.__unsafe_private_named.27,
-            genus: self.__unsafe_private_named.28,
-            geodetic_datum: self.__unsafe_private_named.29,
-            habitat: self.__unsafe_private_named.30,
-            higher_classification: self.__unsafe_private_named.31,
-            identification_qualifier: self.__unsafe_private_named.32,
-            identification_remarks: self.__unsafe_private_named.33,
-            identified_by: self.__unsafe_private_named.34,
-            identified_by_id: self.__unsafe_private_named.35,
-            image_evidence: self.__unsafe_private_named.36,
-            individual_count: self.__unsafe_private_named.37,
-            information_withheld: self.__unsafe_private_named.38,
-            infraspecific_epithet: self.__unsafe_private_named.39,
-            institution_code: self.__unsafe_private_named.40,
-            kingdom: self.__unsafe_private_named.41,
-            license: self.__unsafe_private_named.42,
-            life_stage: self.__unsafe_private_named.43,
-            locality: self.__unsafe_private_named.44,
-            location_id: self.__unsafe_private_named.45,
-            location_remarks: self.__unsafe_private_named.46,
-            maximum_depth_in_meters: self.__unsafe_private_named.47,
-            maximum_elevation_in_meters: self.__unsafe_private_named.48,
-            minimum_depth_in_meters: self.__unsafe_private_named.49,
-            minimum_elevation_in_meters: self.__unsafe_private_named.50,
-            municipality: self.__unsafe_private_named.51,
-            nomenclatural_code: self.__unsafe_private_named.52,
-            occurrence_id: self.__unsafe_private_named.53,
-            occurrence_remarks: self.__unsafe_private_named.54,
-            occurrence_status: self.__unsafe_private_named.55,
-            order: self.__unsafe_private_named.56,
-            organism_quantity: self.__unsafe_private_named.57,
-            organism_quantity_type: self.__unsafe_private_named.58,
-            phylum: self.__unsafe_private_named.59,
-            previous_identifications: self.__unsafe_private_named.60,
-            recorded_by: self.__unsafe_private_named.61,
-            recorded_by_id: self.__unsafe_private_named.62,
-            references: self.__unsafe_private_named.63,
-            reproductive_condition: self.__unsafe_private_named.64,
-            rights_holder: self.__unsafe_private_named.65,
-            sampling_effort: self.__unsafe_private_named.66,
-            sampling_protocol: self.__unsafe_private_named.67,
-            scientific_name: self.__unsafe_private_named.68.unwrap(),
-            scientific_name_authorship: self.__unsafe_private_named.69,
-            sex: self.__unsafe_private_named.70,
-            specific_epithet: self.__unsafe_private_named.71,
-            spectrogram_evidence: self.__unsafe_private_named.72,
-            state_province: self.__unsafe_private_named.73,
-            taxon_rank: self.__unsafe_private_named.74,
-            taxonomic_status: self.__unsafe_private_named.75,
-            verbatim_locality: self.__unsafe_private_named.76,
-            vernacular_name: self.__unsafe_private_named.77,
-            video_evidence: self.__unsafe_private_named.78,
+            associated_media: self._fields.0,
+            associated_occurrences: self._fields.1,
+            associated_references: self._fields.2,
+            associated_sequences: self._fields.3,
+            audio_evidence: self._fields.4,
+            basis_of_record: self._fields.5.unwrap(),
+            behavior: self._fields.6,
+            class: self._fields.7,
+            collection_code: self._fields.8,
+            coordinate_uncertainty_in_meters: self._fields.9,
+            country: self._fields.10,
+            country_code: self._fields.11,
+            county: self._fields.12,
+            created_at: self._fields.13.unwrap(),
+            data_generalizations: self._fields.14,
+            dataset_name: self._fields.15,
+            date_identified: self._fields.16,
+            dc_type: self._fields.17,
+            decimal_latitude: self._fields.18,
+            decimal_longitude: self._fields.19,
+            dynamic_properties: self._fields.20,
+            event_date: self._fields.21.unwrap(),
+            event_id: self._fields.22,
+            event_ref: self._fields.23,
+            event_time: self._fields.24,
+            family: self._fields.25,
+            field_notes: self._fields.26,
+            gbif_taxon_key: self._fields.27,
+            genus: self._fields.28,
+            geodetic_datum: self._fields.29,
+            habitat: self._fields.30,
+            higher_classification: self._fields.31,
+            identification_qualifier: self._fields.32,
+            identification_remarks: self._fields.33,
+            identified_by: self._fields.34,
+            identified_by_id: self._fields.35,
+            image_evidence: self._fields.36,
+            individual_count: self._fields.37,
+            information_withheld: self._fields.38,
+            infraspecific_epithet: self._fields.39,
+            institution_code: self._fields.40,
+            kingdom: self._fields.41,
+            license: self._fields.42,
+            life_stage: self._fields.43,
+            locality: self._fields.44,
+            location_id: self._fields.45,
+            location_remarks: self._fields.46,
+            maximum_depth_in_meters: self._fields.47,
+            maximum_elevation_in_meters: self._fields.48,
+            minimum_depth_in_meters: self._fields.49,
+            minimum_elevation_in_meters: self._fields.50,
+            municipality: self._fields.51,
+            nomenclatural_code: self._fields.52,
+            occurrence_id: self._fields.53,
+            occurrence_remarks: self._fields.54,
+            occurrence_status: self._fields.55,
+            order: self._fields.56,
+            organism_quantity: self._fields.57,
+            organism_quantity_type: self._fields.58,
+            phylum: self._fields.59,
+            previous_identifications: self._fields.60,
+            recorded_by: self._fields.61,
+            recorded_by_id: self._fields.62,
+            references: self._fields.63,
+            reproductive_condition: self._fields.64,
+            rights_holder: self._fields.65,
+            sampling_effort: self._fields.66,
+            sampling_protocol: self._fields.67,
+            scientific_name: self._fields.68.unwrap(),
+            scientific_name_authorship: self._fields.69,
+            sex: self._fields.70,
+            specific_epithet: self._fields.71,
+            spectrogram_evidence: self._fields.72,
+            state_province: self._fields.73,
+            taxon_rank: self._fields.74,
+            taxonomic_status: self._fields.75,
+            verbatim_locality: self._fields.76,
+            vernacular_name: self._fields.77,
+            video_evidence: self._fields.78,
             extra_data: Default::default(),
         }
     }
@@ -2685,85 +2688,85 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Occurrence<'a> {
         Occurrence {
-            associated_media: self.__unsafe_private_named.0,
-            associated_occurrences: self.__unsafe_private_named.1,
-            associated_references: self.__unsafe_private_named.2,
-            associated_sequences: self.__unsafe_private_named.3,
-            audio_evidence: self.__unsafe_private_named.4,
-            basis_of_record: self.__unsafe_private_named.5.unwrap(),
-            behavior: self.__unsafe_private_named.6,
-            class: self.__unsafe_private_named.7,
-            collection_code: self.__unsafe_private_named.8,
-            coordinate_uncertainty_in_meters: self.__unsafe_private_named.9,
-            country: self.__unsafe_private_named.10,
-            country_code: self.__unsafe_private_named.11,
-            county: self.__unsafe_private_named.12,
-            created_at: self.__unsafe_private_named.13.unwrap(),
-            data_generalizations: self.__unsafe_private_named.14,
-            dataset_name: self.__unsafe_private_named.15,
-            date_identified: self.__unsafe_private_named.16,
-            dc_type: self.__unsafe_private_named.17,
-            decimal_latitude: self.__unsafe_private_named.18,
-            decimal_longitude: self.__unsafe_private_named.19,
-            dynamic_properties: self.__unsafe_private_named.20,
-            event_date: self.__unsafe_private_named.21.unwrap(),
-            event_id: self.__unsafe_private_named.22,
-            event_ref: self.__unsafe_private_named.23,
-            event_time: self.__unsafe_private_named.24,
-            family: self.__unsafe_private_named.25,
-            field_notes: self.__unsafe_private_named.26,
-            gbif_taxon_key: self.__unsafe_private_named.27,
-            genus: self.__unsafe_private_named.28,
-            geodetic_datum: self.__unsafe_private_named.29,
-            habitat: self.__unsafe_private_named.30,
-            higher_classification: self.__unsafe_private_named.31,
-            identification_qualifier: self.__unsafe_private_named.32,
-            identification_remarks: self.__unsafe_private_named.33,
-            identified_by: self.__unsafe_private_named.34,
-            identified_by_id: self.__unsafe_private_named.35,
-            image_evidence: self.__unsafe_private_named.36,
-            individual_count: self.__unsafe_private_named.37,
-            information_withheld: self.__unsafe_private_named.38,
-            infraspecific_epithet: self.__unsafe_private_named.39,
-            institution_code: self.__unsafe_private_named.40,
-            kingdom: self.__unsafe_private_named.41,
-            license: self.__unsafe_private_named.42,
-            life_stage: self.__unsafe_private_named.43,
-            locality: self.__unsafe_private_named.44,
-            location_id: self.__unsafe_private_named.45,
-            location_remarks: self.__unsafe_private_named.46,
-            maximum_depth_in_meters: self.__unsafe_private_named.47,
-            maximum_elevation_in_meters: self.__unsafe_private_named.48,
-            minimum_depth_in_meters: self.__unsafe_private_named.49,
-            minimum_elevation_in_meters: self.__unsafe_private_named.50,
-            municipality: self.__unsafe_private_named.51,
-            nomenclatural_code: self.__unsafe_private_named.52,
-            occurrence_id: self.__unsafe_private_named.53,
-            occurrence_remarks: self.__unsafe_private_named.54,
-            occurrence_status: self.__unsafe_private_named.55,
-            order: self.__unsafe_private_named.56,
-            organism_quantity: self.__unsafe_private_named.57,
-            organism_quantity_type: self.__unsafe_private_named.58,
-            phylum: self.__unsafe_private_named.59,
-            previous_identifications: self.__unsafe_private_named.60,
-            recorded_by: self.__unsafe_private_named.61,
-            recorded_by_id: self.__unsafe_private_named.62,
-            references: self.__unsafe_private_named.63,
-            reproductive_condition: self.__unsafe_private_named.64,
-            rights_holder: self.__unsafe_private_named.65,
-            sampling_effort: self.__unsafe_private_named.66,
-            sampling_protocol: self.__unsafe_private_named.67,
-            scientific_name: self.__unsafe_private_named.68.unwrap(),
-            scientific_name_authorship: self.__unsafe_private_named.69,
-            sex: self.__unsafe_private_named.70,
-            specific_epithet: self.__unsafe_private_named.71,
-            spectrogram_evidence: self.__unsafe_private_named.72,
-            state_province: self.__unsafe_private_named.73,
-            taxon_rank: self.__unsafe_private_named.74,
-            taxonomic_status: self.__unsafe_private_named.75,
-            verbatim_locality: self.__unsafe_private_named.76,
-            vernacular_name: self.__unsafe_private_named.77,
-            video_evidence: self.__unsafe_private_named.78,
+            associated_media: self._fields.0,
+            associated_occurrences: self._fields.1,
+            associated_references: self._fields.2,
+            associated_sequences: self._fields.3,
+            audio_evidence: self._fields.4,
+            basis_of_record: self._fields.5.unwrap(),
+            behavior: self._fields.6,
+            class: self._fields.7,
+            collection_code: self._fields.8,
+            coordinate_uncertainty_in_meters: self._fields.9,
+            country: self._fields.10,
+            country_code: self._fields.11,
+            county: self._fields.12,
+            created_at: self._fields.13.unwrap(),
+            data_generalizations: self._fields.14,
+            dataset_name: self._fields.15,
+            date_identified: self._fields.16,
+            dc_type: self._fields.17,
+            decimal_latitude: self._fields.18,
+            decimal_longitude: self._fields.19,
+            dynamic_properties: self._fields.20,
+            event_date: self._fields.21.unwrap(),
+            event_id: self._fields.22,
+            event_ref: self._fields.23,
+            event_time: self._fields.24,
+            family: self._fields.25,
+            field_notes: self._fields.26,
+            gbif_taxon_key: self._fields.27,
+            genus: self._fields.28,
+            geodetic_datum: self._fields.29,
+            habitat: self._fields.30,
+            higher_classification: self._fields.31,
+            identification_qualifier: self._fields.32,
+            identification_remarks: self._fields.33,
+            identified_by: self._fields.34,
+            identified_by_id: self._fields.35,
+            image_evidence: self._fields.36,
+            individual_count: self._fields.37,
+            information_withheld: self._fields.38,
+            infraspecific_epithet: self._fields.39,
+            institution_code: self._fields.40,
+            kingdom: self._fields.41,
+            license: self._fields.42,
+            life_stage: self._fields.43,
+            locality: self._fields.44,
+            location_id: self._fields.45,
+            location_remarks: self._fields.46,
+            maximum_depth_in_meters: self._fields.47,
+            maximum_elevation_in_meters: self._fields.48,
+            minimum_depth_in_meters: self._fields.49,
+            minimum_elevation_in_meters: self._fields.50,
+            municipality: self._fields.51,
+            nomenclatural_code: self._fields.52,
+            occurrence_id: self._fields.53,
+            occurrence_remarks: self._fields.54,
+            occurrence_status: self._fields.55,
+            order: self._fields.56,
+            organism_quantity: self._fields.57,
+            organism_quantity_type: self._fields.58,
+            phylum: self._fields.59,
+            previous_identifications: self._fields.60,
+            recorded_by: self._fields.61,
+            recorded_by_id: self._fields.62,
+            references: self._fields.63,
+            reproductive_condition: self._fields.64,
+            rights_holder: self._fields.65,
+            sampling_effort: self._fields.66,
+            sampling_protocol: self._fields.67,
+            scientific_name: self._fields.68.unwrap(),
+            scientific_name_authorship: self._fields.69,
+            sex: self._fields.70,
+            specific_epithet: self._fields.71,
+            spectrogram_evidence: self._fields.72,
+            state_province: self._fields.73,
+            taxon_rank: self._fields.74,
+            taxonomic_status: self._fields.75,
+            verbatim_locality: self._fields.76,
+            vernacular_name: self._fields.77,
+            video_evidence: self._fields.78,
             extra_data: Some(extra_data),
         }
     }

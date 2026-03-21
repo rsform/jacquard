@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_derive::{IntoStatic, lexicon};
 use serde::{Serialize, Deserialize};
@@ -78,8 +81,8 @@ pub mod get_trends_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetTrendsBuilder<S: get_trends_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>,),
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>,),
 }
 
 impl GetTrends {
@@ -93,8 +96,8 @@ impl GetTrendsBuilder<get_trends_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetTrendsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
+            _state: PhantomData,
+            _fields: (None,),
         }
     }
 }
@@ -102,12 +105,12 @@ impl GetTrendsBuilder<get_trends_state::Empty> {
 impl<S: get_trends_state::State> GetTrendsBuilder<S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -118,8 +121,6 @@ where
 {
     /// Build the final struct
     pub fn build(self) -> GetTrends {
-        GetTrends {
-            limit: self.__unsafe_private_named.0,
-        }
+        GetTrends { limit: self._fields.0 }
     }
 }

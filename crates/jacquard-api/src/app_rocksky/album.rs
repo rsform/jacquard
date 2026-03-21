@@ -9,7 +9,11 @@ pub mod get_album;
 pub mod get_album_tracks;
 pub mod get_albums;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -27,7 +31,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A declaration of an album.
 
 #[lexicon]
@@ -99,6 +103,7 @@ pub struct AlbumGetRecordOutput<'a> {
     pub value: Album<'a>,
 }
 
+
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase")]
@@ -145,6 +150,7 @@ pub struct AlbumViewBasic<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub year: Option<i64>,
 }
+
 
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
@@ -200,7 +206,9 @@ pub struct AlbumViewDetailed<'a> {
 }
 
 impl<'a> Album<'a> {
-    pub fn uri(uri: impl Into<CowStr<'a>>) -> Result<RecordUri<'a, AlbumRecord>, UriError> {
+    pub fn uri(
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, AlbumRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
@@ -260,20 +268,25 @@ impl<'a> LexiconSchema for Album<'a> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("album_art"),
-                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -405,7 +418,7 @@ impl<'a> LexiconSchema for AlbumViewDetailed<'a> {
 
 pub mod album_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -413,58 +426,58 @@ pub mod album_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Artist;
         type Title;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Artist = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Artist = S::Artist;
-        type Title = S::Title;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `artist` field to Set
     pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtist<S> {}
     impl<S: State> State for SetArtist<S> {
-        type CreatedAt = S::CreatedAt;
         type Artist = Set<members::artist>;
         type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
         type Artist = S::Artist;
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Artist = S::Artist;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `artist` field
         pub struct artist(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AlbumBuilder<'a, S: album_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<BlobRef<'a>>,
         Option<UriValue<'a>>,
         Option<UriValue<'a>>,
@@ -480,7 +493,7 @@ pub struct AlbumBuilder<'a, S: album_state::State> {
         Option<i64>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Album<'a> {
@@ -494,11 +507,24 @@ impl<'a> AlbumBuilder<'a, album_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AlbumBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+            _state: PhantomData,
+            _fields: (
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -506,12 +532,12 @@ impl<'a> AlbumBuilder<'a, album_state::Empty> {
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `albumArt` field (optional)
     pub fn album_art(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `albumArt` field to an Option value (optional)
     pub fn maybe_album_art(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -519,12 +545,12 @@ impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `albumArtUrl` field (optional)
     pub fn album_art_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `albumArtUrl` field to an Option value (optional)
     pub fn maybe_album_art_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -532,12 +558,12 @@ impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `appleMusicLink` field (optional)
     pub fn apple_music_link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `appleMusicLink` field to an Option value (optional)
     pub fn maybe_apple_music_link(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -552,11 +578,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AlbumBuilder<'a, album_state::SetArtist<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         AlbumBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -571,11 +597,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> AlbumBuilder<'a, album_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         AlbumBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -583,12 +609,12 @@ where
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `duration` field (optional)
     pub fn duration(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `duration` field to an Option value (optional)
     pub fn maybe_duration(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -596,12 +622,12 @@ impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
     pub fn maybe_genre(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -609,12 +635,12 @@ impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `releaseDate` field (optional)
     pub fn release_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `releaseDate` field to an Option value (optional)
     pub fn maybe_release_date(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -622,12 +648,12 @@ impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `spotifyLink` field (optional)
     pub fn spotify_link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `spotifyLink` field to an Option value (optional)
     pub fn maybe_spotify_link(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -635,12 +661,12 @@ impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -648,12 +674,12 @@ impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `tidalLink` field (optional)
     pub fn tidal_link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `tidalLink` field to an Option value (optional)
     pub fn maybe_tidal_link(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -668,11 +694,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AlbumBuilder<'a, album_state::SetTitle<S>> {
-        self.__unsafe_private_named.11 = Option::Some(value.into());
+        self._fields.11 = Option::Some(value.into());
         AlbumBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -680,12 +706,12 @@ where
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `year` field (optional)
     pub fn year(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `year` field to an Option value (optional)
     pub fn maybe_year(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -693,12 +719,12 @@ impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
 impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
     /// Set the `youtubeLink` field (optional)
     pub fn youtube_link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `youtubeLink` field to an Option value (optional)
     pub fn maybe_youtube_link(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -706,27 +732,27 @@ impl<'a, S: album_state::State> AlbumBuilder<'a, S> {
 impl<'a, S> AlbumBuilder<'a, S>
 where
     S: album_state::State,
-    S::CreatedAt: album_state::IsSet,
     S::Artist: album_state::IsSet,
     S::Title: album_state::IsSet,
+    S::CreatedAt: album_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Album<'a> {
         Album {
-            album_art: self.__unsafe_private_named.0,
-            album_art_url: self.__unsafe_private_named.1,
-            apple_music_link: self.__unsafe_private_named.2,
-            artist: self.__unsafe_private_named.3.unwrap(),
-            created_at: self.__unsafe_private_named.4.unwrap(),
-            duration: self.__unsafe_private_named.5,
-            genre: self.__unsafe_private_named.6,
-            release_date: self.__unsafe_private_named.7,
-            spotify_link: self.__unsafe_private_named.8,
-            tags: self.__unsafe_private_named.9,
-            tidal_link: self.__unsafe_private_named.10,
-            title: self.__unsafe_private_named.11.unwrap(),
-            year: self.__unsafe_private_named.12,
-            youtube_link: self.__unsafe_private_named.13,
+            album_art: self._fields.0,
+            album_art_url: self._fields.1,
+            apple_music_link: self._fields.2,
+            artist: self._fields.3.unwrap(),
+            created_at: self._fields.4.unwrap(),
+            duration: self._fields.5,
+            genre: self._fields.6,
+            release_date: self._fields.7,
+            spotify_link: self._fields.8,
+            tags: self._fields.9,
+            tidal_link: self._fields.10,
+            title: self._fields.11.unwrap(),
+            year: self._fields.12,
+            youtube_link: self._fields.13,
             extra_data: Default::default(),
         }
     }
@@ -736,30 +762,30 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Album<'a> {
         Album {
-            album_art: self.__unsafe_private_named.0,
-            album_art_url: self.__unsafe_private_named.1,
-            apple_music_link: self.__unsafe_private_named.2,
-            artist: self.__unsafe_private_named.3.unwrap(),
-            created_at: self.__unsafe_private_named.4.unwrap(),
-            duration: self.__unsafe_private_named.5,
-            genre: self.__unsafe_private_named.6,
-            release_date: self.__unsafe_private_named.7,
-            spotify_link: self.__unsafe_private_named.8,
-            tags: self.__unsafe_private_named.9,
-            tidal_link: self.__unsafe_private_named.10,
-            title: self.__unsafe_private_named.11.unwrap(),
-            year: self.__unsafe_private_named.12,
-            youtube_link: self.__unsafe_private_named.13,
+            album_art: self._fields.0,
+            album_art_url: self._fields.1,
+            apple_music_link: self._fields.2,
+            artist: self._fields.3.unwrap(),
+            created_at: self._fields.4.unwrap(),
+            duration: self._fields.5,
+            genre: self._fields.6,
+            release_date: self._fields.7,
+            spotify_link: self._fields.8,
+            tags: self._fields.9,
+            tidal_link: self._fields.10,
+            title: self._fields.11.unwrap(),
+            year: self._fields.12,
+            youtube_link: self._fields.13,
             extra_data: Some(extra_data),
         }
     }
 }
 
 fn lexicon_doc_app_rocksky_album() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.album"),
@@ -771,26 +797,25 @@ fn lexicon_doc_app_rocksky_album() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("A declaration of an album.")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("artist"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("title"), SmolStr::new_static("artist"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("albumArt"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("albumArtUrl"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The URL of the album art of the album.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The URL of the album art of the album."),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -798,9 +823,9 @@ fn lexicon_doc_app_rocksky_album() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("appleMusicLink"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The Apple Music link of the album.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The Apple Music link of the album."),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -808,9 +833,9 @@ fn lexicon_doc_app_rocksky_album() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("artist"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The artist of the album.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The artist of the album."),
+                                    ),
                                     min_length: Some(1usize),
                                     max_length: Some(256usize),
                                     ..Default::default()
@@ -819,9 +844,11 @@ fn lexicon_doc_app_rocksky_album() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The date and time when the album was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The date and time when the album was created.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -835,9 +862,9 @@ fn lexicon_doc_app_rocksky_album() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("genre"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The genre of the album.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The genre of the album."),
+                                    ),
                                     max_length: Some(256usize),
                                     ..Default::default()
                                 }),
@@ -845,9 +872,9 @@ fn lexicon_doc_app_rocksky_album() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("releaseDate"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The release date of the album.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The release date of the album."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -855,9 +882,9 @@ fn lexicon_doc_app_rocksky_album() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("spotifyLink"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The Spotify link of the album.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The Spotify link of the album."),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -865,7 +892,9 @@ fn lexicon_doc_app_rocksky_album() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("tags"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static("The tags of the album.")),
+                                    description: Some(
+                                        CowStr::new_static("The tags of the album."),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         min_length: Some(1usize),
                                         max_length: Some(256usize),
@@ -877,9 +906,9 @@ fn lexicon_doc_app_rocksky_album() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("tidalLink"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The tidal link of the album.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The tidal link of the album."),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -887,9 +916,9 @@ fn lexicon_doc_app_rocksky_album() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("title"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The title of the album.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The title of the album."),
+                                    ),
                                     min_length: Some(1usize),
                                     max_length: Some(512usize),
                                     ..Default::default()
@@ -904,9 +933,9 @@ fn lexicon_doc_app_rocksky_album() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("youtubeLink"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The YouTube link of the album.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The YouTube link of the album."),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -925,10 +954,10 @@ fn lexicon_doc_app_rocksky_album() -> LexiconDoc<'static> {
 }
 
 fn lexicon_doc_app_rocksky_album_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.album.defs"),
@@ -943,9 +972,9 @@ fn lexicon_doc_app_rocksky_album_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("albumArt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The URL of the album art image.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The URL of the album art image."),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -953,16 +982,18 @@ fn lexicon_doc_app_rocksky_album_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("artist"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The artist of the album.")),
+                                description: Some(
+                                    CowStr::new_static("The artist of the album."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("artistUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The URI of the album's artist.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The URI of the album's artist."),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -970,9 +1001,9 @@ fn lexicon_doc_app_rocksky_album_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The unique identifier of the album.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The unique identifier of the album."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -986,25 +1017,27 @@ fn lexicon_doc_app_rocksky_album_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("releaseDate"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The release date of the album.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The release date of the album."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("sha256"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The SHA256 hash of the album.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The SHA256 hash of the album."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("title"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The title of the album.")),
+                                description: Some(
+                                    CowStr::new_static("The title of the album."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1018,7 +1051,9 @@ fn lexicon_doc_app_rocksky_album_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The URI of the album.")),
+                                description: Some(
+                                    CowStr::new_static("The URI of the album."),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1043,9 +1078,9 @@ fn lexicon_doc_app_rocksky_album_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("albumArt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The URL of the album art image.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The URL of the album art image."),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -1053,16 +1088,18 @@ fn lexicon_doc_app_rocksky_album_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("artist"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The artist of the album.")),
+                                description: Some(
+                                    CowStr::new_static("The artist of the album."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("artistUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The URI of the album's artist.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The URI of the album's artist."),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1070,9 +1107,9 @@ fn lexicon_doc_app_rocksky_album_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The unique identifier of the album.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The unique identifier of the album."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1086,18 +1123,18 @@ fn lexicon_doc_app_rocksky_album_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("releaseDate"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The release date of the album.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The release date of the album."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("sha256"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The SHA256 hash of the album.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The SHA256 hash of the album."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1113,7 +1150,9 @@ fn lexicon_doc_app_rocksky_album_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("title"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The title of the album.")),
+                                description: Some(
+                                    CowStr::new_static("The title of the album."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1139,7 +1178,9 @@ fn lexicon_doc_app_rocksky_album_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The URI of the album.")),
+                                description: Some(
+                                    CowStr::new_static("The URI of the album."),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),

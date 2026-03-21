@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::string::{Did, Cid, UriValue};
 use jacquard_derive::{IntoStatic, lexicon};
@@ -77,45 +80,45 @@ pub mod start_livestream_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type Livestream;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type Livestream = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
-        type Streamer = Set<members::streamer>;
-        type Livestream = S::Livestream;
+        type Streamer = Unset;
     }
     ///State transition - sets the `livestream` field to Set
     pub struct SetLivestream<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLivestream<S> {}
     impl<S: State> State for SetLivestream<S> {
-        type Streamer = S::Streamer;
         type Livestream = Set<members::livestream>;
+        type Streamer = S::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStreamer<S> {}
+    impl<S: State> State for SetStreamer<S> {
+        type Livestream = S::Livestream;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `livestream` field
         pub struct livestream(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct StartLivestreamBuilder<'a, S: start_livestream_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>, Option<Livestream<'a>>, Option<Did<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<Livestream<'a>>, Option<Did<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> StartLivestream<'a> {
@@ -129,9 +132,9 @@ impl<'a> StartLivestreamBuilder<'a, start_livestream_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StartLivestreamBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -139,12 +142,12 @@ impl<'a> StartLivestreamBuilder<'a, start_livestream_state::Empty> {
 impl<'a, S: start_livestream_state::State> StartLivestreamBuilder<'a, S> {
     /// Set the `createBlueskyPost` field (optional)
     pub fn create_bluesky_post(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `createBlueskyPost` field to an Option value (optional)
     pub fn maybe_create_bluesky_post(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -159,11 +162,11 @@ where
         mut self,
         value: impl Into<Livestream<'a>>,
     ) -> StartLivestreamBuilder<'a, start_livestream_state::SetLivestream<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         StartLivestreamBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -178,11 +181,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> StartLivestreamBuilder<'a, start_livestream_state::SetStreamer<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         StartLivestreamBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -190,15 +193,15 @@ where
 impl<'a, S> StartLivestreamBuilder<'a, S>
 where
     S: start_livestream_state::State,
-    S::Streamer: start_livestream_state::IsSet,
     S::Livestream: start_livestream_state::IsSet,
+    S::Streamer: start_livestream_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> StartLivestream<'a> {
         StartLivestream {
-            create_bluesky_post: self.__unsafe_private_named.0,
-            livestream: self.__unsafe_private_named.1.unwrap(),
-            streamer: self.__unsafe_private_named.2.unwrap(),
+            create_bluesky_post: self._fields.0,
+            livestream: self._fields.1.unwrap(),
+            streamer: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -211,9 +214,9 @@ where
         >,
     ) -> StartLivestream<'a> {
         StartLivestream {
-            create_bluesky_post: self.__unsafe_private_named.0,
-            livestream: self.__unsafe_private_named.1.unwrap(),
-            streamer: self.__unsafe_private_named.2.unwrap(),
+            create_bluesky_post: self._fields.0,
+            livestream: self._fields.1.unwrap(),
+            streamer: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::{AtUri, Cid};
@@ -141,9 +144,9 @@ pub mod hydrate_record_state {
 
 /// Builder for constructing an instance of this type
 pub struct HydrateRecordBuilder<'a, S: hydrate_record_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Cid<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Cid<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> HydrateRecord<'a> {
@@ -157,9 +160,9 @@ impl<'a> HydrateRecordBuilder<'a, hydrate_record_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         HydrateRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -167,12 +170,12 @@ impl<'a> HydrateRecordBuilder<'a, hydrate_record_state::Empty> {
 impl<'a, S: hydrate_record_state::State> HydrateRecordBuilder<'a, S> {
     /// Set the `cid` field (optional)
     pub fn cid(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cid` field to an Option value (optional)
     pub fn maybe_cid(mut self, value: Option<Cid<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -187,11 +190,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> HydrateRecordBuilder<'a, hydrate_record_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         HydrateRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -204,8 +207,8 @@ where
     /// Build the final struct
     pub fn build(self) -> HydrateRecord<'a> {
         HydrateRecord {
-            cid: self.__unsafe_private_named.0,
-            uri: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0,
+            uri: self._fields.1.unwrap(),
         }
     }
 }

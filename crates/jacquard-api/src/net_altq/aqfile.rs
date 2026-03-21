@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -567,50 +570,45 @@ pub mod file_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Size;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Size = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Size = S::Size;
+        type Name = Unset;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSize<S> {}
     impl<S: State> State for SetSize<S> {
-        type Name = S::Name;
         type Size = Set<members::size>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Size = S::Size;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `size` field
         pub struct size(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FileBuilder<'a, S: file_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<CowStr<'a>>,
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<i64>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Datetime>, Option<CowStr<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> File<'a> {
@@ -624,9 +622,9 @@ impl<'a> FileBuilder<'a, file_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -634,12 +632,12 @@ impl<'a> FileBuilder<'a, file_state::Empty> {
 impl<'a, S: file_state::State> FileBuilder<'a, S> {
     /// Set the `mimeType` field (optional)
     pub fn mime_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `mimeType` field to an Option value (optional)
     pub fn maybe_mime_type(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -647,12 +645,12 @@ impl<'a, S: file_state::State> FileBuilder<'a, S> {
 impl<'a, S: file_state::State> FileBuilder<'a, S> {
     /// Set the `modifiedAt` field (optional)
     pub fn modified_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `modifiedAt` field to an Option value (optional)
     pub fn maybe_modified_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -667,11 +665,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> FileBuilder<'a, file_state::SetName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         FileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -686,11 +684,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> FileBuilder<'a, file_state::SetSize<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         FileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -698,16 +696,16 @@ where
 impl<'a, S> FileBuilder<'a, S>
 where
     S: file_state::State,
-    S::Name: file_state::IsSet,
     S::Size: file_state::IsSet,
+    S::Name: file_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> File<'a> {
         File {
-            mime_type: self.__unsafe_private_named.0,
-            modified_at: self.__unsafe_private_named.1,
-            name: self.__unsafe_private_named.2.unwrap(),
-            size: self.__unsafe_private_named.3.unwrap(),
+            mime_type: self._fields.0,
+            modified_at: self._fields.1,
+            name: self._fields.2.unwrap(),
+            size: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -720,10 +718,10 @@ where
         >,
     ) -> File<'a> {
         File {
-            mime_type: self.__unsafe_private_named.0,
-            modified_at: self.__unsafe_private_named.1,
-            name: self.__unsafe_private_named.2.unwrap(),
-            size: self.__unsafe_private_named.3.unwrap(),
+            mime_type: self._fields.0,
+            modified_at: self._fields.1,
+            name: self._fields.2.unwrap(),
+            size: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -789,15 +787,15 @@ pub mod aqfile_state {
 
 /// Builder for constructing an instance of this type
 pub struct AqfileBuilder<'a, S: aqfile_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AtIdentifier<'a>>,
         Option<BlobRef<'a>>,
         Option<aqfile::Checksum<'a>>,
         Option<Datetime>,
         Option<aqfile::File<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Aqfile<'a> {
@@ -811,9 +809,9 @@ impl<'a> AqfileBuilder<'a, aqfile_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AqfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -821,12 +819,12 @@ impl<'a> AqfileBuilder<'a, aqfile_state::Empty> {
 impl<'a, S: aqfile_state::State> AqfileBuilder<'a, S> {
     /// Set the `attribution` field (optional)
     pub fn attribution(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `attribution` field to an Option value (optional)
     pub fn maybe_attribution(mut self, value: Option<AtIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -841,11 +839,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> AqfileBuilder<'a, aqfile_state::SetBlob<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AqfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -853,12 +851,12 @@ where
 impl<'a, S: aqfile_state::State> AqfileBuilder<'a, S> {
     /// Set the `checksum` field (optional)
     pub fn checksum(mut self, value: impl Into<Option<aqfile::Checksum<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `checksum` field to an Option value (optional)
     pub fn maybe_checksum(mut self, value: Option<aqfile::Checksum<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -873,11 +871,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> AqfileBuilder<'a, aqfile_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         AqfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -892,11 +890,11 @@ where
         mut self,
         value: impl Into<aqfile::File<'a>>,
     ) -> AqfileBuilder<'a, aqfile_state::SetFile<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         AqfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -911,11 +909,11 @@ where
     /// Build the final struct
     pub fn build(self) -> Aqfile<'a> {
         Aqfile {
-            attribution: self.__unsafe_private_named.0,
-            blob: self.__unsafe_private_named.1.unwrap(),
-            checksum: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            file: self.__unsafe_private_named.4.unwrap(),
+            attribution: self._fields.0,
+            blob: self._fields.1.unwrap(),
+            checksum: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            file: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -928,11 +926,11 @@ where
         >,
     ) -> Aqfile<'a> {
         Aqfile {
-            attribution: self.__unsafe_private_named.0,
-            blob: self.__unsafe_private_named.1.unwrap(),
-            checksum: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            file: self.__unsafe_private_named.4.unwrap(),
+            attribution: self._fields.0,
+            blob: self._fields.1.unwrap(),
+            checksum: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            file: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

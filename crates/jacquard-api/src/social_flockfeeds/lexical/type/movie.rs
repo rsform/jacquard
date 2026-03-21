@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -5804,8 +5807,8 @@ pub mod movie_state {
 
 /// Builder for constructing an instance of this type
 pub struct MovieBuilder<'a, S: movie_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<MovieAbout<'a>>,
         Option<MovieAbstract<'a>>,
         Option<MovieAccessMode<'a>>,
@@ -5944,7 +5947,7 @@ pub struct MovieBuilder<'a, S: movie_state::State> {
         Option<MovieWorkExample<'a>>,
         Option<MovieWorkTranslation<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Movie<'a> {
@@ -5958,8 +5961,8 @@ impl<'a> MovieBuilder<'a, movie_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MovieBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -6098,7 +6101,7 @@ impl<'a> MovieBuilder<'a, movie_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -6106,12 +6109,12 @@ impl<'a> MovieBuilder<'a, movie_state::Empty> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `about` field (optional)
     pub fn about(mut self, value: impl Into<Option<MovieAbout<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `about` field to an Option value (optional)
     pub fn maybe_about(mut self, value: Option<MovieAbout<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -6119,12 +6122,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `abstract` field (optional)
     pub fn r#abstract(mut self, value: impl Into<Option<MovieAbstract<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `abstract` field to an Option value (optional)
     pub fn maybe_abstract(mut self, value: Option<MovieAbstract<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -6132,12 +6135,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `accessMode` field (optional)
     pub fn access_mode(mut self, value: impl Into<Option<MovieAccessMode<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `accessMode` field to an Option value (optional)
     pub fn maybe_access_mode(mut self, value: Option<MovieAccessMode<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -6148,7 +6151,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieAccessModeSufficient<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `accessModeSufficient` field to an Option value (optional)
@@ -6156,7 +6159,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieAccessModeSufficient<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -6167,7 +6170,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieAccessibilityApi<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `accessibilityAPI` field to an Option value (optional)
@@ -6175,7 +6178,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieAccessibilityApi<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -6186,7 +6189,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieAccessibilityControl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `accessibilityControl` field to an Option value (optional)
@@ -6194,7 +6197,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieAccessibilityControl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -6205,7 +6208,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieAccessibilityFeature<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `accessibilityFeature` field to an Option value (optional)
@@ -6213,7 +6216,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieAccessibilityFeature<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -6224,7 +6227,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieAccessibilityHazard<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `accessibilityHazard` field to an Option value (optional)
@@ -6232,7 +6235,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieAccessibilityHazard<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -6243,7 +6246,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieAccessibilitySummary<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `accessibilitySummary` field to an Option value (optional)
@@ -6251,7 +6254,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieAccessibilitySummary<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -6262,7 +6265,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieAccountablePerson<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `accountablePerson` field to an Option value (optional)
@@ -6270,7 +6273,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieAccountablePerson<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -6281,7 +6284,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieAcquireLicensePage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `acquireLicensePage` field to an Option value (optional)
@@ -6289,7 +6292,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieAcquireLicensePage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -6297,12 +6300,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `actor` field (optional)
     pub fn actor(mut self, value: impl Into<Option<MovieActor<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `actor` field to an Option value (optional)
     pub fn maybe_actor(mut self, value: Option<MovieActor<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -6310,12 +6313,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `actors` field (optional)
     pub fn actors(mut self, value: impl Into<Option<MovieActors<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `actors` field to an Option value (optional)
     pub fn maybe_actors(mut self, value: Option<MovieActors<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -6326,7 +6329,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieAdditionalType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
@@ -6334,7 +6337,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieAdditionalType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -6345,7 +6348,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieAggregateRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
@@ -6353,7 +6356,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieAggregateRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -6364,7 +6367,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieAlternateName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
@@ -6372,7 +6375,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieAlternateName<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -6383,7 +6386,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieAlternativeHeadline<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `alternativeHeadline` field to an Option value (optional)
@@ -6391,7 +6394,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieAlternativeHeadline<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -6399,12 +6402,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `archivedAt` field (optional)
     pub fn archived_at(mut self, value: impl Into<Option<MovieArchivedAt<'a>>>) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `archivedAt` field to an Option value (optional)
     pub fn maybe_archived_at(mut self, value: Option<MovieArchivedAt<'a>>) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -6412,12 +6415,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `assesses` field (optional)
     pub fn assesses(mut self, value: impl Into<Option<MovieAssesses<'a>>>) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `assesses` field to an Option value (optional)
     pub fn maybe_assesses(mut self, value: Option<MovieAssesses<'a>>) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -6428,7 +6431,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieAssociatedMedia<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `associatedMedia` field to an Option value (optional)
@@ -6436,7 +6439,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieAssociatedMedia<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -6444,12 +6447,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `audience` field (optional)
     pub fn audience(mut self, value: impl Into<Option<MovieAudience<'a>>>) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `audience` field to an Option value (optional)
     pub fn maybe_audience(mut self, value: Option<MovieAudience<'a>>) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -6457,12 +6460,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `audio` field (optional)
     pub fn audio(mut self, value: impl Into<Option<MovieAudio<'a>>>) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `audio` field to an Option value (optional)
     pub fn maybe_audio(mut self, value: Option<MovieAudio<'a>>) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -6470,12 +6473,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `author` field (optional)
     pub fn author(mut self, value: impl Into<Option<MovieAuthor<'a>>>) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
     pub fn maybe_author(mut self, value: Option<MovieAuthor<'a>>) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -6483,12 +6486,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<MovieAward<'a>>>) -> Self {
-        self.__unsafe_private_named.23 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
     pub fn maybe_award(mut self, value: Option<MovieAward<'a>>) -> Self {
-        self.__unsafe_private_named.23 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -6496,12 +6499,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<MovieAwards<'a>>>) -> Self {
-        self.__unsafe_private_named.24 = value.into();
+        self._fields.24 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
     pub fn maybe_awards(mut self, value: Option<MovieAwards<'a>>) -> Self {
-        self.__unsafe_private_named.24 = value;
+        self._fields.24 = value;
         self
     }
 }
@@ -6509,12 +6512,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `character` field (optional)
     pub fn character(mut self, value: impl Into<Option<MovieCharacter<'a>>>) -> Self {
-        self.__unsafe_private_named.25 = value.into();
+        self._fields.25 = value.into();
         self
     }
     /// Set the `character` field to an Option value (optional)
     pub fn maybe_character(mut self, value: Option<MovieCharacter<'a>>) -> Self {
-        self.__unsafe_private_named.25 = value;
+        self._fields.25 = value;
         self
     }
 }
@@ -6522,12 +6525,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `citation` field (optional)
     pub fn citation(mut self, value: impl Into<Option<MovieCitation<'a>>>) -> Self {
-        self.__unsafe_private_named.26 = value.into();
+        self._fields.26 = value.into();
         self
     }
     /// Set the `citation` field to an Option value (optional)
     pub fn maybe_citation(mut self, value: Option<MovieCitation<'a>>) -> Self {
-        self.__unsafe_private_named.26 = value;
+        self._fields.26 = value;
         self
     }
 }
@@ -6535,12 +6538,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<MovieComment<'a>>>) -> Self {
-        self.__unsafe_private_named.27 = value.into();
+        self._fields.27 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
     pub fn maybe_comment(mut self, value: Option<MovieComment<'a>>) -> Self {
-        self.__unsafe_private_named.27 = value;
+        self._fields.27 = value;
         self
     }
 }
@@ -6551,12 +6554,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieCommentCount<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.28 = value.into();
+        self._fields.28 = value.into();
         self
     }
     /// Set the `commentCount` field to an Option value (optional)
     pub fn maybe_comment_count(mut self, value: Option<MovieCommentCount<'a>>) -> Self {
-        self.__unsafe_private_named.28 = value;
+        self._fields.28 = value;
         self
     }
 }
@@ -6567,7 +6570,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieConditionsOfAccess<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.29 = value.into();
+        self._fields.29 = value.into();
         self
     }
     /// Set the `conditionsOfAccess` field to an Option value (optional)
@@ -6575,7 +6578,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieConditionsOfAccess<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.29 = value;
+        self._fields.29 = value;
         self
     }
 }
@@ -6586,7 +6589,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieContentLocation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.30 = value.into();
+        self._fields.30 = value.into();
         self
     }
     /// Set the `contentLocation` field to an Option value (optional)
@@ -6594,7 +6597,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieContentLocation<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.30 = value;
+        self._fields.30 = value;
         self
     }
 }
@@ -6605,7 +6608,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieContentRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value.into();
+        self._fields.31 = value.into();
         self
     }
     /// Set the `contentRating` field to an Option value (optional)
@@ -6613,7 +6616,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieContentRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value;
+        self._fields.31 = value;
         self
     }
 }
@@ -6624,7 +6627,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieContentReferenceTime<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value.into();
+        self._fields.32 = value.into();
         self
     }
     /// Set the `contentReferenceTime` field to an Option value (optional)
@@ -6632,7 +6635,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieContentReferenceTime<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value;
+        self._fields.32 = value;
         self
     }
 }
@@ -6643,12 +6646,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieContributor<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value.into();
+        self._fields.33 = value.into();
         self
     }
     /// Set the `contributor` field to an Option value (optional)
     pub fn maybe_contributor(mut self, value: Option<MovieContributor<'a>>) -> Self {
-        self.__unsafe_private_named.33 = value;
+        self._fields.33 = value;
         self
     }
 }
@@ -6659,7 +6662,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieCopyrightHolder<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.34 = value.into();
+        self._fields.34 = value.into();
         self
     }
     /// Set the `copyrightHolder` field to an Option value (optional)
@@ -6667,7 +6670,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieCopyrightHolder<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.34 = value;
+        self._fields.34 = value;
         self
     }
 }
@@ -6678,7 +6681,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieCopyrightNotice<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value.into();
+        self._fields.35 = value.into();
         self
     }
     /// Set the `copyrightNotice` field to an Option value (optional)
@@ -6686,7 +6689,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieCopyrightNotice<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value;
+        self._fields.35 = value;
         self
     }
 }
@@ -6697,7 +6700,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieCopyrightYear<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value.into();
+        self._fields.36 = value.into();
         self
     }
     /// Set the `copyrightYear` field to an Option value (optional)
@@ -6705,7 +6708,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieCopyrightYear<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value;
+        self._fields.36 = value;
         self
     }
 }
@@ -6713,12 +6716,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `correction` field (optional)
     pub fn correction(mut self, value: impl Into<Option<MovieCorrection<'a>>>) -> Self {
-        self.__unsafe_private_named.37 = value.into();
+        self._fields.37 = value.into();
         self
     }
     /// Set the `correction` field to an Option value (optional)
     pub fn maybe_correction(mut self, value: Option<MovieCorrection<'a>>) -> Self {
-        self.__unsafe_private_named.37 = value;
+        self._fields.37 = value;
         self
     }
 }
@@ -6729,7 +6732,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieCountryOfOrigin<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.38 = value.into();
+        self._fields.38 = value.into();
         self
     }
     /// Set the `countryOfOrigin` field to an Option value (optional)
@@ -6737,7 +6740,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieCountryOfOrigin<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.38 = value;
+        self._fields.38 = value;
         self
     }
 }
@@ -6748,7 +6751,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieCreativeWorkStatus<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value.into();
+        self._fields.39 = value.into();
         self
     }
     /// Set the `creativeWorkStatus` field to an Option value (optional)
@@ -6756,7 +6759,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieCreativeWorkStatus<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value;
+        self._fields.39 = value;
         self
     }
 }
@@ -6764,12 +6767,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `creator` field (optional)
     pub fn creator(mut self, value: impl Into<Option<MovieCreator<'a>>>) -> Self {
-        self.__unsafe_private_named.40 = value.into();
+        self._fields.40 = value.into();
         self
     }
     /// Set the `creator` field to an Option value (optional)
     pub fn maybe_creator(mut self, value: Option<MovieCreator<'a>>) -> Self {
-        self.__unsafe_private_named.40 = value;
+        self._fields.40 = value;
         self
     }
 }
@@ -6777,12 +6780,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `creditText` field (optional)
     pub fn credit_text(mut self, value: impl Into<Option<MovieCreditText<'a>>>) -> Self {
-        self.__unsafe_private_named.41 = value.into();
+        self._fields.41 = value.into();
         self
     }
     /// Set the `creditText` field to an Option value (optional)
     pub fn maybe_credit_text(mut self, value: Option<MovieCreditText<'a>>) -> Self {
-        self.__unsafe_private_named.41 = value;
+        self._fields.41 = value;
         self
     }
 }
@@ -6793,12 +6796,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieDateCreated<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.42 = value.into();
+        self._fields.42 = value.into();
         self
     }
     /// Set the `dateCreated` field to an Option value (optional)
     pub fn maybe_date_created(mut self, value: Option<MovieDateCreated<'a>>) -> Self {
-        self.__unsafe_private_named.42 = value;
+        self._fields.42 = value;
         self
     }
 }
@@ -6809,12 +6812,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieDateModified<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.43 = value.into();
+        self._fields.43 = value.into();
         self
     }
     /// Set the `dateModified` field to an Option value (optional)
     pub fn maybe_date_modified(mut self, value: Option<MovieDateModified<'a>>) -> Self {
-        self.__unsafe_private_named.43 = value;
+        self._fields.43 = value;
         self
     }
 }
@@ -6825,7 +6828,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieDatePublished<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.44 = value.into();
+        self._fields.44 = value.into();
         self
     }
     /// Set the `datePublished` field to an Option value (optional)
@@ -6833,7 +6836,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieDatePublished<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.44 = value;
+        self._fields.44 = value;
         self
     }
 }
@@ -6844,12 +6847,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value.into();
+        self._fields.45 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<MovieDescription<'a>>) -> Self {
-        self.__unsafe_private_named.45 = value;
+        self._fields.45 = value;
         self
     }
 }
@@ -6860,7 +6863,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieDigitalSourceType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.46 = value.into();
+        self._fields.46 = value.into();
         self
     }
     /// Set the `digitalSourceType` field to an Option value (optional)
@@ -6868,7 +6871,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieDigitalSourceType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.46 = value;
+        self._fields.46 = value;
         self
     }
 }
@@ -6876,12 +6879,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `director` field (optional)
     pub fn director(mut self, value: impl Into<Option<MovieDirector<'a>>>) -> Self {
-        self.__unsafe_private_named.47 = value.into();
+        self._fields.47 = value.into();
         self
     }
     /// Set the `director` field to an Option value (optional)
     pub fn maybe_director(mut self, value: Option<MovieDirector<'a>>) -> Self {
-        self.__unsafe_private_named.47 = value;
+        self._fields.47 = value;
         self
     }
 }
@@ -6889,12 +6892,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `directors` field (optional)
     pub fn directors(mut self, value: impl Into<Option<MovieDirectors<'a>>>) -> Self {
-        self.__unsafe_private_named.48 = value.into();
+        self._fields.48 = value.into();
         self
     }
     /// Set the `directors` field to an Option value (optional)
     pub fn maybe_directors(mut self, value: Option<MovieDirectors<'a>>) -> Self {
-        self.__unsafe_private_named.48 = value;
+        self._fields.48 = value;
         self
     }
 }
@@ -6905,7 +6908,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieDisambiguatingDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.49 = value.into();
+        self._fields.49 = value.into();
         self
     }
     /// Set the `disambiguatingDescription` field to an Option value (optional)
@@ -6913,7 +6916,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieDisambiguatingDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.49 = value;
+        self._fields.49 = value;
         self
     }
 }
@@ -6924,7 +6927,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieDiscussionUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.50 = value.into();
+        self._fields.50 = value.into();
         self
     }
     /// Set the `discussionUrl` field to an Option value (optional)
@@ -6932,7 +6935,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieDiscussionUrl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.50 = value;
+        self._fields.50 = value;
         self
     }
 }
@@ -6940,12 +6943,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `duration` field (optional)
     pub fn duration(mut self, value: impl Into<Option<MovieDuration<'a>>>) -> Self {
-        self.__unsafe_private_named.51 = value.into();
+        self._fields.51 = value.into();
         self
     }
     /// Set the `duration` field to an Option value (optional)
     pub fn maybe_duration(mut self, value: Option<MovieDuration<'a>>) -> Self {
-        self.__unsafe_private_named.51 = value;
+        self._fields.51 = value;
         self
     }
 }
@@ -6953,12 +6956,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `editEIDR` field (optional)
     pub fn edit_eidr(mut self, value: impl Into<Option<MovieEditEidr<'a>>>) -> Self {
-        self.__unsafe_private_named.52 = value.into();
+        self._fields.52 = value.into();
         self
     }
     /// Set the `editEIDR` field to an Option value (optional)
     pub fn maybe_edit_eidr(mut self, value: Option<MovieEditEidr<'a>>) -> Self {
-        self.__unsafe_private_named.52 = value;
+        self._fields.52 = value;
         self
     }
 }
@@ -6966,12 +6969,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `editor` field (optional)
     pub fn editor(mut self, value: impl Into<Option<MovieEditor<'a>>>) -> Self {
-        self.__unsafe_private_named.53 = value.into();
+        self._fields.53 = value.into();
         self
     }
     /// Set the `editor` field to an Option value (optional)
     pub fn maybe_editor(mut self, value: Option<MovieEditor<'a>>) -> Self {
-        self.__unsafe_private_named.53 = value;
+        self._fields.53 = value;
         self
     }
 }
@@ -6982,7 +6985,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieEducationalAlignment<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.54 = value.into();
+        self._fields.54 = value.into();
         self
     }
     /// Set the `educationalAlignment` field to an Option value (optional)
@@ -6990,7 +6993,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieEducationalAlignment<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.54 = value;
+        self._fields.54 = value;
         self
     }
 }
@@ -7001,7 +7004,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieEducationalLevel<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.55 = value.into();
+        self._fields.55 = value.into();
         self
     }
     /// Set the `educationalLevel` field to an Option value (optional)
@@ -7009,7 +7012,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieEducationalLevel<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.55 = value;
+        self._fields.55 = value;
         self
     }
 }
@@ -7020,7 +7023,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieEducationalUse<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value.into();
+        self._fields.56 = value.into();
         self
     }
     /// Set the `educationalUse` field to an Option value (optional)
@@ -7028,7 +7031,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieEducationalUse<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value;
+        self._fields.56 = value;
         self
     }
 }
@@ -7036,12 +7039,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `encoding` field (optional)
     pub fn encoding(mut self, value: impl Into<Option<MovieEncoding<'a>>>) -> Self {
-        self.__unsafe_private_named.57 = value.into();
+        self._fields.57 = value.into();
         self
     }
     /// Set the `encoding` field to an Option value (optional)
     pub fn maybe_encoding(mut self, value: Option<MovieEncoding<'a>>) -> Self {
-        self.__unsafe_private_named.57 = value;
+        self._fields.57 = value;
         self
     }
 }
@@ -7052,7 +7055,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieEncodingFormat<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.58 = value.into();
+        self._fields.58 = value.into();
         self
     }
     /// Set the `encodingFormat` field to an Option value (optional)
@@ -7060,7 +7063,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieEncodingFormat<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.58 = value;
+        self._fields.58 = value;
         self
     }
 }
@@ -7068,12 +7071,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `encodings` field (optional)
     pub fn encodings(mut self, value: impl Into<Option<MovieEncodings<'a>>>) -> Self {
-        self.__unsafe_private_named.59 = value.into();
+        self._fields.59 = value.into();
         self
     }
     /// Set the `encodings` field to an Option value (optional)
     pub fn maybe_encodings(mut self, value: Option<MovieEncodings<'a>>) -> Self {
-        self.__unsafe_private_named.59 = value;
+        self._fields.59 = value;
         self
     }
 }
@@ -7084,7 +7087,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieExampleOfWork<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.60 = value.into();
+        self._fields.60 = value.into();
         self
     }
     /// Set the `exampleOfWork` field to an Option value (optional)
@@ -7092,7 +7095,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieExampleOfWork<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.60 = value;
+        self._fields.60 = value;
         self
     }
 }
@@ -7100,12 +7103,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `expires` field (optional)
     pub fn expires(mut self, value: impl Into<Option<MovieExpires<'a>>>) -> Self {
-        self.__unsafe_private_named.61 = value.into();
+        self._fields.61 = value.into();
         self
     }
     /// Set the `expires` field to an Option value (optional)
     pub fn maybe_expires(mut self, value: Option<MovieExpires<'a>>) -> Self {
-        self.__unsafe_private_named.61 = value;
+        self._fields.61 = value;
         self
     }
 }
@@ -7113,12 +7116,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `fileFormat` field (optional)
     pub fn file_format(mut self, value: impl Into<Option<MovieFileFormat<'a>>>) -> Self {
-        self.__unsafe_private_named.62 = value.into();
+        self._fields.62 = value.into();
         self
     }
     /// Set the `fileFormat` field to an Option value (optional)
     pub fn maybe_file_format(mut self, value: Option<MovieFileFormat<'a>>) -> Self {
-        self.__unsafe_private_named.62 = value;
+        self._fields.62 = value;
         self
     }
 }
@@ -7126,12 +7129,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `funder` field (optional)
     pub fn funder(mut self, value: impl Into<Option<MovieFunder<'a>>>) -> Self {
-        self.__unsafe_private_named.63 = value.into();
+        self._fields.63 = value.into();
         self
     }
     /// Set the `funder` field to an Option value (optional)
     pub fn maybe_funder(mut self, value: Option<MovieFunder<'a>>) -> Self {
-        self.__unsafe_private_named.63 = value;
+        self._fields.63 = value;
         self
     }
 }
@@ -7139,12 +7142,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<MovieFunding<'a>>>) -> Self {
-        self.__unsafe_private_named.64 = value.into();
+        self._fields.64 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
     pub fn maybe_funding(mut self, value: Option<MovieFunding<'a>>) -> Self {
-        self.__unsafe_private_named.64 = value;
+        self._fields.64 = value;
         self
     }
 }
@@ -7152,12 +7155,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<MovieGenre<'a>>>) -> Self {
-        self.__unsafe_private_named.65 = value.into();
+        self._fields.65 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
     pub fn maybe_genre(mut self, value: Option<MovieGenre<'a>>) -> Self {
-        self.__unsafe_private_named.65 = value;
+        self._fields.65 = value;
         self
     }
 }
@@ -7165,12 +7168,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `hasPart` field (optional)
     pub fn has_part(mut self, value: impl Into<Option<MovieHasPart<'a>>>) -> Self {
-        self.__unsafe_private_named.66 = value.into();
+        self._fields.66 = value.into();
         self
     }
     /// Set the `hasPart` field to an Option value (optional)
     pub fn maybe_has_part(mut self, value: Option<MovieHasPart<'a>>) -> Self {
-        self.__unsafe_private_named.66 = value;
+        self._fields.66 = value;
         self
     }
 }
@@ -7178,12 +7181,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `headline` field (optional)
     pub fn headline(mut self, value: impl Into<Option<MovieHeadline<'a>>>) -> Self {
-        self.__unsafe_private_named.67 = value.into();
+        self._fields.67 = value.into();
         self
     }
     /// Set the `headline` field to an Option value (optional)
     pub fn maybe_headline(mut self, value: Option<MovieHeadline<'a>>) -> Self {
-        self.__unsafe_private_named.67 = value;
+        self._fields.67 = value;
         self
     }
 }
@@ -7191,12 +7194,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `identifier` field (optional)
     pub fn identifier(mut self, value: impl Into<Option<MovieIdentifier<'a>>>) -> Self {
-        self.__unsafe_private_named.68 = value.into();
+        self._fields.68 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
     pub fn maybe_identifier(mut self, value: Option<MovieIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.68 = value;
+        self._fields.68 = value;
         self
     }
 }
@@ -7204,12 +7207,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<MovieImage<'a>>>) -> Self {
-        self.__unsafe_private_named.69 = value.into();
+        self._fields.69 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<MovieImage<'a>>) -> Self {
-        self.__unsafe_private_named.69 = value;
+        self._fields.69 = value;
         self
     }
 }
@@ -7217,12 +7220,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `inLanguage` field (optional)
     pub fn in_language(mut self, value: impl Into<Option<MovieInLanguage<'a>>>) -> Self {
-        self.__unsafe_private_named.70 = value.into();
+        self._fields.70 = value.into();
         self
     }
     /// Set the `inLanguage` field to an Option value (optional)
     pub fn maybe_in_language(mut self, value: Option<MovieInLanguage<'a>>) -> Self {
-        self.__unsafe_private_named.70 = value;
+        self._fields.70 = value;
         self
     }
 }
@@ -7233,7 +7236,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieInteractionStatistic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.71 = value.into();
+        self._fields.71 = value.into();
         self
     }
     /// Set the `interactionStatistic` field to an Option value (optional)
@@ -7241,7 +7244,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieInteractionStatistic<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.71 = value;
+        self._fields.71 = value;
         self
     }
 }
@@ -7252,7 +7255,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieInteractivityType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.72 = value.into();
+        self._fields.72 = value.into();
         self
     }
     /// Set the `interactivityType` field to an Option value (optional)
@@ -7260,7 +7263,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieInteractivityType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.72 = value;
+        self._fields.72 = value;
         self
     }
 }
@@ -7271,7 +7274,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieInterpretedAsClaim<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.73 = value.into();
+        self._fields.73 = value.into();
         self
     }
     /// Set the `interpretedAsClaim` field to an Option value (optional)
@@ -7279,7 +7282,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieInterpretedAsClaim<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.73 = value;
+        self._fields.73 = value;
         self
     }
 }
@@ -7290,7 +7293,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieIsAccessibleForFree<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.74 = value.into();
+        self._fields.74 = value.into();
         self
     }
     /// Set the `isAccessibleForFree` field to an Option value (optional)
@@ -7298,7 +7301,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieIsAccessibleForFree<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.74 = value;
+        self._fields.74 = value;
         self
     }
 }
@@ -7306,12 +7309,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `isBasedOn` field (optional)
     pub fn is_based_on(mut self, value: impl Into<Option<MovieIsBasedOn<'a>>>) -> Self {
-        self.__unsafe_private_named.75 = value.into();
+        self._fields.75 = value.into();
         self
     }
     /// Set the `isBasedOn` field to an Option value (optional)
     pub fn maybe_is_based_on(mut self, value: Option<MovieIsBasedOn<'a>>) -> Self {
-        self.__unsafe_private_named.75 = value;
+        self._fields.75 = value;
         self
     }
 }
@@ -7322,7 +7325,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieIsBasedOnUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.76 = value.into();
+        self._fields.76 = value.into();
         self
     }
     /// Set the `isBasedOnUrl` field to an Option value (optional)
@@ -7330,7 +7333,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieIsBasedOnUrl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.76 = value;
+        self._fields.76 = value;
         self
     }
 }
@@ -7341,7 +7344,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieIsFamilyFriendly<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.77 = value.into();
+        self._fields.77 = value.into();
         self
     }
     /// Set the `isFamilyFriendly` field to an Option value (optional)
@@ -7349,7 +7352,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieIsFamilyFriendly<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.77 = value;
+        self._fields.77 = value;
         self
     }
 }
@@ -7357,12 +7360,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `isPartOf` field (optional)
     pub fn is_part_of(mut self, value: impl Into<Option<MovieIsPartOf<'a>>>) -> Self {
-        self.__unsafe_private_named.78 = value.into();
+        self._fields.78 = value.into();
         self
     }
     /// Set the `isPartOf` field to an Option value (optional)
     pub fn maybe_is_part_of(mut self, value: Option<MovieIsPartOf<'a>>) -> Self {
-        self.__unsafe_private_named.78 = value;
+        self._fields.78 = value;
         self
     }
 }
@@ -7370,12 +7373,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<MovieKeywords<'a>>>) -> Self {
-        self.__unsafe_private_named.79 = value.into();
+        self._fields.79 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
     pub fn maybe_keywords(mut self, value: Option<MovieKeywords<'a>>) -> Self {
-        self.__unsafe_private_named.79 = value;
+        self._fields.79 = value;
         self
     }
 }
@@ -7386,7 +7389,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieLearningResourceType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.80 = value.into();
+        self._fields.80 = value.into();
         self
     }
     /// Set the `learningResourceType` field to an Option value (optional)
@@ -7394,7 +7397,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieLearningResourceType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.80 = value;
+        self._fields.80 = value;
         self
     }
 }
@@ -7402,12 +7405,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `license` field (optional)
     pub fn license(mut self, value: impl Into<Option<MovieLicense<'a>>>) -> Self {
-        self.__unsafe_private_named.81 = value.into();
+        self._fields.81 = value.into();
         self
     }
     /// Set the `license` field to an Option value (optional)
     pub fn maybe_license(mut self, value: Option<MovieLicense<'a>>) -> Self {
-        self.__unsafe_private_named.81 = value;
+        self._fields.81 = value;
         self
     }
 }
@@ -7418,7 +7421,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieLocationCreated<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.82 = value.into();
+        self._fields.82 = value.into();
         self
     }
     /// Set the `locationCreated` field to an Option value (optional)
@@ -7426,7 +7429,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieLocationCreated<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.82 = value;
+        self._fields.82 = value;
         self
     }
 }
@@ -7434,12 +7437,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `mainEntity` field (optional)
     pub fn main_entity(mut self, value: impl Into<Option<MovieMainEntity<'a>>>) -> Self {
-        self.__unsafe_private_named.83 = value.into();
+        self._fields.83 = value.into();
         self
     }
     /// Set the `mainEntity` field to an Option value (optional)
     pub fn maybe_main_entity(mut self, value: Option<MovieMainEntity<'a>>) -> Self {
-        self.__unsafe_private_named.83 = value;
+        self._fields.83 = value;
         self
     }
 }
@@ -7450,7 +7453,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieMainEntityOfPage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.84 = value.into();
+        self._fields.84 = value.into();
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
@@ -7458,7 +7461,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieMainEntityOfPage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.84 = value;
+        self._fields.84 = value;
         self
     }
 }
@@ -7466,12 +7469,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `maintainer` field (optional)
     pub fn maintainer(mut self, value: impl Into<Option<MovieMaintainer<'a>>>) -> Self {
-        self.__unsafe_private_named.85 = value.into();
+        self._fields.85 = value.into();
         self
     }
     /// Set the `maintainer` field to an Option value (optional)
     pub fn maybe_maintainer(mut self, value: Option<MovieMaintainer<'a>>) -> Self {
-        self.__unsafe_private_named.85 = value;
+        self._fields.85 = value;
         self
     }
 }
@@ -7479,12 +7482,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `material` field (optional)
     pub fn material(mut self, value: impl Into<Option<MovieMaterial<'a>>>) -> Self {
-        self.__unsafe_private_named.86 = value.into();
+        self._fields.86 = value.into();
         self
     }
     /// Set the `material` field to an Option value (optional)
     pub fn maybe_material(mut self, value: Option<MovieMaterial<'a>>) -> Self {
-        self.__unsafe_private_named.86 = value;
+        self._fields.86 = value;
         self
     }
 }
@@ -7495,7 +7498,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieMaterialExtent<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.87 = value.into();
+        self._fields.87 = value.into();
         self
     }
     /// Set the `materialExtent` field to an Option value (optional)
@@ -7503,7 +7506,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieMaterialExtent<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.87 = value;
+        self._fields.87 = value;
         self
     }
 }
@@ -7511,12 +7514,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `mentions` field (optional)
     pub fn mentions(mut self, value: impl Into<Option<MovieMentions<'a>>>) -> Self {
-        self.__unsafe_private_named.88 = value.into();
+        self._fields.88 = value.into();
         self
     }
     /// Set the `mentions` field to an Option value (optional)
     pub fn maybe_mentions(mut self, value: Option<MovieMentions<'a>>) -> Self {
-        self.__unsafe_private_named.88 = value;
+        self._fields.88 = value;
         self
     }
 }
@@ -7524,12 +7527,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `musicBy` field (optional)
     pub fn music_by(mut self, value: impl Into<Option<MovieMusicBy<'a>>>) -> Self {
-        self.__unsafe_private_named.89 = value.into();
+        self._fields.89 = value.into();
         self
     }
     /// Set the `musicBy` field to an Option value (optional)
     pub fn maybe_music_by(mut self, value: Option<MovieMusicBy<'a>>) -> Self {
-        self.__unsafe_private_named.89 = value;
+        self._fields.89 = value;
         self
     }
 }
@@ -7537,12 +7540,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<MovieName<'a>>>) -> Self {
-        self.__unsafe_private_named.90 = value.into();
+        self._fields.90 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<MovieName<'a>>) -> Self {
-        self.__unsafe_private_named.90 = value;
+        self._fields.90 = value;
         self
     }
 }
@@ -7550,12 +7553,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `offers` field (optional)
     pub fn offers(mut self, value: impl Into<Option<MovieOffers<'a>>>) -> Self {
-        self.__unsafe_private_named.91 = value.into();
+        self._fields.91 = value.into();
         self
     }
     /// Set the `offers` field to an Option value (optional)
     pub fn maybe_offers(mut self, value: Option<MovieOffers<'a>>) -> Self {
-        self.__unsafe_private_named.91 = value;
+        self._fields.91 = value;
         self
     }
 }
@@ -7563,12 +7566,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `pattern` field (optional)
     pub fn pattern(mut self, value: impl Into<Option<MoviePattern<'a>>>) -> Self {
-        self.__unsafe_private_named.92 = value.into();
+        self._fields.92 = value.into();
         self
     }
     /// Set the `pattern` field to an Option value (optional)
     pub fn maybe_pattern(mut self, value: Option<MoviePattern<'a>>) -> Self {
-        self.__unsafe_private_named.92 = value;
+        self._fields.92 = value;
         self
     }
 }
@@ -7576,12 +7579,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `position` field (optional)
     pub fn position(mut self, value: impl Into<Option<MoviePosition<'a>>>) -> Self {
-        self.__unsafe_private_named.93 = value.into();
+        self._fields.93 = value.into();
         self
     }
     /// Set the `position` field to an Option value (optional)
     pub fn maybe_position(mut self, value: Option<MoviePosition<'a>>) -> Self {
-        self.__unsafe_private_named.93 = value;
+        self._fields.93 = value;
         self
     }
 }
@@ -7592,7 +7595,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MoviePotentialAction<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.94 = value.into();
+        self._fields.94 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
@@ -7600,7 +7603,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MoviePotentialAction<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.94 = value;
+        self._fields.94 = value;
         self
     }
 }
@@ -7608,12 +7611,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `producer` field (optional)
     pub fn producer(mut self, value: impl Into<Option<MovieProducer<'a>>>) -> Self {
-        self.__unsafe_private_named.95 = value.into();
+        self._fields.95 = value.into();
         self
     }
     /// Set the `producer` field to an Option value (optional)
     pub fn maybe_producer(mut self, value: Option<MovieProducer<'a>>) -> Self {
-        self.__unsafe_private_named.95 = value;
+        self._fields.95 = value;
         self
     }
 }
@@ -7624,7 +7627,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieProductionCompany<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.96 = value.into();
+        self._fields.96 = value.into();
         self
     }
     /// Set the `productionCompany` field to an Option value (optional)
@@ -7632,7 +7635,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieProductionCompany<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.96 = value;
+        self._fields.96 = value;
         self
     }
 }
@@ -7640,12 +7643,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `provider` field (optional)
     pub fn provider(mut self, value: impl Into<Option<MovieProvider<'a>>>) -> Self {
-        self.__unsafe_private_named.97 = value.into();
+        self._fields.97 = value.into();
         self
     }
     /// Set the `provider` field to an Option value (optional)
     pub fn maybe_provider(mut self, value: Option<MovieProvider<'a>>) -> Self {
-        self.__unsafe_private_named.97 = value;
+        self._fields.97 = value;
         self
     }
 }
@@ -7656,12 +7659,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MoviePublication<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.98 = value.into();
+        self._fields.98 = value.into();
         self
     }
     /// Set the `publication` field to an Option value (optional)
     pub fn maybe_publication(mut self, value: Option<MoviePublication<'a>>) -> Self {
-        self.__unsafe_private_named.98 = value;
+        self._fields.98 = value;
         self
     }
 }
@@ -7669,12 +7672,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `publisher` field (optional)
     pub fn publisher(mut self, value: impl Into<Option<MoviePublisher<'a>>>) -> Self {
-        self.__unsafe_private_named.99 = value.into();
+        self._fields.99 = value.into();
         self
     }
     /// Set the `publisher` field to an Option value (optional)
     pub fn maybe_publisher(mut self, value: Option<MoviePublisher<'a>>) -> Self {
-        self.__unsafe_private_named.99 = value;
+        self._fields.99 = value;
         self
     }
 }
@@ -7685,7 +7688,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MoviePublisherImprint<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.100 = value.into();
+        self._fields.100 = value.into();
         self
     }
     /// Set the `publisherImprint` field to an Option value (optional)
@@ -7693,7 +7696,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MoviePublisherImprint<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.100 = value;
+        self._fields.100 = value;
         self
     }
 }
@@ -7704,7 +7707,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MoviePublishingPrinciples<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.101 = value.into();
+        self._fields.101 = value.into();
         self
     }
     /// Set the `publishingPrinciples` field to an Option value (optional)
@@ -7712,7 +7715,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MoviePublishingPrinciples<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.101 = value;
+        self._fields.101 = value;
         self
     }
 }
@@ -7720,12 +7723,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `recordedAt` field (optional)
     pub fn recorded_at(mut self, value: impl Into<Option<MovieRecordedAt<'a>>>) -> Self {
-        self.__unsafe_private_named.102 = value.into();
+        self._fields.102 = value.into();
         self
     }
     /// Set the `recordedAt` field to an Option value (optional)
     pub fn maybe_recorded_at(mut self, value: Option<MovieRecordedAt<'a>>) -> Self {
-        self.__unsafe_private_named.102 = value;
+        self._fields.102 = value;
         self
     }
 }
@@ -7736,7 +7739,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieReleasedEvent<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.103 = value.into();
+        self._fields.103 = value.into();
         self
     }
     /// Set the `releasedEvent` field to an Option value (optional)
@@ -7744,7 +7747,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieReleasedEvent<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.103 = value;
+        self._fields.103 = value;
         self
     }
 }
@@ -7752,12 +7755,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<MovieReview<'a>>>) -> Self {
-        self.__unsafe_private_named.104 = value.into();
+        self._fields.104 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
     pub fn maybe_review(mut self, value: Option<MovieReview<'a>>) -> Self {
-        self.__unsafe_private_named.104 = value;
+        self._fields.104 = value;
         self
     }
 }
@@ -7765,12 +7768,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `reviews` field (optional)
     pub fn reviews(mut self, value: impl Into<Option<MovieReviews<'a>>>) -> Self {
-        self.__unsafe_private_named.105 = value.into();
+        self._fields.105 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
     pub fn maybe_reviews(mut self, value: Option<MovieReviews<'a>>) -> Self {
-        self.__unsafe_private_named.105 = value;
+        self._fields.105 = value;
         self
     }
 }
@@ -7778,12 +7781,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<MovieSameAs<'a>>>) -> Self {
-        self.__unsafe_private_named.106 = value.into();
+        self._fields.106 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
     pub fn maybe_same_as(mut self, value: Option<MovieSameAs<'a>>) -> Self {
-        self.__unsafe_private_named.106 = value;
+        self._fields.106 = value;
         self
     }
 }
@@ -7794,7 +7797,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieSchemaVersion<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.107 = value.into();
+        self._fields.107 = value.into();
         self
     }
     /// Set the `schemaVersion` field to an Option value (optional)
@@ -7802,7 +7805,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieSchemaVersion<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.107 = value;
+        self._fields.107 = value;
         self
     }
 }
@@ -7813,7 +7816,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieSdDatePublished<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.108 = value.into();
+        self._fields.108 = value.into();
         self
     }
     /// Set the `sdDatePublished` field to an Option value (optional)
@@ -7821,7 +7824,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieSdDatePublished<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.108 = value;
+        self._fields.108 = value;
         self
     }
 }
@@ -7829,12 +7832,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `sdLicense` field (optional)
     pub fn sd_license(mut self, value: impl Into<Option<MovieSdLicense<'a>>>) -> Self {
-        self.__unsafe_private_named.109 = value.into();
+        self._fields.109 = value.into();
         self
     }
     /// Set the `sdLicense` field to an Option value (optional)
     pub fn maybe_sd_license(mut self, value: Option<MovieSdLicense<'a>>) -> Self {
-        self.__unsafe_private_named.109 = value;
+        self._fields.109 = value;
         self
     }
 }
@@ -7845,12 +7848,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieSdPublisher<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.110 = value.into();
+        self._fields.110 = value.into();
         self
     }
     /// Set the `sdPublisher` field to an Option value (optional)
     pub fn maybe_sd_publisher(mut self, value: Option<MovieSdPublisher<'a>>) -> Self {
-        self.__unsafe_private_named.110 = value;
+        self._fields.110 = value;
         self
     }
 }
@@ -7858,12 +7861,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<MovieSize<'a>>>) -> Self {
-        self.__unsafe_private_named.111 = value.into();
+        self._fields.111 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
     pub fn maybe_size(mut self, value: Option<MovieSize<'a>>) -> Self {
-        self.__unsafe_private_named.111 = value;
+        self._fields.111 = value;
         self
     }
 }
@@ -7874,7 +7877,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieSourceOrganization<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.112 = value.into();
+        self._fields.112 = value.into();
         self
     }
     /// Set the `sourceOrganization` field to an Option value (optional)
@@ -7882,7 +7885,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieSourceOrganization<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.112 = value;
+        self._fields.112 = value;
         self
     }
 }
@@ -7890,12 +7893,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `spatial` field (optional)
     pub fn spatial(mut self, value: impl Into<Option<MovieSpatial<'a>>>) -> Self {
-        self.__unsafe_private_named.113 = value.into();
+        self._fields.113 = value.into();
         self
     }
     /// Set the `spatial` field to an Option value (optional)
     pub fn maybe_spatial(mut self, value: Option<MovieSpatial<'a>>) -> Self {
-        self.__unsafe_private_named.113 = value;
+        self._fields.113 = value;
         self
     }
 }
@@ -7906,7 +7909,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieSpatialCoverage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.114 = value.into();
+        self._fields.114 = value.into();
         self
     }
     /// Set the `spatialCoverage` field to an Option value (optional)
@@ -7914,7 +7917,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieSpatialCoverage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.114 = value;
+        self._fields.114 = value;
         self
     }
 }
@@ -7922,12 +7925,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `sponsor` field (optional)
     pub fn sponsor(mut self, value: impl Into<Option<MovieSponsor<'a>>>) -> Self {
-        self.__unsafe_private_named.115 = value.into();
+        self._fields.115 = value.into();
         self
     }
     /// Set the `sponsor` field to an Option value (optional)
     pub fn maybe_sponsor(mut self, value: Option<MovieSponsor<'a>>) -> Self {
-        self.__unsafe_private_named.115 = value;
+        self._fields.115 = value;
         self
     }
 }
@@ -7935,12 +7938,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(mut self, value: impl Into<Option<MovieSubjectOf<'a>>>) -> Self {
-        self.__unsafe_private_named.116 = value.into();
+        self._fields.116 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
     pub fn maybe_subject_of(mut self, value: Option<MovieSubjectOf<'a>>) -> Self {
-        self.__unsafe_private_named.116 = value;
+        self._fields.116 = value;
         self
     }
 }
@@ -7951,7 +7954,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieSubtitleLanguage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.117 = value.into();
+        self._fields.117 = value.into();
         self
     }
     /// Set the `subtitleLanguage` field to an Option value (optional)
@@ -7959,7 +7962,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieSubtitleLanguage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.117 = value;
+        self._fields.117 = value;
         self
     }
 }
@@ -7967,12 +7970,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `teaches` field (optional)
     pub fn teaches(mut self, value: impl Into<Option<MovieTeaches<'a>>>) -> Self {
-        self.__unsafe_private_named.118 = value.into();
+        self._fields.118 = value.into();
         self
     }
     /// Set the `teaches` field to an Option value (optional)
     pub fn maybe_teaches(mut self, value: Option<MovieTeaches<'a>>) -> Self {
-        self.__unsafe_private_named.118 = value;
+        self._fields.118 = value;
         self
     }
 }
@@ -7980,12 +7983,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `temporal` field (optional)
     pub fn temporal(mut self, value: impl Into<Option<MovieTemporal<'a>>>) -> Self {
-        self.__unsafe_private_named.119 = value.into();
+        self._fields.119 = value.into();
         self
     }
     /// Set the `temporal` field to an Option value (optional)
     pub fn maybe_temporal(mut self, value: Option<MovieTemporal<'a>>) -> Self {
-        self.__unsafe_private_named.119 = value;
+        self._fields.119 = value;
         self
     }
 }
@@ -7996,7 +7999,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieTemporalCoverage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.120 = value.into();
+        self._fields.120 = value.into();
         self
     }
     /// Set the `temporalCoverage` field to an Option value (optional)
@@ -8004,7 +8007,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieTemporalCoverage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.120 = value;
+        self._fields.120 = value;
         self
     }
 }
@@ -8012,12 +8015,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<MovieText<'a>>>) -> Self {
-        self.__unsafe_private_named.121 = value.into();
+        self._fields.121 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
     pub fn maybe_text(mut self, value: Option<MovieText<'a>>) -> Self {
-        self.__unsafe_private_named.121 = value;
+        self._fields.121 = value;
         self
     }
 }
@@ -8025,12 +8028,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `thumbnail` field (optional)
     pub fn thumbnail(mut self, value: impl Into<Option<MovieThumbnail<'a>>>) -> Self {
-        self.__unsafe_private_named.122 = value.into();
+        self._fields.122 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
     pub fn maybe_thumbnail(mut self, value: Option<MovieThumbnail<'a>>) -> Self {
-        self.__unsafe_private_named.122 = value;
+        self._fields.122 = value;
         self
     }
 }
@@ -8041,12 +8044,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieThumbnailUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.123 = value.into();
+        self._fields.123 = value.into();
         self
     }
     /// Set the `thumbnailUrl` field to an Option value (optional)
     pub fn maybe_thumbnail_url(mut self, value: Option<MovieThumbnailUrl<'a>>) -> Self {
-        self.__unsafe_private_named.123 = value;
+        self._fields.123 = value;
         self
     }
 }
@@ -8057,12 +8060,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieTimeRequired<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.124 = value.into();
+        self._fields.124 = value.into();
         self
     }
     /// Set the `timeRequired` field to an Option value (optional)
     pub fn maybe_time_required(mut self, value: Option<MovieTimeRequired<'a>>) -> Self {
-        self.__unsafe_private_named.124 = value;
+        self._fields.124 = value;
         self
     }
 }
@@ -8070,12 +8073,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `titleEIDR` field (optional)
     pub fn title_eidr(mut self, value: impl Into<Option<MovieTitleEidr<'a>>>) -> Self {
-        self.__unsafe_private_named.125 = value.into();
+        self._fields.125 = value.into();
         self
     }
     /// Set the `titleEIDR` field to an Option value (optional)
     pub fn maybe_title_eidr(mut self, value: Option<MovieTitleEidr<'a>>) -> Self {
-        self.__unsafe_private_named.125 = value;
+        self._fields.125 = value;
         self
     }
 }
@@ -8083,12 +8086,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `trailer` field (optional)
     pub fn trailer(mut self, value: impl Into<Option<MovieTrailer<'a>>>) -> Self {
-        self.__unsafe_private_named.126 = value.into();
+        self._fields.126 = value.into();
         self
     }
     /// Set the `trailer` field to an Option value (optional)
     pub fn maybe_trailer(mut self, value: Option<MovieTrailer<'a>>) -> Self {
-        self.__unsafe_private_named.126 = value;
+        self._fields.126 = value;
         self
     }
 }
@@ -8099,7 +8102,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieTranslationOfWork<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.127 = value.into();
+        self._fields.127 = value.into();
         self
     }
     /// Set the `translationOfWork` field to an Option value (optional)
@@ -8107,7 +8110,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieTranslationOfWork<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.127 = value;
+        self._fields.127 = value;
         self
     }
 }
@@ -8115,12 +8118,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `translator` field (optional)
     pub fn translator(mut self, value: impl Into<Option<MovieTranslator<'a>>>) -> Self {
-        self.__unsafe_private_named.128 = value.into();
+        self._fields.128 = value.into();
         self
     }
     /// Set the `translator` field to an Option value (optional)
     pub fn maybe_translator(mut self, value: Option<MovieTranslator<'a>>) -> Self {
-        self.__unsafe_private_named.128 = value;
+        self._fields.128 = value;
         self
     }
 }
@@ -8131,7 +8134,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieTypicalAgeRange<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.129 = value.into();
+        self._fields.129 = value.into();
         self
     }
     /// Set the `typicalAgeRange` field to an Option value (optional)
@@ -8139,7 +8142,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieTypicalAgeRange<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.129 = value;
+        self._fields.129 = value;
         self
     }
 }
@@ -8147,12 +8150,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<MovieUrl<'a>>>) -> Self {
-        self.__unsafe_private_named.130 = value.into();
+        self._fields.130 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<MovieUrl<'a>>) -> Self {
-        self.__unsafe_private_named.130 = value;
+        self._fields.130 = value;
         self
     }
 }
@@ -8160,12 +8163,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `usageInfo` field (optional)
     pub fn usage_info(mut self, value: impl Into<Option<MovieUsageInfo<'a>>>) -> Self {
-        self.__unsafe_private_named.131 = value.into();
+        self._fields.131 = value.into();
         self
     }
     /// Set the `usageInfo` field to an Option value (optional)
     pub fn maybe_usage_info(mut self, value: Option<MovieUsageInfo<'a>>) -> Self {
-        self.__unsafe_private_named.131 = value;
+        self._fields.131 = value;
         self
     }
 }
@@ -8173,12 +8176,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `version` field (optional)
     pub fn version(mut self, value: impl Into<Option<MovieVersion<'a>>>) -> Self {
-        self.__unsafe_private_named.132 = value.into();
+        self._fields.132 = value.into();
         self
     }
     /// Set the `version` field to an Option value (optional)
     pub fn maybe_version(mut self, value: Option<MovieVersion<'a>>) -> Self {
-        self.__unsafe_private_named.132 = value;
+        self._fields.132 = value;
         self
     }
 }
@@ -8186,12 +8189,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `video` field (optional)
     pub fn video(mut self, value: impl Into<Option<MovieVideo<'a>>>) -> Self {
-        self.__unsafe_private_named.133 = value.into();
+        self._fields.133 = value.into();
         self
     }
     /// Set the `video` field to an Option value (optional)
     pub fn maybe_video(mut self, value: Option<MovieVideo<'a>>) -> Self {
-        self.__unsafe_private_named.133 = value;
+        self._fields.133 = value;
         self
     }
 }
@@ -8199,12 +8202,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
 impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
     /// Set the `wordCount` field (optional)
     pub fn word_count(mut self, value: impl Into<Option<MovieWordCount<'a>>>) -> Self {
-        self.__unsafe_private_named.134 = value.into();
+        self._fields.134 = value.into();
         self
     }
     /// Set the `wordCount` field to an Option value (optional)
     pub fn maybe_word_count(mut self, value: Option<MovieWordCount<'a>>) -> Self {
-        self.__unsafe_private_named.134 = value;
+        self._fields.134 = value;
         self
     }
 }
@@ -8215,12 +8218,12 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieWorkExample<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.135 = value.into();
+        self._fields.135 = value.into();
         self
     }
     /// Set the `workExample` field to an Option value (optional)
     pub fn maybe_work_example(mut self, value: Option<MovieWorkExample<'a>>) -> Self {
-        self.__unsafe_private_named.135 = value;
+        self._fields.135 = value;
         self
     }
 }
@@ -8231,7 +8234,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MovieWorkTranslation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.136 = value.into();
+        self._fields.136 = value.into();
         self
     }
     /// Set the `workTranslation` field to an Option value (optional)
@@ -8239,7 +8242,7 @@ impl<'a, S: movie_state::State> MovieBuilder<'a, S> {
         mut self,
         value: Option<MovieWorkTranslation<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.136 = value;
+        self._fields.136 = value;
         self
     }
 }
@@ -8251,143 +8254,143 @@ where
     /// Build the final struct
     pub fn build(self) -> Movie<'a> {
         Movie {
-            about: self.__unsafe_private_named.0,
-            r#abstract: self.__unsafe_private_named.1,
-            access_mode: self.__unsafe_private_named.2,
-            access_mode_sufficient: self.__unsafe_private_named.3,
-            accessibility_api: self.__unsafe_private_named.4,
-            accessibility_control: self.__unsafe_private_named.5,
-            accessibility_feature: self.__unsafe_private_named.6,
-            accessibility_hazard: self.__unsafe_private_named.7,
-            accessibility_summary: self.__unsafe_private_named.8,
-            accountable_person: self.__unsafe_private_named.9,
-            acquire_license_page: self.__unsafe_private_named.10,
-            actor: self.__unsafe_private_named.11,
-            actors: self.__unsafe_private_named.12,
-            additional_type: self.__unsafe_private_named.13,
-            aggregate_rating: self.__unsafe_private_named.14,
-            alternate_name: self.__unsafe_private_named.15,
-            alternative_headline: self.__unsafe_private_named.16,
-            archived_at: self.__unsafe_private_named.17,
-            assesses: self.__unsafe_private_named.18,
-            associated_media: self.__unsafe_private_named.19,
-            audience: self.__unsafe_private_named.20,
-            audio: self.__unsafe_private_named.21,
-            author: self.__unsafe_private_named.22,
-            award: self.__unsafe_private_named.23,
-            awards: self.__unsafe_private_named.24,
-            character: self.__unsafe_private_named.25,
-            citation: self.__unsafe_private_named.26,
-            comment: self.__unsafe_private_named.27,
-            comment_count: self.__unsafe_private_named.28,
-            conditions_of_access: self.__unsafe_private_named.29,
-            content_location: self.__unsafe_private_named.30,
-            content_rating: self.__unsafe_private_named.31,
-            content_reference_time: self.__unsafe_private_named.32,
-            contributor: self.__unsafe_private_named.33,
-            copyright_holder: self.__unsafe_private_named.34,
-            copyright_notice: self.__unsafe_private_named.35,
-            copyright_year: self.__unsafe_private_named.36,
-            correction: self.__unsafe_private_named.37,
-            country_of_origin: self.__unsafe_private_named.38,
-            creative_work_status: self.__unsafe_private_named.39,
-            creator: self.__unsafe_private_named.40,
-            credit_text: self.__unsafe_private_named.41,
-            date_created: self.__unsafe_private_named.42,
-            date_modified: self.__unsafe_private_named.43,
-            date_published: self.__unsafe_private_named.44,
-            description: self.__unsafe_private_named.45,
-            digital_source_type: self.__unsafe_private_named.46,
-            director: self.__unsafe_private_named.47,
-            directors: self.__unsafe_private_named.48,
-            disambiguating_description: self.__unsafe_private_named.49,
-            discussion_url: self.__unsafe_private_named.50,
-            duration: self.__unsafe_private_named.51,
-            edit_eidr: self.__unsafe_private_named.52,
-            editor: self.__unsafe_private_named.53,
-            educational_alignment: self.__unsafe_private_named.54,
-            educational_level: self.__unsafe_private_named.55,
-            educational_use: self.__unsafe_private_named.56,
-            encoding: self.__unsafe_private_named.57,
-            encoding_format: self.__unsafe_private_named.58,
-            encodings: self.__unsafe_private_named.59,
-            example_of_work: self.__unsafe_private_named.60,
-            expires: self.__unsafe_private_named.61,
-            file_format: self.__unsafe_private_named.62,
-            funder: self.__unsafe_private_named.63,
-            funding: self.__unsafe_private_named.64,
-            genre: self.__unsafe_private_named.65,
-            has_part: self.__unsafe_private_named.66,
-            headline: self.__unsafe_private_named.67,
-            identifier: self.__unsafe_private_named.68,
-            image: self.__unsafe_private_named.69,
-            in_language: self.__unsafe_private_named.70,
-            interaction_statistic: self.__unsafe_private_named.71,
-            interactivity_type: self.__unsafe_private_named.72,
-            interpreted_as_claim: self.__unsafe_private_named.73,
-            is_accessible_for_free: self.__unsafe_private_named.74,
-            is_based_on: self.__unsafe_private_named.75,
-            is_based_on_url: self.__unsafe_private_named.76,
-            is_family_friendly: self.__unsafe_private_named.77,
-            is_part_of: self.__unsafe_private_named.78,
-            keywords: self.__unsafe_private_named.79,
-            learning_resource_type: self.__unsafe_private_named.80,
-            license: self.__unsafe_private_named.81,
-            location_created: self.__unsafe_private_named.82,
-            main_entity: self.__unsafe_private_named.83,
-            main_entity_of_page: self.__unsafe_private_named.84,
-            maintainer: self.__unsafe_private_named.85,
-            material: self.__unsafe_private_named.86,
-            material_extent: self.__unsafe_private_named.87,
-            mentions: self.__unsafe_private_named.88,
-            music_by: self.__unsafe_private_named.89,
-            name: self.__unsafe_private_named.90,
-            offers: self.__unsafe_private_named.91,
-            pattern: self.__unsafe_private_named.92,
-            position: self.__unsafe_private_named.93,
-            potential_action: self.__unsafe_private_named.94,
-            producer: self.__unsafe_private_named.95,
-            production_company: self.__unsafe_private_named.96,
-            provider: self.__unsafe_private_named.97,
-            publication: self.__unsafe_private_named.98,
-            publisher: self.__unsafe_private_named.99,
-            publisher_imprint: self.__unsafe_private_named.100,
-            publishing_principles: self.__unsafe_private_named.101,
-            recorded_at: self.__unsafe_private_named.102,
-            released_event: self.__unsafe_private_named.103,
-            review: self.__unsafe_private_named.104,
-            reviews: self.__unsafe_private_named.105,
-            same_as: self.__unsafe_private_named.106,
-            schema_version: self.__unsafe_private_named.107,
-            sd_date_published: self.__unsafe_private_named.108,
-            sd_license: self.__unsafe_private_named.109,
-            sd_publisher: self.__unsafe_private_named.110,
-            size: self.__unsafe_private_named.111,
-            source_organization: self.__unsafe_private_named.112,
-            spatial: self.__unsafe_private_named.113,
-            spatial_coverage: self.__unsafe_private_named.114,
-            sponsor: self.__unsafe_private_named.115,
-            subject_of: self.__unsafe_private_named.116,
-            subtitle_language: self.__unsafe_private_named.117,
-            teaches: self.__unsafe_private_named.118,
-            temporal: self.__unsafe_private_named.119,
-            temporal_coverage: self.__unsafe_private_named.120,
-            text: self.__unsafe_private_named.121,
-            thumbnail: self.__unsafe_private_named.122,
-            thumbnail_url: self.__unsafe_private_named.123,
-            time_required: self.__unsafe_private_named.124,
-            title_eidr: self.__unsafe_private_named.125,
-            trailer: self.__unsafe_private_named.126,
-            translation_of_work: self.__unsafe_private_named.127,
-            translator: self.__unsafe_private_named.128,
-            typical_age_range: self.__unsafe_private_named.129,
-            url: self.__unsafe_private_named.130,
-            usage_info: self.__unsafe_private_named.131,
-            version: self.__unsafe_private_named.132,
-            video: self.__unsafe_private_named.133,
-            word_count: self.__unsafe_private_named.134,
-            work_example: self.__unsafe_private_named.135,
-            work_translation: self.__unsafe_private_named.136,
+            about: self._fields.0,
+            r#abstract: self._fields.1,
+            access_mode: self._fields.2,
+            access_mode_sufficient: self._fields.3,
+            accessibility_api: self._fields.4,
+            accessibility_control: self._fields.5,
+            accessibility_feature: self._fields.6,
+            accessibility_hazard: self._fields.7,
+            accessibility_summary: self._fields.8,
+            accountable_person: self._fields.9,
+            acquire_license_page: self._fields.10,
+            actor: self._fields.11,
+            actors: self._fields.12,
+            additional_type: self._fields.13,
+            aggregate_rating: self._fields.14,
+            alternate_name: self._fields.15,
+            alternative_headline: self._fields.16,
+            archived_at: self._fields.17,
+            assesses: self._fields.18,
+            associated_media: self._fields.19,
+            audience: self._fields.20,
+            audio: self._fields.21,
+            author: self._fields.22,
+            award: self._fields.23,
+            awards: self._fields.24,
+            character: self._fields.25,
+            citation: self._fields.26,
+            comment: self._fields.27,
+            comment_count: self._fields.28,
+            conditions_of_access: self._fields.29,
+            content_location: self._fields.30,
+            content_rating: self._fields.31,
+            content_reference_time: self._fields.32,
+            contributor: self._fields.33,
+            copyright_holder: self._fields.34,
+            copyright_notice: self._fields.35,
+            copyright_year: self._fields.36,
+            correction: self._fields.37,
+            country_of_origin: self._fields.38,
+            creative_work_status: self._fields.39,
+            creator: self._fields.40,
+            credit_text: self._fields.41,
+            date_created: self._fields.42,
+            date_modified: self._fields.43,
+            date_published: self._fields.44,
+            description: self._fields.45,
+            digital_source_type: self._fields.46,
+            director: self._fields.47,
+            directors: self._fields.48,
+            disambiguating_description: self._fields.49,
+            discussion_url: self._fields.50,
+            duration: self._fields.51,
+            edit_eidr: self._fields.52,
+            editor: self._fields.53,
+            educational_alignment: self._fields.54,
+            educational_level: self._fields.55,
+            educational_use: self._fields.56,
+            encoding: self._fields.57,
+            encoding_format: self._fields.58,
+            encodings: self._fields.59,
+            example_of_work: self._fields.60,
+            expires: self._fields.61,
+            file_format: self._fields.62,
+            funder: self._fields.63,
+            funding: self._fields.64,
+            genre: self._fields.65,
+            has_part: self._fields.66,
+            headline: self._fields.67,
+            identifier: self._fields.68,
+            image: self._fields.69,
+            in_language: self._fields.70,
+            interaction_statistic: self._fields.71,
+            interactivity_type: self._fields.72,
+            interpreted_as_claim: self._fields.73,
+            is_accessible_for_free: self._fields.74,
+            is_based_on: self._fields.75,
+            is_based_on_url: self._fields.76,
+            is_family_friendly: self._fields.77,
+            is_part_of: self._fields.78,
+            keywords: self._fields.79,
+            learning_resource_type: self._fields.80,
+            license: self._fields.81,
+            location_created: self._fields.82,
+            main_entity: self._fields.83,
+            main_entity_of_page: self._fields.84,
+            maintainer: self._fields.85,
+            material: self._fields.86,
+            material_extent: self._fields.87,
+            mentions: self._fields.88,
+            music_by: self._fields.89,
+            name: self._fields.90,
+            offers: self._fields.91,
+            pattern: self._fields.92,
+            position: self._fields.93,
+            potential_action: self._fields.94,
+            producer: self._fields.95,
+            production_company: self._fields.96,
+            provider: self._fields.97,
+            publication: self._fields.98,
+            publisher: self._fields.99,
+            publisher_imprint: self._fields.100,
+            publishing_principles: self._fields.101,
+            recorded_at: self._fields.102,
+            released_event: self._fields.103,
+            review: self._fields.104,
+            reviews: self._fields.105,
+            same_as: self._fields.106,
+            schema_version: self._fields.107,
+            sd_date_published: self._fields.108,
+            sd_license: self._fields.109,
+            sd_publisher: self._fields.110,
+            size: self._fields.111,
+            source_organization: self._fields.112,
+            spatial: self._fields.113,
+            spatial_coverage: self._fields.114,
+            sponsor: self._fields.115,
+            subject_of: self._fields.116,
+            subtitle_language: self._fields.117,
+            teaches: self._fields.118,
+            temporal: self._fields.119,
+            temporal_coverage: self._fields.120,
+            text: self._fields.121,
+            thumbnail: self._fields.122,
+            thumbnail_url: self._fields.123,
+            time_required: self._fields.124,
+            title_eidr: self._fields.125,
+            trailer: self._fields.126,
+            translation_of_work: self._fields.127,
+            translator: self._fields.128,
+            typical_age_range: self._fields.129,
+            url: self._fields.130,
+            usage_info: self._fields.131,
+            version: self._fields.132,
+            video: self._fields.133,
+            word_count: self._fields.134,
+            work_example: self._fields.135,
+            work_translation: self._fields.136,
             extra_data: Default::default(),
         }
     }
@@ -8397,143 +8400,143 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Movie<'a> {
         Movie {
-            about: self.__unsafe_private_named.0,
-            r#abstract: self.__unsafe_private_named.1,
-            access_mode: self.__unsafe_private_named.2,
-            access_mode_sufficient: self.__unsafe_private_named.3,
-            accessibility_api: self.__unsafe_private_named.4,
-            accessibility_control: self.__unsafe_private_named.5,
-            accessibility_feature: self.__unsafe_private_named.6,
-            accessibility_hazard: self.__unsafe_private_named.7,
-            accessibility_summary: self.__unsafe_private_named.8,
-            accountable_person: self.__unsafe_private_named.9,
-            acquire_license_page: self.__unsafe_private_named.10,
-            actor: self.__unsafe_private_named.11,
-            actors: self.__unsafe_private_named.12,
-            additional_type: self.__unsafe_private_named.13,
-            aggregate_rating: self.__unsafe_private_named.14,
-            alternate_name: self.__unsafe_private_named.15,
-            alternative_headline: self.__unsafe_private_named.16,
-            archived_at: self.__unsafe_private_named.17,
-            assesses: self.__unsafe_private_named.18,
-            associated_media: self.__unsafe_private_named.19,
-            audience: self.__unsafe_private_named.20,
-            audio: self.__unsafe_private_named.21,
-            author: self.__unsafe_private_named.22,
-            award: self.__unsafe_private_named.23,
-            awards: self.__unsafe_private_named.24,
-            character: self.__unsafe_private_named.25,
-            citation: self.__unsafe_private_named.26,
-            comment: self.__unsafe_private_named.27,
-            comment_count: self.__unsafe_private_named.28,
-            conditions_of_access: self.__unsafe_private_named.29,
-            content_location: self.__unsafe_private_named.30,
-            content_rating: self.__unsafe_private_named.31,
-            content_reference_time: self.__unsafe_private_named.32,
-            contributor: self.__unsafe_private_named.33,
-            copyright_holder: self.__unsafe_private_named.34,
-            copyright_notice: self.__unsafe_private_named.35,
-            copyright_year: self.__unsafe_private_named.36,
-            correction: self.__unsafe_private_named.37,
-            country_of_origin: self.__unsafe_private_named.38,
-            creative_work_status: self.__unsafe_private_named.39,
-            creator: self.__unsafe_private_named.40,
-            credit_text: self.__unsafe_private_named.41,
-            date_created: self.__unsafe_private_named.42,
-            date_modified: self.__unsafe_private_named.43,
-            date_published: self.__unsafe_private_named.44,
-            description: self.__unsafe_private_named.45,
-            digital_source_type: self.__unsafe_private_named.46,
-            director: self.__unsafe_private_named.47,
-            directors: self.__unsafe_private_named.48,
-            disambiguating_description: self.__unsafe_private_named.49,
-            discussion_url: self.__unsafe_private_named.50,
-            duration: self.__unsafe_private_named.51,
-            edit_eidr: self.__unsafe_private_named.52,
-            editor: self.__unsafe_private_named.53,
-            educational_alignment: self.__unsafe_private_named.54,
-            educational_level: self.__unsafe_private_named.55,
-            educational_use: self.__unsafe_private_named.56,
-            encoding: self.__unsafe_private_named.57,
-            encoding_format: self.__unsafe_private_named.58,
-            encodings: self.__unsafe_private_named.59,
-            example_of_work: self.__unsafe_private_named.60,
-            expires: self.__unsafe_private_named.61,
-            file_format: self.__unsafe_private_named.62,
-            funder: self.__unsafe_private_named.63,
-            funding: self.__unsafe_private_named.64,
-            genre: self.__unsafe_private_named.65,
-            has_part: self.__unsafe_private_named.66,
-            headline: self.__unsafe_private_named.67,
-            identifier: self.__unsafe_private_named.68,
-            image: self.__unsafe_private_named.69,
-            in_language: self.__unsafe_private_named.70,
-            interaction_statistic: self.__unsafe_private_named.71,
-            interactivity_type: self.__unsafe_private_named.72,
-            interpreted_as_claim: self.__unsafe_private_named.73,
-            is_accessible_for_free: self.__unsafe_private_named.74,
-            is_based_on: self.__unsafe_private_named.75,
-            is_based_on_url: self.__unsafe_private_named.76,
-            is_family_friendly: self.__unsafe_private_named.77,
-            is_part_of: self.__unsafe_private_named.78,
-            keywords: self.__unsafe_private_named.79,
-            learning_resource_type: self.__unsafe_private_named.80,
-            license: self.__unsafe_private_named.81,
-            location_created: self.__unsafe_private_named.82,
-            main_entity: self.__unsafe_private_named.83,
-            main_entity_of_page: self.__unsafe_private_named.84,
-            maintainer: self.__unsafe_private_named.85,
-            material: self.__unsafe_private_named.86,
-            material_extent: self.__unsafe_private_named.87,
-            mentions: self.__unsafe_private_named.88,
-            music_by: self.__unsafe_private_named.89,
-            name: self.__unsafe_private_named.90,
-            offers: self.__unsafe_private_named.91,
-            pattern: self.__unsafe_private_named.92,
-            position: self.__unsafe_private_named.93,
-            potential_action: self.__unsafe_private_named.94,
-            producer: self.__unsafe_private_named.95,
-            production_company: self.__unsafe_private_named.96,
-            provider: self.__unsafe_private_named.97,
-            publication: self.__unsafe_private_named.98,
-            publisher: self.__unsafe_private_named.99,
-            publisher_imprint: self.__unsafe_private_named.100,
-            publishing_principles: self.__unsafe_private_named.101,
-            recorded_at: self.__unsafe_private_named.102,
-            released_event: self.__unsafe_private_named.103,
-            review: self.__unsafe_private_named.104,
-            reviews: self.__unsafe_private_named.105,
-            same_as: self.__unsafe_private_named.106,
-            schema_version: self.__unsafe_private_named.107,
-            sd_date_published: self.__unsafe_private_named.108,
-            sd_license: self.__unsafe_private_named.109,
-            sd_publisher: self.__unsafe_private_named.110,
-            size: self.__unsafe_private_named.111,
-            source_organization: self.__unsafe_private_named.112,
-            spatial: self.__unsafe_private_named.113,
-            spatial_coverage: self.__unsafe_private_named.114,
-            sponsor: self.__unsafe_private_named.115,
-            subject_of: self.__unsafe_private_named.116,
-            subtitle_language: self.__unsafe_private_named.117,
-            teaches: self.__unsafe_private_named.118,
-            temporal: self.__unsafe_private_named.119,
-            temporal_coverage: self.__unsafe_private_named.120,
-            text: self.__unsafe_private_named.121,
-            thumbnail: self.__unsafe_private_named.122,
-            thumbnail_url: self.__unsafe_private_named.123,
-            time_required: self.__unsafe_private_named.124,
-            title_eidr: self.__unsafe_private_named.125,
-            trailer: self.__unsafe_private_named.126,
-            translation_of_work: self.__unsafe_private_named.127,
-            translator: self.__unsafe_private_named.128,
-            typical_age_range: self.__unsafe_private_named.129,
-            url: self.__unsafe_private_named.130,
-            usage_info: self.__unsafe_private_named.131,
-            version: self.__unsafe_private_named.132,
-            video: self.__unsafe_private_named.133,
-            word_count: self.__unsafe_private_named.134,
-            work_example: self.__unsafe_private_named.135,
-            work_translation: self.__unsafe_private_named.136,
+            about: self._fields.0,
+            r#abstract: self._fields.1,
+            access_mode: self._fields.2,
+            access_mode_sufficient: self._fields.3,
+            accessibility_api: self._fields.4,
+            accessibility_control: self._fields.5,
+            accessibility_feature: self._fields.6,
+            accessibility_hazard: self._fields.7,
+            accessibility_summary: self._fields.8,
+            accountable_person: self._fields.9,
+            acquire_license_page: self._fields.10,
+            actor: self._fields.11,
+            actors: self._fields.12,
+            additional_type: self._fields.13,
+            aggregate_rating: self._fields.14,
+            alternate_name: self._fields.15,
+            alternative_headline: self._fields.16,
+            archived_at: self._fields.17,
+            assesses: self._fields.18,
+            associated_media: self._fields.19,
+            audience: self._fields.20,
+            audio: self._fields.21,
+            author: self._fields.22,
+            award: self._fields.23,
+            awards: self._fields.24,
+            character: self._fields.25,
+            citation: self._fields.26,
+            comment: self._fields.27,
+            comment_count: self._fields.28,
+            conditions_of_access: self._fields.29,
+            content_location: self._fields.30,
+            content_rating: self._fields.31,
+            content_reference_time: self._fields.32,
+            contributor: self._fields.33,
+            copyright_holder: self._fields.34,
+            copyright_notice: self._fields.35,
+            copyright_year: self._fields.36,
+            correction: self._fields.37,
+            country_of_origin: self._fields.38,
+            creative_work_status: self._fields.39,
+            creator: self._fields.40,
+            credit_text: self._fields.41,
+            date_created: self._fields.42,
+            date_modified: self._fields.43,
+            date_published: self._fields.44,
+            description: self._fields.45,
+            digital_source_type: self._fields.46,
+            director: self._fields.47,
+            directors: self._fields.48,
+            disambiguating_description: self._fields.49,
+            discussion_url: self._fields.50,
+            duration: self._fields.51,
+            edit_eidr: self._fields.52,
+            editor: self._fields.53,
+            educational_alignment: self._fields.54,
+            educational_level: self._fields.55,
+            educational_use: self._fields.56,
+            encoding: self._fields.57,
+            encoding_format: self._fields.58,
+            encodings: self._fields.59,
+            example_of_work: self._fields.60,
+            expires: self._fields.61,
+            file_format: self._fields.62,
+            funder: self._fields.63,
+            funding: self._fields.64,
+            genre: self._fields.65,
+            has_part: self._fields.66,
+            headline: self._fields.67,
+            identifier: self._fields.68,
+            image: self._fields.69,
+            in_language: self._fields.70,
+            interaction_statistic: self._fields.71,
+            interactivity_type: self._fields.72,
+            interpreted_as_claim: self._fields.73,
+            is_accessible_for_free: self._fields.74,
+            is_based_on: self._fields.75,
+            is_based_on_url: self._fields.76,
+            is_family_friendly: self._fields.77,
+            is_part_of: self._fields.78,
+            keywords: self._fields.79,
+            learning_resource_type: self._fields.80,
+            license: self._fields.81,
+            location_created: self._fields.82,
+            main_entity: self._fields.83,
+            main_entity_of_page: self._fields.84,
+            maintainer: self._fields.85,
+            material: self._fields.86,
+            material_extent: self._fields.87,
+            mentions: self._fields.88,
+            music_by: self._fields.89,
+            name: self._fields.90,
+            offers: self._fields.91,
+            pattern: self._fields.92,
+            position: self._fields.93,
+            potential_action: self._fields.94,
+            producer: self._fields.95,
+            production_company: self._fields.96,
+            provider: self._fields.97,
+            publication: self._fields.98,
+            publisher: self._fields.99,
+            publisher_imprint: self._fields.100,
+            publishing_principles: self._fields.101,
+            recorded_at: self._fields.102,
+            released_event: self._fields.103,
+            review: self._fields.104,
+            reviews: self._fields.105,
+            same_as: self._fields.106,
+            schema_version: self._fields.107,
+            sd_date_published: self._fields.108,
+            sd_license: self._fields.109,
+            sd_publisher: self._fields.110,
+            size: self._fields.111,
+            source_organization: self._fields.112,
+            spatial: self._fields.113,
+            spatial_coverage: self._fields.114,
+            sponsor: self._fields.115,
+            subject_of: self._fields.116,
+            subtitle_language: self._fields.117,
+            teaches: self._fields.118,
+            temporal: self._fields.119,
+            temporal_coverage: self._fields.120,
+            text: self._fields.121,
+            thumbnail: self._fields.122,
+            thumbnail_url: self._fields.123,
+            time_required: self._fields.124,
+            title_eidr: self._fields.125,
+            trailer: self._fields.126,
+            translation_of_work: self._fields.127,
+            translator: self._fields.128,
+            typical_age_range: self._fields.129,
+            url: self._fields.130,
+            usage_info: self._fields.131,
+            version: self._fields.132,
+            video: self._fields.133,
+            word_count: self._fields.134,
+            work_example: self._fields.135,
+            work_translation: self._fields.136,
             extra_data: Some(extra_data),
         }
     }

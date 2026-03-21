@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::deps::bytes::Bytes;
@@ -164,9 +165,9 @@ pub mod get_repo_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetRepoBuilder<'a, S: get_repo_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>, Option<Tid>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<Tid>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetRepo<'a> {
@@ -180,9 +181,9 @@ impl<'a> GetRepoBuilder<'a, get_repo_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetRepoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -197,11 +198,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> GetRepoBuilder<'a, get_repo_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetRepoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -209,12 +210,12 @@ where
 impl<'a, S: get_repo_state::State> GetRepoBuilder<'a, S> {
     /// Set the `since` field (optional)
     pub fn since(mut self, value: impl Into<Option<Tid>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `since` field to an Option value (optional)
     pub fn maybe_since(mut self, value: Option<Tid>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -227,8 +228,8 @@ where
     /// Build the final struct
     pub fn build(self) -> GetRepo<'a> {
         GetRepo {
-            did: self.__unsafe_private_named.0.unwrap(),
-            since: self.__unsafe_private_named.1,
+            did: self._fields.0.unwrap(),
+            since: self._fields.1,
         }
     }
 }

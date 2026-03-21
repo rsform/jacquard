@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -113,59 +116,59 @@ pub mod stamp_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type List;
         type Book;
         type CreatedAt;
+        type List;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type List = Unset;
         type Book = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `list` field to Set
-    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetList<S> {}
-    impl<S: State> State for SetList<S> {
-        type List = Set<members::list>;
-        type Book = S::Book;
-        type CreatedAt = S::CreatedAt;
+        type List = Unset;
     }
     ///State transition - sets the `book` field to Set
     pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBook<S> {}
     impl<S: State> State for SetBook<S> {
-        type List = S::List;
         type Book = Set<members::book>;
         type CreatedAt = S::CreatedAt;
+        type List = S::List;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type List = S::List;
         type Book = S::Book;
         type CreatedAt = Set<members::created_at>;
+        type List = S::List;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetList<S> {}
+    impl<S: State> State for SetList<S> {
+        type Book = S::Book;
+        type CreatedAt = S::CreatedAt;
+        type List = Set<members::list>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `list` field
-        pub struct list(());
         ///Marker type for the `book` field
         pub struct book(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `list` field
+        pub struct list(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct StampBuilder<'a, S: stamp_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>, Option<Datetime>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>, Option<Datetime>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Stamp<'a> {
@@ -179,9 +182,9 @@ impl<'a> StampBuilder<'a, stamp_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StampBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -196,11 +199,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> StampBuilder<'a, stamp_state::SetBook<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         StampBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -215,11 +218,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> StampBuilder<'a, stamp_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         StampBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -234,11 +237,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> StampBuilder<'a, stamp_state::SetList<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         StampBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -246,16 +249,16 @@ where
 impl<'a, S> StampBuilder<'a, S>
 where
     S: stamp_state::State,
-    S::List: stamp_state::IsSet,
     S::Book: stamp_state::IsSet,
     S::CreatedAt: stamp_state::IsSet,
+    S::List: stamp_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Stamp<'a> {
         Stamp {
-            book: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            list: self.__unsafe_private_named.2.unwrap(),
+            book: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            list: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -268,9 +271,9 @@ where
         >,
     ) -> Stamp<'a> {
         Stamp {
-            book: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            list: self.__unsafe_private_named.2.unwrap(),
+            book: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            list: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

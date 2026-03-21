@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::deps::bytes::Bytes;
@@ -151,63 +152,59 @@ pub mod get_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
         type Did;
         type Rkey;
+        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
         type Did = Unset;
         type Rkey = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type Did = S::Did;
-        type Rkey = S::Rkey;
+        type Collection = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Collection = S::Collection;
         type Did = Set<members::did>;
         type Rkey = S::Rkey;
+        type Collection = S::Collection;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
-        type Collection = S::Collection;
         type Did = S::Did;
         type Rkey = Set<members::rkey>;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Did = S::Did;
+        type Rkey = S::Rkey;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetRecordBuilder<'a, S: get_record_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Nsid<'a>>,
-        Option<Did<'a>>,
-        Option<RecordKey<Rkey<'a>>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Nsid<'a>>, Option<Did<'a>>, Option<RecordKey<Rkey<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetRecord<'a> {
@@ -221,9 +218,9 @@ impl<'a> GetRecordBuilder<'a, get_record_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -238,11 +235,11 @@ where
         mut self,
         value: impl Into<Nsid<'a>>,
     ) -> GetRecordBuilder<'a, get_record_state::SetCollection<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -257,11 +254,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> GetRecordBuilder<'a, get_record_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GetRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -276,11 +273,11 @@ where
         mut self,
         value: impl Into<RecordKey<Rkey<'a>>>,
     ) -> GetRecordBuilder<'a, get_record_state::SetRkey<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         GetRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -288,16 +285,16 @@ where
 impl<'a, S> GetRecordBuilder<'a, S>
 where
     S: get_record_state::State,
-    S::Collection: get_record_state::IsSet,
     S::Did: get_record_state::IsSet,
     S::Rkey: get_record_state::IsSet,
+    S::Collection: get_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetRecord<'a> {
         GetRecord {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            rkey: self.__unsafe_private_named.2.unwrap(),
+            collection: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            rkey: self._fields.2.unwrap(),
         }
     }
 }

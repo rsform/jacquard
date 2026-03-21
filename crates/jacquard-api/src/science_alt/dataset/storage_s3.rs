@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -150,50 +153,50 @@ pub mod storage_s3_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Bucket;
         type Shards;
+        type Bucket;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Bucket = Unset;
         type Shards = Unset;
-    }
-    ///State transition - sets the `bucket` field to Set
-    pub struct SetBucket<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBucket<S> {}
-    impl<S: State> State for SetBucket<S> {
-        type Bucket = Set<members::bucket>;
-        type Shards = S::Shards;
+        type Bucket = Unset;
     }
     ///State transition - sets the `shards` field to Set
     pub struct SetShards<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShards<S> {}
     impl<S: State> State for SetShards<S> {
-        type Bucket = S::Bucket;
         type Shards = Set<members::shards>;
+        type Bucket = S::Bucket;
+    }
+    ///State transition - sets the `bucket` field to Set
+    pub struct SetBucket<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBucket<S> {}
+    impl<S: State> State for SetBucket<S> {
+        type Shards = S::Shards;
+        type Bucket = Set<members::bucket>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `bucket` field
-        pub struct bucket(());
         ///Marker type for the `shards` field
         pub struct shards(());
+        ///Marker type for the `bucket` field
+        pub struct bucket(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct StorageS3Builder<'a, S: storage_s3_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
         Option<CowStr<'a>>,
         Option<Vec<storage_s3::ShardEntry<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> StorageS3<'a> {
@@ -207,9 +210,9 @@ impl<'a> StorageS3Builder<'a, storage_s3_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StorageS3Builder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -224,11 +227,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> StorageS3Builder<'a, storage_s3_state::SetBucket<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         StorageS3Builder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -236,12 +239,12 @@ where
 impl<'a, S: storage_s3_state::State> StorageS3Builder<'a, S> {
     /// Set the `endpoint` field (optional)
     pub fn endpoint(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `endpoint` field to an Option value (optional)
     pub fn maybe_endpoint(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -249,12 +252,12 @@ impl<'a, S: storage_s3_state::State> StorageS3Builder<'a, S> {
 impl<'a, S: storage_s3_state::State> StorageS3Builder<'a, S> {
     /// Set the `region` field (optional)
     pub fn region(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `region` field to an Option value (optional)
     pub fn maybe_region(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -269,11 +272,11 @@ where
         mut self,
         value: impl Into<Vec<storage_s3::ShardEntry<'a>>>,
     ) -> StorageS3Builder<'a, storage_s3_state::SetShards<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         StorageS3Builder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -281,16 +284,16 @@ where
 impl<'a, S> StorageS3Builder<'a, S>
 where
     S: storage_s3_state::State,
-    S::Bucket: storage_s3_state::IsSet,
     S::Shards: storage_s3_state::IsSet,
+    S::Bucket: storage_s3_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> StorageS3<'a> {
         StorageS3 {
-            bucket: self.__unsafe_private_named.0.unwrap(),
-            endpoint: self.__unsafe_private_named.1,
-            region: self.__unsafe_private_named.2,
-            shards: self.__unsafe_private_named.3.unwrap(),
+            bucket: self._fields.0.unwrap(),
+            endpoint: self._fields.1,
+            region: self._fields.2,
+            shards: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -303,10 +306,10 @@ where
         >,
     ) -> StorageS3<'a> {
         StorageS3 {
-            bucket: self.__unsafe_private_named.0.unwrap(),
-            endpoint: self.__unsafe_private_named.1,
-            region: self.__unsafe_private_named.2,
-            shards: self.__unsafe_private_named.3.unwrap(),
+            bucket: self._fields.0.unwrap(),
+            endpoint: self._fields.1,
+            region: self._fields.2,
+            shards: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -484,9 +487,9 @@ pub mod shard_entry_state {
 
 /// Builder for constructing an instance of this type
 pub struct ShardEntryBuilder<'a, S: shard_entry_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<ShardChecksum<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<ShardChecksum<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ShardEntry<'a> {
@@ -500,9 +503,9 @@ impl<'a> ShardEntryBuilder<'a, shard_entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ShardEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -517,11 +520,11 @@ where
         mut self,
         value: impl Into<ShardChecksum<'a>>,
     ) -> ShardEntryBuilder<'a, shard_entry_state::SetChecksum<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ShardEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -536,11 +539,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ShardEntryBuilder<'a, shard_entry_state::SetKey<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ShardEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -554,8 +557,8 @@ where
     /// Build the final struct
     pub fn build(self) -> ShardEntry<'a> {
         ShardEntry {
-            checksum: self.__unsafe_private_named.0.unwrap(),
-            key: self.__unsafe_private_named.1.unwrap(),
+            checksum: self._fields.0.unwrap(),
+            key: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -568,8 +571,8 @@ where
         >,
     ) -> ShardEntry<'a> {
         ShardEntry {
-            checksum: self.__unsafe_private_named.0.unwrap(),
-            key: self.__unsafe_private_named.1.unwrap(),
+            checksum: self._fields.0.unwrap(),
+            key: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

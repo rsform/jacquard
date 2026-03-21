@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -117,9 +120,9 @@ pub mod masl_state {
 
 /// Builder for constructing an instance of this type
 pub struct MaslBuilder<'a, S: masl_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<Vec<masl::Resource<'a>>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Vec<masl::Resource<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Masl<'a> {
@@ -133,9 +136,9 @@ impl<'a> MaslBuilder<'a, masl_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MaslBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -143,12 +146,12 @@ impl<'a> MaslBuilder<'a, masl_state::Empty> {
 impl<'a, S: masl_state::State> MaslBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -163,11 +166,11 @@ where
         mut self,
         value: impl Into<Vec<masl::Resource<'a>>>,
     ) -> MaslBuilder<'a, masl_state::SetResources<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MaslBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -180,8 +183,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Masl<'a> {
         Masl {
-            name: self.__unsafe_private_named.0,
-            resources: self.__unsafe_private_named.1.unwrap(),
+            name: self._fields.0,
+            resources: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -194,8 +197,8 @@ where
         >,
     ) -> Masl<'a> {
         Masl {
-            name: self.__unsafe_private_named.0,
-            resources: self.__unsafe_private_named.1.unwrap(),
+            name: self._fields.0,
+            resources: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -322,13 +325,9 @@ pub mod resource_state {
 
 /// Builder for constructing an instance of this type
 pub struct ResourceBuilder<'a, S: resource_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<BlobRef<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Resource<'a> {
@@ -342,9 +341,9 @@ impl<'a> ResourceBuilder<'a, resource_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ResourceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -352,12 +351,12 @@ impl<'a> ResourceBuilder<'a, resource_state::Empty> {
 impl<'a, S: resource_state::State> ResourceBuilder<'a, S> {
     /// Set the `contentType` field (optional)
     pub fn content_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `contentType` field to an Option value (optional)
     pub fn maybe_content_type(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -365,12 +364,12 @@ impl<'a, S: resource_state::State> ResourceBuilder<'a, S> {
 impl<'a, S: resource_state::State> ResourceBuilder<'a, S> {
     /// Set the `path` field (optional)
     pub fn path(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `path` field to an Option value (optional)
     pub fn maybe_path(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -385,11 +384,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> ResourceBuilder<'a, resource_state::SetSrc<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ResourceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -402,9 +401,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Resource<'a> {
         Resource {
-            content_type: self.__unsafe_private_named.0,
-            path: self.__unsafe_private_named.1,
-            src: self.__unsafe_private_named.2.unwrap(),
+            content_type: self._fields.0,
+            path: self._fields.1,
+            src: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -417,9 +416,9 @@ where
         >,
     ) -> Resource<'a> {
         Resource {
-            content_type: self.__unsafe_private_named.0,
-            path: self.__unsafe_private_named.1,
-            src: self.__unsafe_private_named.2.unwrap(),
+            content_type: self._fields.0,
+            path: self._fields.1,
+            src: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

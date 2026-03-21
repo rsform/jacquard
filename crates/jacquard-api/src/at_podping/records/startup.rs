@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -144,58 +147,58 @@ pub mod startup_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ServerAccount;
-        type Timestamp;
         type Message;
+        type Timestamp;
+        type ServerAccount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ServerAccount = Unset;
-        type Timestamp = Unset;
         type Message = Unset;
-    }
-    ///State transition - sets the `server_account` field to Set
-    pub struct SetServerAccount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServerAccount<S> {}
-    impl<S: State> State for SetServerAccount<S> {
-        type ServerAccount = Set<members::server_account>;
-        type Timestamp = S::Timestamp;
-        type Message = S::Message;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type ServerAccount = S::ServerAccount;
-        type Timestamp = Set<members::timestamp>;
-        type Message = S::Message;
+        type Timestamp = Unset;
+        type ServerAccount = Unset;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
-        type ServerAccount = S::ServerAccount;
-        type Timestamp = S::Timestamp;
         type Message = Set<members::message>;
+        type Timestamp = S::Timestamp;
+        type ServerAccount = S::ServerAccount;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type Message = S::Message;
+        type Timestamp = Set<members::timestamp>;
+        type ServerAccount = S::ServerAccount;
+    }
+    ///State transition - sets the `server_account` field to Set
+    pub struct SetServerAccount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetServerAccount<S> {}
+    impl<S: State> State for SetServerAccount<S> {
+        type Message = S::Message;
+        type Timestamp = S::Timestamp;
+        type ServerAccount = Set<members::server_account>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `server_account` field
-        pub struct server_account(());
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
+        ///Marker type for the `server_account` field
+        pub struct server_account(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct StartupBuilder<'a, S: startup_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
         Option<CowStr<'a>>,
@@ -208,7 +211,7 @@ pub struct StartupBuilder<'a, S: startup_state::State> {
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Startup<'a> {
@@ -222,21 +225,9 @@ impl<'a> StartupBuilder<'a, startup_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StartupBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -244,12 +235,12 @@ impl<'a> StartupBuilder<'a, startup_state::Empty> {
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `capacity` field (optional)
     pub fn capacity(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `capacity` field to an Option value (optional)
     pub fn maybe_capacity(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -257,12 +248,12 @@ impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `hive` field (optional)
     pub fn hive(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `hive` field to an Option value (optional)
     pub fn maybe_hive(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -277,11 +268,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> StartupBuilder<'a, startup_state::SetMessage<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         StartupBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -289,12 +280,12 @@ where
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `pingingApp` field (optional)
     pub fn pinging_app(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `pingingApp` field to an Option value (optional)
     pub fn maybe_pinging_app(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -309,11 +300,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> StartupBuilder<'a, startup_state::SetServerAccount<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         StartupBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -321,12 +312,12 @@ where
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `sessionId` field (optional)
     pub fn session_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `sessionId` field to an Option value (optional)
     pub fn maybe_session_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -334,12 +325,12 @@ impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
     pub fn maybe_source(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -354,11 +345,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> StartupBuilder<'a, startup_state::SetTimestamp<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         StartupBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -366,12 +357,12 @@ where
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `useTestNode` field (optional)
     pub fn use_test_node(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `useTestNode` field to an Option value (optional)
     pub fn maybe_use_test_node(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -379,12 +370,12 @@ impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `uuid` field (optional)
     pub fn uuid(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `uuid` field to an Option value (optional)
     pub fn maybe_uuid(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -392,12 +383,12 @@ impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
 impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
     /// Set the `v` field (optional)
     pub fn v(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `v` field to an Option value (optional)
     pub fn maybe_v(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -405,24 +396,24 @@ impl<'a, S: startup_state::State> StartupBuilder<'a, S> {
 impl<'a, S> StartupBuilder<'a, S>
 where
     S: startup_state::State,
-    S::ServerAccount: startup_state::IsSet,
-    S::Timestamp: startup_state::IsSet,
     S::Message: startup_state::IsSet,
+    S::Timestamp: startup_state::IsSet,
+    S::ServerAccount: startup_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Startup<'a> {
         Startup {
-            capacity: self.__unsafe_private_named.0,
-            hive: self.__unsafe_private_named.1,
-            message: self.__unsafe_private_named.2.unwrap(),
-            pinging_app: self.__unsafe_private_named.3,
-            server_account: self.__unsafe_private_named.4.unwrap(),
-            session_id: self.__unsafe_private_named.5,
-            source: self.__unsafe_private_named.6,
-            timestamp: self.__unsafe_private_named.7.unwrap(),
-            use_test_node: self.__unsafe_private_named.8,
-            uuid: self.__unsafe_private_named.9,
-            v: self.__unsafe_private_named.10,
+            capacity: self._fields.0,
+            hive: self._fields.1,
+            message: self._fields.2.unwrap(),
+            pinging_app: self._fields.3,
+            server_account: self._fields.4.unwrap(),
+            session_id: self._fields.5,
+            source: self._fields.6,
+            timestamp: self._fields.7.unwrap(),
+            use_test_node: self._fields.8,
+            uuid: self._fields.9,
+            v: self._fields.10,
             extra_data: Default::default(),
         }
     }
@@ -435,17 +426,17 @@ where
         >,
     ) -> Startup<'a> {
         Startup {
-            capacity: self.__unsafe_private_named.0,
-            hive: self.__unsafe_private_named.1,
-            message: self.__unsafe_private_named.2.unwrap(),
-            pinging_app: self.__unsafe_private_named.3,
-            server_account: self.__unsafe_private_named.4.unwrap(),
-            session_id: self.__unsafe_private_named.5,
-            source: self.__unsafe_private_named.6,
-            timestamp: self.__unsafe_private_named.7.unwrap(),
-            use_test_node: self.__unsafe_private_named.8,
-            uuid: self.__unsafe_private_named.9,
-            v: self.__unsafe_private_named.10,
+            capacity: self._fields.0,
+            hive: self._fields.1,
+            message: self._fields.2.unwrap(),
+            pinging_app: self._fields.3,
+            server_account: self._fields.4.unwrap(),
+            session_id: self._fields.5,
+            source: self._fields.6,
+            timestamp: self._fields.7.unwrap(),
+            use_test_node: self._fields.8,
+            uuid: self._fields.9,
+            v: self._fields.10,
             extra_data: Some(extra_data),
         }
     }

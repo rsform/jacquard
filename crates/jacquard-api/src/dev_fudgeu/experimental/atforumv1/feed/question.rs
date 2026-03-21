@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -173,112 +176,112 @@ pub mod question_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Content;
-        type Tags;
-        type Title;
-        type IsOpen;
         type Forum;
+        type CreatedAt;
+        type Title;
+        type Tags;
+        type IsOpen;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Content = Unset;
-        type Tags = Unset;
-        type Title = Unset;
-        type IsOpen = Unset;
         type Forum = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Content = S::Content;
-        type Tags = S::Tags;
-        type Title = S::Title;
-        type IsOpen = S::IsOpen;
-        type Forum = S::Forum;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type CreatedAt = S::CreatedAt;
-        type Content = Set<members::content>;
-        type Tags = S::Tags;
-        type Title = S::Title;
-        type IsOpen = S::IsOpen;
-        type Forum = S::Forum;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
-        type Tags = Set<members::tags>;
-        type Title = S::Title;
-        type IsOpen = S::IsOpen;
-        type Forum = S::Forum;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
-        type Tags = S::Tags;
-        type Title = Set<members::title>;
-        type IsOpen = S::IsOpen;
-        type Forum = S::Forum;
-    }
-    ///State transition - sets the `is_open` field to Set
-    pub struct SetIsOpen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsOpen<S> {}
-    impl<S: State> State for SetIsOpen<S> {
-        type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
-        type Tags = S::Tags;
-        type Title = S::Title;
-        type IsOpen = Set<members::is_open>;
-        type Forum = S::Forum;
+        type CreatedAt = Unset;
+        type Title = Unset;
+        type Tags = Unset;
+        type IsOpen = Unset;
+        type Content = Unset;
     }
     ///State transition - sets the `forum` field to Set
     pub struct SetForum<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetForum<S> {}
     impl<S: State> State for SetForum<S> {
-        type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
-        type Tags = S::Tags;
-        type Title = S::Title;
-        type IsOpen = S::IsOpen;
         type Forum = Set<members::forum>;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type Tags = S::Tags;
+        type IsOpen = S::IsOpen;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Forum = S::Forum;
+        type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+        type Tags = S::Tags;
+        type IsOpen = S::IsOpen;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Forum = S::Forum;
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
+        type Tags = S::Tags;
+        type IsOpen = S::IsOpen;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTags<S> {}
+    impl<S: State> State for SetTags<S> {
+        type Forum = S::Forum;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type Tags = Set<members::tags>;
+        type IsOpen = S::IsOpen;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `is_open` field to Set
+    pub struct SetIsOpen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsOpen<S> {}
+    impl<S: State> State for SetIsOpen<S> {
+        type Forum = S::Forum;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type Tags = S::Tags;
+        type IsOpen = Set<members::is_open>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Forum = S::Forum;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+        type Tags = S::Tags;
+        type IsOpen = S::IsOpen;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `content` field
-        pub struct content(());
-        ///Marker type for the `tags` field
-        pub struct tags(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `is_open` field
-        pub struct is_open(());
         ///Marker type for the `forum` field
         pub struct forum(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
+        ///Marker type for the `is_open` field
+        pub struct is_open(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct QuestionBuilder<'a, S: question_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<AtIdentifier<'a>>,
@@ -287,7 +290,7 @@ pub struct QuestionBuilder<'a, S: question_state::State> {
         Option<CowStr<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Question<'a> {
@@ -301,9 +304,9 @@ impl<'a> QuestionBuilder<'a, question_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         QuestionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -318,11 +321,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> QuestionBuilder<'a, question_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         QuestionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -337,11 +340,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> QuestionBuilder<'a, question_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         QuestionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -356,11 +359,11 @@ where
         mut self,
         value: impl Into<AtIdentifier<'a>>,
     ) -> QuestionBuilder<'a, question_state::SetForum<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         QuestionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -375,11 +378,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> QuestionBuilder<'a, question_state::SetIsOpen<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         QuestionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -394,11 +397,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> QuestionBuilder<'a, question_state::SetTags<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         QuestionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -413,11 +416,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> QuestionBuilder<'a, question_state::SetTitle<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         QuestionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -425,12 +428,12 @@ where
 impl<'a, S: question_state::State> QuestionBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -438,23 +441,23 @@ impl<'a, S: question_state::State> QuestionBuilder<'a, S> {
 impl<'a, S> QuestionBuilder<'a, S>
 where
     S: question_state::State,
-    S::CreatedAt: question_state::IsSet,
-    S::Content: question_state::IsSet,
-    S::Tags: question_state::IsSet,
-    S::Title: question_state::IsSet,
-    S::IsOpen: question_state::IsSet,
     S::Forum: question_state::IsSet,
+    S::CreatedAt: question_state::IsSet,
+    S::Title: question_state::IsSet,
+    S::Tags: question_state::IsSet,
+    S::IsOpen: question_state::IsSet,
+    S::Content: question_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Question<'a> {
         Question {
-            content: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            forum: self.__unsafe_private_named.2.unwrap(),
-            is_open: self.__unsafe_private_named.3.unwrap(),
-            tags: self.__unsafe_private_named.4.unwrap(),
-            title: self.__unsafe_private_named.5.unwrap(),
-            updated_at: self.__unsafe_private_named.6,
+            content: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            forum: self._fields.2.unwrap(),
+            is_open: self._fields.3.unwrap(),
+            tags: self._fields.4.unwrap(),
+            title: self._fields.5.unwrap(),
+            updated_at: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -467,13 +470,13 @@ where
         >,
     ) -> Question<'a> {
         Question {
-            content: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            forum: self.__unsafe_private_named.2.unwrap(),
-            is_open: self.__unsafe_private_named.3.unwrap(),
-            tags: self.__unsafe_private_named.4.unwrap(),
-            title: self.__unsafe_private_named.5.unwrap(),
-            updated_at: self.__unsafe_private_named.6,
+            content: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            forum: self._fields.2.unwrap(),
+            is_open: self._fields.3.unwrap(),
+            tags: self._fields.4.unwrap(),
+            title: self._fields.5.unwrap(),
+            updated_at: self._fields.6,
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -171,80 +174,80 @@ pub mod project_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Repo;
-        type Language;
         type Title;
         type Description;
+        type Language;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Repo = Unset;
-        type Language = Unset;
         type Title = Unset;
         type Description = Unset;
+        type Language = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
         type Repo = Set<members::repo>;
+        type Title = S::Title;
+        type Description = S::Description;
         type Language = S::Language;
-        type Title = S::Title;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `language` field to Set
-    pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLanguage<S> {}
-    impl<S: State> State for SetLanguage<S> {
-        type Repo = S::Repo;
-        type Language = Set<members::language>;
-        type Title = S::Title;
-        type Description = S::Description;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Repo = S::Repo;
-        type Language = S::Language;
         type Title = Set<members::title>;
         type Description = S::Description;
+        type Language = S::Language;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
         type Repo = S::Repo;
-        type Language = S::Language;
         type Title = S::Title;
         type Description = Set<members::description>;
+        type Language = S::Language;
+    }
+    ///State transition - sets the `language` field to Set
+    pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLanguage<S> {}
+    impl<S: State> State for SetLanguage<S> {
+        type Repo = S::Repo;
+        type Title = S::Title;
+        type Description = S::Description;
+        type Language = Set<members::language>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `language` field
-        pub struct language(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `description` field
         pub struct description(());
+        ///Marker type for the `language` field
+        pub struct language(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ProjectBuilder<'a, S: project_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
         Option<UriValue<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Project<'a> {
@@ -258,9 +261,9 @@ impl<'a> ProjectBuilder<'a, project_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProjectBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -275,11 +278,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ProjectBuilder<'a, project_state::SetDescription<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ProjectBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -294,11 +297,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ProjectBuilder<'a, project_state::SetLanguage<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ProjectBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -306,12 +309,12 @@ where
 impl<'a, S: project_state::State> ProjectBuilder<'a, S> {
     /// Set the `link` field (optional)
     pub fn link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `link` field to an Option value (optional)
     pub fn maybe_link(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -326,11 +329,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ProjectBuilder<'a, project_state::SetRepo<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ProjectBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -345,11 +348,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ProjectBuilder<'a, project_state::SetTitle<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ProjectBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -358,18 +361,18 @@ impl<'a, S> ProjectBuilder<'a, S>
 where
     S: project_state::State,
     S::Repo: project_state::IsSet,
-    S::Language: project_state::IsSet,
     S::Title: project_state::IsSet,
     S::Description: project_state::IsSet,
+    S::Language: project_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Project<'a> {
         Project {
-            description: self.__unsafe_private_named.0.unwrap(),
-            language: self.__unsafe_private_named.1.unwrap(),
-            link: self.__unsafe_private_named.2,
-            repo: self.__unsafe_private_named.3.unwrap(),
-            title: self.__unsafe_private_named.4.unwrap(),
+            description: self._fields.0.unwrap(),
+            language: self._fields.1.unwrap(),
+            link: self._fields.2,
+            repo: self._fields.3.unwrap(),
+            title: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -382,11 +385,11 @@ where
         >,
     ) -> Project<'a> {
         Project {
-            description: self.__unsafe_private_named.0.unwrap(),
-            language: self.__unsafe_private_named.1.unwrap(),
-            link: self.__unsafe_private_named.2,
-            repo: self.__unsafe_private_named.3.unwrap(),
-            title: self.__unsafe_private_named.4.unwrap(),
+            description: self._fields.0.unwrap(),
+            language: self._fields.1.unwrap(),
+            link: self._fields.2,
+            repo: self._fields.3.unwrap(),
+            title: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -180,64 +183,64 @@ pub mod external_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Description;
         type Uri;
         type Title;
-        type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Description = Unset;
         type Uri = Unset;
         type Title = Unset;
-        type Description = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Title = S::Title;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Uri = S::Uri;
-        type Title = Set<members::title>;
-        type Description = S::Description;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
+        type Description = Set<members::description>;
         type Uri = S::Uri;
         type Title = S::Title;
-        type Description = Set<members::description>;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Description = S::Description;
+        type Uri = Set<members::uri>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Description = S::Description;
+        type Uri = S::Uri;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `description` field
+        pub struct description(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `description` field
-        pub struct description(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ExternalBuilder<'a, S: external_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<BlobRef<'a>>,
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> External<'a> {
@@ -251,9 +254,9 @@ impl<'a> ExternalBuilder<'a, external_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ExternalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -268,11 +271,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ExternalBuilder<'a, external_state::SetDescription<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ExternalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -280,12 +283,12 @@ where
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `thumb` field (optional)
     pub fn thumb(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `thumb` field to an Option value (optional)
     pub fn maybe_thumb(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -300,11 +303,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ExternalBuilder<'a, external_state::SetTitle<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ExternalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -319,11 +322,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ExternalBuilder<'a, external_state::SetUri<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ExternalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -331,17 +334,17 @@ where
 impl<'a, S> ExternalBuilder<'a, S>
 where
     S: external_state::State,
+    S::Description: external_state::IsSet,
     S::Uri: external_state::IsSet,
     S::Title: external_state::IsSet,
-    S::Description: external_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> External<'a> {
         External {
-            description: self.__unsafe_private_named.0.unwrap(),
-            thumb: self.__unsafe_private_named.1,
-            title: self.__unsafe_private_named.2.unwrap(),
-            uri: self.__unsafe_private_named.3.unwrap(),
+            description: self._fields.0.unwrap(),
+            thumb: self._fields.1,
+            title: self._fields.2.unwrap(),
+            uri: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -354,10 +357,10 @@ where
         >,
     ) -> External<'a> {
         External {
-            description: self.__unsafe_private_named.0.unwrap(),
-            thumb: self.__unsafe_private_named.1,
-            title: self.__unsafe_private_named.2.unwrap(),
-            uri: self.__unsafe_private_named.3.unwrap(),
+            description: self._fields.0.unwrap(),
+            thumb: self._fields.1,
+            title: self._fields.2.unwrap(),
+            uri: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -531,9 +534,9 @@ pub mod external_record_state {
 
 /// Builder for constructing an instance of this type
 pub struct ExternalRecordBuilder<'a, S: external_record_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<external::External<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<external::External<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ExternalRecord<'a> {
@@ -547,9 +550,9 @@ impl<'a> ExternalRecordBuilder<'a, external_record_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ExternalRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -564,11 +567,11 @@ where
         mut self,
         value: impl Into<external::External<'a>>,
     ) -> ExternalRecordBuilder<'a, external_record_state::SetExternal<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ExternalRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -581,7 +584,7 @@ where
     /// Build the final struct
     pub fn build(self) -> ExternalRecord<'a> {
         ExternalRecord {
-            external: self.__unsafe_private_named.0.unwrap(),
+            external: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -594,7 +597,7 @@ where
         >,
     ) -> ExternalRecord<'a> {
         ExternalRecord {
-            external: self.__unsafe_private_named.0.unwrap(),
+            external: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -634,9 +637,9 @@ pub mod view_state {
 
 /// Builder for constructing an instance of this type
 pub struct ViewBuilder<'a, S: view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<external::ViewExternal<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<external::ViewExternal<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> View<'a> {
@@ -650,9 +653,9 @@ impl<'a> ViewBuilder<'a, view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -667,11 +670,11 @@ where
         mut self,
         value: impl Into<external::ViewExternal<'a>>,
     ) -> ViewBuilder<'a, view_state::SetExternal<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -684,7 +687,7 @@ where
     /// Build the final struct
     pub fn build(self) -> View<'a> {
         View {
-            external: self.__unsafe_private_named.0.unwrap(),
+            external: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -697,7 +700,7 @@ where
         >,
     ) -> View<'a> {
         View {
-            external: self.__unsafe_private_named.0.unwrap(),
+            external: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -713,64 +716,64 @@ pub mod view_external_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Uri;
         type Description;
+        type Uri;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Uri = Unset;
         type Description = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Uri = S::Uri;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Title = S::Title;
-        type Uri = Set<members::uri>;
-        type Description = S::Description;
+        type Uri = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type Title = S::Title;
-        type Uri = S::Uri;
         type Description = Set<members::description>;
+        type Uri = S::Uri;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Description = S::Description;
+        type Uri = Set<members::uri>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Description = S::Description;
+        type Uri = S::Uri;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `description` field
         pub struct description(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ViewExternalBuilder<'a, S: view_external_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ViewExternal<'a> {
@@ -784,9 +787,9 @@ impl<'a> ViewExternalBuilder<'a, view_external_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ViewExternalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -801,11 +804,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ViewExternalBuilder<'a, view_external_state::SetDescription<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ViewExternalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -813,12 +816,12 @@ where
 impl<'a, S: view_external_state::State> ViewExternalBuilder<'a, S> {
     /// Set the `thumb` field (optional)
     pub fn thumb(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `thumb` field to an Option value (optional)
     pub fn maybe_thumb(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -833,11 +836,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ViewExternalBuilder<'a, view_external_state::SetTitle<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ViewExternalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -852,11 +855,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ViewExternalBuilder<'a, view_external_state::SetUri<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ViewExternalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -864,17 +867,17 @@ where
 impl<'a, S> ViewExternalBuilder<'a, S>
 where
     S: view_external_state::State,
-    S::Title: view_external_state::IsSet,
-    S::Uri: view_external_state::IsSet,
     S::Description: view_external_state::IsSet,
+    S::Uri: view_external_state::IsSet,
+    S::Title: view_external_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ViewExternal<'a> {
         ViewExternal {
-            description: self.__unsafe_private_named.0.unwrap(),
-            thumb: self.__unsafe_private_named.1,
-            title: self.__unsafe_private_named.2.unwrap(),
-            uri: self.__unsafe_private_named.3.unwrap(),
+            description: self._fields.0.unwrap(),
+            thumb: self._fields.1,
+            title: self._fields.2.unwrap(),
+            uri: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -887,10 +890,10 @@ where
         >,
     ) -> ViewExternal<'a> {
         ViewExternal {
-            description: self.__unsafe_private_named.0.unwrap(),
-            thumb: self.__unsafe_private_named.1,
-            title: self.__unsafe_private_named.2.unwrap(),
-            uri: self.__unsafe_private_named.3.unwrap(),
+            description: self._fields.0.unwrap(),
+            thumb: self._fields.1,
+            title: self._fields.2.unwrap(),
+            uri: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

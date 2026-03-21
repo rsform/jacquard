@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -326,45 +329,45 @@ pub mod directory_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Entries;
         type Type;
+        type Entries;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Entries = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `entries` field to Set
-    pub struct SetEntries<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntries<S> {}
-    impl<S: State> State for SetEntries<S> {
-        type Entries = Set<members::entries>;
-        type Type = S::Type;
+        type Entries = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Entries = S::Entries;
         type Type = Set<members::r#type>;
+        type Entries = S::Entries;
+    }
+    ///State transition - sets the `entries` field to Set
+    pub struct SetEntries<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEntries<S> {}
+    impl<S: State> State for SetEntries<S> {
+        type Type = S::Type;
+        type Entries = Set<members::entries>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `entries` field
-        pub struct entries(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `entries` field
+        pub struct entries(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DirectoryBuilder<'a, S: directory_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<fs::Entry<'a>>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<fs::Entry<'a>>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Directory<'a> {
@@ -378,9 +381,9 @@ impl<'a> DirectoryBuilder<'a, directory_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DirectoryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -395,11 +398,11 @@ where
         mut self,
         value: impl Into<Vec<fs::Entry<'a>>>,
     ) -> DirectoryBuilder<'a, directory_state::SetEntries<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DirectoryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -414,11 +417,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DirectoryBuilder<'a, directory_state::SetType<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DirectoryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -426,14 +429,14 @@ where
 impl<'a, S> DirectoryBuilder<'a, S>
 where
     S: directory_state::State,
-    S::Entries: directory_state::IsSet,
     S::Type: directory_state::IsSet,
+    S::Entries: directory_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Directory<'a> {
         Directory {
-            entries: self.__unsafe_private_named.0.unwrap(),
-            r#type: self.__unsafe_private_named.1.unwrap(),
+            entries: self._fields.0.unwrap(),
+            r#type: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -446,8 +449,8 @@ where
         >,
     ) -> Directory<'a> {
         Directory {
-            entries: self.__unsafe_private_named.0.unwrap(),
-            r#type: self.__unsafe_private_named.1.unwrap(),
+            entries: self._fields.0.unwrap(),
+            r#type: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -675,45 +678,45 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Node;
         type Name;
+        type Node;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Node = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `node` field to Set
-    pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNode<S> {}
-    impl<S: State> State for SetNode<S> {
-        type Node = Set<members::node>;
-        type Name = S::Name;
+        type Node = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Node = S::Node;
         type Name = Set<members::name>;
+        type Node = S::Node;
+    }
+    ///State transition - sets the `node` field to Set
+    pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNode<S> {}
+    impl<S: State> State for SetNode<S> {
+        type Name = S::Name;
+        type Node = Set<members::node>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `node` field
-        pub struct node(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `node` field
+        pub struct node(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EntryBuilder<'a, S: entry_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<EntryNode<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<EntryNode<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Entry<'a> {
@@ -727,9 +730,9 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -744,11 +747,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EntryBuilder<'a, entry_state::SetName<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -763,11 +766,11 @@ where
         mut self,
         value: impl Into<EntryNode<'a>>,
     ) -> EntryBuilder<'a, entry_state::SetNode<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -775,14 +778,14 @@ where
 impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
-    S::Node: entry_state::IsSet,
     S::Name: entry_state::IsSet,
+    S::Node: entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Entry<'a> {
         Entry {
-            name: self.__unsafe_private_named.0.unwrap(),
-            node: self.__unsafe_private_named.1.unwrap(),
+            name: self._fields.0.unwrap(),
+            node: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -795,8 +798,8 @@ where
         >,
     ) -> Entry<'a> {
         Entry {
-            name: self.__unsafe_private_named.0.unwrap(),
-            node: self.__unsafe_private_named.1.unwrap(),
+            name: self._fields.0.unwrap(),
+            node: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -848,15 +851,15 @@ pub mod file_state {
 
 /// Builder for constructing an instance of this type
 pub struct FileBuilder<'a, S: file_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<bool>,
         Option<BlobRef<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> File<'a> {
@@ -870,9 +873,9 @@ impl<'a> FileBuilder<'a, file_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -880,12 +883,12 @@ impl<'a> FileBuilder<'a, file_state::Empty> {
 impl<'a, S: file_state::State> FileBuilder<'a, S> {
     /// Set the `base64` field (optional)
     pub fn base64(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `base64` field to an Option value (optional)
     pub fn maybe_base64(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -900,11 +903,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> FileBuilder<'a, file_state::SetBlob<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         FileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -912,12 +915,12 @@ where
 impl<'a, S: file_state::State> FileBuilder<'a, S> {
     /// Set the `encoding` field (optional)
     pub fn encoding(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `encoding` field to an Option value (optional)
     pub fn maybe_encoding(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -925,12 +928,12 @@ impl<'a, S: file_state::State> FileBuilder<'a, S> {
 impl<'a, S: file_state::State> FileBuilder<'a, S> {
     /// Set the `mimeType` field (optional)
     pub fn mime_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `mimeType` field to an Option value (optional)
     pub fn maybe_mime_type(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -945,11 +948,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> FileBuilder<'a, file_state::SetType<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         FileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -963,11 +966,11 @@ where
     /// Build the final struct
     pub fn build(self) -> File<'a> {
         File {
-            base64: self.__unsafe_private_named.0,
-            blob: self.__unsafe_private_named.1.unwrap(),
-            encoding: self.__unsafe_private_named.2,
-            mime_type: self.__unsafe_private_named.3,
-            r#type: self.__unsafe_private_named.4.unwrap(),
+            base64: self._fields.0,
+            blob: self._fields.1.unwrap(),
+            encoding: self._fields.2,
+            mime_type: self._fields.3,
+            r#type: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -980,11 +983,11 @@ where
         >,
     ) -> File<'a> {
         File {
-            base64: self.__unsafe_private_named.0,
-            blob: self.__unsafe_private_named.1.unwrap(),
-            encoding: self.__unsafe_private_named.2,
-            mime_type: self.__unsafe_private_named.3,
-            r#type: self.__unsafe_private_named.4.unwrap(),
+            base64: self._fields.0,
+            blob: self._fields.1.unwrap(),
+            encoding: self._fields.2,
+            mime_type: self._fields.3,
+            r#type: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1000,64 +1003,64 @@ pub mod fs_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Root;
         type Site;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Root = Unset;
         type Site = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Root = S::Root;
-        type Site = S::Site;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `root` field to Set
     pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoot<S> {}
     impl<S: State> State for SetRoot<S> {
-        type CreatedAt = S::CreatedAt;
         type Root = Set<members::root>;
         type Site = S::Site;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `site` field to Set
     pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSite<S> {}
     impl<S: State> State for SetSite<S> {
-        type CreatedAt = S::CreatedAt;
         type Root = S::Root;
         type Site = Set<members::site>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Root = S::Root;
+        type Site = S::Site;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `root` field
         pub struct root(());
         ///Marker type for the `site` field
         pub struct site(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FsBuilder<'a, S: fs_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<i64>,
         Option<fs::Directory<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Fs<'a> {
@@ -1071,9 +1074,9 @@ impl<'a> FsBuilder<'a, fs_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1088,11 +1091,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> FsBuilder<'a, fs_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         FsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1100,12 +1103,12 @@ where
 impl<'a, S: fs_state::State> FsBuilder<'a, S> {
     /// Set the `fileCount` field (optional)
     pub fn file_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `fileCount` field to an Option value (optional)
     pub fn maybe_file_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1120,11 +1123,11 @@ where
         mut self,
         value: impl Into<fs::Directory<'a>>,
     ) -> FsBuilder<'a, fs_state::SetRoot<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         FsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1139,11 +1142,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> FsBuilder<'a, fs_state::SetSite<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         FsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1151,17 +1154,17 @@ where
 impl<'a, S> FsBuilder<'a, S>
 where
     S: fs_state::State,
-    S::CreatedAt: fs_state::IsSet,
     S::Root: fs_state::IsSet,
     S::Site: fs_state::IsSet,
+    S::CreatedAt: fs_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Fs<'a> {
         Fs {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            file_count: self.__unsafe_private_named.1,
-            root: self.__unsafe_private_named.2.unwrap(),
-            site: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            file_count: self._fields.1,
+            root: self._fields.2.unwrap(),
+            site: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1174,10 +1177,10 @@ where
         >,
     ) -> Fs<'a> {
         Fs {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            file_count: self.__unsafe_private_named.1,
-            root: self.__unsafe_private_named.2.unwrap(),
-            site: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            file_count: self._fields.1,
+            root: self._fields.2.unwrap(),
+            site: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1229,9 +1232,9 @@ pub mod subfs_state {
 
 /// Builder for constructing an instance of this type
 pub struct SubfsBuilder<'a, S: subfs_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>, Option<AtUri<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<AtUri<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Subfs<'a> {
@@ -1245,9 +1248,9 @@ impl<'a> SubfsBuilder<'a, subfs_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SubfsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1255,12 +1258,12 @@ impl<'a> SubfsBuilder<'a, subfs_state::Empty> {
 impl<'a, S: subfs_state::State> SubfsBuilder<'a, S> {
     /// Set the `flat` field (optional)
     pub fn flat(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `flat` field to an Option value (optional)
     pub fn maybe_flat(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1275,11 +1278,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> SubfsBuilder<'a, subfs_state::SetSubject<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SubfsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1294,11 +1297,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SubfsBuilder<'a, subfs_state::SetType<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SubfsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1312,9 +1315,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Subfs<'a> {
         Subfs {
-            flat: self.__unsafe_private_named.0,
-            subject: self.__unsafe_private_named.1.unwrap(),
-            r#type: self.__unsafe_private_named.2.unwrap(),
+            flat: self._fields.0,
+            subject: self._fields.1.unwrap(),
+            r#type: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1327,9 +1330,9 @@ where
         >,
     ) -> Subfs<'a> {
         Subfs {
-            flat: self.__unsafe_private_named.0,
-            subject: self.__unsafe_private_named.1.unwrap(),
-            r#type: self.__unsafe_private_named.2.unwrap(),
+            flat: self._fields.0,
+            subject: self._fields.1.unwrap(),
+            r#type: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

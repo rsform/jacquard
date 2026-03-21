@@ -13,7 +13,11 @@ pub mod get_tag_list;
 pub mod get_tags;
 pub mod tag;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -112,99 +116,99 @@ pub mod clip_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Uri;
         type IndexedAt;
         type Record;
-        type Uri;
-        type Cid;
         type Author;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Uri = Unset;
         type IndexedAt = Unset;
         type Record = Unset;
-        type Uri = Unset;
-        type Cid = Unset;
         type Author = Unset;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type IndexedAt = Set<members::indexed_at>;
-        type Record = S::Record;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type IndexedAt = S::IndexedAt;
-        type Record = Set<members::record>;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Author = S::Author;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type IndexedAt = S::IndexedAt;
-        type Record = S::Record;
         type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
         type IndexedAt = S::IndexedAt;
         type Record = S::Record;
-        type Uri = S::Uri;
-        type Cid = Set<members::cid>;
         type Author = S::Author;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type IndexedAt = Set<members::indexed_at>;
+        type Record = S::Record;
+        type Author = S::Author;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+        type Record = Set<members::record>;
+        type Author = S::Author;
+        type Cid = S::Cid;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
+        type Uri = S::Uri;
         type IndexedAt = S::IndexedAt;
         type Record = S::Record;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
         type Author = Set<members::author>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+        type Record = S::Record;
+        type Author = S::Author;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
         ///Marker type for the `record` field
         pub struct record(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ClipViewBuilder<'a, S: clip_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ProfileView<'a>>,
         Option<Cid<'a>>,
         Option<Datetime>,
         Option<Data<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ClipView<'a> {
@@ -218,9 +222,9 @@ impl<'a> ClipViewBuilder<'a, clip_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ClipViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -235,11 +239,11 @@ where
         mut self,
         value: impl Into<ProfileView<'a>>,
     ) -> ClipViewBuilder<'a, clip_view_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ClipViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -254,11 +258,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> ClipViewBuilder<'a, clip_view_state::SetCid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ClipViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -273,11 +277,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ClipViewBuilder<'a, clip_view_state::SetIndexedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ClipViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -292,11 +296,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> ClipViewBuilder<'a, clip_view_state::SetRecord<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ClipViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -311,11 +315,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ClipViewBuilder<'a, clip_view_state::SetUri<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ClipViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -323,20 +327,20 @@ where
 impl<'a, S> ClipViewBuilder<'a, S>
 where
     S: clip_view_state::State,
+    S::Uri: clip_view_state::IsSet,
     S::IndexedAt: clip_view_state::IsSet,
     S::Record: clip_view_state::IsSet,
-    S::Uri: clip_view_state::IsSet,
-    S::Cid: clip_view_state::IsSet,
     S::Author: clip_view_state::IsSet,
+    S::Cid: clip_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ClipView<'a> {
         ClipView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            record: self.__unsafe_private_named.3.unwrap(),
-            uri: self.__unsafe_private_named.4.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
+            record: self._fields.3.unwrap(),
+            uri: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -346,11 +350,11 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ClipView<'a> {
         ClipView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            record: self.__unsafe_private_named.3.unwrap(),
-            uri: self.__unsafe_private_named.4.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
+            record: self._fields.3.unwrap(),
+            uri: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -514,99 +518,99 @@ pub mod tag_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IndexedAt;
-        type Cid;
         type Uri;
         type Author;
         type Record;
+        type Cid;
+        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IndexedAt = Unset;
-        type Cid = Unset;
         type Uri = Unset;
         type Author = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type IndexedAt = Set<members::indexed_at>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type IndexedAt = S::IndexedAt;
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type Record = S::Record;
+        type Cid = Unset;
+        type IndexedAt = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
         type Author = S::Author;
         type Record = S::Record;
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Uri = S::Uri;
         type Author = Set<members::author>;
         type Record = S::Record;
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Uri = S::Uri;
         type Author = S::Author;
         type Record = Set<members::record>;
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Author = S::Author;
+        type Record = S::Record;
+        type Cid = Set<members::cid>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Author = S::Author;
+        type Record = S::Record;
+        type Cid = S::Cid;
+        type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `author` field
         pub struct author(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TagViewBuilder<'a, S: tag_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ProfileView<'a>>,
         Option<Cid<'a>>,
         Option<Datetime>,
         Option<Data<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TagView<'a> {
@@ -620,9 +624,9 @@ impl<'a> TagViewBuilder<'a, tag_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TagViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -637,11 +641,11 @@ where
         mut self,
         value: impl Into<ProfileView<'a>>,
     ) -> TagViewBuilder<'a, tag_view_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TagViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -656,11 +660,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> TagViewBuilder<'a, tag_view_state::SetCid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TagViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -675,11 +679,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> TagViewBuilder<'a, tag_view_state::SetIndexedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         TagViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -694,11 +698,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> TagViewBuilder<'a, tag_view_state::SetRecord<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         TagViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -713,11 +717,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> TagViewBuilder<'a, tag_view_state::SetUri<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         TagViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -725,20 +729,20 @@ where
 impl<'a, S> TagViewBuilder<'a, S>
 where
     S: tag_view_state::State,
-    S::IndexedAt: tag_view_state::IsSet,
-    S::Cid: tag_view_state::IsSet,
     S::Uri: tag_view_state::IsSet,
     S::Author: tag_view_state::IsSet,
     S::Record: tag_view_state::IsSet,
+    S::Cid: tag_view_state::IsSet,
+    S::IndexedAt: tag_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TagView<'a> {
         TagView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            record: self.__unsafe_private_named.3.unwrap(),
-            uri: self.__unsafe_private_named.4.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
+            record: self._fields.3.unwrap(),
+            uri: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -748,11 +752,11 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> TagView<'a> {
         TagView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            record: self.__unsafe_private_named.3.unwrap(),
-            uri: self.__unsafe_private_named.4.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
+            record: self._fields.3.unwrap(),
+            uri: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

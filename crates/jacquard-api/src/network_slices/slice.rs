@@ -22,7 +22,11 @@ pub mod stats;
 pub mod sync_user_collections;
 pub mod update_o_auth_client;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -243,58 +247,58 @@ pub mod slice_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type CreatedAt;
         type Domain;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type CreatedAt = Unset;
         type Domain = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type Domain = S::Domain;
         type CreatedAt = S::CreatedAt;
-        type Domain = S::Domain;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type CreatedAt = Set<members::created_at>;
-        type Domain = S::Domain;
     }
     ///State transition - sets the `domain` field to Set
     pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDomain<S> {}
     impl<S: State> State for SetDomain<S> {
         type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
         type Domain = Set<members::domain>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type Domain = S::Domain;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `domain` field
         pub struct domain(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SliceBuilder<'a, S: slice_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<CowStr<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Slice<'a> {
@@ -308,9 +312,9 @@ impl<'a> SliceBuilder<'a, slice_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SliceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -325,11 +329,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SliceBuilder<'a, slice_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SliceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -344,11 +348,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SliceBuilder<'a, slice_state::SetDomain<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SliceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -363,11 +367,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SliceBuilder<'a, slice_state::SetName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SliceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -376,15 +380,15 @@ impl<'a, S> SliceBuilder<'a, S>
 where
     S: slice_state::State,
     S::Name: slice_state::IsSet,
-    S::CreatedAt: slice_state::IsSet,
     S::Domain: slice_state::IsSet,
+    S::CreatedAt: slice_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Slice<'a> {
         Slice {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            domain: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            domain: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -397,9 +401,9 @@ where
         >,
     ) -> Slice<'a> {
         Slice {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            domain: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            domain: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -482,103 +486,103 @@ pub mod slice_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Domain;
-        type Cid;
-        type Uri;
         type Creator;
         type CreatedAt;
+        type Uri;
+        type Cid;
+        type Domain;
         type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Domain = Unset;
-        type Cid = Unset;
-        type Uri = Unset;
         type Creator = Unset;
         type CreatedAt = Unset;
+        type Uri = Unset;
+        type Cid = Unset;
+        type Domain = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `domain` field to Set
-    pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDomain<S> {}
-    impl<S: State> State for SetDomain<S> {
-        type Domain = Set<members::domain>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Creator = S::Creator;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Domain = S::Domain;
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
-        type Creator = S::Creator;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Domain = S::Domain;
-        type Cid = S::Cid;
-        type Uri = Set<members::uri>;
-        type Creator = S::Creator;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
     }
     ///State transition - sets the `creator` field to Set
     pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreator<S> {}
     impl<S: State> State for SetCreator<S> {
-        type Domain = S::Domain;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
         type Creator = Set<members::creator>;
         type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Domain = S::Domain;
         type Name = S::Name;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Domain = S::Domain;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
         type Creator = S::Creator;
         type CreatedAt = Set<members::created_at>;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Domain = S::Domain;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Creator = S::Creator;
+        type CreatedAt = S::CreatedAt;
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Domain = S::Domain;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Creator = S::Creator;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Domain = S::Domain;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `domain` field to Set
+    pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDomain<S> {}
+    impl<S: State> State for SetDomain<S> {
+        type Creator = S::Creator;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Domain = Set<members::domain>;
         type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Domain = S::Domain;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
         type Creator = S::Creator;
         type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Domain = S::Domain;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `domain` field
-        pub struct domain(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `creator` field
         pub struct creator(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `domain` field
+        pub struct domain(());
         ///Marker type for the `name` field
         pub struct name(());
     }
@@ -586,8 +590,8 @@ pub mod slice_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct SliceViewBuilder<'a, S: slice_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Cid<'a>>,
         Option<Datetime>,
         Option<ProfileViewBasic<'a>>,
@@ -601,7 +605,7 @@ pub struct SliceViewBuilder<'a, S: slice_view_state::State> {
         Option<i64>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SliceView<'a> {
@@ -615,8 +619,8 @@ impl<'a> SliceViewBuilder<'a, slice_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SliceViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -630,7 +634,7 @@ impl<'a> SliceViewBuilder<'a, slice_view_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -645,11 +649,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> SliceViewBuilder<'a, slice_view_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SliceViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -664,11 +668,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SliceViewBuilder<'a, slice_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SliceViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -683,11 +687,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> SliceViewBuilder<'a, slice_view_state::SetCreator<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SliceViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -702,11 +706,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SliceViewBuilder<'a, slice_view_state::SetDomain<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         SliceViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -714,12 +718,12 @@ where
 impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
     /// Set the `indexedActorCount` field (optional)
     pub fn indexed_actor_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `indexedActorCount` field to an Option value (optional)
     pub fn maybe_indexed_actor_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -727,12 +731,12 @@ impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
 impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
     /// Set the `indexedCollectionCount` field (optional)
     pub fn indexed_collection_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `indexedCollectionCount` field to an Option value (optional)
     pub fn maybe_indexed_collection_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -740,12 +744,12 @@ impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
 impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
     /// Set the `indexedRecordCount` field (optional)
     pub fn indexed_record_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `indexedRecordCount` field to an Option value (optional)
     pub fn maybe_indexed_record_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -760,11 +764,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SliceViewBuilder<'a, slice_view_state::SetName<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         SliceViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -775,7 +779,7 @@ impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<slice::SparklinePoint<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `sparkline` field to an Option value (optional)
@@ -783,7 +787,7 @@ impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<slice::SparklinePoint<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -798,11 +802,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> SliceViewBuilder<'a, slice_view_state::SetUri<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         SliceViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -810,12 +814,12 @@ where
 impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
     /// Set the `waitlistInviteCount` field (optional)
     pub fn waitlist_invite_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `waitlistInviteCount` field to an Option value (optional)
     pub fn maybe_waitlist_invite_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -823,12 +827,12 @@ impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
 impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
     /// Set the `waitlistRequestCount` field (optional)
     pub fn waitlist_request_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `waitlistRequestCount` field to an Option value (optional)
     pub fn maybe_waitlist_request_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -836,28 +840,28 @@ impl<'a, S: slice_view_state::State> SliceViewBuilder<'a, S> {
 impl<'a, S> SliceViewBuilder<'a, S>
 where
     S: slice_view_state::State,
-    S::Domain: slice_view_state::IsSet,
-    S::Cid: slice_view_state::IsSet,
-    S::Uri: slice_view_state::IsSet,
     S::Creator: slice_view_state::IsSet,
     S::CreatedAt: slice_view_state::IsSet,
+    S::Uri: slice_view_state::IsSet,
+    S::Cid: slice_view_state::IsSet,
+    S::Domain: slice_view_state::IsSet,
     S::Name: slice_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SliceView<'a> {
         SliceView {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            creator: self.__unsafe_private_named.2.unwrap(),
-            domain: self.__unsafe_private_named.3.unwrap(),
-            indexed_actor_count: self.__unsafe_private_named.4,
-            indexed_collection_count: self.__unsafe_private_named.5,
-            indexed_record_count: self.__unsafe_private_named.6,
-            name: self.__unsafe_private_named.7.unwrap(),
-            sparkline: self.__unsafe_private_named.8,
-            uri: self.__unsafe_private_named.9.unwrap(),
-            waitlist_invite_count: self.__unsafe_private_named.10,
-            waitlist_request_count: self.__unsafe_private_named.11,
+            cid: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            creator: self._fields.2.unwrap(),
+            domain: self._fields.3.unwrap(),
+            indexed_actor_count: self._fields.4,
+            indexed_collection_count: self._fields.5,
+            indexed_record_count: self._fields.6,
+            name: self._fields.7.unwrap(),
+            sparkline: self._fields.8,
+            uri: self._fields.9.unwrap(),
+            waitlist_invite_count: self._fields.10,
+            waitlist_request_count: self._fields.11,
             extra_data: Default::default(),
         }
     }
@@ -870,18 +874,18 @@ where
         >,
     ) -> SliceView<'a> {
         SliceView {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            creator: self.__unsafe_private_named.2.unwrap(),
-            domain: self.__unsafe_private_named.3.unwrap(),
-            indexed_actor_count: self.__unsafe_private_named.4,
-            indexed_collection_count: self.__unsafe_private_named.5,
-            indexed_record_count: self.__unsafe_private_named.6,
-            name: self.__unsafe_private_named.7.unwrap(),
-            sparkline: self.__unsafe_private_named.8,
-            uri: self.__unsafe_private_named.9.unwrap(),
-            waitlist_invite_count: self.__unsafe_private_named.10,
-            waitlist_request_count: self.__unsafe_private_named.11,
+            cid: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            creator: self._fields.2.unwrap(),
+            domain: self._fields.3.unwrap(),
+            indexed_actor_count: self._fields.4,
+            indexed_collection_count: self._fields.5,
+            indexed_record_count: self._fields.6,
+            name: self._fields.7.unwrap(),
+            sparkline: self._fields.8,
+            uri: self._fields.9.unwrap(),
+            waitlist_invite_count: self._fields.10,
+            waitlist_request_count: self._fields.11,
             extra_data: Some(extra_data),
         }
     }
@@ -1094,9 +1098,9 @@ pub mod sparkline_point_state {
 
 /// Builder for constructing an instance of this type
 pub struct SparklinePointBuilder<'a, S: sparkline_point_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<Datetime>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SparklinePoint<'a> {
@@ -1110,9 +1114,9 @@ impl<'a> SparklinePointBuilder<'a, sparkline_point_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SparklinePointBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1127,11 +1131,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SparklinePointBuilder<'a, sparkline_point_state::SetCount<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SparklinePointBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1146,11 +1150,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SparklinePointBuilder<'a, sparkline_point_state::SetTimestamp<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SparklinePointBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1164,8 +1168,8 @@ where
     /// Build the final struct
     pub fn build(self) -> SparklinePoint<'a> {
         SparklinePoint {
-            count: self.__unsafe_private_named.0.unwrap(),
-            timestamp: self.__unsafe_private_named.1.unwrap(),
+            count: self._fields.0.unwrap(),
+            timestamp: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1178,8 +1182,8 @@ where
         >,
     ) -> SparklinePoint<'a> {
         SparklinePoint {
-            count: self.__unsafe_private_named.0.unwrap(),
-            timestamp: self.__unsafe_private_named.1.unwrap(),
+            count: self._fields.0.unwrap(),
+            timestamp: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

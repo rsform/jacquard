@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -182,15 +185,15 @@ pub mod publishing_owner_state {
 
 /// Builder for constructing an instance of this type
 pub struct PublishingOwnerBuilder<'a, S: publishing_owner_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> PublishingOwner<'a> {
@@ -204,9 +207,9 @@ impl<'a> PublishingOwnerBuilder<'a, publishing_owner_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PublishingOwnerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -214,12 +217,12 @@ impl<'a> PublishingOwnerBuilder<'a, publishing_owner_state::Empty> {
 impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
     /// Set the `collectingSociety` field (optional)
     pub fn collecting_society(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `collectingSociety` field to an Option value (optional)
     pub fn maybe_collecting_society(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -227,12 +230,12 @@ impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
 impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
     /// Set the `companyName` field (optional)
     pub fn company_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `companyName` field to an Option value (optional)
     pub fn maybe_company_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -240,12 +243,12 @@ impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
 impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
     /// Set the `firstName` field (optional)
     pub fn first_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `firstName` field to an Option value (optional)
     pub fn maybe_first_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -253,12 +256,12 @@ impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
 impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
     /// Set the `ipi` field (optional)
     pub fn ipi(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `ipi` field to an Option value (optional)
     pub fn maybe_ipi(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -266,12 +269,12 @@ impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
 impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
     /// Set the `lastName` field (optional)
     pub fn last_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `lastName` field to an Option value (optional)
     pub fn maybe_last_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -283,11 +286,11 @@ where
     /// Build the final struct
     pub fn build(self) -> PublishingOwner<'a> {
         PublishingOwner {
-            collecting_society: self.__unsafe_private_named.0,
-            company_name: self.__unsafe_private_named.1,
-            first_name: self.__unsafe_private_named.2,
-            ipi: self.__unsafe_private_named.3,
-            last_name: self.__unsafe_private_named.4,
+            collecting_society: self._fields.0,
+            company_name: self._fields.1,
+            first_name: self._fields.2,
+            ipi: self._fields.3,
+            last_name: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -300,11 +303,11 @@ where
         >,
     ) -> PublishingOwner<'a> {
         PublishingOwner {
-            collecting_society: self.__unsafe_private_named.0,
-            company_name: self.__unsafe_private_named.1,
-            first_name: self.__unsafe_private_named.2,
-            ipi: self.__unsafe_private_named.3,
-            last_name: self.__unsafe_private_named.4,
+            collecting_society: self._fields.0,
+            company_name: self._fields.1,
+            first_name: self._fields.2,
+            ipi: self._fields.3,
+            last_name: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

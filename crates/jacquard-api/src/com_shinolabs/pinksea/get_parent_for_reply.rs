@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::ident::AtIdentifier;
@@ -104,9 +107,9 @@ pub mod get_parent_for_reply_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetParentForReplyBuilder<'a, S: get_parent_for_reply_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetParentForReply<'a> {
@@ -120,9 +123,9 @@ impl<'a> GetParentForReplyBuilder<'a, get_parent_for_reply_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetParentForReplyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -137,11 +140,11 @@ where
         mut self,
         value: impl Into<AtIdentifier<'a>>,
     ) -> GetParentForReplyBuilder<'a, get_parent_for_reply_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetParentForReplyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -156,11 +159,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GetParentForReplyBuilder<'a, get_parent_for_reply_state::SetRkey<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GetParentForReplyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -174,8 +177,8 @@ where
     /// Build the final struct
     pub fn build(self) -> GetParentForReply<'a> {
         GetParentForReply {
-            did: self.__unsafe_private_named.0.unwrap(),
-            rkey: self.__unsafe_private_named.1.unwrap(),
+            did: self._fields.0.unwrap(),
+            rkey: self._fields.1.unwrap(),
         }
     }
 }

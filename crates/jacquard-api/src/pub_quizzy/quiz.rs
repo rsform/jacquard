@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -345,65 +348,65 @@ pub mod quiz_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Timestamp;
-        type Title;
         type Locales;
+        type Title;
+        type Timestamp;
         type Rounds;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Timestamp = Unset;
-        type Title = Unset;
         type Locales = Unset;
+        type Title = Unset;
+        type Timestamp = Unset;
         type Rounds = Unset;
     }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Timestamp = Set<members::timestamp>;
+    ///State transition - sets the `locales` field to Set
+    pub struct SetLocales<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLocales<S> {}
+    impl<S: State> State for SetLocales<S> {
+        type Locales = Set<members::locales>;
         type Title = S::Title;
-        type Locales = S::Locales;
+        type Timestamp = S::Timestamp;
         type Rounds = S::Rounds;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Timestamp = S::Timestamp;
-        type Title = Set<members::title>;
         type Locales = S::Locales;
+        type Title = Set<members::title>;
+        type Timestamp = S::Timestamp;
         type Rounds = S::Rounds;
     }
-    ///State transition - sets the `locales` field to Set
-    pub struct SetLocales<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLocales<S> {}
-    impl<S: State> State for SetLocales<S> {
-        type Timestamp = S::Timestamp;
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type Locales = S::Locales;
         type Title = S::Title;
-        type Locales = Set<members::locales>;
+        type Timestamp = Set<members::timestamp>;
         type Rounds = S::Rounds;
     }
     ///State transition - sets the `rounds` field to Set
     pub struct SetRounds<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRounds<S> {}
     impl<S: State> State for SetRounds<S> {
-        type Timestamp = S::Timestamp;
-        type Title = S::Title;
         type Locales = S::Locales;
+        type Title = S::Title;
+        type Timestamp = S::Timestamp;
         type Rounds = Set<members::rounds>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `locales` field
         pub struct locales(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
         ///Marker type for the `rounds` field
         pub struct rounds(());
     }
@@ -411,8 +414,8 @@ pub mod quiz_state {
 
 /// Builder for constructing an instance of this type
 pub struct QuizBuilder<'a, S: quiz_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<bool>,
         Option<bool>,
@@ -422,7 +425,7 @@ pub struct QuizBuilder<'a, S: quiz_state::State> {
         Option<Datetime>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Quiz<'a> {
@@ -436,9 +439,9 @@ impl<'a> QuizBuilder<'a, quiz_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         QuizBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -446,12 +449,12 @@ impl<'a> QuizBuilder<'a, quiz_state::Empty> {
 impl<'a, S: quiz_state::State> QuizBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -459,12 +462,12 @@ impl<'a, S: quiz_state::State> QuizBuilder<'a, S> {
 impl<'a, S: quiz_state::State> QuizBuilder<'a, S> {
     /// Set the `hasAudio` field (optional)
     pub fn has_audio(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `hasAudio` field to an Option value (optional)
     pub fn maybe_has_audio(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -472,12 +475,12 @@ impl<'a, S: quiz_state::State> QuizBuilder<'a, S> {
 impl<'a, S: quiz_state::State> QuizBuilder<'a, S> {
     /// Set the `hasVisuals` field (optional)
     pub fn has_visuals(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `hasVisuals` field to an Option value (optional)
     pub fn maybe_has_visuals(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -492,11 +495,11 @@ where
         mut self,
         value: impl Into<Vec<Language>>,
     ) -> QuizBuilder<'a, quiz_state::SetLocales<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         QuizBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -504,12 +507,12 @@ where
 impl<'a, S: quiz_state::State> QuizBuilder<'a, S> {
     /// Set the `revisionOf` field (optional)
     pub fn revision_of(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `revisionOf` field to an Option value (optional)
     pub fn maybe_revision_of(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -524,11 +527,11 @@ where
         mut self,
         value: impl Into<Vec<quiz::Round<'a>>>,
     ) -> QuizBuilder<'a, quiz_state::SetRounds<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         QuizBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -543,11 +546,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> QuizBuilder<'a, quiz_state::SetTimestamp<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         QuizBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -562,11 +565,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> QuizBuilder<'a, quiz_state::SetTitle<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         QuizBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -574,22 +577,22 @@ where
 impl<'a, S> QuizBuilder<'a, S>
 where
     S: quiz_state::State,
-    S::Timestamp: quiz_state::IsSet,
-    S::Title: quiz_state::IsSet,
     S::Locales: quiz_state::IsSet,
+    S::Title: quiz_state::IsSet,
+    S::Timestamp: quiz_state::IsSet,
     S::Rounds: quiz_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Quiz<'a> {
         Quiz {
-            description: self.__unsafe_private_named.0,
-            has_audio: self.__unsafe_private_named.1.or_else(|| Some(false)),
-            has_visuals: self.__unsafe_private_named.2.or_else(|| Some(false)),
-            locales: self.__unsafe_private_named.3.unwrap(),
-            revision_of: self.__unsafe_private_named.4,
-            rounds: self.__unsafe_private_named.5.unwrap(),
-            timestamp: self.__unsafe_private_named.6.unwrap(),
-            title: self.__unsafe_private_named.7.unwrap(),
+            description: self._fields.0,
+            has_audio: self._fields.1.or_else(|| Some(false)),
+            has_visuals: self._fields.2.or_else(|| Some(false)),
+            locales: self._fields.3.unwrap(),
+            revision_of: self._fields.4,
+            rounds: self._fields.5.unwrap(),
+            timestamp: self._fields.6.unwrap(),
+            title: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -602,14 +605,14 @@ where
         >,
     ) -> Quiz<'a> {
         Quiz {
-            description: self.__unsafe_private_named.0,
-            has_audio: self.__unsafe_private_named.1.or_else(|| Some(false)),
-            has_visuals: self.__unsafe_private_named.2.or_else(|| Some(false)),
-            locales: self.__unsafe_private_named.3.unwrap(),
-            revision_of: self.__unsafe_private_named.4,
-            rounds: self.__unsafe_private_named.5.unwrap(),
-            timestamp: self.__unsafe_private_named.6.unwrap(),
-            title: self.__unsafe_private_named.7.unwrap(),
+            description: self._fields.0,
+            has_audio: self._fields.1.or_else(|| Some(false)),
+            has_visuals: self._fields.2.or_else(|| Some(false)),
+            locales: self._fields.3.unwrap(),
+            revision_of: self._fields.4,
+            rounds: self._fields.5.unwrap(),
+            timestamp: self._fields.6.unwrap(),
+            title: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -864,9 +867,9 @@ pub mod question_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct QuestionRefBuilder<'a, S: question_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>, Option<StrongRef<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<i64>, Option<StrongRef<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> QuestionRef<'a> {
@@ -880,9 +883,9 @@ impl<'a> QuestionRefBuilder<'a, question_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         QuestionRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -890,12 +893,12 @@ impl<'a> QuestionRefBuilder<'a, question_ref_state::Empty> {
 impl<'a, S: question_ref_state::State> QuestionRefBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -903,12 +906,12 @@ impl<'a, S: question_ref_state::State> QuestionRefBuilder<'a, S> {
 impl<'a, S: question_ref_state::State> QuestionRefBuilder<'a, S> {
     /// Set the `points` field (optional)
     pub fn points(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `points` field to an Option value (optional)
     pub fn maybe_points(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -923,11 +926,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> QuestionRefBuilder<'a, question_ref_state::SetQuestion<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         QuestionRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -940,9 +943,9 @@ where
     /// Build the final struct
     pub fn build(self) -> QuestionRef<'a> {
         QuestionRef {
-            name: self.__unsafe_private_named.0,
-            points: self.__unsafe_private_named.1.or_else(|| Some(1i64)),
-            question: self.__unsafe_private_named.2.unwrap(),
+            name: self._fields.0,
+            points: self._fields.1.or_else(|| Some(1i64)),
+            question: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -955,9 +958,9 @@ where
         >,
     ) -> QuestionRef<'a> {
         QuestionRef {
-            name: self.__unsafe_private_named.0,
-            points: self.__unsafe_private_named.1.or_else(|| Some(1i64)),
-            question: self.__unsafe_private_named.2.unwrap(),
+            name: self._fields.0,
+            points: self._fields.1.or_else(|| Some(1i64)),
+            question: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -997,9 +1000,9 @@ pub mod round_state {
 
 /// Builder for constructing an instance of this type
 pub struct RoundBuilder<'a, S: round_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<quiz::QuestionRef<'a>>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<quiz::QuestionRef<'a>>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Round<'a> {
@@ -1013,9 +1016,9 @@ impl<'a> RoundBuilder<'a, round_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RoundBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1030,11 +1033,11 @@ where
         mut self,
         value: impl Into<Vec<quiz::QuestionRef<'a>>>,
     ) -> RoundBuilder<'a, round_state::SetQuestions<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RoundBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1042,12 +1045,12 @@ where
 impl<'a, S: round_state::State> RoundBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1060,8 +1063,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Round<'a> {
         Round {
-            questions: self.__unsafe_private_named.0.unwrap(),
-            title: self.__unsafe_private_named.1,
+            questions: self._fields.0.unwrap(),
+            title: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -1074,8 +1077,8 @@ where
         >,
     ) -> Round<'a> {
         Round {
-            questions: self.__unsafe_private_named.0.unwrap(),
-            title: self.__unsafe_private_named.1,
+            questions: self._fields.0.unwrap(),
+            title: self._fields.1,
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -262,8 +265,8 @@ pub mod post_state {
 
 /// Builder for constructing an instance of this type
 pub struct PostBuilder<'a, S: post_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Domains<'a>>,
         Option<Datetime>,
         Option<PostEmbed<'a>>,
@@ -275,7 +278,7 @@ pub struct PostBuilder<'a, S: post_state::State> {
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Post<'a> {
@@ -289,20 +292,9 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -310,12 +302,12 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `boundary` field (optional)
     pub fn boundary(mut self, value: impl Into<Option<Domains<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `boundary` field to an Option value (optional)
     pub fn maybe_boundary(mut self, value: Option<Domains<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -330,11 +322,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PostBuilder<'a, post_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -342,12 +334,12 @@ where
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `embed` field (optional)
     pub fn embed(mut self, value: impl Into<Option<PostEmbed<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `embed` field to an Option value (optional)
     pub fn maybe_embed(mut self, value: Option<PostEmbed<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -355,12 +347,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
     pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -368,12 +360,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -381,12 +373,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `langs` field (optional)
     pub fn langs(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `langs` field to an Option value (optional)
     pub fn maybe_langs(mut self, value: Option<Vec<Language>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -394,12 +386,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `reply` field (optional)
     pub fn reply(mut self, value: impl Into<Option<post::ReplyRef<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `reply` field to an Option value (optional)
     pub fn maybe_reply(mut self, value: Option<post::ReplyRef<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -407,12 +399,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<Source<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
     pub fn maybe_source(mut self, value: Option<Source<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -420,12 +412,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -433,12 +425,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
     pub fn maybe_text(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -451,16 +443,16 @@ where
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
         Post {
-            boundary: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            embed: self.__unsafe_private_named.2,
-            facets: self.__unsafe_private_named.3,
-            labels: self.__unsafe_private_named.4,
-            langs: self.__unsafe_private_named.5,
-            reply: self.__unsafe_private_named.6,
-            source: self.__unsafe_private_named.7,
-            tags: self.__unsafe_private_named.8,
-            text: self.__unsafe_private_named.9,
+            boundary: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            embed: self._fields.2,
+            facets: self._fields.3,
+            labels: self._fields.4,
+            langs: self._fields.5,
+            reply: self._fields.6,
+            source: self._fields.7,
+            tags: self._fields.8,
+            text: self._fields.9,
             extra_data: Default::default(),
         }
     }
@@ -473,16 +465,16 @@ where
         >,
     ) -> Post<'a> {
         Post {
-            boundary: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            embed: self.__unsafe_private_named.2,
-            facets: self.__unsafe_private_named.3,
-            labels: self.__unsafe_private_named.4,
-            langs: self.__unsafe_private_named.5,
-            reply: self.__unsafe_private_named.6,
-            source: self.__unsafe_private_named.7,
-            tags: self.__unsafe_private_named.8,
-            text: self.__unsafe_private_named.9,
+            boundary: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            embed: self._fields.2,
+            facets: self._fields.3,
+            labels: self._fields.4,
+            langs: self._fields.5,
+            reply: self._fields.6,
+            source: self._fields.7,
+            tags: self._fields.8,
+            text: self._fields.9,
             extra_data: Some(extra_data),
         }
     }
@@ -732,9 +724,9 @@ pub mod reply_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct ReplyRefBuilder<'a, S: reply_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<StrongRef<'a>>, Option<StrongRef<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<StrongRef<'a>>, Option<StrongRef<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ReplyRef<'a> {
@@ -748,9 +740,9 @@ impl<'a> ReplyRefBuilder<'a, reply_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ReplyRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -765,11 +757,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> ReplyRefBuilder<'a, reply_ref_state::SetParent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ReplyRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -784,11 +776,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> ReplyRefBuilder<'a, reply_ref_state::SetRoot<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ReplyRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -802,8 +794,8 @@ where
     /// Build the final struct
     pub fn build(self) -> ReplyRef<'a> {
         ReplyRef {
-            parent: self.__unsafe_private_named.0.unwrap(),
-            root: self.__unsafe_private_named.1.unwrap(),
+            parent: self._fields.0.unwrap(),
+            root: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -816,8 +808,8 @@ where
         >,
     ) -> ReplyRef<'a> {
         ReplyRef {
-            parent: self.__unsafe_private_named.0.unwrap(),
-            root: self.__unsafe_private_named.1.unwrap(),
+            parent: self._fields.0.unwrap(),
+            root: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

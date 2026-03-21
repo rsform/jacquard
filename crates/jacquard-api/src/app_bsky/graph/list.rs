@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -212,58 +215,58 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type Purpose;
         type CreatedAt;
+        type Purpose;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type Purpose = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Purpose = S::Purpose;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `purpose` field to Set
-    pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPurpose<S> {}
-    impl<S: State> State for SetPurpose<S> {
-        type Name = S::Name;
-        type Purpose = Set<members::purpose>;
-        type CreatedAt = S::CreatedAt;
+        type Purpose = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type Purpose = S::Purpose;
         type CreatedAt = Set<members::created_at>;
+        type Purpose = S::Purpose;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `purpose` field to Set
+    pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPurpose<S> {}
+    impl<S: State> State for SetPurpose<S> {
+        type CreatedAt = S::CreatedAt;
+        type Purpose = Set<members::purpose>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Purpose = S::Purpose;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `purpose` field
-        pub struct purpose(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `purpose` field
+        pub struct purpose(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ListBuilder<'a, S: list_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<BlobRef<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -272,7 +275,7 @@ pub struct ListBuilder<'a, S: list_state::State> {
         Option<CowStr<'a>>,
         Option<ListPurpose<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> List<'a> {
@@ -286,9 +289,9 @@ impl<'a> ListBuilder<'a, list_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -296,12 +299,12 @@ impl<'a> ListBuilder<'a, list_state::Empty> {
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
     pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -316,11 +319,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ListBuilder<'a, list_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -328,12 +331,12 @@ where
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -344,12 +347,12 @@ impl<'a, S: list_state::State> ListBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<Facet<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `descriptionFacets` field to an Option value (optional)
     pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -357,12 +360,12 @@ impl<'a, S: list_state::State> ListBuilder<'a, S> {
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -377,11 +380,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ListBuilder<'a, list_state::SetName<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -396,11 +399,11 @@ where
         mut self,
         value: impl Into<ListPurpose<'a>>,
     ) -> ListBuilder<'a, list_state::SetPurpose<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -408,20 +411,20 @@ where
 impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
-    S::Name: list_state::IsSet,
-    S::Purpose: list_state::IsSet,
     S::CreatedAt: list_state::IsSet,
+    S::Purpose: list_state::IsSet,
+    S::Name: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
         List {
-            avatar: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            description_facets: self.__unsafe_private_named.3,
-            labels: self.__unsafe_private_named.4,
-            name: self.__unsafe_private_named.5.unwrap(),
-            purpose: self.__unsafe_private_named.6.unwrap(),
+            avatar: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            description_facets: self._fields.3,
+            labels: self._fields.4,
+            name: self._fields.5.unwrap(),
+            purpose: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -434,13 +437,13 @@ where
         >,
     ) -> List<'a> {
         List {
-            avatar: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            description_facets: self.__unsafe_private_named.3,
-            labels: self.__unsafe_private_named.4,
-            name: self.__unsafe_private_named.5.unwrap(),
-            purpose: self.__unsafe_private_named.6.unwrap(),
+            avatar: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            description_facets: self._fields.3,
+            labels: self._fields.4,
+            name: self._fields.5.unwrap(),
+            purpose: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

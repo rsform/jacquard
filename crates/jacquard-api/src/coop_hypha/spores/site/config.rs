@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -624,8 +627,8 @@ pub mod config_state {
 
 /// Builder for constructing an instance of this type
 pub struct ConfigBuilder<'a, S: config_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ConfigBodyFont<'a>>,
         Option<ConfigFontBody<'a>>,
         Option<ConfigFontHeading<'a>>,
@@ -633,7 +636,7 @@ pub struct ConfigBuilder<'a, S: config_state::State> {
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Config<'a> {
@@ -647,9 +650,9 @@ impl<'a> ConfigBuilder<'a, config_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -657,12 +660,12 @@ impl<'a> ConfigBuilder<'a, config_state::Empty> {
 impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
     /// Set the `bodyFont` field (optional)
     pub fn body_font(mut self, value: impl Into<Option<ConfigBodyFont<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `bodyFont` field to an Option value (optional)
     pub fn maybe_body_font(mut self, value: Option<ConfigBodyFont<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -670,12 +673,12 @@ impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
 impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
     /// Set the `fontBody` field (optional)
     pub fn font_body(mut self, value: impl Into<Option<ConfigFontBody<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `fontBody` field to an Option value (optional)
     pub fn maybe_font_body(mut self, value: Option<ConfigFontBody<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -686,12 +689,12 @@ impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ConfigFontHeading<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `fontHeading` field to an Option value (optional)
     pub fn maybe_font_heading(mut self, value: Option<ConfigFontHeading<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -702,12 +705,12 @@ impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ConfigHeadingFont<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `headingFont` field to an Option value (optional)
     pub fn maybe_heading_font(mut self, value: Option<ConfigHeadingFont<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -715,12 +718,12 @@ impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
 impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
     /// Set the `subtitle` field (optional)
     pub fn subtitle(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `subtitle` field to an Option value (optional)
     pub fn maybe_subtitle(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -728,12 +731,12 @@ impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
 impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -745,12 +748,12 @@ where
     /// Build the final struct
     pub fn build(self) -> Config<'a> {
         Config {
-            body_font: self.__unsafe_private_named.0,
-            font_body: self.__unsafe_private_named.1,
-            font_heading: self.__unsafe_private_named.2,
-            heading_font: self.__unsafe_private_named.3,
-            subtitle: self.__unsafe_private_named.4,
-            title: self.__unsafe_private_named.5,
+            body_font: self._fields.0,
+            font_body: self._fields.1,
+            font_heading: self._fields.2,
+            heading_font: self._fields.3,
+            subtitle: self._fields.4,
+            title: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -763,12 +766,12 @@ where
         >,
     ) -> Config<'a> {
         Config {
-            body_font: self.__unsafe_private_named.0,
-            font_body: self.__unsafe_private_named.1,
-            font_heading: self.__unsafe_private_named.2,
-            heading_font: self.__unsafe_private_named.3,
-            subtitle: self.__unsafe_private_named.4,
-            title: self.__unsafe_private_named.5,
+            body_font: self._fields.0,
+            font_body: self._fields.1,
+            font_heading: self._fields.2,
+            heading_font: self._fields.3,
+            subtitle: self._fields.4,
+            title: self._fields.5,
             extra_data: Some(extra_data),
         }
     }

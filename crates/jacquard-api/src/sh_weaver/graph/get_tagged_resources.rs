@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
@@ -151,8 +154,8 @@ pub mod get_tagged_resources_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetTaggedResourcesBuilder<'a, S: get_tagged_resources_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<bool>,
         Option<bool>,
@@ -161,7 +164,7 @@ pub struct GetTaggedResourcesBuilder<'a, S: get_tagged_resources_state::State> {
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetTaggedResources<'a> {
@@ -175,9 +178,9 @@ impl<'a> GetTaggedResourcesBuilder<'a, get_tagged_resources_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetTaggedResourcesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -185,12 +188,12 @@ impl<'a> GetTaggedResourcesBuilder<'a, get_tagged_resources_state::Empty> {
 impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -198,12 +201,12 @@ impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> 
 impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> {
     /// Set the `includeAuthorTags` field (optional)
     pub fn include_author_tags(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `includeAuthorTags` field to an Option value (optional)
     pub fn maybe_include_author_tags(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -211,12 +214,12 @@ impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> 
 impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> {
     /// Set the `includeCommunityTags` field (optional)
     pub fn include_community_tags(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `includeCommunityTags` field to an Option value (optional)
     pub fn maybe_include_community_tags(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -224,12 +227,12 @@ impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> 
 impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -237,12 +240,12 @@ impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> 
 impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> {
     /// Set the `resourceType` field (optional)
     pub fn resource_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `resourceType` field to an Option value (optional)
     pub fn maybe_resource_type(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -250,12 +253,12 @@ impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> 
 impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> {
     /// Set the `sort` field (optional)
     pub fn sort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
     pub fn maybe_sort(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -270,11 +273,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GetTaggedResourcesBuilder<'a, get_tagged_resources_state::SetTag<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         GetTaggedResourcesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -287,13 +290,13 @@ where
     /// Build the final struct
     pub fn build(self) -> GetTaggedResources<'a> {
         GetTaggedResources {
-            cursor: self.__unsafe_private_named.0,
-            include_author_tags: self.__unsafe_private_named.1,
-            include_community_tags: self.__unsafe_private_named.2,
-            limit: self.__unsafe_private_named.3,
-            resource_type: self.__unsafe_private_named.4,
-            sort: self.__unsafe_private_named.5,
-            tag: self.__unsafe_private_named.6.unwrap(),
+            cursor: self._fields.0,
+            include_author_tags: self._fields.1,
+            include_community_tags: self._fields.2,
+            limit: self._fields.3,
+            resource_type: self._fields.4,
+            sort: self._fields.5,
+            tag: self._fields.6.unwrap(),
         }
     }
 }

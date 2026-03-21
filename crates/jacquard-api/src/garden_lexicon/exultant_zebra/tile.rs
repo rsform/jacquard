@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -803,44 +806,44 @@ pub mod tile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Name;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Name = S::Name;
+        type Content = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Content = S::Content;
         type Name = Set<members::name>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Name = S::Name;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TileBuilder<'a, S: tile_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<TileAspectRatio<'a>>,
         Option<TileContent<'a>>,
         Option<CowStr<'a>>,
@@ -851,7 +854,7 @@ pub struct TileBuilder<'a, S: tile_state::State> {
         Option<CowStr<'a>>,
         Option<Vec<tile::Param<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Tile<'a> {
@@ -865,19 +868,9 @@ impl<'a> TileBuilder<'a, tile_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -888,12 +881,12 @@ impl<'a, S: tile_state::State> TileBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TileAspectRatio<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
     pub fn maybe_aspect_ratio(mut self, value: Option<TileAspectRatio<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -908,11 +901,11 @@ where
         mut self,
         value: impl Into<TileContent<'a>>,
     ) -> TileBuilder<'a, tile_state::SetContent<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -920,12 +913,12 @@ where
 impl<'a, S: tile_state::State> TileBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -933,12 +926,12 @@ impl<'a, S: tile_state::State> TileBuilder<'a, S> {
 impl<'a, S: tile_state::State> TileBuilder<'a, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
     pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -946,12 +939,12 @@ impl<'a, S: tile_state::State> TileBuilder<'a, S> {
 impl<'a, S: tile_state::State> TileBuilder<'a, S> {
     /// Set the `icon` field (optional)
     pub fn icon(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `icon` field to an Option value (optional)
     pub fn maybe_icon(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -962,12 +955,12 @@ impl<'a, S: tile_state::State> TileBuilder<'a, S> {
         mut self,
         value: impl Into<Option<tile::Interactions<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `interactions` field to an Option value (optional)
     pub fn maybe_interactions(mut self, value: Option<tile::Interactions<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -975,12 +968,12 @@ impl<'a, S: tile_state::State> TileBuilder<'a, S> {
 impl<'a, S: tile_state::State> TileBuilder<'a, S> {
     /// Set the `loadingImage` field (optional)
     pub fn loading_image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `loadingImage` field to an Option value (optional)
     pub fn maybe_loading_image(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -995,11 +988,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TileBuilder<'a, tile_state::SetName<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         TileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1007,12 +1000,12 @@ where
 impl<'a, S: tile_state::State> TileBuilder<'a, S> {
     /// Set the `params` field (optional)
     pub fn params(mut self, value: impl Into<Option<Vec<tile::Param<'a>>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `params` field to an Option value (optional)
     pub fn maybe_params(mut self, value: Option<Vec<tile::Param<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -1020,21 +1013,21 @@ impl<'a, S: tile_state::State> TileBuilder<'a, S> {
 impl<'a, S> TileBuilder<'a, S>
 where
     S: tile_state::State,
-    S::Content: tile_state::IsSet,
     S::Name: tile_state::IsSet,
+    S::Content: tile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tile<'a> {
         Tile {
-            aspect_ratio: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            facets: self.__unsafe_private_named.3,
-            icon: self.__unsafe_private_named.4,
-            interactions: self.__unsafe_private_named.5,
-            loading_image: self.__unsafe_private_named.6,
-            name: self.__unsafe_private_named.7.unwrap(),
-            params: self.__unsafe_private_named.8,
+            aspect_ratio: self._fields.0,
+            content: self._fields.1.unwrap(),
+            description: self._fields.2,
+            facets: self._fields.3,
+            icon: self._fields.4,
+            interactions: self._fields.5,
+            loading_image: self._fields.6,
+            name: self._fields.7.unwrap(),
+            params: self._fields.8,
             extra_data: Default::default(),
         }
     }
@@ -1047,15 +1040,15 @@ where
         >,
     ) -> Tile<'a> {
         Tile {
-            aspect_ratio: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            facets: self.__unsafe_private_named.3,
-            icon: self.__unsafe_private_named.4,
-            interactions: self.__unsafe_private_named.5,
-            loading_image: self.__unsafe_private_named.6,
-            name: self.__unsafe_private_named.7.unwrap(),
-            params: self.__unsafe_private_named.8,
+            aspect_ratio: self._fields.0,
+            content: self._fields.1.unwrap(),
+            description: self._fields.2,
+            facets: self._fields.3,
+            icon: self._fields.4,
+            interactions: self._fields.5,
+            loading_image: self._fields.6,
+            name: self._fields.7.unwrap(),
+            params: self._fields.8,
             extra_data: Some(extra_data),
         }
     }

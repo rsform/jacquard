@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -120,14 +123,9 @@ pub mod image_carousel_state {
 
 /// Builder for constructing an instance of this type
 pub struct ImageCarouselBuilder<'a, S: image_carousel_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<bool>,
-        Option<CowStr<'a>>,
-        Option<Vec<GridImage<'a>>>,
-        Option<i64>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<CowStr<'a>>, Option<Vec<GridImage<'a>>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ImageCarousel<'a> {
@@ -141,9 +139,9 @@ impl<'a> ImageCarouselBuilder<'a, image_carousel_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ImageCarouselBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -151,12 +149,12 @@ impl<'a> ImageCarouselBuilder<'a, image_carousel_state::Empty> {
 impl<'a, S: image_carousel_state::State> ImageCarouselBuilder<'a, S> {
     /// Set the `autoplay` field (optional)
     pub fn autoplay(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `autoplay` field to an Option value (optional)
     pub fn maybe_autoplay(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -164,12 +162,12 @@ impl<'a, S: image_carousel_state::State> ImageCarouselBuilder<'a, S> {
 impl<'a, S: image_carousel_state::State> ImageCarouselBuilder<'a, S> {
     /// Set the `caption` field (optional)
     pub fn caption(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `caption` field to an Option value (optional)
     pub fn maybe_caption(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -184,11 +182,11 @@ where
         mut self,
         value: impl Into<Vec<GridImage<'a>>>,
     ) -> ImageCarouselBuilder<'a, image_carousel_state::SetImages<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ImageCarouselBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -196,12 +194,12 @@ where
 impl<'a, S: image_carousel_state::State> ImageCarouselBuilder<'a, S> {
     /// Set the `interval` field (optional)
     pub fn interval(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `interval` field to an Option value (optional)
     pub fn maybe_interval(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -214,10 +212,10 @@ where
     /// Build the final struct
     pub fn build(self) -> ImageCarousel<'a> {
         ImageCarousel {
-            autoplay: self.__unsafe_private_named.0.or_else(|| Some(false)),
-            caption: self.__unsafe_private_named.1,
-            images: self.__unsafe_private_named.2.unwrap(),
-            interval: self.__unsafe_private_named.3.or_else(|| Some(3000i64)),
+            autoplay: self._fields.0.or_else(|| Some(false)),
+            caption: self._fields.1,
+            images: self._fields.2.unwrap(),
+            interval: self._fields.3.or_else(|| Some(3000i64)),
             extra_data: Default::default(),
         }
     }
@@ -230,10 +228,10 @@ where
         >,
     ) -> ImageCarousel<'a> {
         ImageCarousel {
-            autoplay: self.__unsafe_private_named.0.or_else(|| Some(false)),
-            caption: self.__unsafe_private_named.1,
-            images: self.__unsafe_private_named.2.unwrap(),
-            interval: self.__unsafe_private_named.3.or_else(|| Some(3000i64)),
+            autoplay: self._fields.0.or_else(|| Some(false)),
+            caption: self._fields.1,
+            images: self._fields.2.unwrap(),
+            interval: self._fields.3.or_else(|| Some(3000i64)),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::ident::AtIdentifier;
@@ -107,15 +110,15 @@ pub mod search_entries_state {
 
 /// Builder for constructing an instance of this type
 pub struct SearchEntriesBuilder<'a, S: search_entries_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AtIdentifier<'a>>,
         Option<CowStr<'a>>,
         Option<i64>,
         Option<CowStr<'a>>,
         Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SearchEntries<'a> {
@@ -129,9 +132,9 @@ impl<'a> SearchEntriesBuilder<'a, search_entries_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SearchEntriesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -139,12 +142,12 @@ impl<'a> SearchEntriesBuilder<'a, search_entries_state::Empty> {
 impl<'a, S: search_entries_state::State> SearchEntriesBuilder<'a, S> {
     /// Set the `author` field (optional)
     pub fn author(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
     pub fn maybe_author(mut self, value: Option<AtIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -152,12 +155,12 @@ impl<'a, S: search_entries_state::State> SearchEntriesBuilder<'a, S> {
 impl<'a, S: search_entries_state::State> SearchEntriesBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -165,12 +168,12 @@ impl<'a, S: search_entries_state::State> SearchEntriesBuilder<'a, S> {
 impl<'a, S: search_entries_state::State> SearchEntriesBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -185,11 +188,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SearchEntriesBuilder<'a, search_entries_state::SetQ<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         SearchEntriesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -197,12 +200,12 @@ where
 impl<'a, S: search_entries_state::State> SearchEntriesBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -215,11 +218,11 @@ where
     /// Build the final struct
     pub fn build(self) -> SearchEntries<'a> {
         SearchEntries {
-            author: self.__unsafe_private_named.0,
-            cursor: self.__unsafe_private_named.1,
-            limit: self.__unsafe_private_named.2,
-            q: self.__unsafe_private_named.3.unwrap(),
-            tags: self.__unsafe_private_named.4,
+            author: self._fields.0,
+            cursor: self._fields.1,
+            limit: self._fields.2,
+            q: self._fields.3.unwrap(),
+            tags: self._fields.4,
         }
     }
 }

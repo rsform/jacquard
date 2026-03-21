@@ -9,7 +9,11 @@ pub mod get_recipe;
 pub mod get_recipes;
 pub mod recipe;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -127,9 +131,9 @@ pub mod not_found_recipe_state {
 
 /// Builder for constructing an instance of this type
 pub struct NotFoundRecipeBuilder<'a, S: not_found_recipe_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> NotFoundRecipe<'a> {
@@ -143,9 +147,9 @@ impl<'a> NotFoundRecipeBuilder<'a, not_found_recipe_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NotFoundRecipeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -160,11 +164,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> NotFoundRecipeBuilder<'a, not_found_recipe_state::SetNotFound<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         NotFoundRecipeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -179,11 +183,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> NotFoundRecipeBuilder<'a, not_found_recipe_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         NotFoundRecipeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -197,8 +201,8 @@ where
     /// Build the final struct
     pub fn build(self) -> NotFoundRecipe<'a> {
         NotFoundRecipe {
-            not_found: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
+            not_found: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -211,8 +215,8 @@ where
         >,
     ) -> NotFoundRecipe<'a> {
         NotFoundRecipe {
-            not_found: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
+            not_found: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -331,99 +335,99 @@ pub mod recipe_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Author;
-        type Cid;
         type Uri;
-        type IndexedAt;
+        type Cid;
+        type Author;
         type Record;
+        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Author = Unset;
-        type Cid = Unset;
         type Uri = Unset;
-        type IndexedAt = Unset;
+        type Cid = Unset;
+        type Author = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Author = Set<members::author>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Author = S::Author;
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-        type Record = S::Record;
+        type IndexedAt = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Author = S::Author;
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
-        type IndexedAt = S::IndexedAt;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Author = S::Author;
         type Cid = S::Cid;
-        type Uri = S::Uri;
-        type IndexedAt = Set<members::indexed_at>;
+        type Author = S::Author;
         type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Author = S::Author;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = Set<members::author>;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRecord<S> {}
     impl<S: State> State for SetRecord<S> {
-        type Author = S::Author;
-        type Cid = S::Cid;
         type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
+        type Author = S::Author;
         type Record = Set<members::record>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Record = S::Record;
+        type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `author` field
-        pub struct author(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `author` field
+        pub struct author(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RecipeViewBuilder<'a, S: recipe_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ProfileViewBasic<'a>>,
         Option<Cid<'a>>,
         Option<Datetime>,
         Option<Recipe<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RecipeView<'a> {
@@ -437,9 +441,9 @@ impl<'a> RecipeViewBuilder<'a, recipe_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RecipeViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -454,11 +458,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> RecipeViewBuilder<'a, recipe_view_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RecipeViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -473,11 +477,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> RecipeViewBuilder<'a, recipe_view_state::SetCid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RecipeViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -492,11 +496,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> RecipeViewBuilder<'a, recipe_view_state::SetIndexedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RecipeViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -511,11 +515,11 @@ where
         mut self,
         value: impl Into<Recipe<'a>>,
     ) -> RecipeViewBuilder<'a, recipe_view_state::SetRecord<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         RecipeViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -530,11 +534,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> RecipeViewBuilder<'a, recipe_view_state::SetUri<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         RecipeViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -542,20 +546,20 @@ where
 impl<'a, S> RecipeViewBuilder<'a, S>
 where
     S: recipe_view_state::State,
-    S::Author: recipe_view_state::IsSet,
-    S::Cid: recipe_view_state::IsSet,
     S::Uri: recipe_view_state::IsSet,
-    S::IndexedAt: recipe_view_state::IsSet,
+    S::Cid: recipe_view_state::IsSet,
+    S::Author: recipe_view_state::IsSet,
     S::Record: recipe_view_state::IsSet,
+    S::IndexedAt: recipe_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RecipeView<'a> {
         RecipeView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            record: self.__unsafe_private_named.3.unwrap(),
-            uri: self.__unsafe_private_named.4.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
+            record: self._fields.3.unwrap(),
+            uri: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -568,11 +572,11 @@ where
         >,
     ) -> RecipeView<'a> {
         RecipeView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            record: self.__unsafe_private_named.3.unwrap(),
-            uri: self.__unsafe_private_named.4.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
+            record: self._fields.3.unwrap(),
+            uri: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

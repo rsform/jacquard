@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_derive::IntoStatic;
@@ -74,9 +75,9 @@ pub mod get_currently_playing_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetCurrentlyPlayingBuilder<'a, S: get_currently_playing_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtIdentifier<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtIdentifier<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetCurrentlyPlaying<'a> {
@@ -90,9 +91,9 @@ impl<'a> GetCurrentlyPlayingBuilder<'a, get_currently_playing_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetCurrentlyPlayingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -100,12 +101,12 @@ impl<'a> GetCurrentlyPlayingBuilder<'a, get_currently_playing_state::Empty> {
 impl<'a, S: get_currently_playing_state::State> GetCurrentlyPlayingBuilder<'a, S> {
     /// Set the `actor` field (optional)
     pub fn actor(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `actor` field to an Option value (optional)
     pub fn maybe_actor(mut self, value: Option<AtIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -117,7 +118,7 @@ where
     /// Build the final struct
     pub fn build(self) -> GetCurrentlyPlaying<'a> {
         GetCurrentlyPlaying {
-            actor: self.__unsafe_private_named.0,
+            actor: self._fields.0,
         }
     }
 }

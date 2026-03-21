@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::UriValue;
@@ -126,45 +129,45 @@ pub mod get_part_upload_url_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UploadId;
         type PartNumber;
+        type UploadId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UploadId = Unset;
         type PartNumber = Unset;
-    }
-    ///State transition - sets the `upload_id` field to Set
-    pub struct SetUploadId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUploadId<S> {}
-    impl<S: State> State for SetUploadId<S> {
-        type UploadId = Set<members::upload_id>;
-        type PartNumber = S::PartNumber;
+        type UploadId = Unset;
     }
     ///State transition - sets the `part_number` field to Set
     pub struct SetPartNumber<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPartNumber<S> {}
     impl<S: State> State for SetPartNumber<S> {
-        type UploadId = S::UploadId;
         type PartNumber = Set<members::part_number>;
+        type UploadId = S::UploadId;
+    }
+    ///State transition - sets the `upload_id` field to Set
+    pub struct SetUploadId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUploadId<S> {}
+    impl<S: State> State for SetUploadId<S> {
+        type PartNumber = S::PartNumber;
+        type UploadId = Set<members::upload_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `upload_id` field
-        pub struct upload_id(());
         ///Marker type for the `part_number` field
         pub struct part_number(());
+        ///Marker type for the `upload_id` field
+        pub struct upload_id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetPartUploadUrlBuilder<'a, S: get_part_upload_url_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetPartUploadUrl<'a> {
@@ -178,9 +181,9 @@ impl<'a> GetPartUploadUrlBuilder<'a, get_part_upload_url_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetPartUploadUrlBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -195,11 +198,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> GetPartUploadUrlBuilder<'a, get_part_upload_url_state::SetPartNumber<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetPartUploadUrlBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -214,11 +217,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GetPartUploadUrlBuilder<'a, get_part_upload_url_state::SetUploadId<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GetPartUploadUrlBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -226,14 +229,14 @@ where
 impl<'a, S> GetPartUploadUrlBuilder<'a, S>
 where
     S: get_part_upload_url_state::State,
-    S::UploadId: get_part_upload_url_state::IsSet,
     S::PartNumber: get_part_upload_url_state::IsSet,
+    S::UploadId: get_part_upload_url_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetPartUploadUrl<'a> {
         GetPartUploadUrl {
-            part_number: self.__unsafe_private_named.0.unwrap(),
-            upload_id: self.__unsafe_private_named.1.unwrap(),
+            part_number: self._fields.0.unwrap(),
+            upload_id: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -243,8 +246,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> GetPartUploadUrl<'a> {
         GetPartUploadUrl {
-            part_number: self.__unsafe_private_named.0.unwrap(),
-            upload_id: self.__unsafe_private_named.1.unwrap(),
+            part_number: self._fields.0.unwrap(),
+            upload_id: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

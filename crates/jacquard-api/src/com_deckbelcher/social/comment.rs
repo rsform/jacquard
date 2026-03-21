@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -372,9 +375,9 @@ pub mod card_subject_state {
 
 /// Builder for constructing an instance of this type
 pub struct CardSubjectBuilder<'a, S: card_subject_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CardRef<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CardRef<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CardSubject<'a> {
@@ -388,9 +391,9 @@ impl<'a> CardSubjectBuilder<'a, card_subject_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CardSubjectBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -405,11 +408,11 @@ where
         mut self,
         value: impl Into<CardRef<'a>>,
     ) -> CardSubjectBuilder<'a, card_subject_state::SetRef<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CardSubjectBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -422,7 +425,7 @@ where
     /// Build the final struct
     pub fn build(self) -> CardSubject<'a> {
         CardSubject {
-            r#ref: self.__unsafe_private_named.0.unwrap(),
+            r#ref: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -435,7 +438,7 @@ where
         >,
     ) -> CardSubject<'a> {
         CardSubject {
-            r#ref: self.__unsafe_private_named.0.unwrap(),
+            r#ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -713,9 +716,9 @@ pub mod card_target_state {
 
 /// Builder for constructing an instance of this type
 pub struct CardTargetBuilder<'a, S: card_target_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CardRef<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CardRef<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CardTarget<'a> {
@@ -729,9 +732,9 @@ impl<'a> CardTargetBuilder<'a, card_target_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CardTargetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -746,11 +749,11 @@ where
         mut self,
         value: impl Into<CardRef<'a>>,
     ) -> CardTargetBuilder<'a, card_target_state::SetRef<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CardTargetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -763,7 +766,7 @@ where
     /// Build the final struct
     pub fn build(self) -> CardTarget<'a> {
         CardTarget {
-            r#ref: self.__unsafe_private_named.0.unwrap(),
+            r#ref: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -776,7 +779,7 @@ where
         >,
     ) -> CardTarget<'a> {
         CardTarget {
-            r#ref: self.__unsafe_private_named.0.unwrap(),
+            r#ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -816,9 +819,9 @@ pub mod deck_target_state {
 
 /// Builder for constructing an instance of this type
 pub struct DeckTargetBuilder<'a, S: deck_target_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<StrongRef<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<StrongRef<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DeckTarget<'a> {
@@ -832,9 +835,9 @@ impl<'a> DeckTargetBuilder<'a, deck_target_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeckTargetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -849,11 +852,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> DeckTargetBuilder<'a, deck_target_state::SetRef<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DeckTargetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -866,7 +869,7 @@ where
     /// Build the final struct
     pub fn build(self) -> DeckTarget<'a> {
         DeckTarget {
-            r#ref: self.__unsafe_private_named.0.unwrap(),
+            r#ref: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -879,7 +882,7 @@ where
         >,
     ) -> DeckTarget<'a> {
         DeckTarget {
-            r#ref: self.__unsafe_private_named.0.unwrap(),
+            r#ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -895,65 +898,65 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Content;
         type Subject;
+        type Content;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Content = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Content = S::Content;
-        type Subject = S::Subject;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type CreatedAt = S::CreatedAt;
-        type Content = Set<members::content>;
-        type Subject = S::Subject;
+        type Content = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
         type Subject = Set<members::subject>;
+        type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Subject = S::Subject;
+        type Content = Set<members::content>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type Content = S::Content;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `content` field
+        pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CommentBuilder<'a, S: comment_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Document<'a>>,
         Option<Datetime>,
         Option<CommentSubject<'a>>,
         Option<CommentTarget<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Comment<'a> {
@@ -967,9 +970,9 @@ impl<'a> CommentBuilder<'a, comment_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -984,11 +987,11 @@ where
         mut self,
         value: impl Into<Document<'a>>,
     ) -> CommentBuilder<'a, comment_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1003,11 +1006,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CommentBuilder<'a, comment_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1022,11 +1025,11 @@ where
         mut self,
         value: impl Into<CommentSubject<'a>>,
     ) -> CommentBuilder<'a, comment_state::SetSubject<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1034,12 +1037,12 @@ where
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `target` field (optional)
     pub fn target(mut self, value: impl Into<Option<CommentTarget<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `target` field to an Option value (optional)
     pub fn maybe_target(mut self, value: Option<CommentTarget<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1047,12 +1050,12 @@ impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1060,18 +1063,18 @@ impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::CreatedAt: comment_state::IsSet,
-    S::Content: comment_state::IsSet,
     S::Subject: comment_state::IsSet,
+    S::Content: comment_state::IsSet,
+    S::CreatedAt: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {
         Comment {
-            content: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            subject: self.__unsafe_private_named.2.unwrap(),
-            target: self.__unsafe_private_named.3,
-            updated_at: self.__unsafe_private_named.4,
+            content: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            subject: self._fields.2.unwrap(),
+            target: self._fields.3,
+            updated_at: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -1084,11 +1087,11 @@ where
         >,
     ) -> Comment<'a> {
         Comment {
-            content: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            subject: self.__unsafe_private_named.2.unwrap(),
-            target: self.__unsafe_private_named.3,
-            updated_at: self.__unsafe_private_named.4,
+            content: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            subject: self._fields.2.unwrap(),
+            target: self._fields.3,
+            updated_at: self._fields.4,
             extra_data: Some(extra_data),
         }
     }
@@ -1128,9 +1131,9 @@ pub mod record_subject_state {
 
 /// Builder for constructing an instance of this type
 pub struct RecordSubjectBuilder<'a, S: record_subject_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<StrongRef<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<StrongRef<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RecordSubject<'a> {
@@ -1144,9 +1147,9 @@ impl<'a> RecordSubjectBuilder<'a, record_subject_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RecordSubjectBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1161,11 +1164,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> RecordSubjectBuilder<'a, record_subject_state::SetRef<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RecordSubjectBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1178,7 +1181,7 @@ where
     /// Build the final struct
     pub fn build(self) -> RecordSubject<'a> {
         RecordSubject {
-            r#ref: self.__unsafe_private_named.0.unwrap(),
+            r#ref: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1191,7 +1194,7 @@ where
         >,
     ) -> RecordSubject<'a> {
         RecordSubject {
-            r#ref: self.__unsafe_private_named.0.unwrap(),
+            r#ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

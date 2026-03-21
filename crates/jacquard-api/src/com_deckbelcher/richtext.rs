@@ -7,7 +7,11 @@
 
 pub mod facet;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -481,9 +485,9 @@ pub mod bullet_list_block_state {
 
 /// Builder for constructing an instance of this type
 pub struct BulletListBlockBuilder<'a, S: bullet_list_block_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<richtext::ListItem<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<richtext::ListItem<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> BulletListBlock<'a> {
@@ -497,9 +501,9 @@ impl<'a> BulletListBlockBuilder<'a, bullet_list_block_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BulletListBlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -514,11 +518,11 @@ where
         mut self,
         value: impl Into<Vec<richtext::ListItem<'a>>>,
     ) -> BulletListBlockBuilder<'a, bullet_list_block_state::SetItems<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BulletListBlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -531,7 +535,7 @@ where
     /// Build the final struct
     pub fn build(self) -> BulletListBlock<'a> {
         BulletListBlock {
-            items: self.__unsafe_private_named.0.unwrap(),
+            items: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -544,7 +548,7 @@ where
         >,
     ) -> BulletListBlock<'a> {
         BulletListBlock {
-            items: self.__unsafe_private_named.0.unwrap(),
+            items: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -946,9 +950,9 @@ pub mod document_state {
 
 /// Builder for constructing an instance of this type
 pub struct DocumentBuilder<'a, S: document_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<DocumentContentItem<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<DocumentContentItem<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Document<'a> {
@@ -962,9 +966,9 @@ impl<'a> DocumentBuilder<'a, document_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -979,11 +983,11 @@ where
         mut self,
         value: impl Into<Vec<DocumentContentItem<'a>>>,
     ) -> DocumentBuilder<'a, document_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -996,7 +1000,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Document<'a> {
         Document {
-            content: self.__unsafe_private_named.0.unwrap(),
+            content: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1009,7 +1013,7 @@ where
         >,
     ) -> Document<'a> {
         Document {
-            content: self.__unsafe_private_named.0.unwrap(),
+            content: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1049,9 +1053,9 @@ pub mod heading_block_state {
 
 /// Builder for constructing an instance of this type
 pub struct HeadingBlockBuilder<'a, S: heading_block_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<Facet<'a>>>, Option<i64>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<Facet<'a>>>, Option<i64>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> HeadingBlock<'a> {
@@ -1065,9 +1069,9 @@ impl<'a> HeadingBlockBuilder<'a, heading_block_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         HeadingBlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1075,12 +1079,12 @@ impl<'a> HeadingBlockBuilder<'a, heading_block_state::Empty> {
 impl<'a, S: heading_block_state::State> HeadingBlockBuilder<'a, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
     pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1095,11 +1099,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> HeadingBlockBuilder<'a, heading_block_state::SetLevel<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         HeadingBlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1107,12 +1111,12 @@ where
 impl<'a, S: heading_block_state::State> HeadingBlockBuilder<'a, S> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
     pub fn maybe_text(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1125,9 +1129,9 @@ where
     /// Build the final struct
     pub fn build(self) -> HeadingBlock<'a> {
         HeadingBlock {
-            facets: self.__unsafe_private_named.0,
-            level: self.__unsafe_private_named.1.unwrap(),
-            text: self.__unsafe_private_named.2,
+            facets: self._fields.0,
+            level: self._fields.1.unwrap(),
+            text: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -1140,9 +1144,9 @@ where
         >,
     ) -> HeadingBlock<'a> {
         HeadingBlock {
-            facets: self.__unsafe_private_named.0,
-            level: self.__unsafe_private_named.1.unwrap(),
-            text: self.__unsafe_private_named.2,
+            facets: self._fields.0,
+            level: self._fields.1.unwrap(),
+            text: self._fields.2,
             extra_data: Some(extra_data),
         }
     }
@@ -1182,9 +1186,9 @@ pub mod ordered_list_block_state {
 
 /// Builder for constructing an instance of this type
 pub struct OrderedListBlockBuilder<'a, S: ordered_list_block_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<richtext::ListItem<'a>>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<richtext::ListItem<'a>>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> OrderedListBlock<'a> {
@@ -1198,9 +1202,9 @@ impl<'a> OrderedListBlockBuilder<'a, ordered_list_block_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         OrderedListBlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1215,11 +1219,11 @@ where
         mut self,
         value: impl Into<Vec<richtext::ListItem<'a>>>,
     ) -> OrderedListBlockBuilder<'a, ordered_list_block_state::SetItems<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         OrderedListBlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1227,12 +1231,12 @@ where
 impl<'a, S: ordered_list_block_state::State> OrderedListBlockBuilder<'a, S> {
     /// Set the `start` field (optional)
     pub fn start(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `start` field to an Option value (optional)
     pub fn maybe_start(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1245,8 +1249,8 @@ where
     /// Build the final struct
     pub fn build(self) -> OrderedListBlock<'a> {
         OrderedListBlock {
-            items: self.__unsafe_private_named.0.unwrap(),
-            start: self.__unsafe_private_named.1,
+            items: self._fields.0.unwrap(),
+            start: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -1259,8 +1263,8 @@ where
         >,
     ) -> OrderedListBlock<'a> {
         OrderedListBlock {
-            items: self.__unsafe_private_named.0.unwrap(),
-            start: self.__unsafe_private_named.1,
+            items: self._fields.0.unwrap(),
+            start: self._fields.1,
             extra_data: Some(extra_data),
         }
     }

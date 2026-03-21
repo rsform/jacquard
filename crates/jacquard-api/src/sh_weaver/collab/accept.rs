@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -113,49 +116,49 @@ pub mod accept_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Resource;
         type Invite;
+        type Resource;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Resource = Unset;
         type Invite = Unset;
+        type Resource = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type Resource = Set<members::resource>;
-        type Invite = S::Invite;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `invite` field to Set
     pub struct SetInvite<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetInvite<S> {}
     impl<S: State> State for SetInvite<S> {
-        type Resource = S::Resource;
         type Invite = Set<members::invite>;
+        type Resource = S::Resource;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `resource` field to Set
+    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResource<S> {}
+    impl<S: State> State for SetResource<S> {
+        type Invite = S::Invite;
+        type Resource = Set<members::resource>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Resource = S::Resource;
         type Invite = S::Invite;
+        type Resource = S::Resource;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `resource` field
-        pub struct resource(());
         ///Marker type for the `invite` field
         pub struct invite(());
+        ///Marker type for the `resource` field
+        pub struct resource(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -163,9 +166,9 @@ pub mod accept_state {
 
 /// Builder for constructing an instance of this type
 pub struct AcceptBuilder<'a, S: accept_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<StrongRef<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<StrongRef<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Accept<'a> {
@@ -179,9 +182,9 @@ impl<'a> AcceptBuilder<'a, accept_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AcceptBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -196,11 +199,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> AcceptBuilder<'a, accept_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AcceptBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -215,11 +218,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> AcceptBuilder<'a, accept_state::SetInvite<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AcceptBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -234,11 +237,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> AcceptBuilder<'a, accept_state::SetResource<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         AcceptBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -246,16 +249,16 @@ where
 impl<'a, S> AcceptBuilder<'a, S>
 where
     S: accept_state::State,
-    S::Resource: accept_state::IsSet,
     S::Invite: accept_state::IsSet,
+    S::Resource: accept_state::IsSet,
     S::CreatedAt: accept_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Accept<'a> {
         Accept {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            invite: self.__unsafe_private_named.1.unwrap(),
-            resource: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            invite: self._fields.1.unwrap(),
+            resource: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -268,9 +271,9 @@ where
         >,
     ) -> Accept<'a> {
         Accept {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            invite: self.__unsafe_private_named.1.unwrap(),
-            resource: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            invite: self._fields.1.unwrap(),
+            resource: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

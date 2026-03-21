@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -127,92 +130,92 @@ pub mod log_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LogType;
-        type Message;
-        type Level;
         type Id;
         type CreatedAt;
+        type Level;
+        type LogType;
+        type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LogType = Unset;
-        type Message = Unset;
-        type Level = Unset;
         type Id = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `log_type` field to Set
-    pub struct SetLogType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLogType<S> {}
-    impl<S: State> State for SetLogType<S> {
-        type LogType = Set<members::log_type>;
-        type Message = S::Message;
-        type Level = S::Level;
-        type Id = S::Id;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type LogType = S::LogType;
-        type Message = Set<members::message>;
-        type Level = S::Level;
-        type Id = S::Id;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type LogType = S::LogType;
-        type Message = S::Message;
-        type Level = Set<members::level>;
-        type Id = S::Id;
-        type CreatedAt = S::CreatedAt;
+        type Level = Unset;
+        type LogType = Unset;
+        type Message = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type LogType = S::LogType;
-        type Message = S::Message;
-        type Level = S::Level;
         type Id = Set<members::id>;
         type CreatedAt = S::CreatedAt;
+        type Level = S::Level;
+        type LogType = S::LogType;
+        type Message = S::Message;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type LogType = S::LogType;
-        type Message = S::Message;
-        type Level = S::Level;
         type Id = S::Id;
         type CreatedAt = Set<members::created_at>;
+        type Level = S::Level;
+        type LogType = S::LogType;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLevel<S> {}
+    impl<S: State> State for SetLevel<S> {
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type Level = Set<members::level>;
+        type LogType = S::LogType;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `log_type` field to Set
+    pub struct SetLogType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLogType<S> {}
+    impl<S: State> State for SetLogType<S> {
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type Level = S::Level;
+        type LogType = Set<members::log_type>;
+        type Message = S::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Id = S::Id;
+        type CreatedAt = S::CreatedAt;
+        type Level = S::Level;
+        type LogType = S::LogType;
+        type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `log_type` field
-        pub struct log_type(());
-        ///Marker type for the `message` field
-        pub struct message(());
-        ///Marker type for the `level` field
-        pub struct level(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `level` field
+        pub struct level(());
+        ///Marker type for the `log_type` field
+        pub struct log_type(());
+        ///Marker type for the `message` field
+        pub struct message(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LogEntryBuilder<'a, S: log_entry_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<i64>,
         Option<CowStr<'a>>,
@@ -223,7 +226,7 @@ pub struct LogEntryBuilder<'a, S: log_entry_state::State> {
         Option<CowStr<'a>>,
         Option<Did<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LogEntry<'a> {
@@ -237,19 +240,9 @@ impl<'a> LogEntryBuilder<'a, log_entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LogEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -264,11 +257,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LogEntryBuilder<'a, log_entry_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LogEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -283,11 +276,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> LogEntryBuilder<'a, log_entry_state::SetId<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LogEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -295,12 +288,12 @@ where
 impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
     /// Set the `jobId` field (optional)
     pub fn job_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `jobId` field to an Option value (optional)
     pub fn maybe_job_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -315,11 +308,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LogEntryBuilder<'a, log_entry_state::SetLevel<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         LogEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -334,11 +327,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LogEntryBuilder<'a, log_entry_state::SetLogType<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         LogEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -353,11 +346,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LogEntryBuilder<'a, log_entry_state::SetMessage<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         LogEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -365,12 +358,12 @@ where
 impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
     pub fn maybe_metadata(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -378,12 +371,12 @@ impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
 impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
     /// Set the `sliceUri` field (optional)
     pub fn slice_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `sliceUri` field to an Option value (optional)
     pub fn maybe_slice_uri(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -391,12 +384,12 @@ impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
 impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
     /// Set the `userDid` field (optional)
     pub fn user_did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `userDid` field to an Option value (optional)
     pub fn maybe_user_did(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -404,24 +397,24 @@ impl<'a, S: log_entry_state::State> LogEntryBuilder<'a, S> {
 impl<'a, S> LogEntryBuilder<'a, S>
 where
     S: log_entry_state::State,
-    S::LogType: log_entry_state::IsSet,
-    S::Message: log_entry_state::IsSet,
-    S::Level: log_entry_state::IsSet,
     S::Id: log_entry_state::IsSet,
     S::CreatedAt: log_entry_state::IsSet,
+    S::Level: log_entry_state::IsSet,
+    S::LogType: log_entry_state::IsSet,
+    S::Message: log_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LogEntry<'a> {
         LogEntry {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            id: self.__unsafe_private_named.1.unwrap(),
-            job_id: self.__unsafe_private_named.2,
-            level: self.__unsafe_private_named.3.unwrap(),
-            log_type: self.__unsafe_private_named.4.unwrap(),
-            message: self.__unsafe_private_named.5.unwrap(),
-            metadata: self.__unsafe_private_named.6,
-            slice_uri: self.__unsafe_private_named.7,
-            user_did: self.__unsafe_private_named.8,
+            created_at: self._fields.0.unwrap(),
+            id: self._fields.1.unwrap(),
+            job_id: self._fields.2,
+            level: self._fields.3.unwrap(),
+            log_type: self._fields.4.unwrap(),
+            message: self._fields.5.unwrap(),
+            metadata: self._fields.6,
+            slice_uri: self._fields.7,
+            user_did: self._fields.8,
             extra_data: Default::default(),
         }
     }
@@ -431,15 +424,15 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> LogEntry<'a> {
         LogEntry {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            id: self.__unsafe_private_named.1.unwrap(),
-            job_id: self.__unsafe_private_named.2,
-            level: self.__unsafe_private_named.3.unwrap(),
-            log_type: self.__unsafe_private_named.4.unwrap(),
-            message: self.__unsafe_private_named.5.unwrap(),
-            metadata: self.__unsafe_private_named.6,
-            slice_uri: self.__unsafe_private_named.7,
-            user_did: self.__unsafe_private_named.8,
+            created_at: self._fields.0.unwrap(),
+            id: self._fields.1.unwrap(),
+            job_id: self._fields.2,
+            level: self._fields.3.unwrap(),
+            log_type: self._fields.4.unwrap(),
+            message: self._fields.5.unwrap(),
+            metadata: self._fields.6,
+            slice_uri: self._fields.7,
+            user_did: self._fields.8,
             extra_data: Some(extra_data),
         }
     }
@@ -620,9 +613,9 @@ pub mod get_job_logs_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetJobLogsBuilder<'a, S: get_job_logs_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetJobLogs<'a> {
@@ -636,9 +629,9 @@ impl<'a> GetJobLogsBuilder<'a, get_job_logs_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetJobLogsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -653,11 +646,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GetJobLogsBuilder<'a, get_job_logs_state::SetJobId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetJobLogsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -665,12 +658,12 @@ where
 impl<'a, S: get_job_logs_state::State> GetJobLogsBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -683,8 +676,8 @@ where
     /// Build the final struct
     pub fn build(self) -> GetJobLogs<'a> {
         GetJobLogs {
-            job_id: self.__unsafe_private_named.0.unwrap(),
-            limit: self.__unsafe_private_named.1,
+            job_id: self._fields.0.unwrap(),
+            limit: self._fields.1,
         }
     }
 }

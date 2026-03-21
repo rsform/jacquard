@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -260,9 +263,9 @@ pub mod get_branding_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetBrandingBuilder<'a, S: get_branding_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetBranding<'a> {
@@ -276,9 +279,9 @@ impl<'a> GetBrandingBuilder<'a, get_branding_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetBrandingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -286,12 +289,12 @@ impl<'a> GetBrandingBuilder<'a, get_branding_state::Empty> {
 impl<'a, S: get_branding_state::State> GetBrandingBuilder<'a, S> {
     /// Set the `broadcaster` field (optional)
     pub fn broadcaster(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `broadcaster` field to an Option value (optional)
     pub fn maybe_broadcaster(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -303,7 +306,7 @@ where
     /// Build the final struct
     pub fn build(self) -> GetBranding<'a> {
         GetBranding {
-            broadcaster: self.__unsafe_private_named.0,
+            broadcaster: self._fields.0,
         }
     }
 }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::Nsid;
@@ -273,65 +276,65 @@ pub mod upsert_option_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
-        type Scope;
         type Value;
+        type Scope;
+        type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
-        type Scope = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Key = Set<members::key>;
-        type Scope = S::Scope;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `scope` field to Set
-    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScope<S> {}
-    impl<S: State> State for SetScope<S> {
-        type Key = S::Key;
-        type Scope = Set<members::scope>;
-        type Value = S::Value;
+        type Scope = Unset;
+        type Key = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Key = S::Key;
-        type Scope = S::Scope;
         type Value = Set<members::value>;
+        type Scope = S::Scope;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `scope` field to Set
+    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScope<S> {}
+    impl<S: State> State for SetScope<S> {
+        type Value = S::Value;
+        type Scope = Set<members::scope>;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Value = S::Value;
+        type Scope = S::Scope;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
-        ///Marker type for the `scope` field
-        pub struct scope(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `scope` field
+        pub struct scope(());
+        ///Marker type for the `key` field
+        pub struct key(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct UpsertOptionBuilder<'a, S: upsert_option_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Nsid<'a>>,
         Option<UpsertOptionManagerRole<'a>>,
         Option<UpsertOptionScope<'a>>,
         Option<Data<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> UpsertOption<'a> {
@@ -345,9 +348,9 @@ impl<'a> UpsertOptionBuilder<'a, upsert_option_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpsertOptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -355,12 +358,12 @@ impl<'a> UpsertOptionBuilder<'a, upsert_option_state::Empty> {
 impl<'a, S: upsert_option_state::State> UpsertOptionBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -375,11 +378,11 @@ where
         mut self,
         value: impl Into<Nsid<'a>>,
     ) -> UpsertOptionBuilder<'a, upsert_option_state::SetKey<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         UpsertOptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -390,7 +393,7 @@ impl<'a, S: upsert_option_state::State> UpsertOptionBuilder<'a, S> {
         mut self,
         value: impl Into<Option<UpsertOptionManagerRole<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `managerRole` field to an Option value (optional)
@@ -398,7 +401,7 @@ impl<'a, S: upsert_option_state::State> UpsertOptionBuilder<'a, S> {
         mut self,
         value: Option<UpsertOptionManagerRole<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -413,11 +416,11 @@ where
         mut self,
         value: impl Into<UpsertOptionScope<'a>>,
     ) -> UpsertOptionBuilder<'a, upsert_option_state::SetScope<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         UpsertOptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -432,11 +435,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> UpsertOptionBuilder<'a, upsert_option_state::SetValue<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         UpsertOptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -444,18 +447,18 @@ where
 impl<'a, S> UpsertOptionBuilder<'a, S>
 where
     S: upsert_option_state::State,
-    S::Key: upsert_option_state::IsSet,
-    S::Scope: upsert_option_state::IsSet,
     S::Value: upsert_option_state::IsSet,
+    S::Scope: upsert_option_state::IsSet,
+    S::Key: upsert_option_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpsertOption<'a> {
         UpsertOption {
-            description: self.__unsafe_private_named.0,
-            key: self.__unsafe_private_named.1.unwrap(),
-            manager_role: self.__unsafe_private_named.2,
-            scope: self.__unsafe_private_named.3.unwrap(),
-            value: self.__unsafe_private_named.4.unwrap(),
+            description: self._fields.0,
+            key: self._fields.1.unwrap(),
+            manager_role: self._fields.2,
+            scope: self._fields.3.unwrap(),
+            value: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -465,11 +468,11 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> UpsertOption<'a> {
         UpsertOption {
-            description: self.__unsafe_private_named.0,
-            key: self.__unsafe_private_named.1.unwrap(),
-            manager_role: self.__unsafe_private_named.2,
-            scope: self.__unsafe_private_named.3.unwrap(),
-            value: self.__unsafe_private_named.4.unwrap(),
+            description: self._fields.0,
+            key: self._fields.1.unwrap(),
+            manager_role: self._fields.2,
+            scope: self._fields.3.unwrap(),
+            value: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

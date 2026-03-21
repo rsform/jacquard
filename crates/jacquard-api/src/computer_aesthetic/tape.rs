@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -211,58 +214,58 @@ pub mod tape_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type When;
-        type Code;
         type Slug;
+        type Code;
+        type When;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type When = Unset;
-        type Code = Unset;
         type Slug = Unset;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type When = Set<members::when>;
-        type Code = S::Code;
-        type Slug = S::Slug;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCode<S> {}
-    impl<S: State> State for SetCode<S> {
-        type When = S::When;
-        type Code = Set<members::code>;
-        type Slug = S::Slug;
+        type Code = Unset;
+        type When = Unset;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type When = S::When;
-        type Code = S::Code;
         type Slug = Set<members::slug>;
+        type Code = S::Code;
+        type When = S::When;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCode<S> {}
+    impl<S: State> State for SetCode<S> {
+        type Slug = S::Slug;
+        type Code = Set<members::code>;
+        type When = S::When;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWhen<S> {}
+    impl<S: State> State for SetWhen<S> {
+        type Slug = S::Slug;
+        type Code = S::Code;
+        type When = Set<members::when>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `when` field
-        pub struct when(());
-        ///Marker type for the `code` field
-        pub struct code(());
         ///Marker type for the `slug` field
         pub struct slug(());
+        ///Marker type for the `code` field
+        pub struct code(());
+        ///Marker type for the `when` field
+        pub struct when(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TapeBuilder<'a, S: tape_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
@@ -272,7 +275,7 @@ pub struct TapeBuilder<'a, S: tape_state::State> {
         Option<Datetime>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Tape<'a> {
@@ -286,9 +289,9 @@ impl<'a> TapeBuilder<'a, tape_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TapeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -296,12 +299,12 @@ impl<'a> TapeBuilder<'a, tape_state::Empty> {
 impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
     /// Set the `acUrl` field (optional)
     pub fn ac_url(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `acUrl` field to an Option value (optional)
     pub fn maybe_ac_url(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -316,11 +319,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TapeBuilder<'a, tape_state::SetCode<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TapeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -328,12 +331,12 @@ where
 impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
     /// Set the `ref` field (optional)
     pub fn r#ref(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `ref` field to an Option value (optional)
     pub fn maybe_ref(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -348,11 +351,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TapeBuilder<'a, tape_state::SetSlug<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         TapeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -360,12 +363,12 @@ where
 impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
     /// Set the `thumbnail` field (optional)
     pub fn thumbnail(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
     pub fn maybe_thumbnail(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -373,12 +376,12 @@ impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
 impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
     /// Set the `video` field (optional)
     pub fn video(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `video` field to an Option value (optional)
     pub fn maybe_video(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -393,11 +396,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> TapeBuilder<'a, tape_state::SetWhen<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         TapeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -405,12 +408,12 @@ where
 impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
     /// Set the `zipUrl` field (optional)
     pub fn zip_url(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `zipUrl` field to an Option value (optional)
     pub fn maybe_zip_url(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -418,21 +421,21 @@ impl<'a, S: tape_state::State> TapeBuilder<'a, S> {
 impl<'a, S> TapeBuilder<'a, S>
 where
     S: tape_state::State,
-    S::When: tape_state::IsSet,
-    S::Code: tape_state::IsSet,
     S::Slug: tape_state::IsSet,
+    S::Code: tape_state::IsSet,
+    S::When: tape_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tape<'a> {
         Tape {
-            ac_url: self.__unsafe_private_named.0,
-            code: self.__unsafe_private_named.1.unwrap(),
-            r#ref: self.__unsafe_private_named.2,
-            slug: self.__unsafe_private_named.3.unwrap(),
-            thumbnail: self.__unsafe_private_named.4,
-            video: self.__unsafe_private_named.5,
-            when: self.__unsafe_private_named.6.unwrap(),
-            zip_url: self.__unsafe_private_named.7,
+            ac_url: self._fields.0,
+            code: self._fields.1.unwrap(),
+            r#ref: self._fields.2,
+            slug: self._fields.3.unwrap(),
+            thumbnail: self._fields.4,
+            video: self._fields.5,
+            when: self._fields.6.unwrap(),
+            zip_url: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -445,14 +448,14 @@ where
         >,
     ) -> Tape<'a> {
         Tape {
-            ac_url: self.__unsafe_private_named.0,
-            code: self.__unsafe_private_named.1.unwrap(),
-            r#ref: self.__unsafe_private_named.2,
-            slug: self.__unsafe_private_named.3.unwrap(),
-            thumbnail: self.__unsafe_private_named.4,
-            video: self.__unsafe_private_named.5,
-            when: self.__unsafe_private_named.6.unwrap(),
-            zip_url: self.__unsafe_private_named.7,
+            ac_url: self._fields.0,
+            code: self._fields.1.unwrap(),
+            r#ref: self._fields.2,
+            slug: self._fields.3.unwrap(),
+            thumbnail: self._fields.4,
+            video: self._fields.5,
+            when: self._fields.6.unwrap(),
+            zip_url: self._fields.7,
             extra_data: Some(extra_data),
         }
     }

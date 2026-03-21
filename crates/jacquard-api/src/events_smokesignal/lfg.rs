@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -148,112 +151,112 @@ pub mod lfg_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Active;
-        type Tags;
         type StartsAt;
-        type EndsAt;
+        type Active;
         type Location;
         type CreatedAt;
+        type Tags;
+        type EndsAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Active = Unset;
-        type Tags = Unset;
         type StartsAt = Unset;
-        type EndsAt = Unset;
+        type Active = Unset;
         type Location = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `active` field to Set
-    pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActive<S> {}
-    impl<S: State> State for SetActive<S> {
-        type Active = Set<members::active>;
-        type Tags = S::Tags;
-        type StartsAt = S::StartsAt;
-        type EndsAt = S::EndsAt;
-        type Location = S::Location;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type Active = S::Active;
-        type Tags = Set<members::tags>;
-        type StartsAt = S::StartsAt;
-        type EndsAt = S::EndsAt;
-        type Location = S::Location;
-        type CreatedAt = S::CreatedAt;
+        type Tags = Unset;
+        type EndsAt = Unset;
     }
     ///State transition - sets the `starts_at` field to Set
     pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartsAt<S> {}
     impl<S: State> State for SetStartsAt<S> {
-        type Active = S::Active;
-        type Tags = S::Tags;
         type StartsAt = Set<members::starts_at>;
-        type EndsAt = S::EndsAt;
-        type Location = S::Location;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `ends_at` field to Set
-    pub struct SetEndsAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEndsAt<S> {}
-    impl<S: State> State for SetEndsAt<S> {
         type Active = S::Active;
-        type Tags = S::Tags;
-        type StartsAt = S::StartsAt;
-        type EndsAt = Set<members::ends_at>;
         type Location = S::Location;
         type CreatedAt = S::CreatedAt;
+        type Tags = S::Tags;
+        type EndsAt = S::EndsAt;
+    }
+    ///State transition - sets the `active` field to Set
+    pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActive<S> {}
+    impl<S: State> State for SetActive<S> {
+        type StartsAt = S::StartsAt;
+        type Active = Set<members::active>;
+        type Location = S::Location;
+        type CreatedAt = S::CreatedAt;
+        type Tags = S::Tags;
+        type EndsAt = S::EndsAt;
     }
     ///State transition - sets the `location` field to Set
     pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLocation<S> {}
     impl<S: State> State for SetLocation<S> {
-        type Active = S::Active;
-        type Tags = S::Tags;
         type StartsAt = S::StartsAt;
-        type EndsAt = S::EndsAt;
+        type Active = S::Active;
         type Location = Set<members::location>;
         type CreatedAt = S::CreatedAt;
+        type Tags = S::Tags;
+        type EndsAt = S::EndsAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Active = S::Active;
-        type Tags = S::Tags;
         type StartsAt = S::StartsAt;
-        type EndsAt = S::EndsAt;
+        type Active = S::Active;
         type Location = S::Location;
         type CreatedAt = Set<members::created_at>;
+        type Tags = S::Tags;
+        type EndsAt = S::EndsAt;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTags<S> {}
+    impl<S: State> State for SetTags<S> {
+        type StartsAt = S::StartsAt;
+        type Active = S::Active;
+        type Location = S::Location;
+        type CreatedAt = S::CreatedAt;
+        type Tags = Set<members::tags>;
+        type EndsAt = S::EndsAt;
+    }
+    ///State transition - sets the `ends_at` field to Set
+    pub struct SetEndsAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEndsAt<S> {}
+    impl<S: State> State for SetEndsAt<S> {
+        type StartsAt = S::StartsAt;
+        type Active = S::Active;
+        type Location = S::Location;
+        type CreatedAt = S::CreatedAt;
+        type Tags = S::Tags;
+        type EndsAt = Set<members::ends_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `active` field
-        pub struct active(());
-        ///Marker type for the `tags` field
-        pub struct tags(());
         ///Marker type for the `starts_at` field
         pub struct starts_at(());
-        ///Marker type for the `ends_at` field
-        pub struct ends_at(());
+        ///Marker type for the `active` field
+        pub struct active(());
         ///Marker type for the `location` field
         pub struct location(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
+        ///Marker type for the `ends_at` field
+        pub struct ends_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LfgBuilder<'a, S: lfg_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<bool>,
         Option<Datetime>,
         Option<Datetime>,
@@ -261,7 +264,7 @@ pub struct LfgBuilder<'a, S: lfg_state::State> {
         Option<Datetime>,
         Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Lfg<'a> {
@@ -275,9 +278,9 @@ impl<'a> LfgBuilder<'a, lfg_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LfgBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -292,11 +295,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> LfgBuilder<'a, lfg_state::SetActive<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LfgBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -311,11 +314,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LfgBuilder<'a, lfg_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LfgBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -330,11 +333,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LfgBuilder<'a, lfg_state::SetEndsAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LfgBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -349,11 +352,11 @@ where
         mut self,
         value: impl Into<LfgLocation<'a>>,
     ) -> LfgBuilder<'a, lfg_state::SetLocation<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         LfgBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -368,11 +371,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LfgBuilder<'a, lfg_state::SetStartsAt<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         LfgBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -387,11 +390,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> LfgBuilder<'a, lfg_state::SetTags<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         LfgBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -399,22 +402,22 @@ where
 impl<'a, S> LfgBuilder<'a, S>
 where
     S: lfg_state::State,
-    S::Active: lfg_state::IsSet,
-    S::Tags: lfg_state::IsSet,
     S::StartsAt: lfg_state::IsSet,
-    S::EndsAt: lfg_state::IsSet,
+    S::Active: lfg_state::IsSet,
     S::Location: lfg_state::IsSet,
     S::CreatedAt: lfg_state::IsSet,
+    S::Tags: lfg_state::IsSet,
+    S::EndsAt: lfg_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lfg<'a> {
         Lfg {
-            active: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            ends_at: self.__unsafe_private_named.2.unwrap(),
-            location: self.__unsafe_private_named.3.unwrap(),
-            starts_at: self.__unsafe_private_named.4.unwrap(),
-            tags: self.__unsafe_private_named.5.unwrap(),
+            active: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            ends_at: self._fields.2.unwrap(),
+            location: self._fields.3.unwrap(),
+            starts_at: self._fields.4.unwrap(),
+            tags: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -424,12 +427,12 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Lfg<'a> {
         Lfg {
-            active: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            ends_at: self.__unsafe_private_named.2.unwrap(),
-            location: self.__unsafe_private_named.3.unwrap(),
-            starts_at: self.__unsafe_private_named.4.unwrap(),
-            tags: self.__unsafe_private_named.5.unwrap(),
+            active: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            ends_at: self._fields.2.unwrap(),
+            location: self._fields.3.unwrap(),
+            starts_at: self._fields.4.unwrap(),
+            tags: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

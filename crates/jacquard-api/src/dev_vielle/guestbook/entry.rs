@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -108,45 +111,45 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Book;
         type Contents;
+        type Book;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Book = Unset;
         type Contents = Unset;
-    }
-    ///State transition - sets the `book` field to Set
-    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBook<S> {}
-    impl<S: State> State for SetBook<S> {
-        type Book = Set<members::book>;
-        type Contents = S::Contents;
+        type Book = Unset;
     }
     ///State transition - sets the `contents` field to Set
     pub struct SetContents<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContents<S> {}
     impl<S: State> State for SetContents<S> {
-        type Book = S::Book;
         type Contents = Set<members::contents>;
+        type Book = S::Book;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBook<S> {}
+    impl<S: State> State for SetBook<S> {
+        type Contents = S::Contents;
+        type Book = Set<members::book>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `book` field
-        pub struct book(());
         ///Marker type for the `contents` field
         pub struct contents(());
+        ///Marker type for the `book` field
+        pub struct book(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EntryBuilder<'a, S: entry_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Entry<'a> {
@@ -160,9 +163,9 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -177,11 +180,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> EntryBuilder<'a, entry_state::SetBook<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -196,11 +199,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EntryBuilder<'a, entry_state::SetContents<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -208,14 +211,14 @@ where
 impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
-    S::Book: entry_state::IsSet,
     S::Contents: entry_state::IsSet,
+    S::Book: entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Entry<'a> {
         Entry {
-            book: self.__unsafe_private_named.0.unwrap(),
-            contents: self.__unsafe_private_named.1.unwrap(),
+            book: self._fields.0.unwrap(),
+            contents: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -228,8 +231,8 @@ where
         >,
     ) -> Entry<'a> {
         Entry {
-            book: self.__unsafe_private_named.0.unwrap(),
-            contents: self.__unsafe_private_named.1.unwrap(),
+            book: self._fields.0.unwrap(),
+            contents: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

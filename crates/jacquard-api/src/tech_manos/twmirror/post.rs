@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -119,65 +122,65 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type TweetId;
         type BskyPost;
+        type CreatedAt;
         type TwUserId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type TweetId = Unset;
         type BskyPost = Unset;
+        type CreatedAt = Unset;
         type TwUserId = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type TweetId = S::TweetId;
-        type BskyPost = S::BskyPost;
-        type TwUserId = S::TwUserId;
     }
     ///State transition - sets the `tweet_id` field to Set
     pub struct SetTweetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTweetId<S> {}
     impl<S: State> State for SetTweetId<S> {
-        type CreatedAt = S::CreatedAt;
         type TweetId = Set<members::tweet_id>;
         type BskyPost = S::BskyPost;
+        type CreatedAt = S::CreatedAt;
         type TwUserId = S::TwUserId;
     }
     ///State transition - sets the `bsky_post` field to Set
     pub struct SetBskyPost<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBskyPost<S> {}
     impl<S: State> State for SetBskyPost<S> {
-        type CreatedAt = S::CreatedAt;
         type TweetId = S::TweetId;
         type BskyPost = Set<members::bsky_post>;
+        type CreatedAt = S::CreatedAt;
+        type TwUserId = S::TwUserId;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type TweetId = S::TweetId;
+        type BskyPost = S::BskyPost;
+        type CreatedAt = Set<members::created_at>;
         type TwUserId = S::TwUserId;
     }
     ///State transition - sets the `tw_user_id` field to Set
     pub struct SetTwUserId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTwUserId<S> {}
     impl<S: State> State for SetTwUserId<S> {
-        type CreatedAt = S::CreatedAt;
         type TweetId = S::TweetId;
         type BskyPost = S::BskyPost;
+        type CreatedAt = S::CreatedAt;
         type TwUserId = Set<members::tw_user_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `tweet_id` field
         pub struct tweet_id(());
         ///Marker type for the `bsky_post` field
         pub struct bsky_post(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `tw_user_id` field
         pub struct tw_user_id(());
     }
@@ -185,14 +188,14 @@ pub mod post_state {
 
 /// Builder for constructing an instance of this type
 pub struct PostBuilder<'a, S: post_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Data<'a>>,
         Option<Datetime>,
         Option<post::TwitterId<'a>>,
         Option<post::TwitterId<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Post<'a> {
@@ -206,9 +209,9 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -223,11 +226,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> PostBuilder<'a, post_state::SetBskyPost<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -242,11 +245,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PostBuilder<'a, post_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -261,11 +264,11 @@ where
         mut self,
         value: impl Into<post::TwitterId<'a>>,
     ) -> PostBuilder<'a, post_state::SetTwUserId<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -280,11 +283,11 @@ where
         mut self,
         value: impl Into<post::TwitterId<'a>>,
     ) -> PostBuilder<'a, post_state::SetTweetId<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -292,18 +295,18 @@ where
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::CreatedAt: post_state::IsSet,
     S::TweetId: post_state::IsSet,
     S::BskyPost: post_state::IsSet,
+    S::CreatedAt: post_state::IsSet,
     S::TwUserId: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
         Post {
-            bsky_post: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            tw_user_id: self.__unsafe_private_named.2.unwrap(),
-            tweet_id: self.__unsafe_private_named.3.unwrap(),
+            bsky_post: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            tw_user_id: self._fields.2.unwrap(),
+            tweet_id: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -313,10 +316,10 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Post<'a> {
         Post {
-            bsky_post: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            tw_user_id: self.__unsafe_private_named.2.unwrap(),
-            tweet_id: self.__unsafe_private_named.3.unwrap(),
+            bsky_post: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            tw_user_id: self._fields.2.unwrap(),
+            tweet_id: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

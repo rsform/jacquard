@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -276,8 +279,8 @@ pub mod get_suggested_notebooks_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetSuggestedNotebooksBuilder<S: get_suggested_notebooks_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>,),
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>,),
 }
 
 impl GetSuggestedNotebooks {
@@ -291,8 +294,8 @@ impl GetSuggestedNotebooksBuilder<get_suggested_notebooks_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSuggestedNotebooksBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
+            _state: PhantomData,
+            _fields: (None,),
         }
     }
 }
@@ -300,12 +303,12 @@ impl GetSuggestedNotebooksBuilder<get_suggested_notebooks_state::Empty> {
 impl<S: get_suggested_notebooks_state::State> GetSuggestedNotebooksBuilder<S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -317,7 +320,7 @@ where
     /// Build the final struct
     pub fn build(self) -> GetSuggestedNotebooks {
         GetSuggestedNotebooks {
-            limit: self.__unsafe_private_named.0,
+            limit: self._fields.0,
         }
     }
 }
@@ -332,49 +335,49 @@ pub mod suggested_notebook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Reason;
         type Notebook;
+        type Reason;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Reason = Unset;
         type Notebook = Unset;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
-        type Reason = Set<members::reason>;
-        type Notebook = S::Notebook;
+        type Reason = Unset;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotebook<S> {}
     impl<S: State> State for SetNotebook<S> {
-        type Reason = S::Reason;
         type Notebook = Set<members::notebook>;
+        type Reason = S::Reason;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type Notebook = S::Notebook;
+        type Reason = Set<members::reason>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `reason` field
-        pub struct reason(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
+        ///Marker type for the `reason` field
+        pub struct reason(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SuggestedNotebookBuilder<'a, S: suggested_notebook_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<NotebookView<'a>>,
         Option<get_suggested_notebooks::SuggestionReason<'a>>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SuggestedNotebook<'a> {
@@ -388,9 +391,9 @@ impl<'a> SuggestedNotebookBuilder<'a, suggested_notebook_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SuggestedNotebookBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -405,11 +408,11 @@ where
         mut self,
         value: impl Into<NotebookView<'a>>,
     ) -> SuggestedNotebookBuilder<'a, suggested_notebook_state::SetNotebook<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SuggestedNotebookBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -424,11 +427,11 @@ where
         mut self,
         value: impl Into<get_suggested_notebooks::SuggestionReason<'a>>,
     ) -> SuggestedNotebookBuilder<'a, suggested_notebook_state::SetReason<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SuggestedNotebookBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -436,12 +439,12 @@ where
 impl<'a, S: suggested_notebook_state::State> SuggestedNotebookBuilder<'a, S> {
     /// Set the `score` field (optional)
     pub fn score(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `score` field to an Option value (optional)
     pub fn maybe_score(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -449,15 +452,15 @@ impl<'a, S: suggested_notebook_state::State> SuggestedNotebookBuilder<'a, S> {
 impl<'a, S> SuggestedNotebookBuilder<'a, S>
 where
     S: suggested_notebook_state::State,
-    S::Reason: suggested_notebook_state::IsSet,
     S::Notebook: suggested_notebook_state::IsSet,
+    S::Reason: suggested_notebook_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SuggestedNotebook<'a> {
         SuggestedNotebook {
-            notebook: self.__unsafe_private_named.0.unwrap(),
-            reason: self.__unsafe_private_named.1.unwrap(),
-            score: self.__unsafe_private_named.2,
+            notebook: self._fields.0.unwrap(),
+            reason: self._fields.1.unwrap(),
+            score: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -470,9 +473,9 @@ where
         >,
     ) -> SuggestedNotebook<'a> {
         SuggestedNotebook {
-            notebook: self.__unsafe_private_named.0.unwrap(),
-            reason: self.__unsafe_private_named.1.unwrap(),
-            score: self.__unsafe_private_named.2,
+            notebook: self._fields.0.unwrap(),
+            reason: self._fields.1.unwrap(),
+            score: self._fields.2,
             extra_data: Some(extra_data),
         }
     }

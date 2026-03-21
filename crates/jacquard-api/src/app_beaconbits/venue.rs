@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -205,8 +208,8 @@ pub mod venue_state {
 
 /// Builder for constructing an instance of this type
 pub struct VenueBuilder<'a, S: venue_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Address<'a>>,
         Option<CowStr<'a>>,
@@ -215,7 +218,7 @@ pub struct VenueBuilder<'a, S: venue_state::State> {
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Venue<'a> {
@@ -229,9 +232,9 @@ impl<'a> VenueBuilder<'a, venue_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         VenueBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -239,12 +242,12 @@ impl<'a> VenueBuilder<'a, venue_state::Empty> {
 impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     /// Set the `address` field (optional)
     pub fn address(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `address` field to an Option value (optional)
     pub fn maybe_address(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -252,12 +255,12 @@ impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
 impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     /// Set the `addressDetails` field (optional)
     pub fn address_details(mut self, value: impl Into<Option<Address<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `addressDetails` field to an Option value (optional)
     pub fn maybe_address_details(mut self, value: Option<Address<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -265,12 +268,12 @@ impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
 impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
     pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -285,11 +288,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> VenueBuilder<'a, venue_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         VenueBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -297,12 +300,12 @@ where
 impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<Geo<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
     pub fn maybe_location(mut self, value: Option<Geo<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -317,11 +320,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> VenueBuilder<'a, venue_state::SetName<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         VenueBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -329,12 +332,12 @@ where
 impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     /// Set the `osmUri` field (optional)
     pub fn osm_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `osmUri` field to an Option value (optional)
     pub fn maybe_osm_uri(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -348,13 +351,13 @@ where
     /// Build the final struct
     pub fn build(self) -> Venue<'a> {
         Venue {
-            address: self.__unsafe_private_named.0,
-            address_details: self.__unsafe_private_named.1,
-            category: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            location: self.__unsafe_private_named.4,
-            name: self.__unsafe_private_named.5.unwrap(),
-            osm_uri: self.__unsafe_private_named.6,
+            address: self._fields.0,
+            address_details: self._fields.1,
+            category: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            location: self._fields.4,
+            name: self._fields.5.unwrap(),
+            osm_uri: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -367,13 +370,13 @@ where
         >,
     ) -> Venue<'a> {
         Venue {
-            address: self.__unsafe_private_named.0,
-            address_details: self.__unsafe_private_named.1,
-            category: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            location: self.__unsafe_private_named.4,
-            name: self.__unsafe_private_named.5.unwrap(),
-            osm_uri: self.__unsafe_private_named.6,
+            address: self._fields.0,
+            address_details: self._fields.1,
+            category: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            location: self._fields.4,
+            name: self._fields.5.unwrap(),
+            osm_uri: self._fields.6,
             extra_data: Some(extra_data),
         }
     }

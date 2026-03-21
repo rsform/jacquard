@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -140,45 +143,45 @@ pub mod like_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CheckinRef;
         type CreatedAt;
+        type CheckinRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CheckinRef = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `checkin_ref` field to Set
-    pub struct SetCheckinRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCheckinRef<S> {}
-    impl<S: State> State for SetCheckinRef<S> {
-        type CheckinRef = Set<members::checkin_ref>;
-        type CreatedAt = S::CreatedAt;
+        type CheckinRef = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type CheckinRef = S::CheckinRef;
         type CreatedAt = Set<members::created_at>;
+        type CheckinRef = S::CheckinRef;
+    }
+    ///State transition - sets the `checkin_ref` field to Set
+    pub struct SetCheckinRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCheckinRef<S> {}
+    impl<S: State> State for SetCheckinRef<S> {
+        type CreatedAt = S::CreatedAt;
+        type CheckinRef = Set<members::checkin_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `checkin_ref` field
-        pub struct checkin_ref(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `checkin_ref` field
+        pub struct checkin_ref(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LikeBuilder<'a, S: like_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<like::StrongRef<'a>>, Option<Datetime>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<like::StrongRef<'a>>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Like<'a> {
@@ -192,9 +195,9 @@ impl<'a> LikeBuilder<'a, like_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LikeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -209,11 +212,11 @@ where
         mut self,
         value: impl Into<like::StrongRef<'a>>,
     ) -> LikeBuilder<'a, like_state::SetCheckinRef<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LikeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -228,11 +231,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LikeBuilder<'a, like_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LikeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -240,14 +243,14 @@ where
 impl<'a, S> LikeBuilder<'a, S>
 where
     S: like_state::State,
-    S::CheckinRef: like_state::IsSet,
     S::CreatedAt: like_state::IsSet,
+    S::CheckinRef: like_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Like<'a> {
         Like {
-            checkin_ref: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
+            checkin_ref: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -260,8 +263,8 @@ where
         >,
     ) -> Like<'a> {
         Like {
-            checkin_ref: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
+            checkin_ref: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -377,45 +380,45 @@ pub mod strong_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Cid;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
+        type Uri = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
         type Cid = Set<members::cid>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct StrongRefBuilder<'a, S: strong_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Cid<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Cid<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> StrongRef<'a> {
@@ -429,9 +432,9 @@ impl<'a> StrongRefBuilder<'a, strong_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StrongRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -446,11 +449,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> StrongRefBuilder<'a, strong_ref_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         StrongRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -465,11 +468,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> StrongRefBuilder<'a, strong_ref_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         StrongRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -477,14 +480,14 @@ where
 impl<'a, S> StrongRefBuilder<'a, S>
 where
     S: strong_ref_state::State,
-    S::Uri: strong_ref_state::IsSet,
     S::Cid: strong_ref_state::IsSet,
+    S::Uri: strong_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> StrongRef<'a> {
         StrongRef {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -497,8 +500,8 @@ where
         >,
     ) -> StrongRef<'a> {
         StrongRef {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

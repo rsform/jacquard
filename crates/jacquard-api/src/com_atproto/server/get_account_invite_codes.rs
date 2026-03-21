@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
@@ -123,8 +126,8 @@ pub mod get_account_invite_codes_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetAccountInviteCodesBuilder<S: get_account_invite_codes_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>, Option<bool>),
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<bool>),
 }
 
 impl GetAccountInviteCodes {
@@ -138,8 +141,8 @@ impl GetAccountInviteCodesBuilder<get_account_invite_codes_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetAccountInviteCodesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
+            _state: PhantomData,
+            _fields: (None, None),
         }
     }
 }
@@ -147,12 +150,12 @@ impl GetAccountInviteCodesBuilder<get_account_invite_codes_state::Empty> {
 impl<S: get_account_invite_codes_state::State> GetAccountInviteCodesBuilder<S> {
     /// Set the `createAvailable` field (optional)
     pub fn create_available(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `createAvailable` field to an Option value (optional)
     pub fn maybe_create_available(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -160,12 +163,12 @@ impl<S: get_account_invite_codes_state::State> GetAccountInviteCodesBuilder<S> {
 impl<S: get_account_invite_codes_state::State> GetAccountInviteCodesBuilder<S> {
     /// Set the `includeUsed` field (optional)
     pub fn include_used(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `includeUsed` field to an Option value (optional)
     pub fn maybe_include_used(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -177,8 +180,8 @@ where
     /// Build the final struct
     pub fn build(self) -> GetAccountInviteCodes {
         GetAccountInviteCodes {
-            create_available: self.__unsafe_private_named.0,
-            include_used: self.__unsafe_private_named.1,
+            create_available: self._fields.0,
+            include_used: self._fields.1,
         }
     }
 }

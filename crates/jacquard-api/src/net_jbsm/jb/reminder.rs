@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -138,74 +141,74 @@ pub mod reminder_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Requester;
         type CreatedAt;
         type TriggerAt;
         type Subject;
+        type Requester;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Requester = Unset;
         type CreatedAt = Unset;
         type TriggerAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `requester` field to Set
-    pub struct SetRequester<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRequester<S> {}
-    impl<S: State> State for SetRequester<S> {
-        type Requester = Set<members::requester>;
-        type CreatedAt = S::CreatedAt;
-        type TriggerAt = S::TriggerAt;
-        type Subject = S::Subject;
+        type Requester = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Requester = S::Requester;
         type CreatedAt = Set<members::created_at>;
         type TriggerAt = S::TriggerAt;
         type Subject = S::Subject;
+        type Requester = S::Requester;
     }
     ///State transition - sets the `trigger_at` field to Set
     pub struct SetTriggerAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTriggerAt<S> {}
     impl<S: State> State for SetTriggerAt<S> {
-        type Requester = S::Requester;
         type CreatedAt = S::CreatedAt;
         type TriggerAt = Set<members::trigger_at>;
         type Subject = S::Subject;
+        type Requester = S::Requester;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Requester = S::Requester;
         type CreatedAt = S::CreatedAt;
         type TriggerAt = S::TriggerAt;
         type Subject = Set<members::subject>;
+        type Requester = S::Requester;
+    }
+    ///State transition - sets the `requester` field to Set
+    pub struct SetRequester<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRequester<S> {}
+    impl<S: State> State for SetRequester<S> {
+        type CreatedAt = S::CreatedAt;
+        type TriggerAt = S::TriggerAt;
+        type Subject = S::Subject;
+        type Requester = Set<members::requester>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `requester` field
-        pub struct requester(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `trigger_at` field
         pub struct trigger_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `requester` field
+        pub struct requester(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ReminderBuilder<'a, S: reminder_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<bool>,
         Option<AtUri<'a>>,
@@ -213,7 +216,7 @@ pub struct ReminderBuilder<'a, S: reminder_state::State> {
         Option<CowStr<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Reminder<'a> {
@@ -227,9 +230,9 @@ impl<'a> ReminderBuilder<'a, reminder_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ReminderBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -244,11 +247,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ReminderBuilder<'a, reminder_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ReminderBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -256,12 +259,12 @@ where
 impl<'a, S: reminder_state::State> ReminderBuilder<'a, S> {
     /// Set the `occurred` field (optional)
     pub fn occurred(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `occurred` field to an Option value (optional)
     pub fn maybe_occurred(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -269,12 +272,12 @@ impl<'a, S: reminder_state::State> ReminderBuilder<'a, S> {
 impl<'a, S: reminder_state::State> ReminderBuilder<'a, S> {
     /// Set the `originUri` field (optional)
     pub fn origin_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `originUri` field to an Option value (optional)
     pub fn maybe_origin_uri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -289,11 +292,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> ReminderBuilder<'a, reminder_state::SetRequester<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ReminderBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -308,11 +311,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ReminderBuilder<'a, reminder_state::SetSubject<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ReminderBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -327,11 +330,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ReminderBuilder<'a, reminder_state::SetTriggerAt<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ReminderBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -339,20 +342,20 @@ where
 impl<'a, S> ReminderBuilder<'a, S>
 where
     S: reminder_state::State,
-    S::Requester: reminder_state::IsSet,
     S::CreatedAt: reminder_state::IsSet,
     S::TriggerAt: reminder_state::IsSet,
     S::Subject: reminder_state::IsSet,
+    S::Requester: reminder_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Reminder<'a> {
         Reminder {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            occurred: self.__unsafe_private_named.1.or_else(|| Some(false)),
-            origin_uri: self.__unsafe_private_named.2,
-            requester: self.__unsafe_private_named.3.unwrap(),
-            subject: self.__unsafe_private_named.4.unwrap(),
-            trigger_at: self.__unsafe_private_named.5.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            occurred: self._fields.1.or_else(|| Some(false)),
+            origin_uri: self._fields.2,
+            requester: self._fields.3.unwrap(),
+            subject: self._fields.4.unwrap(),
+            trigger_at: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -365,12 +368,12 @@ where
         >,
     ) -> Reminder<'a> {
         Reminder {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            occurred: self.__unsafe_private_named.1.or_else(|| Some(false)),
-            origin_uri: self.__unsafe_private_named.2,
-            requester: self.__unsafe_private_named.3.unwrap(),
-            subject: self.__unsafe_private_named.4.unwrap(),
-            trigger_at: self.__unsafe_private_named.5.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            occurred: self._fields.1.or_else(|| Some(false)),
+            origin_uri: self._fields.2,
+            requester: self._fields.3.unwrap(),
+            subject: self._fields.4.unwrap(),
+            trigger_at: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -9,7 +9,11 @@ pub mod get_broadcaster;
 pub mod origin;
 pub mod syndication;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -64,80 +68,80 @@ pub mod broadcast_origin_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Author;
-        type Cid;
-        type Record;
         type Uri;
+        type Cid;
+        type Author;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Author = Unset;
-        type Cid = Unset;
-        type Record = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Author = Set<members::author>;
-        type Cid = S::Cid;
-        type Record = S::Record;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Author = S::Author;
-        type Cid = Set<members::cid>;
-        type Record = S::Record;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Author = S::Author;
-        type Cid = S::Cid;
-        type Record = Set<members::record>;
-        type Uri = S::Uri;
+        type Cid = Unset;
+        type Author = Unset;
+        type Record = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Author = S::Author;
-        type Cid = S::Cid;
-        type Record = S::Record;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Author = S::Author;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = Set<members::author>;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `author` field
-        pub struct author(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BroadcastOriginViewBuilder<'a, S: broadcast_origin_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ProfileViewBasic<'a>>,
         Option<Cid<'a>>,
         Option<Data<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> BroadcastOriginView<'a> {
@@ -151,9 +155,9 @@ impl<'a> BroadcastOriginViewBuilder<'a, broadcast_origin_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BroadcastOriginViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -168,11 +172,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> BroadcastOriginViewBuilder<'a, broadcast_origin_view_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BroadcastOriginViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -187,11 +191,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> BroadcastOriginViewBuilder<'a, broadcast_origin_view_state::SetCid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         BroadcastOriginViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -206,11 +210,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> BroadcastOriginViewBuilder<'a, broadcast_origin_view_state::SetRecord<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         BroadcastOriginViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -225,11 +229,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> BroadcastOriginViewBuilder<'a, broadcast_origin_view_state::SetUri<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         BroadcastOriginViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -237,18 +241,18 @@ where
 impl<'a, S> BroadcastOriginViewBuilder<'a, S>
 where
     S: broadcast_origin_view_state::State,
-    S::Author: broadcast_origin_view_state::IsSet,
-    S::Cid: broadcast_origin_view_state::IsSet,
-    S::Record: broadcast_origin_view_state::IsSet,
     S::Uri: broadcast_origin_view_state::IsSet,
+    S::Cid: broadcast_origin_view_state::IsSet,
+    S::Author: broadcast_origin_view_state::IsSet,
+    S::Record: broadcast_origin_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BroadcastOriginView<'a> {
         BroadcastOriginView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            record: self.__unsafe_private_named.2.unwrap(),
-            uri: self.__unsafe_private_named.3.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            record: self._fields.2.unwrap(),
+            uri: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -258,10 +262,10 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> BroadcastOriginView<'a> {
         BroadcastOriginView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            record: self.__unsafe_private_named.2.unwrap(),
-            uri: self.__unsafe_private_named.3.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            record: self._fields.2.unwrap(),
+            uri: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -10,7 +10,11 @@ pub mod delete_draft;
 pub mod get_drafts;
 pub mod update_draft;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -585,8 +589,8 @@ pub mod draft_state {
 
 /// Builder for constructing an instance of this type
 pub struct DraftBuilder<'a, S: draft_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<Vec<Language>>,
@@ -594,7 +598,7 @@ pub struct DraftBuilder<'a, S: draft_state::State> {
         Option<Vec<draft::DraftPost<'a>>>,
         Option<Vec<DraftThreadgateAllowItem<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Draft<'a> {
@@ -608,9 +612,9 @@ impl<'a> DraftBuilder<'a, draft_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DraftBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -618,12 +622,12 @@ impl<'a> DraftBuilder<'a, draft_state::Empty> {
 impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
     /// Set the `deviceId` field (optional)
     pub fn device_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `deviceId` field to an Option value (optional)
     pub fn maybe_device_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -631,12 +635,12 @@ impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
 impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
     /// Set the `deviceName` field (optional)
     pub fn device_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `deviceName` field to an Option value (optional)
     pub fn maybe_device_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -644,12 +648,12 @@ impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
 impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
     /// Set the `langs` field (optional)
     pub fn langs(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `langs` field to an Option value (optional)
     pub fn maybe_langs(mut self, value: Option<Vec<Language>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -660,7 +664,7 @@ impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<DisableRule<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `postgateEmbeddingRules` field to an Option value (optional)
@@ -668,7 +672,7 @@ impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
         mut self,
         value: Option<Vec<DisableRule<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -683,11 +687,11 @@ where
         mut self,
         value: impl Into<Vec<draft::DraftPost<'a>>>,
     ) -> DraftBuilder<'a, draft_state::SetPosts<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         DraftBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -698,7 +702,7 @@ impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<DraftThreadgateAllowItem<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `threadgateAllow` field to an Option value (optional)
@@ -706,7 +710,7 @@ impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
         mut self,
         value: Option<Vec<DraftThreadgateAllowItem<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -719,12 +723,12 @@ where
     /// Build the final struct
     pub fn build(self) -> Draft<'a> {
         Draft {
-            device_id: self.__unsafe_private_named.0,
-            device_name: self.__unsafe_private_named.1,
-            langs: self.__unsafe_private_named.2,
-            postgate_embedding_rules: self.__unsafe_private_named.3,
-            posts: self.__unsafe_private_named.4.unwrap(),
-            threadgate_allow: self.__unsafe_private_named.5,
+            device_id: self._fields.0,
+            device_name: self._fields.1,
+            langs: self._fields.2,
+            postgate_embedding_rules: self._fields.3,
+            posts: self._fields.4.unwrap(),
+            threadgate_allow: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -737,12 +741,12 @@ where
         >,
     ) -> Draft<'a> {
         Draft {
-            device_id: self.__unsafe_private_named.0,
-            device_name: self.__unsafe_private_named.1,
-            langs: self.__unsafe_private_named.2,
-            postgate_embedding_rules: self.__unsafe_private_named.3,
-            posts: self.__unsafe_private_named.4.unwrap(),
-            threadgate_allow: self.__unsafe_private_named.5,
+            device_id: self._fields.0,
+            device_name: self._fields.1,
+            langs: self._fields.2,
+            postgate_embedding_rules: self._fields.3,
+            posts: self._fields.4.unwrap(),
+            threadgate_allow: self._fields.5,
             extra_data: Some(extra_data),
         }
     }
@@ -1223,45 +1227,45 @@ pub mod draft_embed_caption_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Lang;
         type Content;
+        type Lang;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Lang = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `lang` field to Set
-    pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLang<S> {}
-    impl<S: State> State for SetLang<S> {
-        type Lang = Set<members::lang>;
-        type Content = S::Content;
+        type Lang = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Lang = S::Lang;
         type Content = Set<members::content>;
+        type Lang = S::Lang;
+    }
+    ///State transition - sets the `lang` field to Set
+    pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLang<S> {}
+    impl<S: State> State for SetLang<S> {
+        type Content = S::Content;
+        type Lang = Set<members::lang>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lang` field
-        pub struct lang(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `lang` field
+        pub struct lang(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DraftEmbedCaptionBuilder<'a, S: draft_embed_caption_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<Language>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Language>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DraftEmbedCaption<'a> {
@@ -1275,9 +1279,9 @@ impl<'a> DraftEmbedCaptionBuilder<'a, draft_embed_caption_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DraftEmbedCaptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1292,11 +1296,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DraftEmbedCaptionBuilder<'a, draft_embed_caption_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DraftEmbedCaptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1311,11 +1315,11 @@ where
         mut self,
         value: impl Into<Language>,
     ) -> DraftEmbedCaptionBuilder<'a, draft_embed_caption_state::SetLang<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DraftEmbedCaptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1323,14 +1327,14 @@ where
 impl<'a, S> DraftEmbedCaptionBuilder<'a, S>
 where
     S: draft_embed_caption_state::State,
-    S::Lang: draft_embed_caption_state::IsSet,
     S::Content: draft_embed_caption_state::IsSet,
+    S::Lang: draft_embed_caption_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DraftEmbedCaption<'a> {
         DraftEmbedCaption {
-            content: self.__unsafe_private_named.0.unwrap(),
-            lang: self.__unsafe_private_named.1.unwrap(),
+            content: self._fields.0.unwrap(),
+            lang: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1343,8 +1347,8 @@ where
         >,
     ) -> DraftEmbedCaption<'a> {
         DraftEmbedCaption {
-            content: self.__unsafe_private_named.0.unwrap(),
-            lang: self.__unsafe_private_named.1.unwrap(),
+            content: self._fields.0.unwrap(),
+            lang: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1384,9 +1388,9 @@ pub mod draft_embed_external_state {
 
 /// Builder for constructing an instance of this type
 pub struct DraftEmbedExternalBuilder<'a, S: draft_embed_external_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<UriValue<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<UriValue<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DraftEmbedExternal<'a> {
@@ -1400,9 +1404,9 @@ impl<'a> DraftEmbedExternalBuilder<'a, draft_embed_external_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DraftEmbedExternalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1417,11 +1421,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> DraftEmbedExternalBuilder<'a, draft_embed_external_state::SetUri<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DraftEmbedExternalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1434,7 +1438,7 @@ where
     /// Build the final struct
     pub fn build(self) -> DraftEmbedExternal<'a> {
         DraftEmbedExternal {
-            uri: self.__unsafe_private_named.0.unwrap(),
+            uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1447,7 +1451,7 @@ where
         >,
     ) -> DraftEmbedExternal<'a> {
         DraftEmbedExternal {
-            uri: self.__unsafe_private_named.0.unwrap(),
+            uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1487,9 +1491,9 @@ pub mod draft_embed_image_state {
 
 /// Builder for constructing an instance of this type
 pub struct DraftEmbedImageBuilder<'a, S: draft_embed_image_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<draft::DraftEmbedLocalRef<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<draft::DraftEmbedLocalRef<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DraftEmbedImage<'a> {
@@ -1503,9 +1507,9 @@ impl<'a> DraftEmbedImageBuilder<'a, draft_embed_image_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DraftEmbedImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1513,12 +1517,12 @@ impl<'a> DraftEmbedImageBuilder<'a, draft_embed_image_state::Empty> {
 impl<'a, S: draft_embed_image_state::State> DraftEmbedImageBuilder<'a, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
     pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1533,11 +1537,11 @@ where
         mut self,
         value: impl Into<draft::DraftEmbedLocalRef<'a>>,
     ) -> DraftEmbedImageBuilder<'a, draft_embed_image_state::SetLocalRef<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DraftEmbedImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1550,8 +1554,8 @@ where
     /// Build the final struct
     pub fn build(self) -> DraftEmbedImage<'a> {
         DraftEmbedImage {
-            alt: self.__unsafe_private_named.0,
-            local_ref: self.__unsafe_private_named.1.unwrap(),
+            alt: self._fields.0,
+            local_ref: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1564,8 +1568,8 @@ where
         >,
     ) -> DraftEmbedImage<'a> {
         DraftEmbedImage {
-            alt: self.__unsafe_private_named.0,
-            local_ref: self.__unsafe_private_named.1.unwrap(),
+            alt: self._fields.0,
+            local_ref: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1605,9 +1609,9 @@ pub mod draft_embed_record_state {
 
 /// Builder for constructing an instance of this type
 pub struct DraftEmbedRecordBuilder<'a, S: draft_embed_record_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<StrongRef<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<StrongRef<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DraftEmbedRecord<'a> {
@@ -1621,9 +1625,9 @@ impl<'a> DraftEmbedRecordBuilder<'a, draft_embed_record_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DraftEmbedRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1638,11 +1642,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> DraftEmbedRecordBuilder<'a, draft_embed_record_state::SetRecord<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DraftEmbedRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1655,7 +1659,7 @@ where
     /// Build the final struct
     pub fn build(self) -> DraftEmbedRecord<'a> {
         DraftEmbedRecord {
-            record: self.__unsafe_private_named.0.unwrap(),
+            record: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1668,7 +1672,7 @@ where
         >,
     ) -> DraftEmbedRecord<'a> {
         DraftEmbedRecord {
-            record: self.__unsafe_private_named.0.unwrap(),
+            record: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1708,13 +1712,13 @@ pub mod draft_embed_video_state {
 
 /// Builder for constructing an instance of this type
 pub struct DraftEmbedVideoBuilder<'a, S: draft_embed_video_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Vec<draft::DraftEmbedCaption<'a>>>,
         Option<draft::DraftEmbedLocalRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DraftEmbedVideo<'a> {
@@ -1728,9 +1732,9 @@ impl<'a> DraftEmbedVideoBuilder<'a, draft_embed_video_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DraftEmbedVideoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1738,12 +1742,12 @@ impl<'a> DraftEmbedVideoBuilder<'a, draft_embed_video_state::Empty> {
 impl<'a, S: draft_embed_video_state::State> DraftEmbedVideoBuilder<'a, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
     pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1754,7 +1758,7 @@ impl<'a, S: draft_embed_video_state::State> DraftEmbedVideoBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<draft::DraftEmbedCaption<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `captions` field to an Option value (optional)
@@ -1762,7 +1766,7 @@ impl<'a, S: draft_embed_video_state::State> DraftEmbedVideoBuilder<'a, S> {
         mut self,
         value: Option<Vec<draft::DraftEmbedCaption<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1777,11 +1781,11 @@ where
         mut self,
         value: impl Into<draft::DraftEmbedLocalRef<'a>>,
     ) -> DraftEmbedVideoBuilder<'a, draft_embed_video_state::SetLocalRef<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         DraftEmbedVideoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1794,9 +1798,9 @@ where
     /// Build the final struct
     pub fn build(self) -> DraftEmbedVideo<'a> {
         DraftEmbedVideo {
-            alt: self.__unsafe_private_named.0,
-            captions: self.__unsafe_private_named.1,
-            local_ref: self.__unsafe_private_named.2.unwrap(),
+            alt: self._fields.0,
+            captions: self._fields.1,
+            local_ref: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1809,9 +1813,9 @@ where
         >,
     ) -> DraftEmbedVideo<'a> {
         DraftEmbedVideo {
-            alt: self.__unsafe_private_named.0,
-            captions: self.__unsafe_private_named.1,
-            local_ref: self.__unsafe_private_named.2.unwrap(),
+            alt: self._fields.0,
+            captions: self._fields.1,
+            local_ref: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1827,80 +1831,75 @@ pub mod draft_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type CreatedAt;
-        type UpdatedAt;
         type Draft;
+        type CreatedAt;
+        type Id;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type CreatedAt = Unset;
-        type UpdatedAt = Unset;
         type Draft = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Draft = S::Draft;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Id = S::Id;
-        type CreatedAt = Set<members::created_at>;
-        type UpdatedAt = S::UpdatedAt;
-        type Draft = S::Draft;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type Id = S::Id;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = Set<members::updated_at>;
-        type Draft = S::Draft;
+        type CreatedAt = Unset;
+        type Id = Unset;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `draft` field to Set
     pub struct SetDraft<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDraft<S> {}
     impl<S: State> State for SetDraft<S> {
-        type Id = S::Id;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
         type Draft = Set<members::draft>;
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Draft = S::Draft;
+        type CreatedAt = Set<members::created_at>;
+        type Id = S::Id;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Draft = S::Draft;
+        type CreatedAt = S::CreatedAt;
+        type Id = Set<members::id>;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Draft = S::Draft;
+        type CreatedAt = S::CreatedAt;
+        type Id = S::Id;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `draft` field
         pub struct draft(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DraftViewBuilder<'a, S: draft_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Datetime>,
-        Option<draft::Draft<'a>>,
-        Option<Tid>,
-        Option<Datetime>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<draft::Draft<'a>>, Option<Tid>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DraftView<'a> {
@@ -1914,9 +1913,9 @@ impl<'a> DraftViewBuilder<'a, draft_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DraftViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1931,11 +1930,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> DraftViewBuilder<'a, draft_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DraftViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1950,11 +1949,11 @@ where
         mut self,
         value: impl Into<draft::Draft<'a>>,
     ) -> DraftViewBuilder<'a, draft_view_state::SetDraft<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DraftViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1969,11 +1968,11 @@ where
         mut self,
         value: impl Into<Tid>,
     ) -> DraftViewBuilder<'a, draft_view_state::SetId<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         DraftViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1988,11 +1987,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> DraftViewBuilder<'a, draft_view_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         DraftViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2000,18 +1999,18 @@ where
 impl<'a, S> DraftViewBuilder<'a, S>
 where
     S: draft_view_state::State,
-    S::Id: draft_view_state::IsSet,
-    S::CreatedAt: draft_view_state::IsSet,
-    S::UpdatedAt: draft_view_state::IsSet,
     S::Draft: draft_view_state::IsSet,
+    S::CreatedAt: draft_view_state::IsSet,
+    S::Id: draft_view_state::IsSet,
+    S::UpdatedAt: draft_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DraftView<'a> {
         DraftView {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            draft: self.__unsafe_private_named.1.unwrap(),
-            id: self.__unsafe_private_named.2.unwrap(),
-            updated_at: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            draft: self._fields.1.unwrap(),
+            id: self._fields.2.unwrap(),
+            updated_at: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2024,10 +2023,10 @@ where
         >,
     ) -> DraftView<'a> {
         DraftView {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            draft: self.__unsafe_private_named.1.unwrap(),
-            id: self.__unsafe_private_named.2.unwrap(),
-            updated_at: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            draft: self._fields.1.unwrap(),
+            id: self._fields.2.unwrap(),
+            updated_at: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2079,9 +2078,9 @@ pub mod draft_with_id_state {
 
 /// Builder for constructing an instance of this type
 pub struct DraftWithIdBuilder<'a, S: draft_with_id_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<draft::Draft<'a>>, Option<Tid>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<draft::Draft<'a>>, Option<Tid>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DraftWithId<'a> {
@@ -2095,9 +2094,9 @@ impl<'a> DraftWithIdBuilder<'a, draft_with_id_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DraftWithIdBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2112,11 +2111,11 @@ where
         mut self,
         value: impl Into<draft::Draft<'a>>,
     ) -> DraftWithIdBuilder<'a, draft_with_id_state::SetDraft<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DraftWithIdBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2131,11 +2130,11 @@ where
         mut self,
         value: impl Into<Tid>,
     ) -> DraftWithIdBuilder<'a, draft_with_id_state::SetId<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DraftWithIdBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2149,8 +2148,8 @@ where
     /// Build the final struct
     pub fn build(self) -> DraftWithId<'a> {
         DraftWithId {
-            draft: self.__unsafe_private_named.0.unwrap(),
-            id: self.__unsafe_private_named.1.unwrap(),
+            draft: self._fields.0.unwrap(),
+            id: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2163,8 +2162,8 @@ where
         >,
     ) -> DraftWithId<'a> {
         DraftWithId {
-            draft: self.__unsafe_private_named.0.unwrap(),
-            id: self.__unsafe_private_named.1.unwrap(),
+            draft: self._fields.0.unwrap(),
+            id: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

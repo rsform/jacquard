@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -100,9 +103,9 @@ pub mod search_accounts_state {
 
 /// Builder for constructing an instance of this type
 pub struct SearchAccountsBuilder<'a, S: search_accounts_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>, Option<Vec<CowStr<'a>>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<i64>, Option<Vec<CowStr<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SearchAccounts<'a> {
@@ -116,9 +119,9 @@ impl<'a> SearchAccountsBuilder<'a, search_accounts_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SearchAccountsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -126,12 +129,12 @@ impl<'a> SearchAccountsBuilder<'a, search_accounts_state::Empty> {
 impl<'a, S: search_accounts_state::State> SearchAccountsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -139,12 +142,12 @@ impl<'a, S: search_accounts_state::State> SearchAccountsBuilder<'a, S> {
 impl<'a, S: search_accounts_state::State> SearchAccountsBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -159,11 +162,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> SearchAccountsBuilder<'a, search_accounts_state::SetValues<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SearchAccountsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -176,9 +179,9 @@ where
     /// Build the final struct
     pub fn build(self) -> SearchAccounts<'a> {
         SearchAccounts {
-            cursor: self.__unsafe_private_named.0,
-            limit: self.__unsafe_private_named.1,
-            values: self.__unsafe_private_named.2.unwrap(),
+            cursor: self._fields.0,
+            limit: self._fields.1,
+            values: self._fields.2.unwrap(),
         }
     }
 }

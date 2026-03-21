@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -146,49 +149,49 @@ pub mod app_password_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Password;
+        type Name;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Password = Unset;
+        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Password = S::Password;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `password` field to Set
     pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPassword<S> {}
     impl<S: State> State for SetPassword<S> {
-        type Name = S::Name;
         type Password = Set<members::password>;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Password = S::Password;
+        type Name = Set<members::name>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type Password = S::Password;
+        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `password` field
         pub struct password(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -196,14 +199,9 @@ pub mod app_password_state {
 
 /// Builder for constructing an instance of this type
 pub struct AppPasswordBuilder<'a, S: app_password_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<bool>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<CowStr<'a>>, Option<CowStr<'a>>, Option<bool>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> AppPassword<'a> {
@@ -217,9 +215,9 @@ impl<'a> AppPasswordBuilder<'a, app_password_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AppPasswordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -234,11 +232,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> AppPasswordBuilder<'a, app_password_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AppPasswordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -253,11 +251,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AppPasswordBuilder<'a, app_password_state::SetName<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AppPasswordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -272,11 +270,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AppPasswordBuilder<'a, app_password_state::SetPassword<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         AppPasswordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -284,12 +282,12 @@ where
 impl<'a, S: app_password_state::State> AppPasswordBuilder<'a, S> {
     /// Set the `privileged` field (optional)
     pub fn privileged(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `privileged` field to an Option value (optional)
     pub fn maybe_privileged(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -297,17 +295,17 @@ impl<'a, S: app_password_state::State> AppPasswordBuilder<'a, S> {
 impl<'a, S> AppPasswordBuilder<'a, S>
 where
     S: app_password_state::State,
-    S::Name: app_password_state::IsSet,
     S::Password: app_password_state::IsSet,
+    S::Name: app_password_state::IsSet,
     S::CreatedAt: app_password_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AppPassword<'a> {
         AppPassword {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1.unwrap(),
-            password: self.__unsafe_private_named.2.unwrap(),
-            privileged: self.__unsafe_private_named.3,
+            created_at: self._fields.0.unwrap(),
+            name: self._fields.1.unwrap(),
+            password: self._fields.2.unwrap(),
+            privileged: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -320,10 +318,10 @@ where
         >,
     ) -> AppPassword<'a> {
         AppPassword {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1.unwrap(),
-            password: self.__unsafe_private_named.2.unwrap(),
-            privileged: self.__unsafe_private_named.3,
+            created_at: self._fields.0.unwrap(),
+            name: self._fields.1.unwrap(),
+            password: self._fields.2.unwrap(),
+            privileged: self._fields.3,
             extra_data: Some(extra_data),
         }
     }

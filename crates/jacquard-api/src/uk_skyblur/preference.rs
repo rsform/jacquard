@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -182,9 +185,9 @@ pub mod preference_state {
 
 /// Builder for constructing an instance of this type
 pub struct PreferenceBuilder<'a, S: preference_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<preference::MyPage<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<preference::MyPage<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Preference<'a> {
@@ -198,9 +201,9 @@ impl<'a> PreferenceBuilder<'a, preference_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PreferenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -215,11 +218,11 @@ where
         mut self,
         value: impl Into<preference::MyPage<'a>>,
     ) -> PreferenceBuilder<'a, preference_state::SetMyPage<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PreferenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -232,7 +235,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Preference<'a> {
         Preference {
-            my_page: self.__unsafe_private_named.0.unwrap(),
+            my_page: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -245,7 +248,7 @@ where
         >,
     ) -> Preference<'a> {
         Preference {
-            my_page: self.__unsafe_private_named.0.unwrap(),
+            my_page: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -360,9 +363,9 @@ pub mod my_page_state {
 
 /// Builder for constructing an instance of this type
 pub struct MyPageBuilder<'a, S: my_page_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<bool>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<bool>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> MyPage<'a> {
@@ -376,9 +379,9 @@ impl<'a> MyPageBuilder<'a, my_page_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MyPageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -386,12 +389,12 @@ impl<'a> MyPageBuilder<'a, my_page_state::Empty> {
 impl<'a, S: my_page_state::State> MyPageBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -406,11 +409,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> MyPageBuilder<'a, my_page_state::SetIsUseMyPage<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MyPageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -423,8 +426,8 @@ where
     /// Build the final struct
     pub fn build(self) -> MyPage<'a> {
         MyPage {
-            description: self.__unsafe_private_named.0,
-            is_use_my_page: self.__unsafe_private_named.1.unwrap(),
+            description: self._fields.0,
+            is_use_my_page: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -437,8 +440,8 @@ where
         >,
     ) -> MyPage<'a> {
         MyPage {
-            description: self.__unsafe_private_named.0,
-            is_use_my_page: self.__unsafe_private_named.1.unwrap(),
+            description: self._fields.0,
+            is_use_my_page: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

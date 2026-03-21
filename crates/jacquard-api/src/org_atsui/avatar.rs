@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::Did;
@@ -206,14 +209,9 @@ pub mod avatar_state {
 
 /// Builder for constructing an instance of this type
 pub struct AvatarBuilder<'a, S: avatar_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Did<'a>>,
-        Option<bool>,
-        Option<AvatarSize<'a>>,
-        Option<Data<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<bool>, Option<AvatarSize<'a>>, Option<Data<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Avatar<'a> {
@@ -227,9 +225,9 @@ impl<'a> AvatarBuilder<'a, avatar_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AvatarBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -237,12 +235,12 @@ impl<'a> AvatarBuilder<'a, avatar_state::Empty> {
 impl<'a, S: avatar_state::State> AvatarBuilder<'a, S> {
     /// Set the `did` field (optional)
     pub fn did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `did` field to an Option value (optional)
     pub fn maybe_did(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -250,12 +248,12 @@ impl<'a, S: avatar_state::State> AvatarBuilder<'a, S> {
 impl<'a, S: avatar_state::State> AvatarBuilder<'a, S> {
     /// Set the `lift` field (optional)
     pub fn lift(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `lift` field to an Option value (optional)
     pub fn maybe_lift(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -263,12 +261,12 @@ impl<'a, S: avatar_state::State> AvatarBuilder<'a, S> {
 impl<'a, S: avatar_state::State> AvatarBuilder<'a, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<AvatarSize<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
     pub fn maybe_size(mut self, value: Option<AvatarSize<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -283,11 +281,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> AvatarBuilder<'a, avatar_state::SetSrc<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         AvatarBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -300,10 +298,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Avatar<'a> {
         Avatar {
-            did: self.__unsafe_private_named.0,
-            lift: self.__unsafe_private_named.1,
-            size: self.__unsafe_private_named.2,
-            src: self.__unsafe_private_named.3.unwrap(),
+            did: self._fields.0,
+            lift: self._fields.1,
+            size: self._fields.2,
+            src: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -313,10 +311,10 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Avatar<'a> {
         Avatar {
-            did: self.__unsafe_private_named.0,
-            lift: self.__unsafe_private_named.1,
-            size: self.__unsafe_private_named.2,
-            src: self.__unsafe_private_named.3.unwrap(),
+            did: self._fields.0,
+            lift: self._fields.1,
+            size: self._fields.2,
+            src: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

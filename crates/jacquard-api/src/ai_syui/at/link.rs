@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -399,13 +402,9 @@ pub mod link_state {
 
 /// Builder for constructing an instance of this type
 pub struct LinkBuilder<'a, S: link_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Datetime>,
-        Option<Vec<link::LinkItem<'a>>>,
-        Option<Datetime>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<Vec<link::LinkItem<'a>>>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Link<'a> {
@@ -419,9 +418,9 @@ impl<'a> LinkBuilder<'a, link_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LinkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -436,11 +435,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LinkBuilder<'a, link_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LinkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -455,11 +454,11 @@ where
         mut self,
         value: impl Into<Vec<link::LinkItem<'a>>>,
     ) -> LinkBuilder<'a, link_state::SetLinks<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LinkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -467,12 +466,12 @@ where
 impl<'a, S: link_state::State> LinkBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -486,9 +485,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Link<'a> {
         Link {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            links: self.__unsafe_private_named.1.unwrap(),
-            updated_at: self.__unsafe_private_named.2,
+            created_at: self._fields.0.unwrap(),
+            links: self._fields.1.unwrap(),
+            updated_at: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -501,9 +500,9 @@ where
         >,
     ) -> Link<'a> {
         Link {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            links: self.__unsafe_private_named.1.unwrap(),
-            updated_at: self.__unsafe_private_named.2,
+            created_at: self._fields.0.unwrap(),
+            links: self._fields.1.unwrap(),
+            updated_at: self._fields.2,
             extra_data: Some(extra_data),
         }
     }

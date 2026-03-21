@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -206,44 +209,44 @@ pub mod image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Image;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Image = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Image = S::Image;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
-        type CreatedAt = S::CreatedAt;
         type Image = Set<members::image>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Image = S::Image;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `image` field
         pub struct image(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ImageBuilder<'a, S: image_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<i64>,
         Option<CowStr<'a>>,
@@ -257,7 +260,7 @@ pub struct ImageBuilder<'a, S: image_state::State> {
         Option<CowStr<'a>>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Image<'a> {
@@ -271,8 +274,8 @@ impl<'a> ImageBuilder<'a, image_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -286,7 +289,7 @@ impl<'a> ImageBuilder<'a, image_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -294,12 +297,12 @@ impl<'a> ImageBuilder<'a, image_state::Empty> {
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
     pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -307,12 +310,12 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
     pub fn aspect_ratio(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
     pub fn maybe_aspect_ratio(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -320,12 +323,12 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `blurhash` field (optional)
     pub fn blurhash(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `blurhash` field to an Option value (optional)
     pub fn maybe_blurhash(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -333,12 +336,12 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `caption` field (optional)
     pub fn caption(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `caption` field to an Option value (optional)
     pub fn maybe_caption(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -346,12 +349,12 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `checksum` field (optional)
     pub fn checksum(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `checksum` field to an Option value (optional)
     pub fn maybe_checksum(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -366,11 +369,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ImageBuilder<'a, image_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -378,12 +381,12 @@ where
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `dominantColour` field (optional)
     pub fn dominant_colour(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `dominantColour` field to an Option value (optional)
     pub fn maybe_dominant_colour(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -391,12 +394,12 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `height` field (optional)
     pub fn height(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `height` field to an Option value (optional)
     pub fn maybe_height(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -411,11 +414,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> ImageBuilder<'a, image_state::SetImage<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         ImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -423,12 +426,12 @@ where
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `sizeInBytes` field (optional)
     pub fn size_in_bytes(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `sizeInBytes` field to an Option value (optional)
     pub fn maybe_size_in_bytes(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -436,12 +439,12 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -449,12 +452,12 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `width` field (optional)
     pub fn width(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `width` field to an Option value (optional)
     pub fn maybe_width(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -462,24 +465,24 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
 impl<'a, S> ImageBuilder<'a, S>
 where
     S: image_state::State,
-    S::CreatedAt: image_state::IsSet,
     S::Image: image_state::IsSet,
+    S::CreatedAt: image_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Image<'a> {
         Image {
-            alt: self.__unsafe_private_named.0,
-            aspect_ratio: self.__unsafe_private_named.1,
-            blurhash: self.__unsafe_private_named.2,
-            caption: self.__unsafe_private_named.3,
-            checksum: self.__unsafe_private_named.4,
-            created_at: self.__unsafe_private_named.5.unwrap(),
-            dominant_colour: self.__unsafe_private_named.6,
-            height: self.__unsafe_private_named.7,
-            image: self.__unsafe_private_named.8.unwrap(),
-            size_in_bytes: self.__unsafe_private_named.9,
-            title: self.__unsafe_private_named.10,
-            width: self.__unsafe_private_named.11,
+            alt: self._fields.0,
+            aspect_ratio: self._fields.1,
+            blurhash: self._fields.2,
+            caption: self._fields.3,
+            checksum: self._fields.4,
+            created_at: self._fields.5.unwrap(),
+            dominant_colour: self._fields.6,
+            height: self._fields.7,
+            image: self._fields.8.unwrap(),
+            size_in_bytes: self._fields.9,
+            title: self._fields.10,
+            width: self._fields.11,
             extra_data: Default::default(),
         }
     }
@@ -492,18 +495,18 @@ where
         >,
     ) -> Image<'a> {
         Image {
-            alt: self.__unsafe_private_named.0,
-            aspect_ratio: self.__unsafe_private_named.1,
-            blurhash: self.__unsafe_private_named.2,
-            caption: self.__unsafe_private_named.3,
-            checksum: self.__unsafe_private_named.4,
-            created_at: self.__unsafe_private_named.5.unwrap(),
-            dominant_colour: self.__unsafe_private_named.6,
-            height: self.__unsafe_private_named.7,
-            image: self.__unsafe_private_named.8.unwrap(),
-            size_in_bytes: self.__unsafe_private_named.9,
-            title: self.__unsafe_private_named.10,
-            width: self.__unsafe_private_named.11,
+            alt: self._fields.0,
+            aspect_ratio: self._fields.1,
+            blurhash: self._fields.2,
+            caption: self._fields.3,
+            checksum: self._fields.4,
+            created_at: self._fields.5.unwrap(),
+            dominant_colour: self._fields.6,
+            height: self._fields.7,
+            image: self._fields.8.unwrap(),
+            size_in_bytes: self._fields.9,
+            title: self._fields.10,
+            width: self._fields.11,
             extra_data: Some(extra_data),
         }
     }

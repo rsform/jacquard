@@ -7,7 +7,11 @@
 
 pub mod like;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -389,73 +393,73 @@ pub mod beacon_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type VenueName;
-        type Visibility;
         type VenueUri;
         type CreatedAt;
+        type Visibility;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type VenueName = Unset;
-        type Visibility = Unset;
         type VenueUri = Unset;
         type CreatedAt = Unset;
+        type Visibility = Unset;
     }
     ///State transition - sets the `venue_name` field to Set
     pub struct SetVenueName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVenueName<S> {}
     impl<S: State> State for SetVenueName<S> {
         type VenueName = Set<members::venue_name>;
+        type VenueUri = S::VenueUri;
+        type CreatedAt = S::CreatedAt;
         type Visibility = S::Visibility;
-        type VenueUri = S::VenueUri;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type VenueName = S::VenueName;
-        type Visibility = Set<members::visibility>;
-        type VenueUri = S::VenueUri;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `venue_uri` field to Set
     pub struct SetVenueUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVenueUri<S> {}
     impl<S: State> State for SetVenueUri<S> {
         type VenueName = S::VenueName;
-        type Visibility = S::Visibility;
         type VenueUri = Set<members::venue_uri>;
         type CreatedAt = S::CreatedAt;
+        type Visibility = S::Visibility;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type VenueName = S::VenueName;
-        type Visibility = S::Visibility;
         type VenueUri = S::VenueUri;
         type CreatedAt = Set<members::created_at>;
+        type Visibility = S::Visibility;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVisibility<S> {}
+    impl<S: State> State for SetVisibility<S> {
+        type VenueName = S::VenueName;
+        type VenueUri = S::VenueUri;
+        type CreatedAt = S::CreatedAt;
+        type Visibility = Set<members::visibility>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `venue_name` field
         pub struct venue_name(());
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
         ///Marker type for the `venue_uri` field
         pub struct venue_uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BeaconBuilder<'a, S: beacon_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Address<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
@@ -474,7 +478,7 @@ pub struct BeaconBuilder<'a, S: beacon_state::State> {
         Option<CowStr<'a>>,
         Option<BeaconVisibility<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Beacon<'a> {
@@ -488,8 +492,8 @@ impl<'a> BeaconBuilder<'a, beacon_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BeaconBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -508,7 +512,7 @@ impl<'a> BeaconBuilder<'a, beacon_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -516,12 +520,12 @@ impl<'a> BeaconBuilder<'a, beacon_state::Empty> {
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `addressDetails` field (optional)
     pub fn address_details(mut self, value: impl Into<Option<Address<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `addressDetails` field to an Option value (optional)
     pub fn maybe_address_details(mut self, value: Option<Address<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -529,12 +533,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `chainEmoji` field (optional)
     pub fn chain_emoji(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `chainEmoji` field to an Option value (optional)
     pub fn maybe_chain_emoji(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -542,12 +546,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `chainName` field (optional)
     pub fn chain_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `chainName` field to an Option value (optional)
     pub fn maybe_chain_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -562,11 +566,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> BeaconBuilder<'a, beacon_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         BeaconBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -574,12 +578,12 @@ where
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<Geo<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
     pub fn maybe_location(mut self, value: Option<Geo<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -587,12 +591,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `mentions` field (optional)
     pub fn mentions(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `mentions` field to an Option value (optional)
     pub fn maybe_mentions(mut self, value: Option<Vec<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -600,12 +604,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `parentBeacon` field (optional)
     pub fn parent_beacon(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `parentBeacon` field to an Option value (optional)
     pub fn maybe_parent_beacon(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -613,12 +617,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `post` field (optional)
     pub fn post(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `post` field to an Option value (optional)
     pub fn maybe_post(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -626,12 +630,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `rating` field (optional)
     pub fn rating(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `rating` field to an Option value (optional)
     pub fn maybe_rating(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -639,12 +643,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `revealAt` field (optional)
     pub fn reveal_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `revealAt` field to an Option value (optional)
     pub fn maybe_reveal_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -652,12 +656,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `shout` field (optional)
     pub fn shout(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `shout` field to an Option value (optional)
     pub fn maybe_shout(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -665,12 +669,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `threadRoot` field (optional)
     pub fn thread_root(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `threadRoot` field to an Option value (optional)
     pub fn maybe_thread_root(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -678,12 +682,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `venueAddress` field (optional)
     pub fn venue_address(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `venueAddress` field to an Option value (optional)
     pub fn maybe_venue_address(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -691,12 +695,12 @@ impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
 impl<'a, S: beacon_state::State> BeaconBuilder<'a, S> {
     /// Set the `venueCategory` field (optional)
     pub fn venue_category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `venueCategory` field to an Option value (optional)
     pub fn maybe_venue_category(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -711,11 +715,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BeaconBuilder<'a, beacon_state::SetVenueName<S>> {
-        self.__unsafe_private_named.14 = Option::Some(value.into());
+        self._fields.14 = Option::Some(value.into());
         BeaconBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -730,11 +734,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BeaconBuilder<'a, beacon_state::SetVenueUri<S>> {
-        self.__unsafe_private_named.15 = Option::Some(value.into());
+        self._fields.15 = Option::Some(value.into());
         BeaconBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -749,11 +753,11 @@ where
         mut self,
         value: impl Into<BeaconVisibility<'a>>,
     ) -> BeaconBuilder<'a, beacon_state::SetVisibility<S>> {
-        self.__unsafe_private_named.16 = Option::Some(value.into());
+        self._fields.16 = Option::Some(value.into());
         BeaconBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -762,30 +766,30 @@ impl<'a, S> BeaconBuilder<'a, S>
 where
     S: beacon_state::State,
     S::VenueName: beacon_state::IsSet,
-    S::Visibility: beacon_state::IsSet,
     S::VenueUri: beacon_state::IsSet,
     S::CreatedAt: beacon_state::IsSet,
+    S::Visibility: beacon_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Beacon<'a> {
         Beacon {
-            address_details: self.__unsafe_private_named.0,
-            chain_emoji: self.__unsafe_private_named.1,
-            chain_name: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            location: self.__unsafe_private_named.4,
-            mentions: self.__unsafe_private_named.5,
-            parent_beacon: self.__unsafe_private_named.6,
-            post: self.__unsafe_private_named.7,
-            rating: self.__unsafe_private_named.8,
-            reveal_at: self.__unsafe_private_named.9,
-            shout: self.__unsafe_private_named.10,
-            thread_root: self.__unsafe_private_named.11,
-            venue_address: self.__unsafe_private_named.12,
-            venue_category: self.__unsafe_private_named.13,
-            venue_name: self.__unsafe_private_named.14.unwrap(),
-            venue_uri: self.__unsafe_private_named.15.unwrap(),
-            visibility: self.__unsafe_private_named.16.unwrap(),
+            address_details: self._fields.0,
+            chain_emoji: self._fields.1,
+            chain_name: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            location: self._fields.4,
+            mentions: self._fields.5,
+            parent_beacon: self._fields.6,
+            post: self._fields.7,
+            rating: self._fields.8,
+            reveal_at: self._fields.9,
+            shout: self._fields.10,
+            thread_root: self._fields.11,
+            venue_address: self._fields.12,
+            venue_category: self._fields.13,
+            venue_name: self._fields.14.unwrap(),
+            venue_uri: self._fields.15.unwrap(),
+            visibility: self._fields.16.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -798,23 +802,23 @@ where
         >,
     ) -> Beacon<'a> {
         Beacon {
-            address_details: self.__unsafe_private_named.0,
-            chain_emoji: self.__unsafe_private_named.1,
-            chain_name: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            location: self.__unsafe_private_named.4,
-            mentions: self.__unsafe_private_named.5,
-            parent_beacon: self.__unsafe_private_named.6,
-            post: self.__unsafe_private_named.7,
-            rating: self.__unsafe_private_named.8,
-            reveal_at: self.__unsafe_private_named.9,
-            shout: self.__unsafe_private_named.10,
-            thread_root: self.__unsafe_private_named.11,
-            venue_address: self.__unsafe_private_named.12,
-            venue_category: self.__unsafe_private_named.13,
-            venue_name: self.__unsafe_private_named.14.unwrap(),
-            venue_uri: self.__unsafe_private_named.15.unwrap(),
-            visibility: self.__unsafe_private_named.16.unwrap(),
+            address_details: self._fields.0,
+            chain_emoji: self._fields.1,
+            chain_name: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            location: self._fields.4,
+            mentions: self._fields.5,
+            parent_beacon: self._fields.6,
+            post: self._fields.7,
+            rating: self._fields.8,
+            reveal_at: self._fields.9,
+            shout: self._fields.10,
+            thread_root: self._fields.11,
+            venue_address: self._fields.12,
+            venue_category: self._fields.13,
+            venue_name: self._fields.14.unwrap(),
+            venue_uri: self._fields.15.unwrap(),
+            visibility: self._fields.16.unwrap(),
             extra_data: Some(extra_data),
         }
     }

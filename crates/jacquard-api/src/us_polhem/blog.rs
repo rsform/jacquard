@@ -9,7 +9,11 @@ pub mod content;
 pub mod post;
 pub mod tag;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -112,9 +116,9 @@ pub mod aspect_ratio_state {
 
 /// Builder for constructing an instance of this type
 pub struct AspectRatioBuilder<'a, S: aspect_ratio_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> AspectRatio<'a> {
@@ -128,9 +132,9 @@ impl<'a> AspectRatioBuilder<'a, aspect_ratio_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AspectRatioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -145,11 +149,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetHeight<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AspectRatioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -164,11 +168,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetWidth<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AspectRatioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -182,8 +186,8 @@ where
     /// Build the final struct
     pub fn build(self) -> AspectRatio<'a> {
         AspectRatio {
-            height: self.__unsafe_private_named.0.unwrap(),
-            width: self.__unsafe_private_named.1.unwrap(),
+            height: self._fields.0.unwrap(),
+            width: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -196,8 +200,8 @@ where
         >,
     ) -> AspectRatio<'a> {
         AspectRatio {
-            height: self.__unsafe_private_named.0.unwrap(),
-            width: self.__unsafe_private_named.1.unwrap(),
+            height: self._fields.0.unwrap(),
+            width: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -3869,8 +3872,8 @@ pub mod organization_state {
 
 /// Builder for constructing an instance of this type
 pub struct OrganizationBuilder<'a, S: organization_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<OrganizationAcceptedPaymentMethod<'a>>,
         Option<OrganizationActionableFeedbackPolicy<'a>>,
         Option<OrganizationAdditionalType<'a>>,
@@ -3961,7 +3964,7 @@ pub struct OrganizationBuilder<'a, S: organization_state::State> {
         Option<OrganizationUrl<'a>>,
         Option<OrganizationVatId<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Organization<'a> {
@@ -3975,8 +3978,8 @@ impl<'a> OrganizationBuilder<'a, organization_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         OrganizationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -4067,7 +4070,7 @@ impl<'a> OrganizationBuilder<'a, organization_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4078,7 +4081,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationAcceptedPaymentMethod<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `acceptedPaymentMethod` field to an Option value (optional)
@@ -4086,7 +4089,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationAcceptedPaymentMethod<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -4097,7 +4100,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationActionableFeedbackPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `actionableFeedbackPolicy` field to an Option value (optional)
@@ -4105,7 +4108,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationActionableFeedbackPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -4116,7 +4119,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationAdditionalType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
@@ -4124,7 +4127,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationAdditionalType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -4132,12 +4135,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `address` field (optional)
     pub fn address(mut self, value: impl Into<Option<OrganizationAddress<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `address` field to an Option value (optional)
     pub fn maybe_address(mut self, value: Option<OrganizationAddress<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -4148,7 +4151,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationAgentInteractionStatistic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `agentInteractionStatistic` field to an Option value (optional)
@@ -4156,7 +4159,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationAgentInteractionStatistic<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -4167,7 +4170,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationAggregateRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
@@ -4175,7 +4178,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationAggregateRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -4186,7 +4189,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationAlternateName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
@@ -4194,7 +4197,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationAlternateName<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -4202,12 +4205,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `alumni` field (optional)
     pub fn alumni(mut self, value: impl Into<Option<OrganizationAlumni<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `alumni` field to an Option value (optional)
     pub fn maybe_alumni(mut self, value: Option<OrganizationAlumni<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -4218,7 +4221,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationAreaServed<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `areaServed` field to an Option value (optional)
@@ -4226,7 +4229,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationAreaServed<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -4234,12 +4237,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<OrganizationAward<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
     pub fn maybe_award(mut self, value: Option<OrganizationAward<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -4247,12 +4250,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<OrganizationAwards<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
     pub fn maybe_awards(mut self, value: Option<OrganizationAwards<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -4260,12 +4263,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `brand` field (optional)
     pub fn brand(mut self, value: impl Into<Option<OrganizationBrand<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `brand` field to an Option value (optional)
     pub fn maybe_brand(mut self, value: Option<OrganizationBrand<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -4276,7 +4279,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationCompanyRegistration<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `companyRegistration` field to an Option value (optional)
@@ -4284,7 +4287,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationCompanyRegistration<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -4295,7 +4298,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationContactPoint<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `contactPoint` field to an Option value (optional)
@@ -4303,7 +4306,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationContactPoint<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -4314,7 +4317,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationContactPoints<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `contactPoints` field to an Option value (optional)
@@ -4322,7 +4325,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationContactPoints<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -4333,7 +4336,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationCorrectionsPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `correctionsPolicy` field to an Option value (optional)
@@ -4341,7 +4344,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationCorrectionsPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -4352,7 +4355,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationDepartment<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `department` field to an Option value (optional)
@@ -4360,7 +4363,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationDepartment<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -4371,7 +4374,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
@@ -4379,7 +4382,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -4390,7 +4393,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationDisambiguatingDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `disambiguatingDescription` field to an Option value (optional)
@@ -4398,7 +4401,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationDisambiguatingDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -4409,7 +4412,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationDissolutionDate<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `dissolutionDate` field to an Option value (optional)
@@ -4417,7 +4420,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationDissolutionDate<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -4428,7 +4431,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationDiversityPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `diversityPolicy` field to an Option value (optional)
@@ -4436,7 +4439,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationDiversityPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -4447,7 +4450,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationDiversityStaffingReport<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `diversityStaffingReport` field to an Option value (optional)
@@ -4455,7 +4458,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationDiversityStaffingReport<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -4463,12 +4466,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `duns` field (optional)
     pub fn duns(mut self, value: impl Into<Option<OrganizationDuns<'a>>>) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `duns` field to an Option value (optional)
     pub fn maybe_duns(mut self, value: Option<OrganizationDuns<'a>>) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -4476,12 +4479,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `email` field (optional)
     pub fn email(mut self, value: impl Into<Option<OrganizationEmail<'a>>>) -> Self {
-        self.__unsafe_private_named.23 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `email` field to an Option value (optional)
     pub fn maybe_email(mut self, value: Option<OrganizationEmail<'a>>) -> Self {
-        self.__unsafe_private_named.23 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -4492,12 +4495,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationEmployee<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.24 = value.into();
+        self._fields.24 = value.into();
         self
     }
     /// Set the `employee` field to an Option value (optional)
     pub fn maybe_employee(mut self, value: Option<OrganizationEmployee<'a>>) -> Self {
-        self.__unsafe_private_named.24 = value;
+        self._fields.24 = value;
         self
     }
 }
@@ -4508,12 +4511,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationEmployees<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.25 = value.into();
+        self._fields.25 = value.into();
         self
     }
     /// Set the `employees` field to an Option value (optional)
     pub fn maybe_employees(mut self, value: Option<OrganizationEmployees<'a>>) -> Self {
-        self.__unsafe_private_named.25 = value;
+        self._fields.25 = value;
         self
     }
 }
@@ -4524,7 +4527,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationEthicsPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.26 = value.into();
+        self._fields.26 = value.into();
         self
     }
     /// Set the `ethicsPolicy` field to an Option value (optional)
@@ -4532,7 +4535,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationEthicsPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.26 = value;
+        self._fields.26 = value;
         self
     }
 }
@@ -4540,12 +4543,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `event` field (optional)
     pub fn event(mut self, value: impl Into<Option<OrganizationEvent<'a>>>) -> Self {
-        self.__unsafe_private_named.27 = value.into();
+        self._fields.27 = value.into();
         self
     }
     /// Set the `event` field to an Option value (optional)
     pub fn maybe_event(mut self, value: Option<OrganizationEvent<'a>>) -> Self {
-        self.__unsafe_private_named.27 = value;
+        self._fields.27 = value;
         self
     }
 }
@@ -4553,12 +4556,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `events` field (optional)
     pub fn events(mut self, value: impl Into<Option<OrganizationEvents<'a>>>) -> Self {
-        self.__unsafe_private_named.28 = value.into();
+        self._fields.28 = value.into();
         self
     }
     /// Set the `events` field to an Option value (optional)
     pub fn maybe_events(mut self, value: Option<OrganizationEvents<'a>>) -> Self {
-        self.__unsafe_private_named.28 = value;
+        self._fields.28 = value;
         self
     }
 }
@@ -4569,12 +4572,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationFaxNumber<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.29 = value.into();
+        self._fields.29 = value.into();
         self
     }
     /// Set the `faxNumber` field to an Option value (optional)
     pub fn maybe_fax_number(mut self, value: Option<OrganizationFaxNumber<'a>>) -> Self {
-        self.__unsafe_private_named.29 = value;
+        self._fields.29 = value;
         self
     }
 }
@@ -4582,12 +4585,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `founder` field (optional)
     pub fn founder(mut self, value: impl Into<Option<OrganizationFounder<'a>>>) -> Self {
-        self.__unsafe_private_named.30 = value.into();
+        self._fields.30 = value.into();
         self
     }
     /// Set the `founder` field to an Option value (optional)
     pub fn maybe_founder(mut self, value: Option<OrganizationFounder<'a>>) -> Self {
-        self.__unsafe_private_named.30 = value;
+        self._fields.30 = value;
         self
     }
 }
@@ -4598,12 +4601,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationFounders<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value.into();
+        self._fields.31 = value.into();
         self
     }
     /// Set the `founders` field to an Option value (optional)
     pub fn maybe_founders(mut self, value: Option<OrganizationFounders<'a>>) -> Self {
-        self.__unsafe_private_named.31 = value;
+        self._fields.31 = value;
         self
     }
 }
@@ -4614,7 +4617,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationFoundingDate<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value.into();
+        self._fields.32 = value.into();
         self
     }
     /// Set the `foundingDate` field to an Option value (optional)
@@ -4622,7 +4625,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationFoundingDate<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value;
+        self._fields.32 = value;
         self
     }
 }
@@ -4633,7 +4636,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationFoundingLocation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value.into();
+        self._fields.33 = value.into();
         self
     }
     /// Set the `foundingLocation` field to an Option value (optional)
@@ -4641,7 +4644,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationFoundingLocation<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value;
+        self._fields.33 = value;
         self
     }
 }
@@ -4649,12 +4652,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `funder` field (optional)
     pub fn funder(mut self, value: impl Into<Option<OrganizationFunder<'a>>>) -> Self {
-        self.__unsafe_private_named.34 = value.into();
+        self._fields.34 = value.into();
         self
     }
     /// Set the `funder` field to an Option value (optional)
     pub fn maybe_funder(mut self, value: Option<OrganizationFunder<'a>>) -> Self {
-        self.__unsafe_private_named.34 = value;
+        self._fields.34 = value;
         self
     }
 }
@@ -4662,12 +4665,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<OrganizationFunding<'a>>>) -> Self {
-        self.__unsafe_private_named.35 = value.into();
+        self._fields.35 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
     pub fn maybe_funding(mut self, value: Option<OrganizationFunding<'a>>) -> Self {
-        self.__unsafe_private_named.35 = value;
+        self._fields.35 = value;
         self
     }
 }
@@ -4678,7 +4681,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationGlobalLocationNumber<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value.into();
+        self._fields.36 = value.into();
         self
     }
     /// Set the `globalLocationNumber` field to an Option value (optional)
@@ -4686,7 +4689,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationGlobalLocationNumber<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value;
+        self._fields.36 = value;
         self
     }
 }
@@ -4697,7 +4700,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationHasCertification<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.37 = value.into();
+        self._fields.37 = value.into();
         self
     }
     /// Set the `hasCertification` field to an Option value (optional)
@@ -4705,7 +4708,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationHasCertification<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.37 = value;
+        self._fields.37 = value;
         self
     }
 }
@@ -4716,7 +4719,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationHasCredential<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.38 = value.into();
+        self._fields.38 = value.into();
         self
     }
     /// Set the `hasCredential` field to an Option value (optional)
@@ -4724,7 +4727,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationHasCredential<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.38 = value;
+        self._fields.38 = value;
         self
     }
 }
@@ -4735,7 +4738,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationHasGs1DigitalLink<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value.into();
+        self._fields.39 = value.into();
         self
     }
     /// Set the `hasGS1DigitalLink` field to an Option value (optional)
@@ -4743,7 +4746,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationHasGs1DigitalLink<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value;
+        self._fields.39 = value;
         self
     }
 }
@@ -4754,7 +4757,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationHasMemberProgram<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.40 = value.into();
+        self._fields.40 = value.into();
         self
     }
     /// Set the `hasMemberProgram` field to an Option value (optional)
@@ -4762,7 +4765,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationHasMemberProgram<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.40 = value;
+        self._fields.40 = value;
         self
     }
 }
@@ -4773,7 +4776,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationHasMerchantReturnPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.41 = value.into();
+        self._fields.41 = value.into();
         self
     }
     /// Set the `hasMerchantReturnPolicy` field to an Option value (optional)
@@ -4781,7 +4784,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationHasMerchantReturnPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.41 = value;
+        self._fields.41 = value;
         self
     }
 }
@@ -4792,7 +4795,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationHasOfferCatalog<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.42 = value.into();
+        self._fields.42 = value.into();
         self
     }
     /// Set the `hasOfferCatalog` field to an Option value (optional)
@@ -4800,7 +4803,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationHasOfferCatalog<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.42 = value;
+        self._fields.42 = value;
         self
     }
 }
@@ -4808,12 +4811,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `hasPOS` field (optional)
     pub fn has_pos(mut self, value: impl Into<Option<OrganizationHasPos<'a>>>) -> Self {
-        self.__unsafe_private_named.43 = value.into();
+        self._fields.43 = value.into();
         self
     }
     /// Set the `hasPOS` field to an Option value (optional)
     pub fn maybe_has_pos(mut self, value: Option<OrganizationHasPos<'a>>) -> Self {
-        self.__unsafe_private_named.43 = value;
+        self._fields.43 = value;
         self
     }
 }
@@ -4824,7 +4827,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationHasProductReturnPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.44 = value.into();
+        self._fields.44 = value.into();
         self
     }
     /// Set the `hasProductReturnPolicy` field to an Option value (optional)
@@ -4832,7 +4835,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationHasProductReturnPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.44 = value;
+        self._fields.44 = value;
         self
     }
 }
@@ -4843,7 +4846,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationHasShippingService<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value.into();
+        self._fields.45 = value.into();
         self
     }
     /// Set the `hasShippingService` field to an Option value (optional)
@@ -4851,7 +4854,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationHasShippingService<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value;
+        self._fields.45 = value;
         self
     }
 }
@@ -4862,7 +4865,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationIdentifier<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.46 = value.into();
+        self._fields.46 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
@@ -4870,7 +4873,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationIdentifier<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.46 = value;
+        self._fields.46 = value;
         self
     }
 }
@@ -4878,12 +4881,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<OrganizationImage<'a>>>) -> Self {
-        self.__unsafe_private_named.47 = value.into();
+        self._fields.47 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<OrganizationImage<'a>>) -> Self {
-        self.__unsafe_private_named.47 = value;
+        self._fields.47 = value;
         self
     }
 }
@@ -4894,7 +4897,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationInteractionStatistic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value.into();
+        self._fields.48 = value.into();
         self
     }
     /// Set the `interactionStatistic` field to an Option value (optional)
@@ -4902,7 +4905,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationInteractionStatistic<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value;
+        self._fields.48 = value;
         self
     }
 }
@@ -4910,12 +4913,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `isicV4` field (optional)
     pub fn isic_v4(mut self, value: impl Into<Option<OrganizationIsicV4<'a>>>) -> Self {
-        self.__unsafe_private_named.49 = value.into();
+        self._fields.49 = value.into();
         self
     }
     /// Set the `isicV4` field to an Option value (optional)
     pub fn maybe_isic_v4(mut self, value: Option<OrganizationIsicV4<'a>>) -> Self {
-        self.__unsafe_private_named.49 = value;
+        self._fields.49 = value;
         self
     }
 }
@@ -4926,7 +4929,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationIso6523Code<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.50 = value.into();
+        self._fields.50 = value.into();
         self
     }
     /// Set the `iso6523Code` field to an Option value (optional)
@@ -4934,7 +4937,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationIso6523Code<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.50 = value;
+        self._fields.50 = value;
         self
     }
 }
@@ -4945,12 +4948,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationKeywords<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.51 = value.into();
+        self._fields.51 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
     pub fn maybe_keywords(mut self, value: Option<OrganizationKeywords<'a>>) -> Self {
-        self.__unsafe_private_named.51 = value;
+        self._fields.51 = value;
         self
     }
 }
@@ -4961,7 +4964,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationKnowsAbout<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.52 = value.into();
+        self._fields.52 = value.into();
         self
     }
     /// Set the `knowsAbout` field to an Option value (optional)
@@ -4969,7 +4972,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationKnowsAbout<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.52 = value;
+        self._fields.52 = value;
         self
     }
 }
@@ -4980,7 +4983,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationKnowsLanguage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.53 = value.into();
+        self._fields.53 = value.into();
         self
     }
     /// Set the `knowsLanguage` field to an Option value (optional)
@@ -4988,7 +4991,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationKnowsLanguage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.53 = value;
+        self._fields.53 = value;
         self
     }
 }
@@ -4999,7 +5002,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationLegalAddress<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.54 = value.into();
+        self._fields.54 = value.into();
         self
     }
     /// Set the `legalAddress` field to an Option value (optional)
@@ -5007,7 +5010,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationLegalAddress<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.54 = value;
+        self._fields.54 = value;
         self
     }
 }
@@ -5018,12 +5021,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationLegalName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.55 = value.into();
+        self._fields.55 = value.into();
         self
     }
     /// Set the `legalName` field to an Option value (optional)
     pub fn maybe_legal_name(mut self, value: Option<OrganizationLegalName<'a>>) -> Self {
-        self.__unsafe_private_named.55 = value;
+        self._fields.55 = value;
         self
     }
 }
@@ -5034,7 +5037,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationLegalRepresentative<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value.into();
+        self._fields.56 = value.into();
         self
     }
     /// Set the `legalRepresentative` field to an Option value (optional)
@@ -5042,7 +5045,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationLegalRepresentative<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value;
+        self._fields.56 = value;
         self
     }
 }
@@ -5053,12 +5056,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationLeiCode<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.57 = value.into();
+        self._fields.57 = value.into();
         self
     }
     /// Set the `leiCode` field to an Option value (optional)
     pub fn maybe_lei_code(mut self, value: Option<OrganizationLeiCode<'a>>) -> Self {
-        self.__unsafe_private_named.57 = value;
+        self._fields.57 = value;
         self
     }
 }
@@ -5069,12 +5072,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationLocation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.58 = value.into();
+        self._fields.58 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
     pub fn maybe_location(mut self, value: Option<OrganizationLocation<'a>>) -> Self {
-        self.__unsafe_private_named.58 = value;
+        self._fields.58 = value;
         self
     }
 }
@@ -5082,12 +5085,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `logo` field (optional)
     pub fn logo(mut self, value: impl Into<Option<OrganizationLogo<'a>>>) -> Self {
-        self.__unsafe_private_named.59 = value.into();
+        self._fields.59 = value.into();
         self
     }
     /// Set the `logo` field to an Option value (optional)
     pub fn maybe_logo(mut self, value: Option<OrganizationLogo<'a>>) -> Self {
-        self.__unsafe_private_named.59 = value;
+        self._fields.59 = value;
         self
     }
 }
@@ -5098,7 +5101,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationMainEntityOfPage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.60 = value.into();
+        self._fields.60 = value.into();
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
@@ -5106,7 +5109,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationMainEntityOfPage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.60 = value;
+        self._fields.60 = value;
         self
     }
 }
@@ -5117,7 +5120,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationMakesOffer<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.61 = value.into();
+        self._fields.61 = value.into();
         self
     }
     /// Set the `makesOffer` field to an Option value (optional)
@@ -5125,7 +5128,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationMakesOffer<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.61 = value;
+        self._fields.61 = value;
         self
     }
 }
@@ -5133,12 +5136,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `member` field (optional)
     pub fn member(mut self, value: impl Into<Option<OrganizationMember<'a>>>) -> Self {
-        self.__unsafe_private_named.62 = value.into();
+        self._fields.62 = value.into();
         self
     }
     /// Set the `member` field to an Option value (optional)
     pub fn maybe_member(mut self, value: Option<OrganizationMember<'a>>) -> Self {
-        self.__unsafe_private_named.62 = value;
+        self._fields.62 = value;
         self
     }
 }
@@ -5149,12 +5152,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationMemberOf<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.63 = value.into();
+        self._fields.63 = value.into();
         self
     }
     /// Set the `memberOf` field to an Option value (optional)
     pub fn maybe_member_of(mut self, value: Option<OrganizationMemberOf<'a>>) -> Self {
-        self.__unsafe_private_named.63 = value;
+        self._fields.63 = value;
         self
     }
 }
@@ -5162,12 +5165,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `members` field (optional)
     pub fn members(mut self, value: impl Into<Option<OrganizationMembers<'a>>>) -> Self {
-        self.__unsafe_private_named.64 = value.into();
+        self._fields.64 = value.into();
         self
     }
     /// Set the `members` field to an Option value (optional)
     pub fn maybe_members(mut self, value: Option<OrganizationMembers<'a>>) -> Self {
-        self.__unsafe_private_named.64 = value;
+        self._fields.64 = value;
         self
     }
 }
@@ -5175,12 +5178,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `naics` field (optional)
     pub fn naics(mut self, value: impl Into<Option<OrganizationNaics<'a>>>) -> Self {
-        self.__unsafe_private_named.65 = value.into();
+        self._fields.65 = value.into();
         self
     }
     /// Set the `naics` field to an Option value (optional)
     pub fn maybe_naics(mut self, value: Option<OrganizationNaics<'a>>) -> Self {
-        self.__unsafe_private_named.65 = value;
+        self._fields.65 = value;
         self
     }
 }
@@ -5188,12 +5191,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<OrganizationName<'a>>>) -> Self {
-        self.__unsafe_private_named.66 = value.into();
+        self._fields.66 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<OrganizationName<'a>>) -> Self {
-        self.__unsafe_private_named.66 = value;
+        self._fields.66 = value;
         self
     }
 }
@@ -5204,7 +5207,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationNonprofitStatus<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.67 = value.into();
+        self._fields.67 = value.into();
         self
     }
     /// Set the `nonprofitStatus` field to an Option value (optional)
@@ -5212,7 +5215,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationNonprofitStatus<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.67 = value;
+        self._fields.67 = value;
         self
     }
 }
@@ -5223,7 +5226,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationNumberOfEmployees<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.68 = value.into();
+        self._fields.68 = value.into();
         self
     }
     /// Set the `numberOfEmployees` field to an Option value (optional)
@@ -5231,7 +5234,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationNumberOfEmployees<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.68 = value;
+        self._fields.68 = value;
         self
     }
 }
@@ -5242,7 +5245,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationOwnershipFundingInfo<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.69 = value.into();
+        self._fields.69 = value.into();
         self
     }
     /// Set the `ownershipFundingInfo` field to an Option value (optional)
@@ -5250,7 +5253,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationOwnershipFundingInfo<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.69 = value;
+        self._fields.69 = value;
         self
     }
 }
@@ -5258,12 +5261,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `owns` field (optional)
     pub fn owns(mut self, value: impl Into<Option<OrganizationOwns<'a>>>) -> Self {
-        self.__unsafe_private_named.70 = value.into();
+        self._fields.70 = value.into();
         self
     }
     /// Set the `owns` field to an Option value (optional)
     pub fn maybe_owns(mut self, value: Option<OrganizationOwns<'a>>) -> Self {
-        self.__unsafe_private_named.70 = value;
+        self._fields.70 = value;
         self
     }
 }
@@ -5274,7 +5277,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationParentOrganization<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.71 = value.into();
+        self._fields.71 = value.into();
         self
     }
     /// Set the `parentOrganization` field to an Option value (optional)
@@ -5282,7 +5285,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationParentOrganization<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.71 = value;
+        self._fields.71 = value;
         self
     }
 }
@@ -5293,7 +5296,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationPotentialAction<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.72 = value.into();
+        self._fields.72 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
@@ -5301,7 +5304,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationPotentialAction<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.72 = value;
+        self._fields.72 = value;
         self
     }
 }
@@ -5312,7 +5315,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationPublishingPrinciples<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.73 = value.into();
+        self._fields.73 = value.into();
         self
     }
     /// Set the `publishingPrinciples` field to an Option value (optional)
@@ -5320,7 +5323,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationPublishingPrinciples<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.73 = value;
+        self._fields.73 = value;
         self
     }
 }
@@ -5328,12 +5331,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<OrganizationReview<'a>>>) -> Self {
-        self.__unsafe_private_named.74 = value.into();
+        self._fields.74 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
     pub fn maybe_review(mut self, value: Option<OrganizationReview<'a>>) -> Self {
-        self.__unsafe_private_named.74 = value;
+        self._fields.74 = value;
         self
     }
 }
@@ -5341,12 +5344,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `reviews` field (optional)
     pub fn reviews(mut self, value: impl Into<Option<OrganizationReviews<'a>>>) -> Self {
-        self.__unsafe_private_named.75 = value.into();
+        self._fields.75 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
     pub fn maybe_reviews(mut self, value: Option<OrganizationReviews<'a>>) -> Self {
-        self.__unsafe_private_named.75 = value;
+        self._fields.75 = value;
         self
     }
 }
@@ -5354,12 +5357,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<OrganizationSameAs<'a>>>) -> Self {
-        self.__unsafe_private_named.76 = value.into();
+        self._fields.76 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
     pub fn maybe_same_as(mut self, value: Option<OrganizationSameAs<'a>>) -> Self {
-        self.__unsafe_private_named.76 = value;
+        self._fields.76 = value;
         self
     }
 }
@@ -5367,12 +5370,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `seeks` field (optional)
     pub fn seeks(mut self, value: impl Into<Option<OrganizationSeeks<'a>>>) -> Self {
-        self.__unsafe_private_named.77 = value.into();
+        self._fields.77 = value.into();
         self
     }
     /// Set the `seeks` field to an Option value (optional)
     pub fn maybe_seeks(mut self, value: Option<OrganizationSeeks<'a>>) -> Self {
-        self.__unsafe_private_named.77 = value;
+        self._fields.77 = value;
         self
     }
 }
@@ -5383,7 +5386,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationServiceArea<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.78 = value.into();
+        self._fields.78 = value.into();
         self
     }
     /// Set the `serviceArea` field to an Option value (optional)
@@ -5391,7 +5394,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationServiceArea<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.78 = value;
+        self._fields.78 = value;
         self
     }
 }
@@ -5399,12 +5402,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `skills` field (optional)
     pub fn skills(mut self, value: impl Into<Option<OrganizationSkills<'a>>>) -> Self {
-        self.__unsafe_private_named.79 = value.into();
+        self._fields.79 = value.into();
         self
     }
     /// Set the `skills` field to an Option value (optional)
     pub fn maybe_skills(mut self, value: Option<OrganizationSkills<'a>>) -> Self {
-        self.__unsafe_private_named.79 = value;
+        self._fields.79 = value;
         self
     }
 }
@@ -5412,12 +5415,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `slogan` field (optional)
     pub fn slogan(mut self, value: impl Into<Option<OrganizationSlogan<'a>>>) -> Self {
-        self.__unsafe_private_named.80 = value.into();
+        self._fields.80 = value.into();
         self
     }
     /// Set the `slogan` field to an Option value (optional)
     pub fn maybe_slogan(mut self, value: Option<OrganizationSlogan<'a>>) -> Self {
-        self.__unsafe_private_named.80 = value;
+        self._fields.80 = value;
         self
     }
 }
@@ -5425,12 +5428,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `sponsor` field (optional)
     pub fn sponsor(mut self, value: impl Into<Option<OrganizationSponsor<'a>>>) -> Self {
-        self.__unsafe_private_named.81 = value.into();
+        self._fields.81 = value.into();
         self
     }
     /// Set the `sponsor` field to an Option value (optional)
     pub fn maybe_sponsor(mut self, value: Option<OrganizationSponsor<'a>>) -> Self {
-        self.__unsafe_private_named.81 = value;
+        self._fields.81 = value;
         self
     }
 }
@@ -5441,7 +5444,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationSubOrganization<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.82 = value.into();
+        self._fields.82 = value.into();
         self
     }
     /// Set the `subOrganization` field to an Option value (optional)
@@ -5449,7 +5452,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationSubOrganization<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.82 = value;
+        self._fields.82 = value;
         self
     }
 }
@@ -5460,12 +5463,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationSubjectOf<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.83 = value.into();
+        self._fields.83 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
     pub fn maybe_subject_of(mut self, value: Option<OrganizationSubjectOf<'a>>) -> Self {
-        self.__unsafe_private_named.83 = value;
+        self._fields.83 = value;
         self
     }
 }
@@ -5473,12 +5476,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `taxID` field (optional)
     pub fn tax_id(mut self, value: impl Into<Option<OrganizationTaxId<'a>>>) -> Self {
-        self.__unsafe_private_named.84 = value.into();
+        self._fields.84 = value.into();
         self
     }
     /// Set the `taxID` field to an Option value (optional)
     pub fn maybe_tax_id(mut self, value: Option<OrganizationTaxId<'a>>) -> Self {
-        self.__unsafe_private_named.84 = value;
+        self._fields.84 = value;
         self
     }
 }
@@ -5489,12 +5492,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationTelephone<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.85 = value.into();
+        self._fields.85 = value.into();
         self
     }
     /// Set the `telephone` field to an Option value (optional)
     pub fn maybe_telephone(mut self, value: Option<OrganizationTelephone<'a>>) -> Self {
-        self.__unsafe_private_named.85 = value;
+        self._fields.85 = value;
         self
     }
 }
@@ -5505,7 +5508,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrganizationUnnamedSourcesPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.86 = value.into();
+        self._fields.86 = value.into();
         self
     }
     /// Set the `unnamedSourcesPolicy` field to an Option value (optional)
@@ -5513,7 +5516,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
         mut self,
         value: Option<OrganizationUnnamedSourcesPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.86 = value;
+        self._fields.86 = value;
         self
     }
 }
@@ -5521,12 +5524,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<OrganizationUrl<'a>>>) -> Self {
-        self.__unsafe_private_named.87 = value.into();
+        self._fields.87 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<OrganizationUrl<'a>>) -> Self {
-        self.__unsafe_private_named.87 = value;
+        self._fields.87 = value;
         self
     }
 }
@@ -5534,12 +5537,12 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
 impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     /// Set the `vatID` field (optional)
     pub fn vat_id(mut self, value: impl Into<Option<OrganizationVatId<'a>>>) -> Self {
-        self.__unsafe_private_named.88 = value.into();
+        self._fields.88 = value.into();
         self
     }
     /// Set the `vatID` field to an Option value (optional)
     pub fn maybe_vat_id(mut self, value: Option<OrganizationVatId<'a>>) -> Self {
-        self.__unsafe_private_named.88 = value;
+        self._fields.88 = value;
         self
     }
 }
@@ -5551,95 +5554,95 @@ where
     /// Build the final struct
     pub fn build(self) -> Organization<'a> {
         Organization {
-            accepted_payment_method: self.__unsafe_private_named.0,
-            actionable_feedback_policy: self.__unsafe_private_named.1,
-            additional_type: self.__unsafe_private_named.2,
-            address: self.__unsafe_private_named.3,
-            agent_interaction_statistic: self.__unsafe_private_named.4,
-            aggregate_rating: self.__unsafe_private_named.5,
-            alternate_name: self.__unsafe_private_named.6,
-            alumni: self.__unsafe_private_named.7,
-            area_served: self.__unsafe_private_named.8,
-            award: self.__unsafe_private_named.9,
-            awards: self.__unsafe_private_named.10,
-            brand: self.__unsafe_private_named.11,
-            company_registration: self.__unsafe_private_named.12,
-            contact_point: self.__unsafe_private_named.13,
-            contact_points: self.__unsafe_private_named.14,
-            corrections_policy: self.__unsafe_private_named.15,
-            department: self.__unsafe_private_named.16,
-            description: self.__unsafe_private_named.17,
-            disambiguating_description: self.__unsafe_private_named.18,
-            dissolution_date: self.__unsafe_private_named.19,
-            diversity_policy: self.__unsafe_private_named.20,
-            diversity_staffing_report: self.__unsafe_private_named.21,
-            duns: self.__unsafe_private_named.22,
-            email: self.__unsafe_private_named.23,
-            employee: self.__unsafe_private_named.24,
-            employees: self.__unsafe_private_named.25,
-            ethics_policy: self.__unsafe_private_named.26,
-            event: self.__unsafe_private_named.27,
-            events: self.__unsafe_private_named.28,
-            fax_number: self.__unsafe_private_named.29,
-            founder: self.__unsafe_private_named.30,
-            founders: self.__unsafe_private_named.31,
-            founding_date: self.__unsafe_private_named.32,
-            founding_location: self.__unsafe_private_named.33,
-            funder: self.__unsafe_private_named.34,
-            funding: self.__unsafe_private_named.35,
-            global_location_number: self.__unsafe_private_named.36,
-            has_certification: self.__unsafe_private_named.37,
-            has_credential: self.__unsafe_private_named.38,
-            has_gs1_digital_link: self.__unsafe_private_named.39,
-            has_member_program: self.__unsafe_private_named.40,
-            has_merchant_return_policy: self.__unsafe_private_named.41,
-            has_offer_catalog: self.__unsafe_private_named.42,
-            has_pos: self.__unsafe_private_named.43,
-            has_product_return_policy: self.__unsafe_private_named.44,
-            has_shipping_service: self.__unsafe_private_named.45,
-            identifier: self.__unsafe_private_named.46,
-            image: self.__unsafe_private_named.47,
-            interaction_statistic: self.__unsafe_private_named.48,
-            isic_v4: self.__unsafe_private_named.49,
-            iso6523_code: self.__unsafe_private_named.50,
-            keywords: self.__unsafe_private_named.51,
-            knows_about: self.__unsafe_private_named.52,
-            knows_language: self.__unsafe_private_named.53,
-            legal_address: self.__unsafe_private_named.54,
-            legal_name: self.__unsafe_private_named.55,
-            legal_representative: self.__unsafe_private_named.56,
-            lei_code: self.__unsafe_private_named.57,
-            location: self.__unsafe_private_named.58,
-            logo: self.__unsafe_private_named.59,
-            main_entity_of_page: self.__unsafe_private_named.60,
-            makes_offer: self.__unsafe_private_named.61,
-            member: self.__unsafe_private_named.62,
-            member_of: self.__unsafe_private_named.63,
-            members: self.__unsafe_private_named.64,
-            naics: self.__unsafe_private_named.65,
-            name: self.__unsafe_private_named.66,
-            nonprofit_status: self.__unsafe_private_named.67,
-            number_of_employees: self.__unsafe_private_named.68,
-            ownership_funding_info: self.__unsafe_private_named.69,
-            owns: self.__unsafe_private_named.70,
-            parent_organization: self.__unsafe_private_named.71,
-            potential_action: self.__unsafe_private_named.72,
-            publishing_principles: self.__unsafe_private_named.73,
-            review: self.__unsafe_private_named.74,
-            reviews: self.__unsafe_private_named.75,
-            same_as: self.__unsafe_private_named.76,
-            seeks: self.__unsafe_private_named.77,
-            service_area: self.__unsafe_private_named.78,
-            skills: self.__unsafe_private_named.79,
-            slogan: self.__unsafe_private_named.80,
-            sponsor: self.__unsafe_private_named.81,
-            sub_organization: self.__unsafe_private_named.82,
-            subject_of: self.__unsafe_private_named.83,
-            tax_id: self.__unsafe_private_named.84,
-            telephone: self.__unsafe_private_named.85,
-            unnamed_sources_policy: self.__unsafe_private_named.86,
-            url: self.__unsafe_private_named.87,
-            vat_id: self.__unsafe_private_named.88,
+            accepted_payment_method: self._fields.0,
+            actionable_feedback_policy: self._fields.1,
+            additional_type: self._fields.2,
+            address: self._fields.3,
+            agent_interaction_statistic: self._fields.4,
+            aggregate_rating: self._fields.5,
+            alternate_name: self._fields.6,
+            alumni: self._fields.7,
+            area_served: self._fields.8,
+            award: self._fields.9,
+            awards: self._fields.10,
+            brand: self._fields.11,
+            company_registration: self._fields.12,
+            contact_point: self._fields.13,
+            contact_points: self._fields.14,
+            corrections_policy: self._fields.15,
+            department: self._fields.16,
+            description: self._fields.17,
+            disambiguating_description: self._fields.18,
+            dissolution_date: self._fields.19,
+            diversity_policy: self._fields.20,
+            diversity_staffing_report: self._fields.21,
+            duns: self._fields.22,
+            email: self._fields.23,
+            employee: self._fields.24,
+            employees: self._fields.25,
+            ethics_policy: self._fields.26,
+            event: self._fields.27,
+            events: self._fields.28,
+            fax_number: self._fields.29,
+            founder: self._fields.30,
+            founders: self._fields.31,
+            founding_date: self._fields.32,
+            founding_location: self._fields.33,
+            funder: self._fields.34,
+            funding: self._fields.35,
+            global_location_number: self._fields.36,
+            has_certification: self._fields.37,
+            has_credential: self._fields.38,
+            has_gs1_digital_link: self._fields.39,
+            has_member_program: self._fields.40,
+            has_merchant_return_policy: self._fields.41,
+            has_offer_catalog: self._fields.42,
+            has_pos: self._fields.43,
+            has_product_return_policy: self._fields.44,
+            has_shipping_service: self._fields.45,
+            identifier: self._fields.46,
+            image: self._fields.47,
+            interaction_statistic: self._fields.48,
+            isic_v4: self._fields.49,
+            iso6523_code: self._fields.50,
+            keywords: self._fields.51,
+            knows_about: self._fields.52,
+            knows_language: self._fields.53,
+            legal_address: self._fields.54,
+            legal_name: self._fields.55,
+            legal_representative: self._fields.56,
+            lei_code: self._fields.57,
+            location: self._fields.58,
+            logo: self._fields.59,
+            main_entity_of_page: self._fields.60,
+            makes_offer: self._fields.61,
+            member: self._fields.62,
+            member_of: self._fields.63,
+            members: self._fields.64,
+            naics: self._fields.65,
+            name: self._fields.66,
+            nonprofit_status: self._fields.67,
+            number_of_employees: self._fields.68,
+            ownership_funding_info: self._fields.69,
+            owns: self._fields.70,
+            parent_organization: self._fields.71,
+            potential_action: self._fields.72,
+            publishing_principles: self._fields.73,
+            review: self._fields.74,
+            reviews: self._fields.75,
+            same_as: self._fields.76,
+            seeks: self._fields.77,
+            service_area: self._fields.78,
+            skills: self._fields.79,
+            slogan: self._fields.80,
+            sponsor: self._fields.81,
+            sub_organization: self._fields.82,
+            subject_of: self._fields.83,
+            tax_id: self._fields.84,
+            telephone: self._fields.85,
+            unnamed_sources_policy: self._fields.86,
+            url: self._fields.87,
+            vat_id: self._fields.88,
             extra_data: Default::default(),
         }
     }
@@ -5649,95 +5652,95 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Organization<'a> {
         Organization {
-            accepted_payment_method: self.__unsafe_private_named.0,
-            actionable_feedback_policy: self.__unsafe_private_named.1,
-            additional_type: self.__unsafe_private_named.2,
-            address: self.__unsafe_private_named.3,
-            agent_interaction_statistic: self.__unsafe_private_named.4,
-            aggregate_rating: self.__unsafe_private_named.5,
-            alternate_name: self.__unsafe_private_named.6,
-            alumni: self.__unsafe_private_named.7,
-            area_served: self.__unsafe_private_named.8,
-            award: self.__unsafe_private_named.9,
-            awards: self.__unsafe_private_named.10,
-            brand: self.__unsafe_private_named.11,
-            company_registration: self.__unsafe_private_named.12,
-            contact_point: self.__unsafe_private_named.13,
-            contact_points: self.__unsafe_private_named.14,
-            corrections_policy: self.__unsafe_private_named.15,
-            department: self.__unsafe_private_named.16,
-            description: self.__unsafe_private_named.17,
-            disambiguating_description: self.__unsafe_private_named.18,
-            dissolution_date: self.__unsafe_private_named.19,
-            diversity_policy: self.__unsafe_private_named.20,
-            diversity_staffing_report: self.__unsafe_private_named.21,
-            duns: self.__unsafe_private_named.22,
-            email: self.__unsafe_private_named.23,
-            employee: self.__unsafe_private_named.24,
-            employees: self.__unsafe_private_named.25,
-            ethics_policy: self.__unsafe_private_named.26,
-            event: self.__unsafe_private_named.27,
-            events: self.__unsafe_private_named.28,
-            fax_number: self.__unsafe_private_named.29,
-            founder: self.__unsafe_private_named.30,
-            founders: self.__unsafe_private_named.31,
-            founding_date: self.__unsafe_private_named.32,
-            founding_location: self.__unsafe_private_named.33,
-            funder: self.__unsafe_private_named.34,
-            funding: self.__unsafe_private_named.35,
-            global_location_number: self.__unsafe_private_named.36,
-            has_certification: self.__unsafe_private_named.37,
-            has_credential: self.__unsafe_private_named.38,
-            has_gs1_digital_link: self.__unsafe_private_named.39,
-            has_member_program: self.__unsafe_private_named.40,
-            has_merchant_return_policy: self.__unsafe_private_named.41,
-            has_offer_catalog: self.__unsafe_private_named.42,
-            has_pos: self.__unsafe_private_named.43,
-            has_product_return_policy: self.__unsafe_private_named.44,
-            has_shipping_service: self.__unsafe_private_named.45,
-            identifier: self.__unsafe_private_named.46,
-            image: self.__unsafe_private_named.47,
-            interaction_statistic: self.__unsafe_private_named.48,
-            isic_v4: self.__unsafe_private_named.49,
-            iso6523_code: self.__unsafe_private_named.50,
-            keywords: self.__unsafe_private_named.51,
-            knows_about: self.__unsafe_private_named.52,
-            knows_language: self.__unsafe_private_named.53,
-            legal_address: self.__unsafe_private_named.54,
-            legal_name: self.__unsafe_private_named.55,
-            legal_representative: self.__unsafe_private_named.56,
-            lei_code: self.__unsafe_private_named.57,
-            location: self.__unsafe_private_named.58,
-            logo: self.__unsafe_private_named.59,
-            main_entity_of_page: self.__unsafe_private_named.60,
-            makes_offer: self.__unsafe_private_named.61,
-            member: self.__unsafe_private_named.62,
-            member_of: self.__unsafe_private_named.63,
-            members: self.__unsafe_private_named.64,
-            naics: self.__unsafe_private_named.65,
-            name: self.__unsafe_private_named.66,
-            nonprofit_status: self.__unsafe_private_named.67,
-            number_of_employees: self.__unsafe_private_named.68,
-            ownership_funding_info: self.__unsafe_private_named.69,
-            owns: self.__unsafe_private_named.70,
-            parent_organization: self.__unsafe_private_named.71,
-            potential_action: self.__unsafe_private_named.72,
-            publishing_principles: self.__unsafe_private_named.73,
-            review: self.__unsafe_private_named.74,
-            reviews: self.__unsafe_private_named.75,
-            same_as: self.__unsafe_private_named.76,
-            seeks: self.__unsafe_private_named.77,
-            service_area: self.__unsafe_private_named.78,
-            skills: self.__unsafe_private_named.79,
-            slogan: self.__unsafe_private_named.80,
-            sponsor: self.__unsafe_private_named.81,
-            sub_organization: self.__unsafe_private_named.82,
-            subject_of: self.__unsafe_private_named.83,
-            tax_id: self.__unsafe_private_named.84,
-            telephone: self.__unsafe_private_named.85,
-            unnamed_sources_policy: self.__unsafe_private_named.86,
-            url: self.__unsafe_private_named.87,
-            vat_id: self.__unsafe_private_named.88,
+            accepted_payment_method: self._fields.0,
+            actionable_feedback_policy: self._fields.1,
+            additional_type: self._fields.2,
+            address: self._fields.3,
+            agent_interaction_statistic: self._fields.4,
+            aggregate_rating: self._fields.5,
+            alternate_name: self._fields.6,
+            alumni: self._fields.7,
+            area_served: self._fields.8,
+            award: self._fields.9,
+            awards: self._fields.10,
+            brand: self._fields.11,
+            company_registration: self._fields.12,
+            contact_point: self._fields.13,
+            contact_points: self._fields.14,
+            corrections_policy: self._fields.15,
+            department: self._fields.16,
+            description: self._fields.17,
+            disambiguating_description: self._fields.18,
+            dissolution_date: self._fields.19,
+            diversity_policy: self._fields.20,
+            diversity_staffing_report: self._fields.21,
+            duns: self._fields.22,
+            email: self._fields.23,
+            employee: self._fields.24,
+            employees: self._fields.25,
+            ethics_policy: self._fields.26,
+            event: self._fields.27,
+            events: self._fields.28,
+            fax_number: self._fields.29,
+            founder: self._fields.30,
+            founders: self._fields.31,
+            founding_date: self._fields.32,
+            founding_location: self._fields.33,
+            funder: self._fields.34,
+            funding: self._fields.35,
+            global_location_number: self._fields.36,
+            has_certification: self._fields.37,
+            has_credential: self._fields.38,
+            has_gs1_digital_link: self._fields.39,
+            has_member_program: self._fields.40,
+            has_merchant_return_policy: self._fields.41,
+            has_offer_catalog: self._fields.42,
+            has_pos: self._fields.43,
+            has_product_return_policy: self._fields.44,
+            has_shipping_service: self._fields.45,
+            identifier: self._fields.46,
+            image: self._fields.47,
+            interaction_statistic: self._fields.48,
+            isic_v4: self._fields.49,
+            iso6523_code: self._fields.50,
+            keywords: self._fields.51,
+            knows_about: self._fields.52,
+            knows_language: self._fields.53,
+            legal_address: self._fields.54,
+            legal_name: self._fields.55,
+            legal_representative: self._fields.56,
+            lei_code: self._fields.57,
+            location: self._fields.58,
+            logo: self._fields.59,
+            main_entity_of_page: self._fields.60,
+            makes_offer: self._fields.61,
+            member: self._fields.62,
+            member_of: self._fields.63,
+            members: self._fields.64,
+            naics: self._fields.65,
+            name: self._fields.66,
+            nonprofit_status: self._fields.67,
+            number_of_employees: self._fields.68,
+            ownership_funding_info: self._fields.69,
+            owns: self._fields.70,
+            parent_organization: self._fields.71,
+            potential_action: self._fields.72,
+            publishing_principles: self._fields.73,
+            review: self._fields.74,
+            reviews: self._fields.75,
+            same_as: self._fields.76,
+            seeks: self._fields.77,
+            service_area: self._fields.78,
+            skills: self._fields.79,
+            slogan: self._fields.80,
+            sponsor: self._fields.81,
+            sub_organization: self._fields.82,
+            subject_of: self._fields.83,
+            tax_id: self._fields.84,
+            telephone: self._fields.85,
+            unnamed_sources_policy: self._fields.86,
+            url: self._fields.87,
+            vat_id: self._fields.88,
             extra_data: Some(extra_data),
         }
     }

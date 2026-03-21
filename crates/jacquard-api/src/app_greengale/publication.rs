@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -165,44 +168,44 @@ pub mod publication_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type Name;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Name = S::Name;
+        type Url = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Url = S::Url;
         type Name = Set<members::name>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Name = S::Name;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PublicationBuilder<'a, S: publication_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<bool>,
         Option<CowStr<'a>>,
@@ -210,7 +213,7 @@ pub struct PublicationBuilder<'a, S: publication_state::State> {
         Option<UriValue<'a>>,
         Option<VoiceTheme<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Publication<'a> {
@@ -224,9 +227,9 @@ impl<'a> PublicationBuilder<'a, publication_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PublicationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -234,12 +237,12 @@ impl<'a> PublicationBuilder<'a, publication_state::Empty> {
 impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -247,12 +250,12 @@ impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
 impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     /// Set the `enableSiteStandard` field (optional)
     pub fn enable_site_standard(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `enableSiteStandard` field to an Option value (optional)
     pub fn maybe_enable_site_standard(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -267,11 +270,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PublicationBuilder<'a, publication_state::SetName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PublicationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -279,12 +282,12 @@ where
 impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<Theme<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `theme` field to an Option value (optional)
     pub fn maybe_theme(mut self, value: Option<Theme<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -299,11 +302,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> PublicationBuilder<'a, publication_state::SetUrl<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         PublicationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -311,12 +314,12 @@ where
 impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     /// Set the `voiceTheme` field (optional)
     pub fn voice_theme(mut self, value: impl Into<Option<VoiceTheme<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `voiceTheme` field to an Option value (optional)
     pub fn maybe_voice_theme(mut self, value: Option<VoiceTheme<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -324,18 +327,18 @@ impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
 impl<'a, S> PublicationBuilder<'a, S>
 where
     S: publication_state::State,
-    S::Url: publication_state::IsSet,
     S::Name: publication_state::IsSet,
+    S::Url: publication_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Publication<'a> {
         Publication {
-            description: self.__unsafe_private_named.0,
-            enable_site_standard: self.__unsafe_private_named.1.or_else(|| Some(false)),
-            name: self.__unsafe_private_named.2.unwrap(),
-            theme: self.__unsafe_private_named.3,
-            url: self.__unsafe_private_named.4.unwrap(),
-            voice_theme: self.__unsafe_private_named.5,
+            description: self._fields.0,
+            enable_site_standard: self._fields.1.or_else(|| Some(false)),
+            name: self._fields.2.unwrap(),
+            theme: self._fields.3,
+            url: self._fields.4.unwrap(),
+            voice_theme: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -348,12 +351,12 @@ where
         >,
     ) -> Publication<'a> {
         Publication {
-            description: self.__unsafe_private_named.0,
-            enable_site_standard: self.__unsafe_private_named.1.or_else(|| Some(false)),
-            name: self.__unsafe_private_named.2.unwrap(),
-            theme: self.__unsafe_private_named.3,
-            url: self.__unsafe_private_named.4.unwrap(),
-            voice_theme: self.__unsafe_private_named.5,
+            description: self._fields.0,
+            enable_site_standard: self._fields.1.or_else(|| Some(false)),
+            name: self._fields.2.unwrap(),
+            theme: self._fields.3,
+            url: self._fields.4.unwrap(),
+            voice_theme: self._fields.5,
             extra_data: Some(extra_data),
         }
     }

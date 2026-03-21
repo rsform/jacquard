@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -270,80 +273,80 @@ pub mod favorite_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artist;
+        type DeltaruneCharacter;
         type Game;
         type Album;
-        type DeltaruneCharacter;
+        type Artist;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artist = Unset;
+        type DeltaruneCharacter = Unset;
         type Game = Unset;
         type Album = Unset;
-        type DeltaruneCharacter = Unset;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtist<S> {}
-    impl<S: State> State for SetArtist<S> {
-        type Artist = Set<members::artist>;
-        type Game = S::Game;
-        type Album = S::Album;
-        type DeltaruneCharacter = S::DeltaruneCharacter;
-    }
-    ///State transition - sets the `game` field to Set
-    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGame<S> {}
-    impl<S: State> State for SetGame<S> {
-        type Artist = S::Artist;
-        type Game = Set<members::game>;
-        type Album = S::Album;
-        type DeltaruneCharacter = S::DeltaruneCharacter;
-    }
-    ///State transition - sets the `album` field to Set
-    pub struct SetAlbum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlbum<S> {}
-    impl<S: State> State for SetAlbum<S> {
-        type Artist = S::Artist;
-        type Game = S::Game;
-        type Album = Set<members::album>;
-        type DeltaruneCharacter = S::DeltaruneCharacter;
+        type Artist = Unset;
     }
     ///State transition - sets the `deltarune_character` field to Set
     pub struct SetDeltaruneCharacter<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDeltaruneCharacter<S> {}
     impl<S: State> State for SetDeltaruneCharacter<S> {
-        type Artist = S::Artist;
+        type DeltaruneCharacter = Set<members::deltarune_character>;
         type Game = S::Game;
         type Album = S::Album;
-        type DeltaruneCharacter = Set<members::deltarune_character>;
+        type Artist = S::Artist;
+    }
+    ///State transition - sets the `game` field to Set
+    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGame<S> {}
+    impl<S: State> State for SetGame<S> {
+        type DeltaruneCharacter = S::DeltaruneCharacter;
+        type Game = Set<members::game>;
+        type Album = S::Album;
+        type Artist = S::Artist;
+    }
+    ///State transition - sets the `album` field to Set
+    pub struct SetAlbum<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlbum<S> {}
+    impl<S: State> State for SetAlbum<S> {
+        type DeltaruneCharacter = S::DeltaruneCharacter;
+        type Game = S::Game;
+        type Album = Set<members::album>;
+        type Artist = S::Artist;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtist<S> {}
+    impl<S: State> State for SetArtist<S> {
+        type DeltaruneCharacter = S::DeltaruneCharacter;
+        type Game = S::Game;
+        type Album = S::Album;
+        type Artist = Set<members::artist>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artist` field
-        pub struct artist(());
+        ///Marker type for the `deltarune_character` field
+        pub struct deltarune_character(());
         ///Marker type for the `game` field
         pub struct game(());
         ///Marker type for the `album` field
         pub struct album(());
-        ///Marker type for the `deltarune_character` field
-        pub struct deltarune_character(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FavoriteBuilder<'a, S: favorite_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<CowStr<'a>>>,
         Option<Vec<CowStr<'a>>>,
         Option<Vec<CowStr<'a>>>,
         Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Favorite<'a> {
@@ -357,9 +360,9 @@ impl<'a> FavoriteBuilder<'a, favorite_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FavoriteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -374,11 +377,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> FavoriteBuilder<'a, favorite_state::SetAlbum<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         FavoriteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -393,11 +396,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> FavoriteBuilder<'a, favorite_state::SetArtist<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         FavoriteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -412,11 +415,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> FavoriteBuilder<'a, favorite_state::SetDeltaruneCharacter<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         FavoriteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -431,11 +434,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> FavoriteBuilder<'a, favorite_state::SetGame<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         FavoriteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -443,18 +446,18 @@ where
 impl<'a, S> FavoriteBuilder<'a, S>
 where
     S: favorite_state::State,
-    S::Artist: favorite_state::IsSet,
+    S::DeltaruneCharacter: favorite_state::IsSet,
     S::Game: favorite_state::IsSet,
     S::Album: favorite_state::IsSet,
-    S::DeltaruneCharacter: favorite_state::IsSet,
+    S::Artist: favorite_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Favorite<'a> {
         Favorite {
-            album: self.__unsafe_private_named.0.unwrap(),
-            artist: self.__unsafe_private_named.1.unwrap(),
-            deltarune_character: self.__unsafe_private_named.2.unwrap(),
-            game: self.__unsafe_private_named.3.unwrap(),
+            album: self._fields.0.unwrap(),
+            artist: self._fields.1.unwrap(),
+            deltarune_character: self._fields.2.unwrap(),
+            game: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -467,10 +470,10 @@ where
         >,
     ) -> Favorite<'a> {
         Favorite {
-            album: self.__unsafe_private_named.0.unwrap(),
-            artist: self.__unsafe_private_named.1.unwrap(),
-            deltarune_character: self.__unsafe_private_named.2.unwrap(),
-            game: self.__unsafe_private_named.3.unwrap(),
+            album: self._fields.0.unwrap(),
+            artist: self._fields.1.unwrap(),
+            deltarune_character: self._fields.2.unwrap(),
+            game: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -666,9 +669,9 @@ pub mod state_state {
 
 /// Builder for constructing an instance of this type
 pub struct StateBuilder<'a, S: state_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<state::Favorite<'a>>, Option<state::Site<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<state::Favorite<'a>>, Option<state::Site<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> State<'a> {
@@ -682,9 +685,9 @@ impl<'a> StateBuilder<'a, state_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -699,11 +702,11 @@ where
         mut self,
         value: impl Into<state::Favorite<'a>>,
     ) -> StateBuilder<'a, state_state::SetFavorite<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         StateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -718,11 +721,11 @@ where
         mut self,
         value: impl Into<state::Site<'a>>,
     ) -> StateBuilder<'a, state_state::SetSite<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         StateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -736,8 +739,8 @@ where
     /// Build the final struct
     pub fn build(self) -> State<'a> {
         State {
-            favorite: self.__unsafe_private_named.0.unwrap(),
-            site: self.__unsafe_private_named.1.unwrap(),
+            favorite: self._fields.0.unwrap(),
+            site: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -750,8 +753,8 @@ where
         >,
     ) -> State<'a> {
         State {
-            favorite: self.__unsafe_private_named.0.unwrap(),
-            site: self.__unsafe_private_named.1.unwrap(),
+            favorite: self._fields.0.unwrap(),
+            site: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -791,9 +794,9 @@ pub mod site_state {
 
 /// Builder for constructing an instance of this type
 pub struct SiteBuilder<'a, S: site_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>, Option<SiteTitleColors<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<SiteTitleColors<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Site<'a> {
@@ -807,9 +810,9 @@ impl<'a> SiteBuilder<'a, site_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SiteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -824,11 +827,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> SiteBuilder<'a, site_state::SetSusieProphecy<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SiteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -839,12 +842,12 @@ impl<'a, S: site_state::State> SiteBuilder<'a, S> {
         mut self,
         value: impl Into<Option<SiteTitleColors<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `titleColors` field to an Option value (optional)
     pub fn maybe_title_colors(mut self, value: Option<SiteTitleColors<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -857,8 +860,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Site<'a> {
         Site {
-            susie_prophecy: self.__unsafe_private_named.0.unwrap(),
-            title_colors: self.__unsafe_private_named.1,
+            susie_prophecy: self._fields.0.unwrap(),
+            title_colors: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -871,8 +874,8 @@ where
         >,
     ) -> Site<'a> {
         Site {
-            susie_prophecy: self.__unsafe_private_named.0.unwrap(),
-            title_colors: self.__unsafe_private_named.1,
+            susie_prophecy: self._fields.0.unwrap(),
+            title_colors: self._fields.1,
             extra_data: Some(extra_data),
         }
     }

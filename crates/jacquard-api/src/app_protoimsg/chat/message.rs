@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -968,9 +971,9 @@ pub mod aspect_ratio_state {
 
 /// Builder for constructing an instance of this type
 pub struct AspectRatioBuilder<'a, S: aspect_ratio_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> AspectRatio<'a> {
@@ -984,9 +987,9 @@ impl<'a> AspectRatioBuilder<'a, aspect_ratio_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AspectRatioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1001,11 +1004,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetHeight<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AspectRatioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1020,11 +1023,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetWidth<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AspectRatioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1038,8 +1041,8 @@ where
     /// Build the final struct
     pub fn build(self) -> AspectRatio<'a> {
         AspectRatio {
-            height: self.__unsafe_private_named.0.unwrap(),
-            width: self.__unsafe_private_named.1.unwrap(),
+            height: self._fields.0.unwrap(),
+            width: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1052,8 +1055,8 @@ where
         >,
     ) -> AspectRatio<'a> {
         AspectRatio {
-            height: self.__unsafe_private_named.0.unwrap(),
-            width: self.__unsafe_private_named.1.unwrap(),
+            height: self._fields.0.unwrap(),
+            width: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1692,9 +1695,9 @@ pub mod byte_slice_state {
 
 /// Builder for constructing an instance of this type
 pub struct ByteSliceBuilder<'a, S: byte_slice_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ByteSlice<'a> {
@@ -1708,9 +1711,9 @@ impl<'a> ByteSliceBuilder<'a, byte_slice_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ByteSliceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1725,11 +1728,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ByteSliceBuilder<'a, byte_slice_state::SetByteEnd<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ByteSliceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1744,11 +1747,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ByteSliceBuilder<'a, byte_slice_state::SetByteStart<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ByteSliceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1762,8 +1765,8 @@ where
     /// Build the final struct
     pub fn build(self) -> ByteSlice<'a> {
         ByteSlice {
-            byte_end: self.__unsafe_private_named.0.unwrap(),
-            byte_start: self.__unsafe_private_named.1.unwrap(),
+            byte_end: self._fields.0.unwrap(),
+            byte_start: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1776,8 +1779,8 @@ where
         >,
     ) -> ByteSlice<'a> {
         ByteSlice {
-            byte_end: self.__unsafe_private_named.0.unwrap(),
-            byte_start: self.__unsafe_private_named.1.unwrap(),
+            byte_end: self._fields.0.unwrap(),
+            byte_start: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1793,50 +1796,50 @@ pub mod external_embed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Title;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Title = S::Title;
+        type Uri = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Uri = S::Uri;
         type Title = Set<members::title>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Title = S::Title;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ExternalEmbedBuilder<'a, S: external_embed_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<BlobRef<'a>>,
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ExternalEmbed<'a> {
@@ -1850,9 +1853,9 @@ impl<'a> ExternalEmbedBuilder<'a, external_embed_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ExternalEmbedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1860,12 +1863,12 @@ impl<'a> ExternalEmbedBuilder<'a, external_embed_state::Empty> {
 impl<'a, S: external_embed_state::State> ExternalEmbedBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1873,12 +1876,12 @@ impl<'a, S: external_embed_state::State> ExternalEmbedBuilder<'a, S> {
 impl<'a, S: external_embed_state::State> ExternalEmbedBuilder<'a, S> {
     /// Set the `thumb` field (optional)
     pub fn thumb(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `thumb` field to an Option value (optional)
     pub fn maybe_thumb(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1893,11 +1896,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ExternalEmbedBuilder<'a, external_embed_state::SetTitle<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ExternalEmbedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1912,11 +1915,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ExternalEmbedBuilder<'a, external_embed_state::SetUri<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ExternalEmbedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1924,16 +1927,16 @@ where
 impl<'a, S> ExternalEmbedBuilder<'a, S>
 where
     S: external_embed_state::State,
-    S::Uri: external_embed_state::IsSet,
     S::Title: external_embed_state::IsSet,
+    S::Uri: external_embed_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ExternalEmbed<'a> {
         ExternalEmbed {
-            description: self.__unsafe_private_named.0,
-            thumb: self.__unsafe_private_named.1,
-            title: self.__unsafe_private_named.2.unwrap(),
-            uri: self.__unsafe_private_named.3.unwrap(),
+            description: self._fields.0,
+            thumb: self._fields.1,
+            title: self._fields.2.unwrap(),
+            uri: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1946,10 +1949,10 @@ where
         >,
     ) -> ExternalEmbed<'a> {
         ExternalEmbed {
-            description: self.__unsafe_private_named.0,
-            thumb: self.__unsafe_private_named.1,
-            title: self.__unsafe_private_named.2.unwrap(),
-            uri: self.__unsafe_private_named.3.unwrap(),
+            description: self._fields.0,
+            thumb: self._fields.1,
+            title: self._fields.2.unwrap(),
+            uri: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1989,9 +1992,9 @@ pub mod image_embed_state {
 
 /// Builder for constructing an instance of this type
 pub struct ImageEmbedBuilder<'a, S: image_embed_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<message::ImageItem<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<message::ImageItem<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ImageEmbed<'a> {
@@ -2005,9 +2008,9 @@ impl<'a> ImageEmbedBuilder<'a, image_embed_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ImageEmbedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2022,11 +2025,11 @@ where
         mut self,
         value: impl Into<Vec<message::ImageItem<'a>>>,
     ) -> ImageEmbedBuilder<'a, image_embed_state::SetImages<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ImageEmbedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2039,7 +2042,7 @@ where
     /// Build the final struct
     pub fn build(self) -> ImageEmbed<'a> {
         ImageEmbed {
-            images: self.__unsafe_private_named.0.unwrap(),
+            images: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2052,7 +2055,7 @@ where
         >,
     ) -> ImageEmbed<'a> {
         ImageEmbed {
-            images: self.__unsafe_private_named.0.unwrap(),
+            images: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2104,13 +2107,9 @@ pub mod image_item_state {
 
 /// Builder for constructing an instance of this type
 pub struct ImageItemBuilder<'a, S: image_item_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<CowStr<'a>>,
-        Option<message::AspectRatio<'a>>,
-        Option<BlobRef<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<message::AspectRatio<'a>>, Option<BlobRef<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ImageItem<'a> {
@@ -2124,9 +2123,9 @@ impl<'a> ImageItemBuilder<'a, image_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ImageItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2141,11 +2140,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ImageItemBuilder<'a, image_item_state::SetAlt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ImageItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2156,7 +2155,7 @@ impl<'a, S: image_item_state::State> ImageItemBuilder<'a, S> {
         mut self,
         value: impl Into<Option<message::AspectRatio<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
@@ -2164,7 +2163,7 @@ impl<'a, S: image_item_state::State> ImageItemBuilder<'a, S> {
         mut self,
         value: Option<message::AspectRatio<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -2179,11 +2178,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> ImageItemBuilder<'a, image_item_state::SetImage<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ImageItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2197,9 +2196,9 @@ where
     /// Build the final struct
     pub fn build(self) -> ImageItem<'a> {
         ImageItem {
-            alt: self.__unsafe_private_named.0.unwrap(),
-            aspect_ratio: self.__unsafe_private_named.1,
-            image: self.__unsafe_private_named.2.unwrap(),
+            alt: self._fields.0.unwrap(),
+            aspect_ratio: self._fields.1,
+            image: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2212,9 +2211,9 @@ where
         >,
     ) -> ImageItem<'a> {
         ImageItem {
-            alt: self.__unsafe_private_named.0.unwrap(),
-            aspect_ratio: self.__unsafe_private_named.1,
-            image: self.__unsafe_private_named.2.unwrap(),
+            alt: self._fields.0.unwrap(),
+            aspect_ratio: self._fields.1,
+            image: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2254,9 +2253,9 @@ pub mod link_state {
 
 /// Builder for constructing an instance of this type
 pub struct LinkBuilder<'a, S: link_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<UriValue<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<UriValue<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Link<'a> {
@@ -2270,9 +2269,9 @@ impl<'a> LinkBuilder<'a, link_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LinkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2287,11 +2286,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> LinkBuilder<'a, link_state::SetUri<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LinkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2304,7 +2303,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Link<'a> {
         Link {
-            uri: self.__unsafe_private_named.0.unwrap(),
+            uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2317,7 +2316,7 @@ where
         >,
     ) -> Link<'a> {
         Link {
-            uri: self.__unsafe_private_named.0.unwrap(),
+            uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2383,8 +2382,8 @@ pub mod message_state {
 
 /// Builder for constructing an instance of this type
 pub struct MessageBuilder<'a, S: message_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AtUri<'a>>,
         Option<Datetime>,
         Option<MessageEmbed<'a>>,
@@ -2392,7 +2391,7 @@ pub struct MessageBuilder<'a, S: message_state::State> {
         Option<message::ReplyRef<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Message<'a> {
@@ -2406,9 +2405,9 @@ impl<'a> MessageBuilder<'a, message_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MessageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2423,11 +2422,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> MessageBuilder<'a, message_state::SetChannel<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MessageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2442,11 +2441,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> MessageBuilder<'a, message_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MessageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2454,12 +2453,12 @@ where
 impl<'a, S: message_state::State> MessageBuilder<'a, S> {
     /// Set the `embed` field (optional)
     pub fn embed(mut self, value: impl Into<Option<MessageEmbed<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `embed` field to an Option value (optional)
     pub fn maybe_embed(mut self, value: Option<MessageEmbed<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -2470,7 +2469,7 @@ impl<'a, S: message_state::State> MessageBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<message::RichTextFacet<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
@@ -2478,7 +2477,7 @@ impl<'a, S: message_state::State> MessageBuilder<'a, S> {
         mut self,
         value: Option<Vec<message::RichTextFacet<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -2486,12 +2485,12 @@ impl<'a, S: message_state::State> MessageBuilder<'a, S> {
 impl<'a, S: message_state::State> MessageBuilder<'a, S> {
     /// Set the `reply` field (optional)
     pub fn reply(mut self, value: impl Into<Option<message::ReplyRef<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `reply` field to an Option value (optional)
     pub fn maybe_reply(mut self, value: Option<message::ReplyRef<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -2506,11 +2505,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> MessageBuilder<'a, message_state::SetText<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         MessageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2525,12 +2524,12 @@ where
     /// Build the final struct
     pub fn build(self) -> Message<'a> {
         Message {
-            channel: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            embed: self.__unsafe_private_named.2,
-            facets: self.__unsafe_private_named.3,
-            reply: self.__unsafe_private_named.4,
-            text: self.__unsafe_private_named.5.unwrap(),
+            channel: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            embed: self._fields.2,
+            facets: self._fields.3,
+            reply: self._fields.4,
+            text: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2543,12 +2542,12 @@ where
         >,
     ) -> Message<'a> {
         Message {
-            channel: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            embed: self.__unsafe_private_named.2,
-            facets: self.__unsafe_private_named.3,
-            reply: self.__unsafe_private_named.4,
-            text: self.__unsafe_private_named.5.unwrap(),
+            channel: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            embed: self._fields.2,
+            facets: self._fields.3,
+            reply: self._fields.4,
+            text: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2588,9 +2587,9 @@ pub mod mention_state {
 
 /// Builder for constructing an instance of this type
 pub struct MentionBuilder<'a, S: mention_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Mention<'a> {
@@ -2604,9 +2603,9 @@ impl<'a> MentionBuilder<'a, mention_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MentionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2621,11 +2620,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> MentionBuilder<'a, mention_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MentionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2638,7 +2637,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Mention<'a> {
         Mention {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2651,7 +2650,7 @@ where
         >,
     ) -> Mention<'a> {
         Mention {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2667,45 +2666,45 @@ pub mod reply_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Root;
         type Parent;
+        type Root;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Root = Unset;
         type Parent = Unset;
-    }
-    ///State transition - sets the `root` field to Set
-    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoot<S> {}
-    impl<S: State> State for SetRoot<S> {
-        type Root = Set<members::root>;
-        type Parent = S::Parent;
+        type Root = Unset;
     }
     ///State transition - sets the `parent` field to Set
     pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetParent<S> {}
     impl<S: State> State for SetParent<S> {
-        type Root = S::Root;
         type Parent = Set<members::parent>;
+        type Root = S::Root;
+    }
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoot<S> {}
+    impl<S: State> State for SetRoot<S> {
+        type Parent = S::Parent;
+        type Root = Set<members::root>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `root` field
-        pub struct root(());
         ///Marker type for the `parent` field
         pub struct parent(());
+        ///Marker type for the `root` field
+        pub struct root(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ReplyRefBuilder<'a, S: reply_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ReplyRef<'a> {
@@ -2719,9 +2718,9 @@ impl<'a> ReplyRefBuilder<'a, reply_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ReplyRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2736,11 +2735,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ReplyRefBuilder<'a, reply_ref_state::SetParent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ReplyRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2755,11 +2754,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ReplyRefBuilder<'a, reply_ref_state::SetRoot<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ReplyRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2767,14 +2766,14 @@ where
 impl<'a, S> ReplyRefBuilder<'a, S>
 where
     S: reply_ref_state::State,
-    S::Root: reply_ref_state::IsSet,
     S::Parent: reply_ref_state::IsSet,
+    S::Root: reply_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReplyRef<'a> {
         ReplyRef {
-            parent: self.__unsafe_private_named.0.unwrap(),
-            root: self.__unsafe_private_named.1.unwrap(),
+            parent: self._fields.0.unwrap(),
+            root: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2787,8 +2786,8 @@ where
         >,
     ) -> ReplyRef<'a> {
         ReplyRef {
-            parent: self.__unsafe_private_named.0.unwrap(),
-            root: self.__unsafe_private_named.1.unwrap(),
+            parent: self._fields.0.unwrap(),
+            root: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2804,48 +2803,48 @@ pub mod rich_text_facet_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Index;
         type Features;
+        type Index;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Index = Unset;
         type Features = Unset;
-    }
-    ///State transition - sets the `index` field to Set
-    pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndex<S> {}
-    impl<S: State> State for SetIndex<S> {
-        type Index = Set<members::index>;
-        type Features = S::Features;
+        type Index = Unset;
     }
     ///State transition - sets the `features` field to Set
     pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFeatures<S> {}
     impl<S: State> State for SetFeatures<S> {
-        type Index = S::Index;
         type Features = Set<members::features>;
+        type Index = S::Index;
+    }
+    ///State transition - sets the `index` field to Set
+    pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndex<S> {}
+    impl<S: State> State for SetIndex<S> {
+        type Features = S::Features;
+        type Index = Set<members::index>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `index` field
-        pub struct index(());
         ///Marker type for the `features` field
         pub struct features(());
+        ///Marker type for the `index` field
+        pub struct index(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RichTextFacetBuilder<'a, S: rich_text_facet_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<RichTextFacetFeaturesItem<'a>>>,
         Option<message::ByteSlice<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RichTextFacet<'a> {
@@ -2859,9 +2858,9 @@ impl<'a> RichTextFacetBuilder<'a, rich_text_facet_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RichTextFacetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2876,11 +2875,11 @@ where
         mut self,
         value: impl Into<Vec<RichTextFacetFeaturesItem<'a>>>,
     ) -> RichTextFacetBuilder<'a, rich_text_facet_state::SetFeatures<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RichTextFacetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2895,11 +2894,11 @@ where
         mut self,
         value: impl Into<message::ByteSlice<'a>>,
     ) -> RichTextFacetBuilder<'a, rich_text_facet_state::SetIndex<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RichTextFacetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2907,14 +2906,14 @@ where
 impl<'a, S> RichTextFacetBuilder<'a, S>
 where
     S: rich_text_facet_state::State,
-    S::Index: rich_text_facet_state::IsSet,
     S::Features: rich_text_facet_state::IsSet,
+    S::Index: rich_text_facet_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RichTextFacet<'a> {
         RichTextFacet {
-            features: self.__unsafe_private_named.0.unwrap(),
-            index: self.__unsafe_private_named.1.unwrap(),
+            features: self._fields.0.unwrap(),
+            index: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2927,8 +2926,8 @@ where
         >,
     ) -> RichTextFacet<'a> {
         RichTextFacet {
-            features: self.__unsafe_private_named.0.unwrap(),
-            index: self.__unsafe_private_named.1.unwrap(),
+            features: self._fields.0.unwrap(),
+            index: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2968,14 +2967,14 @@ pub mod video_embed_state {
 
 /// Builder for constructing an instance of this type
 pub struct VideoEmbedBuilder<'a, S: video_embed_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<message::AspectRatio<'a>>,
         Option<BlobRef<'a>>,
         Option<BlobRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> VideoEmbed<'a> {
@@ -2989,9 +2988,9 @@ impl<'a> VideoEmbedBuilder<'a, video_embed_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         VideoEmbedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2999,12 +2998,12 @@ impl<'a> VideoEmbedBuilder<'a, video_embed_state::Empty> {
 impl<'a, S: video_embed_state::State> VideoEmbedBuilder<'a, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
     pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -3015,7 +3014,7 @@ impl<'a, S: video_embed_state::State> VideoEmbedBuilder<'a, S> {
         mut self,
         value: impl Into<Option<message::AspectRatio<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
@@ -3023,7 +3022,7 @@ impl<'a, S: video_embed_state::State> VideoEmbedBuilder<'a, S> {
         mut self,
         value: Option<message::AspectRatio<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -3031,12 +3030,12 @@ impl<'a, S: video_embed_state::State> VideoEmbedBuilder<'a, S> {
 impl<'a, S: video_embed_state::State> VideoEmbedBuilder<'a, S> {
     /// Set the `thumbnail` field (optional)
     pub fn thumbnail(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
     pub fn maybe_thumbnail(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -3051,11 +3050,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> VideoEmbedBuilder<'a, video_embed_state::SetVideo<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         VideoEmbedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3068,10 +3067,10 @@ where
     /// Build the final struct
     pub fn build(self) -> VideoEmbed<'a> {
         VideoEmbed {
-            alt: self.__unsafe_private_named.0,
-            aspect_ratio: self.__unsafe_private_named.1,
-            thumbnail: self.__unsafe_private_named.2,
-            video: self.__unsafe_private_named.3.unwrap(),
+            alt: self._fields.0,
+            aspect_ratio: self._fields.1,
+            thumbnail: self._fields.2,
+            video: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -3084,10 +3083,10 @@ where
         >,
     ) -> VideoEmbed<'a> {
         VideoEmbed {
-            alt: self.__unsafe_private_named.0,
-            aspect_ratio: self.__unsafe_private_named.1,
-            thumbnail: self.__unsafe_private_named.2,
-            video: self.__unsafe_private_named.3.unwrap(),
+            alt: self._fields.0,
+            aspect_ratio: self._fields.1,
+            thumbnail: self._fields.2,
+            video: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

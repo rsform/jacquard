@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -122,9 +125,9 @@ pub mod post_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Label;
-        type AppliedTo;
-        type Condition;
         type DurationInHours;
+        type Condition;
+        type AppliedTo;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
@@ -132,9 +135,9 @@ pub mod post_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Label = Unset;
-        type AppliedTo = Unset;
-        type Condition = Unset;
         type DurationInHours = Unset;
+        type Condition = Unset;
+        type AppliedTo = Unset;
         type CreatedAt = Unset;
     }
     ///State transition - sets the `label` field to Set
@@ -142,29 +145,9 @@ pub mod post_state {
     impl<S: State> sealed::Sealed for SetLabel<S> {}
     impl<S: State> State for SetLabel<S> {
         type Label = Set<members::label>;
-        type AppliedTo = S::AppliedTo;
+        type DurationInHours = S::DurationInHours;
         type Condition = S::Condition;
-        type DurationInHours = S::DurationInHours;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `applied_to` field to Set
-    pub struct SetAppliedTo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAppliedTo<S> {}
-    impl<S: State> State for SetAppliedTo<S> {
-        type Label = S::Label;
-        type AppliedTo = Set<members::applied_to>;
-        type Condition = S::Condition;
-        type DurationInHours = S::DurationInHours;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `condition` field to Set
-    pub struct SetCondition<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCondition<S> {}
-    impl<S: State> State for SetCondition<S> {
-        type Label = S::Label;
         type AppliedTo = S::AppliedTo;
-        type Condition = Set<members::condition>;
-        type DurationInHours = S::DurationInHours;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `duration_in_hours` field to Set
@@ -172,9 +155,29 @@ pub mod post_state {
     impl<S: State> sealed::Sealed for SetDurationInHours<S> {}
     impl<S: State> State for SetDurationInHours<S> {
         type Label = S::Label;
-        type AppliedTo = S::AppliedTo;
-        type Condition = S::Condition;
         type DurationInHours = Set<members::duration_in_hours>;
+        type Condition = S::Condition;
+        type AppliedTo = S::AppliedTo;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `condition` field to Set
+    pub struct SetCondition<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCondition<S> {}
+    impl<S: State> State for SetCondition<S> {
+        type Label = S::Label;
+        type DurationInHours = S::DurationInHours;
+        type Condition = Set<members::condition>;
+        type AppliedTo = S::AppliedTo;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `applied_to` field to Set
+    pub struct SetAppliedTo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAppliedTo<S> {}
+    impl<S: State> State for SetAppliedTo<S> {
+        type Label = S::Label;
+        type DurationInHours = S::DurationInHours;
+        type Condition = S::Condition;
+        type AppliedTo = Set<members::applied_to>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
@@ -182,9 +185,9 @@ pub mod post_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Label = S::Label;
-        type AppliedTo = S::AppliedTo;
-        type Condition = S::Condition;
         type DurationInHours = S::DurationInHours;
+        type Condition = S::Condition;
+        type AppliedTo = S::AppliedTo;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -192,12 +195,12 @@ pub mod post_state {
     pub mod members {
         ///Marker type for the `label` field
         pub struct label(());
-        ///Marker type for the `applied_to` field
-        pub struct applied_to(());
-        ///Marker type for the `condition` field
-        pub struct condition(());
         ///Marker type for the `duration_in_hours` field
         pub struct duration_in_hours(());
+        ///Marker type for the `condition` field
+        pub struct condition(());
+        ///Marker type for the `applied_to` field
+        pub struct applied_to(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -205,8 +208,8 @@ pub mod post_state {
 
 /// Builder for constructing an instance of this type
 pub struct PostBuilder<'a, S: post_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
@@ -214,7 +217,7 @@ pub struct PostBuilder<'a, S: post_state::State> {
         Option<i64>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Post<'a> {
@@ -228,9 +231,9 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -238,12 +241,12 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `action` field (optional)
     pub fn action(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `action` field to an Option value (optional)
     pub fn maybe_action(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -258,11 +261,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PostBuilder<'a, post_state::SetAppliedTo<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -277,11 +280,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PostBuilder<'a, post_state::SetCondition<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -296,11 +299,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PostBuilder<'a, post_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -315,11 +318,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PostBuilder<'a, post_state::SetDurationInHours<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -334,11 +337,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PostBuilder<'a, post_state::SetLabel<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -347,20 +350,20 @@ impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
     S::Label: post_state::IsSet,
-    S::AppliedTo: post_state::IsSet,
-    S::Condition: post_state::IsSet,
     S::DurationInHours: post_state::IsSet,
+    S::Condition: post_state::IsSet,
+    S::AppliedTo: post_state::IsSet,
     S::CreatedAt: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
         Post {
-            action: self.__unsafe_private_named.0,
-            applied_to: self.__unsafe_private_named.1.unwrap(),
-            condition: self.__unsafe_private_named.2.unwrap(),
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            duration_in_hours: self.__unsafe_private_named.4.unwrap(),
-            label: self.__unsafe_private_named.5.unwrap(),
+            action: self._fields.0,
+            applied_to: self._fields.1.unwrap(),
+            condition: self._fields.2.unwrap(),
+            created_at: self._fields.3.unwrap(),
+            duration_in_hours: self._fields.4.unwrap(),
+            label: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -373,12 +376,12 @@ where
         >,
     ) -> Post<'a> {
         Post {
-            action: self.__unsafe_private_named.0,
-            applied_to: self.__unsafe_private_named.1.unwrap(),
-            condition: self.__unsafe_private_named.2.unwrap(),
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            duration_in_hours: self.__unsafe_private_named.4.unwrap(),
-            label: self.__unsafe_private_named.5.unwrap(),
+            action: self._fields.0,
+            applied_to: self._fields.1.unwrap(),
+            condition: self._fields.2.unwrap(),
+            created_at: self._fields.3.unwrap(),
+            duration_in_hours: self._fields.4.unwrap(),
+            label: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

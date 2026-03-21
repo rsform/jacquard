@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -121,80 +124,75 @@ pub mod market_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Liquidity;
         type ClosesAt;
         type Question;
         type CreatedAt;
+        type Liquidity;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Liquidity = Unset;
         type ClosesAt = Unset;
         type Question = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `liquidity` field to Set
-    pub struct SetLiquidity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLiquidity<S> {}
-    impl<S: State> State for SetLiquidity<S> {
-        type Liquidity = Set<members::liquidity>;
-        type ClosesAt = S::ClosesAt;
-        type Question = S::Question;
-        type CreatedAt = S::CreatedAt;
+        type Liquidity = Unset;
     }
     ///State transition - sets the `closes_at` field to Set
     pub struct SetClosesAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetClosesAt<S> {}
     impl<S: State> State for SetClosesAt<S> {
-        type Liquidity = S::Liquidity;
         type ClosesAt = Set<members::closes_at>;
         type Question = S::Question;
         type CreatedAt = S::CreatedAt;
+        type Liquidity = S::Liquidity;
     }
     ///State transition - sets the `question` field to Set
     pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuestion<S> {}
     impl<S: State> State for SetQuestion<S> {
-        type Liquidity = S::Liquidity;
         type ClosesAt = S::ClosesAt;
         type Question = Set<members::question>;
         type CreatedAt = S::CreatedAt;
+        type Liquidity = S::Liquidity;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Liquidity = S::Liquidity;
         type ClosesAt = S::ClosesAt;
         type Question = S::Question;
         type CreatedAt = Set<members::created_at>;
+        type Liquidity = S::Liquidity;
+    }
+    ///State transition - sets the `liquidity` field to Set
+    pub struct SetLiquidity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLiquidity<S> {}
+    impl<S: State> State for SetLiquidity<S> {
+        type ClosesAt = S::ClosesAt;
+        type Question = S::Question;
+        type CreatedAt = S::CreatedAt;
+        type Liquidity = Set<members::liquidity>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `liquidity` field
-        pub struct liquidity(());
         ///Marker type for the `closes_at` field
         pub struct closes_at(());
         ///Marker type for the `question` field
         pub struct question(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `liquidity` field
+        pub struct liquidity(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MarketBuilder<'a, S: market_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Datetime>,
-        Option<Datetime>,
-        Option<i64>,
-        Option<CowStr<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<Datetime>, Option<i64>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Market<'a> {
@@ -208,9 +206,9 @@ impl<'a> MarketBuilder<'a, market_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MarketBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -225,11 +223,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> MarketBuilder<'a, market_state::SetClosesAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MarketBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -244,11 +242,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> MarketBuilder<'a, market_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MarketBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -263,11 +261,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> MarketBuilder<'a, market_state::SetLiquidity<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         MarketBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -282,11 +280,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> MarketBuilder<'a, market_state::SetQuestion<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         MarketBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -294,18 +292,18 @@ where
 impl<'a, S> MarketBuilder<'a, S>
 where
     S: market_state::State,
-    S::Liquidity: market_state::IsSet,
     S::ClosesAt: market_state::IsSet,
     S::Question: market_state::IsSet,
     S::CreatedAt: market_state::IsSet,
+    S::Liquidity: market_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Market<'a> {
         Market {
-            closes_at: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            liquidity: self.__unsafe_private_named.2.unwrap(),
-            question: self.__unsafe_private_named.3.unwrap(),
+            closes_at: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            liquidity: self._fields.2.unwrap(),
+            question: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -318,10 +316,10 @@ where
         >,
     ) -> Market<'a> {
         Market {
-            closes_at: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            liquidity: self.__unsafe_private_named.2.unwrap(),
-            question: self.__unsafe_private_named.3.unwrap(),
+            closes_at: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            liquidity: self._fields.2.unwrap(),
+            question: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

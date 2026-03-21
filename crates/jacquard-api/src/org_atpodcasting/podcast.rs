@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -226,12 +229,12 @@ pub mod podcast_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Artwork;
         type FeedUrl;
+        type Title;
+        type Language;
         type Categories;
         type CreatedAt;
-        type Language;
         type Guid;
         type Description;
     }
@@ -239,38 +242,25 @@ pub mod podcast_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Artwork = Unset;
         type FeedUrl = Unset;
+        type Title = Unset;
+        type Language = Unset;
         type Categories = Unset;
         type CreatedAt = Unset;
-        type Language = Unset;
         type Guid = Unset;
         type Description = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Artwork = S::Artwork;
-        type FeedUrl = S::FeedUrl;
-        type Categories = S::Categories;
-        type CreatedAt = S::CreatedAt;
-        type Language = S::Language;
-        type Guid = S::Guid;
-        type Description = S::Description;
     }
     ///State transition - sets the `artwork` field to Set
     pub struct SetArtwork<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtwork<S> {}
     impl<S: State> State for SetArtwork<S> {
-        type Title = S::Title;
         type Artwork = Set<members::artwork>;
         type FeedUrl = S::FeedUrl;
+        type Title = S::Title;
+        type Language = S::Language;
         type Categories = S::Categories;
         type CreatedAt = S::CreatedAt;
-        type Language = S::Language;
         type Guid = S::Guid;
         type Description = S::Description;
     }
@@ -278,38 +268,25 @@ pub mod podcast_state {
     pub struct SetFeedUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFeedUrl<S> {}
     impl<S: State> State for SetFeedUrl<S> {
-        type Title = S::Title;
         type Artwork = S::Artwork;
         type FeedUrl = Set<members::feed_url>;
+        type Title = S::Title;
+        type Language = S::Language;
         type Categories = S::Categories;
         type CreatedAt = S::CreatedAt;
-        type Language = S::Language;
         type Guid = S::Guid;
         type Description = S::Description;
     }
-    ///State transition - sets the `categories` field to Set
-    pub struct SetCategories<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCategories<S> {}
-    impl<S: State> State for SetCategories<S> {
-        type Title = S::Title;
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
         type Artwork = S::Artwork;
         type FeedUrl = S::FeedUrl;
-        type Categories = Set<members::categories>;
-        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
         type Language = S::Language;
-        type Guid = S::Guid;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type Artwork = S::Artwork;
-        type FeedUrl = S::FeedUrl;
         type Categories = S::Categories;
-        type CreatedAt = Set<members::created_at>;
-        type Language = S::Language;
+        type CreatedAt = S::CreatedAt;
         type Guid = S::Guid;
         type Description = S::Description;
     }
@@ -317,12 +294,38 @@ pub mod podcast_state {
     pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLanguage<S> {}
     impl<S: State> State for SetLanguage<S> {
-        type Title = S::Title;
         type Artwork = S::Artwork;
         type FeedUrl = S::FeedUrl;
+        type Title = S::Title;
+        type Language = Set<members::language>;
         type Categories = S::Categories;
         type CreatedAt = S::CreatedAt;
-        type Language = Set<members::language>;
+        type Guid = S::Guid;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `categories` field to Set
+    pub struct SetCategories<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCategories<S> {}
+    impl<S: State> State for SetCategories<S> {
+        type Artwork = S::Artwork;
+        type FeedUrl = S::FeedUrl;
+        type Title = S::Title;
+        type Language = S::Language;
+        type Categories = Set<members::categories>;
+        type CreatedAt = S::CreatedAt;
+        type Guid = S::Guid;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Artwork = S::Artwork;
+        type FeedUrl = S::FeedUrl;
+        type Title = S::Title;
+        type Language = S::Language;
+        type Categories = S::Categories;
+        type CreatedAt = Set<members::created_at>;
         type Guid = S::Guid;
         type Description = S::Description;
     }
@@ -330,12 +333,12 @@ pub mod podcast_state {
     pub struct SetGuid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGuid<S> {}
     impl<S: State> State for SetGuid<S> {
-        type Title = S::Title;
         type Artwork = S::Artwork;
         type FeedUrl = S::FeedUrl;
+        type Title = S::Title;
+        type Language = S::Language;
         type Categories = S::Categories;
         type CreatedAt = S::CreatedAt;
-        type Language = S::Language;
         type Guid = Set<members::guid>;
         type Description = S::Description;
     }
@@ -343,30 +346,30 @@ pub mod podcast_state {
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type Title = S::Title;
         type Artwork = S::Artwork;
         type FeedUrl = S::FeedUrl;
+        type Title = S::Title;
+        type Language = S::Language;
         type Categories = S::Categories;
         type CreatedAt = S::CreatedAt;
-        type Language = S::Language;
         type Guid = S::Guid;
         type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `artwork` field
         pub struct artwork(());
         ///Marker type for the `feed_url` field
         pub struct feed_url(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `language` field
+        pub struct language(());
         ///Marker type for the `categories` field
         pub struct categories(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `language` field
-        pub struct language(());
         ///Marker type for the `guid` field
         pub struct guid(());
         ///Marker type for the `description` field
@@ -376,8 +379,8 @@ pub mod podcast_state {
 
 /// Builder for constructing an instance of this type
 pub struct PodcastBuilder<'a, S: podcast_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<BlobRef<'a>>,
         Option<Vec<AppleCategory<'a>>>,
         Option<Datetime>,
@@ -390,7 +393,7 @@ pub struct PodcastBuilder<'a, S: podcast_state::State> {
         Option<AtUri<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Podcast<'a> {
@@ -404,21 +407,9 @@ impl<'a> PodcastBuilder<'a, podcast_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PodcastBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -433,11 +424,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> PodcastBuilder<'a, podcast_state::SetArtwork<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PodcastBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -452,11 +443,11 @@ where
         mut self,
         value: impl Into<Vec<AppleCategory<'a>>>,
     ) -> PodcastBuilder<'a, podcast_state::SetCategories<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PodcastBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -471,11 +462,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PodcastBuilder<'a, podcast_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PodcastBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -490,11 +481,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PodcastBuilder<'a, podcast_state::SetDescription<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         PodcastBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -502,12 +493,12 @@ where
 impl<'a, S: podcast_state::State> PodcastBuilder<'a, S> {
     /// Set the `explicit` field (optional)
     pub fn explicit(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `explicit` field to an Option value (optional)
     pub fn maybe_explicit(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -522,11 +513,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> PodcastBuilder<'a, podcast_state::SetFeedUrl<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         PodcastBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -541,11 +532,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PodcastBuilder<'a, podcast_state::SetGuid<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         PodcastBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -560,11 +551,11 @@ where
         mut self,
         value: impl Into<Language>,
     ) -> PodcastBuilder<'a, podcast_state::SetLanguage<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         PodcastBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -572,12 +563,12 @@ where
 impl<'a, S: podcast_state::State> PodcastBuilder<'a, S> {
     /// Set the `link` field (optional)
     pub fn link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `link` field to an Option value (optional)
     pub fn maybe_link(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -585,12 +576,12 @@ impl<'a, S: podcast_state::State> PodcastBuilder<'a, S> {
 impl<'a, S: podcast_state::State> PodcastBuilder<'a, S> {
     /// Set the `movedTo` field (optional)
     pub fn moved_to(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `movedTo` field to an Option value (optional)
     pub fn maybe_moved_to(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -605,11 +596,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PodcastBuilder<'a, podcast_state::SetTitle<S>> {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         PodcastBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -617,29 +608,29 @@ where
 impl<'a, S> PodcastBuilder<'a, S>
 where
     S: podcast_state::State,
-    S::Title: podcast_state::IsSet,
     S::Artwork: podcast_state::IsSet,
     S::FeedUrl: podcast_state::IsSet,
+    S::Title: podcast_state::IsSet,
+    S::Language: podcast_state::IsSet,
     S::Categories: podcast_state::IsSet,
     S::CreatedAt: podcast_state::IsSet,
-    S::Language: podcast_state::IsSet,
     S::Guid: podcast_state::IsSet,
     S::Description: podcast_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Podcast<'a> {
         Podcast {
-            artwork: self.__unsafe_private_named.0.unwrap(),
-            categories: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3.unwrap(),
-            explicit: self.__unsafe_private_named.4,
-            feed_url: self.__unsafe_private_named.5.unwrap(),
-            guid: self.__unsafe_private_named.6.unwrap(),
-            language: self.__unsafe_private_named.7.unwrap(),
-            link: self.__unsafe_private_named.8,
-            moved_to: self.__unsafe_private_named.9,
-            title: self.__unsafe_private_named.10.unwrap(),
+            artwork: self._fields.0.unwrap(),
+            categories: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3.unwrap(),
+            explicit: self._fields.4,
+            feed_url: self._fields.5.unwrap(),
+            guid: self._fields.6.unwrap(),
+            language: self._fields.7.unwrap(),
+            link: self._fields.8,
+            moved_to: self._fields.9,
+            title: self._fields.10.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -652,17 +643,17 @@ where
         >,
     ) -> Podcast<'a> {
         Podcast {
-            artwork: self.__unsafe_private_named.0.unwrap(),
-            categories: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3.unwrap(),
-            explicit: self.__unsafe_private_named.4,
-            feed_url: self.__unsafe_private_named.5.unwrap(),
-            guid: self.__unsafe_private_named.6.unwrap(),
-            language: self.__unsafe_private_named.7.unwrap(),
-            link: self.__unsafe_private_named.8,
-            moved_to: self.__unsafe_private_named.9,
-            title: self.__unsafe_private_named.10.unwrap(),
+            artwork: self._fields.0.unwrap(),
+            categories: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3.unwrap(),
+            explicit: self._fields.4,
+            feed_url: self._fields.5.unwrap(),
+            guid: self._fields.6.unwrap(),
+            language: self._fields.7.unwrap(),
+            link: self._fields.8,
+            moved_to: self._fields.9,
+            title: self._fields.10.unwrap(),
             extra_data: Some(extra_data),
         }
     }

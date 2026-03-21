@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -113,58 +116,58 @@ pub mod board_game_play_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type BggId;
         type PlayedAt;
+        type BggId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type BggId = Unset;
         type PlayedAt = Unset;
+        type BggId = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type PlayedAt = S::PlayedAt;
         type BggId = S::BggId;
-        type PlayedAt = S::PlayedAt;
-    }
-    ///State transition - sets the `bgg_id` field to Set
-    pub struct SetBggId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBggId<S> {}
-    impl<S: State> State for SetBggId<S> {
-        type Name = S::Name;
-        type BggId = Set<members::bgg_id>;
-        type PlayedAt = S::PlayedAt;
     }
     ///State transition - sets the `played_at` field to Set
     pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
     impl<S: State> State for SetPlayedAt<S> {
         type Name = S::Name;
-        type BggId = S::BggId;
         type PlayedAt = Set<members::played_at>;
+        type BggId = S::BggId;
+    }
+    ///State transition - sets the `bgg_id` field to Set
+    pub struct SetBggId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBggId<S> {}
+    impl<S: State> State for SetBggId<S> {
+        type Name = S::Name;
+        type PlayedAt = S::PlayedAt;
+        type BggId = Set<members::bgg_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `bgg_id` field
-        pub struct bgg_id(());
         ///Marker type for the `played_at` field
         pub struct played_at(());
+        ///Marker type for the `bgg_id` field
+        pub struct bgg_id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BoardGamePlayBuilder<'a, S: board_game_play_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> BoardGamePlay<'a> {
@@ -178,9 +181,9 @@ impl<'a> BoardGamePlayBuilder<'a, board_game_play_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BoardGamePlayBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -195,11 +198,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BoardGamePlayBuilder<'a, board_game_play_state::SetBggId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BoardGamePlayBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -214,11 +217,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BoardGamePlayBuilder<'a, board_game_play_state::SetName<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         BoardGamePlayBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -233,11 +236,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> BoardGamePlayBuilder<'a, board_game_play_state::SetPlayedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         BoardGamePlayBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -246,15 +249,15 @@ impl<'a, S> BoardGamePlayBuilder<'a, S>
 where
     S: board_game_play_state::State,
     S::Name: board_game_play_state::IsSet,
-    S::BggId: board_game_play_state::IsSet,
     S::PlayedAt: board_game_play_state::IsSet,
+    S::BggId: board_game_play_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BoardGamePlay<'a> {
         BoardGamePlay {
-            bgg_id: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1.unwrap(),
-            played_at: self.__unsafe_private_named.2.unwrap(),
+            bgg_id: self._fields.0.unwrap(),
+            name: self._fields.1.unwrap(),
+            played_at: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -267,9 +270,9 @@ where
         >,
     ) -> BoardGamePlay<'a> {
         BoardGamePlay {
-            bgg_id: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1.unwrap(),
-            played_at: self.__unsafe_private_named.2.unwrap(),
+            bgg_id: self._fields.0.unwrap(),
+            name: self._fields.1.unwrap(),
+            played_at: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

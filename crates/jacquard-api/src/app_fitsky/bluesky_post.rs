@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -110,49 +113,49 @@ pub mod bluesky_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type WorkoutUri;
         type PostUri;
+        type WorkoutUri;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type WorkoutUri = Unset;
         type PostUri = Unset;
+        type WorkoutUri = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `workout_uri` field to Set
-    pub struct SetWorkoutUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWorkoutUri<S> {}
-    impl<S: State> State for SetWorkoutUri<S> {
-        type WorkoutUri = Set<members::workout_uri>;
-        type PostUri = S::PostUri;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `post_uri` field to Set
     pub struct SetPostUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPostUri<S> {}
     impl<S: State> State for SetPostUri<S> {
-        type WorkoutUri = S::WorkoutUri;
         type PostUri = Set<members::post_uri>;
+        type WorkoutUri = S::WorkoutUri;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `workout_uri` field to Set
+    pub struct SetWorkoutUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWorkoutUri<S> {}
+    impl<S: State> State for SetWorkoutUri<S> {
+        type PostUri = S::PostUri;
+        type WorkoutUri = Set<members::workout_uri>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type WorkoutUri = S::WorkoutUri;
         type PostUri = S::PostUri;
+        type WorkoutUri = S::WorkoutUri;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `workout_uri` field
-        pub struct workout_uri(());
         ///Marker type for the `post_uri` field
         pub struct post_uri(());
+        ///Marker type for the `workout_uri` field
+        pub struct workout_uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -160,9 +163,9 @@ pub mod bluesky_post_state {
 
 /// Builder for constructing an instance of this type
 pub struct BlueskyPostBuilder<'a, S: bluesky_post_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<AtUri<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<AtUri<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> BlueskyPost<'a> {
@@ -176,9 +179,9 @@ impl<'a> BlueskyPostBuilder<'a, bluesky_post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BlueskyPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -193,11 +196,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> BlueskyPostBuilder<'a, bluesky_post_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BlueskyPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -212,11 +215,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> BlueskyPostBuilder<'a, bluesky_post_state::SetPostUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         BlueskyPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -231,11 +234,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> BlueskyPostBuilder<'a, bluesky_post_state::SetWorkoutUri<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         BlueskyPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -243,16 +246,16 @@ where
 impl<'a, S> BlueskyPostBuilder<'a, S>
 where
     S: bluesky_post_state::State,
-    S::WorkoutUri: bluesky_post_state::IsSet,
     S::PostUri: bluesky_post_state::IsSet,
+    S::WorkoutUri: bluesky_post_state::IsSet,
     S::CreatedAt: bluesky_post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BlueskyPost<'a> {
         BlueskyPost {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            post_uri: self.__unsafe_private_named.1.unwrap(),
-            workout_uri: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            post_uri: self._fields.1.unwrap(),
+            workout_uri: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -265,9 +268,9 @@ where
         >,
     ) -> BlueskyPost<'a> {
         BlueskyPost {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            post_uri: self.__unsafe_private_named.1.unwrap(),
-            workout_uri: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            post_uri: self._fields.1.unwrap(),
+            workout_uri: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -229,9 +232,9 @@ pub struct CheckHandleAvailabilityBuilder<
     'a,
     S: check_handle_availability_state::State,
 > {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<CowStr<'a>>, Option<Handle<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<CowStr<'a>>, Option<Handle<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CheckHandleAvailability<'a> {
@@ -248,9 +251,9 @@ impl<'a> CheckHandleAvailabilityBuilder<'a, check_handle_availability_state::Emp
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CheckHandleAvailabilityBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -261,12 +264,12 @@ impl<
 > CheckHandleAvailabilityBuilder<'a, S> {
     /// Set the `birthDate` field (optional)
     pub fn birth_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `birthDate` field to an Option value (optional)
     pub fn maybe_birth_date(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -277,12 +280,12 @@ impl<
 > CheckHandleAvailabilityBuilder<'a, S> {
     /// Set the `email` field (optional)
     pub fn email(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `email` field to an Option value (optional)
     pub fn maybe_email(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -300,11 +303,11 @@ where
         'a,
         check_handle_availability_state::SetHandle<S>,
     > {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CheckHandleAvailabilityBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -317,9 +320,9 @@ where
     /// Build the final struct
     pub fn build(self) -> CheckHandleAvailability<'a> {
         CheckHandleAvailability {
-            birth_date: self.__unsafe_private_named.0,
-            email: self.__unsafe_private_named.1,
-            handle: self.__unsafe_private_named.2.unwrap(),
+            birth_date: self._fields.0,
+            email: self._fields.1,
+            handle: self._fields.2.unwrap(),
         }
     }
 }
@@ -506,9 +509,9 @@ pub mod result_unavailable_state {
 
 /// Builder for constructing an instance of this type
 pub struct ResultUnavailableBuilder<'a, S: result_unavailable_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<check_handle_availability::Suggestion<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<check_handle_availability::Suggestion<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ResultUnavailable<'a> {
@@ -522,9 +525,9 @@ impl<'a> ResultUnavailableBuilder<'a, result_unavailable_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ResultUnavailableBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -539,11 +542,11 @@ where
         mut self,
         value: impl Into<Vec<check_handle_availability::Suggestion<'a>>>,
     ) -> ResultUnavailableBuilder<'a, result_unavailable_state::SetSuggestions<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ResultUnavailableBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -556,7 +559,7 @@ where
     /// Build the final struct
     pub fn build(self) -> ResultUnavailable<'a> {
         ResultUnavailable {
-            suggestions: self.__unsafe_private_named.0.unwrap(),
+            suggestions: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -569,7 +572,7 @@ where
         >,
     ) -> ResultUnavailable<'a> {
         ResultUnavailable {
-            suggestions: self.__unsafe_private_named.0.unwrap(),
+            suggestions: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -621,9 +624,9 @@ pub mod suggestion_state {
 
 /// Builder for constructing an instance of this type
 pub struct SuggestionBuilder<'a, S: suggestion_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Handle<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Handle<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Suggestion<'a> {
@@ -637,9 +640,9 @@ impl<'a> SuggestionBuilder<'a, suggestion_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SuggestionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -654,11 +657,11 @@ where
         mut self,
         value: impl Into<Handle<'a>>,
     ) -> SuggestionBuilder<'a, suggestion_state::SetHandle<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SuggestionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -673,11 +676,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SuggestionBuilder<'a, suggestion_state::SetMethod<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SuggestionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -691,8 +694,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Suggestion<'a> {
         Suggestion {
-            handle: self.__unsafe_private_named.0.unwrap(),
-            method: self.__unsafe_private_named.1.unwrap(),
+            handle: self._fields.0.unwrap(),
+            method: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -705,8 +708,8 @@ where
         >,
     ) -> Suggestion<'a> {
         Suggestion {
-            handle: self.__unsafe_private_named.0.unwrap(),
-            method: self.__unsafe_private_named.1.unwrap(),
+            handle: self._fields.0.unwrap(),
+            method: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

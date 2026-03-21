@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -5601,8 +5604,8 @@ pub mod book_state {
 
 /// Builder for constructing an instance of this type
 pub struct BookBuilder<'a, S: book_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<BookAbout<'a>>,
         Option<BookAbridged<'a>>,
         Option<BookAbstract<'a>>,
@@ -5737,7 +5740,7 @@ pub struct BookBuilder<'a, S: book_state::State> {
         Option<BookWorkExample<'a>>,
         Option<BookWorkTranslation<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Book<'a> {
@@ -5751,8 +5754,8 @@ impl<'a> BookBuilder<'a, book_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BookBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -5887,7 +5890,7 @@ impl<'a> BookBuilder<'a, book_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -5895,12 +5898,12 @@ impl<'a> BookBuilder<'a, book_state::Empty> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `about` field (optional)
     pub fn about(mut self, value: impl Into<Option<BookAbout<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `about` field to an Option value (optional)
     pub fn maybe_about(mut self, value: Option<BookAbout<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -5908,12 +5911,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `abridged` field (optional)
     pub fn abridged(mut self, value: impl Into<Option<BookAbridged<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `abridged` field to an Option value (optional)
     pub fn maybe_abridged(mut self, value: Option<BookAbridged<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -5921,12 +5924,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `abstract` field (optional)
     pub fn r#abstract(mut self, value: impl Into<Option<BookAbstract<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `abstract` field to an Option value (optional)
     pub fn maybe_abstract(mut self, value: Option<BookAbstract<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -5934,12 +5937,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `accessMode` field (optional)
     pub fn access_mode(mut self, value: impl Into<Option<BookAccessMode<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `accessMode` field to an Option value (optional)
     pub fn maybe_access_mode(mut self, value: Option<BookAccessMode<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -5950,7 +5953,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookAccessModeSufficient<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `accessModeSufficient` field to an Option value (optional)
@@ -5958,7 +5961,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookAccessModeSufficient<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -5969,7 +5972,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookAccessibilityApi<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `accessibilityAPI` field to an Option value (optional)
@@ -5977,7 +5980,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookAccessibilityApi<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -5988,7 +5991,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookAccessibilityControl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `accessibilityControl` field to an Option value (optional)
@@ -5996,7 +5999,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookAccessibilityControl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -6007,7 +6010,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookAccessibilityFeature<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `accessibilityFeature` field to an Option value (optional)
@@ -6015,7 +6018,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookAccessibilityFeature<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -6026,7 +6029,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookAccessibilityHazard<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `accessibilityHazard` field to an Option value (optional)
@@ -6034,7 +6037,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookAccessibilityHazard<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -6045,7 +6048,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookAccessibilitySummary<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `accessibilitySummary` field to an Option value (optional)
@@ -6053,7 +6056,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookAccessibilitySummary<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -6064,7 +6067,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookAccountablePerson<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `accountablePerson` field to an Option value (optional)
@@ -6072,7 +6075,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookAccountablePerson<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -6083,7 +6086,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookAcquireLicensePage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `acquireLicensePage` field to an Option value (optional)
@@ -6091,7 +6094,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookAcquireLicensePage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -6102,7 +6105,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookAdditionalType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
@@ -6110,7 +6113,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookAdditionalType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -6121,7 +6124,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookAggregateRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
@@ -6129,7 +6132,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookAggregateRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -6140,12 +6143,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookAlternateName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
     pub fn maybe_alternate_name(mut self, value: Option<BookAlternateName<'a>>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -6156,7 +6159,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookAlternativeHeadline<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `alternativeHeadline` field to an Option value (optional)
@@ -6164,7 +6167,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookAlternativeHeadline<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -6172,12 +6175,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `archivedAt` field (optional)
     pub fn archived_at(mut self, value: impl Into<Option<BookArchivedAt<'a>>>) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `archivedAt` field to an Option value (optional)
     pub fn maybe_archived_at(mut self, value: Option<BookArchivedAt<'a>>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -6185,12 +6188,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `assesses` field (optional)
     pub fn assesses(mut self, value: impl Into<Option<BookAssesses<'a>>>) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `assesses` field to an Option value (optional)
     pub fn maybe_assesses(mut self, value: Option<BookAssesses<'a>>) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -6201,7 +6204,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookAssociatedMedia<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `associatedMedia` field to an Option value (optional)
@@ -6209,7 +6212,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookAssociatedMedia<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -6217,12 +6220,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `audience` field (optional)
     pub fn audience(mut self, value: impl Into<Option<BookAudience<'a>>>) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `audience` field to an Option value (optional)
     pub fn maybe_audience(mut self, value: Option<BookAudience<'a>>) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -6230,12 +6233,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `audio` field (optional)
     pub fn audio(mut self, value: impl Into<Option<BookAudio<'a>>>) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `audio` field to an Option value (optional)
     pub fn maybe_audio(mut self, value: Option<BookAudio<'a>>) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -6243,12 +6246,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `author` field (optional)
     pub fn author(mut self, value: impl Into<Option<BookAuthor<'a>>>) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
     pub fn maybe_author(mut self, value: Option<BookAuthor<'a>>) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -6256,12 +6259,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<BookAward<'a>>>) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
     pub fn maybe_award(mut self, value: Option<BookAward<'a>>) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -6269,12 +6272,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<BookAwards<'a>>>) -> Self {
-        self.__unsafe_private_named.23 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
     pub fn maybe_awards(mut self, value: Option<BookAwards<'a>>) -> Self {
-        self.__unsafe_private_named.23 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -6285,12 +6288,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookBookEdition<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.24 = value.into();
+        self._fields.24 = value.into();
         self
     }
     /// Set the `bookEdition` field to an Option value (optional)
     pub fn maybe_book_edition(mut self, value: Option<BookBookEdition<'a>>) -> Self {
-        self.__unsafe_private_named.24 = value;
+        self._fields.24 = value;
         self
     }
 }
@@ -6298,12 +6301,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `bookFormat` field (optional)
     pub fn book_format(mut self, value: impl Into<Option<BookBookFormat<'a>>>) -> Self {
-        self.__unsafe_private_named.25 = value.into();
+        self._fields.25 = value.into();
         self
     }
     /// Set the `bookFormat` field to an Option value (optional)
     pub fn maybe_book_format(mut self, value: Option<BookBookFormat<'a>>) -> Self {
-        self.__unsafe_private_named.25 = value;
+        self._fields.25 = value;
         self
     }
 }
@@ -6311,12 +6314,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `character` field (optional)
     pub fn character(mut self, value: impl Into<Option<BookCharacter<'a>>>) -> Self {
-        self.__unsafe_private_named.26 = value.into();
+        self._fields.26 = value.into();
         self
     }
     /// Set the `character` field to an Option value (optional)
     pub fn maybe_character(mut self, value: Option<BookCharacter<'a>>) -> Self {
-        self.__unsafe_private_named.26 = value;
+        self._fields.26 = value;
         self
     }
 }
@@ -6324,12 +6327,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `citation` field (optional)
     pub fn citation(mut self, value: impl Into<Option<BookCitation<'a>>>) -> Self {
-        self.__unsafe_private_named.27 = value.into();
+        self._fields.27 = value.into();
         self
     }
     /// Set the `citation` field to an Option value (optional)
     pub fn maybe_citation(mut self, value: Option<BookCitation<'a>>) -> Self {
-        self.__unsafe_private_named.27 = value;
+        self._fields.27 = value;
         self
     }
 }
@@ -6337,12 +6340,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<BookComment<'a>>>) -> Self {
-        self.__unsafe_private_named.28 = value.into();
+        self._fields.28 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
     pub fn maybe_comment(mut self, value: Option<BookComment<'a>>) -> Self {
-        self.__unsafe_private_named.28 = value;
+        self._fields.28 = value;
         self
     }
 }
@@ -6353,12 +6356,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookCommentCount<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.29 = value.into();
+        self._fields.29 = value.into();
         self
     }
     /// Set the `commentCount` field to an Option value (optional)
     pub fn maybe_comment_count(mut self, value: Option<BookCommentCount<'a>>) -> Self {
-        self.__unsafe_private_named.29 = value;
+        self._fields.29 = value;
         self
     }
 }
@@ -6369,7 +6372,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookConditionsOfAccess<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.30 = value.into();
+        self._fields.30 = value.into();
         self
     }
     /// Set the `conditionsOfAccess` field to an Option value (optional)
@@ -6377,7 +6380,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookConditionsOfAccess<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.30 = value;
+        self._fields.30 = value;
         self
     }
 }
@@ -6388,7 +6391,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookContentLocation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value.into();
+        self._fields.31 = value.into();
         self
     }
     /// Set the `contentLocation` field to an Option value (optional)
@@ -6396,7 +6399,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookContentLocation<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value;
+        self._fields.31 = value;
         self
     }
 }
@@ -6407,12 +6410,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookContentRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value.into();
+        self._fields.32 = value.into();
         self
     }
     /// Set the `contentRating` field to an Option value (optional)
     pub fn maybe_content_rating(mut self, value: Option<BookContentRating<'a>>) -> Self {
-        self.__unsafe_private_named.32 = value;
+        self._fields.32 = value;
         self
     }
 }
@@ -6423,7 +6426,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookContentReferenceTime<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value.into();
+        self._fields.33 = value.into();
         self
     }
     /// Set the `contentReferenceTime` field to an Option value (optional)
@@ -6431,7 +6434,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookContentReferenceTime<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value;
+        self._fields.33 = value;
         self
     }
 }
@@ -6439,12 +6442,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `contributor` field (optional)
     pub fn contributor(mut self, value: impl Into<Option<BookContributor<'a>>>) -> Self {
-        self.__unsafe_private_named.34 = value.into();
+        self._fields.34 = value.into();
         self
     }
     /// Set the `contributor` field to an Option value (optional)
     pub fn maybe_contributor(mut self, value: Option<BookContributor<'a>>) -> Self {
-        self.__unsafe_private_named.34 = value;
+        self._fields.34 = value;
         self
     }
 }
@@ -6455,7 +6458,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookCopyrightHolder<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value.into();
+        self._fields.35 = value.into();
         self
     }
     /// Set the `copyrightHolder` field to an Option value (optional)
@@ -6463,7 +6466,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookCopyrightHolder<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value;
+        self._fields.35 = value;
         self
     }
 }
@@ -6474,7 +6477,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookCopyrightNotice<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value.into();
+        self._fields.36 = value.into();
         self
     }
     /// Set the `copyrightNotice` field to an Option value (optional)
@@ -6482,7 +6485,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookCopyrightNotice<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value;
+        self._fields.36 = value;
         self
     }
 }
@@ -6493,12 +6496,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookCopyrightYear<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.37 = value.into();
+        self._fields.37 = value.into();
         self
     }
     /// Set the `copyrightYear` field to an Option value (optional)
     pub fn maybe_copyright_year(mut self, value: Option<BookCopyrightYear<'a>>) -> Self {
-        self.__unsafe_private_named.37 = value;
+        self._fields.37 = value;
         self
     }
 }
@@ -6506,12 +6509,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `correction` field (optional)
     pub fn correction(mut self, value: impl Into<Option<BookCorrection<'a>>>) -> Self {
-        self.__unsafe_private_named.38 = value.into();
+        self._fields.38 = value.into();
         self
     }
     /// Set the `correction` field to an Option value (optional)
     pub fn maybe_correction(mut self, value: Option<BookCorrection<'a>>) -> Self {
-        self.__unsafe_private_named.38 = value;
+        self._fields.38 = value;
         self
     }
 }
@@ -6522,7 +6525,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookCountryOfOrigin<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value.into();
+        self._fields.39 = value.into();
         self
     }
     /// Set the `countryOfOrigin` field to an Option value (optional)
@@ -6530,7 +6533,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookCountryOfOrigin<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value;
+        self._fields.39 = value;
         self
     }
 }
@@ -6541,7 +6544,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookCreativeWorkStatus<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.40 = value.into();
+        self._fields.40 = value.into();
         self
     }
     /// Set the `creativeWorkStatus` field to an Option value (optional)
@@ -6549,7 +6552,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookCreativeWorkStatus<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.40 = value;
+        self._fields.40 = value;
         self
     }
 }
@@ -6557,12 +6560,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `creator` field (optional)
     pub fn creator(mut self, value: impl Into<Option<BookCreator<'a>>>) -> Self {
-        self.__unsafe_private_named.41 = value.into();
+        self._fields.41 = value.into();
         self
     }
     /// Set the `creator` field to an Option value (optional)
     pub fn maybe_creator(mut self, value: Option<BookCreator<'a>>) -> Self {
-        self.__unsafe_private_named.41 = value;
+        self._fields.41 = value;
         self
     }
 }
@@ -6570,12 +6573,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `creditText` field (optional)
     pub fn credit_text(mut self, value: impl Into<Option<BookCreditText<'a>>>) -> Self {
-        self.__unsafe_private_named.42 = value.into();
+        self._fields.42 = value.into();
         self
     }
     /// Set the `creditText` field to an Option value (optional)
     pub fn maybe_credit_text(mut self, value: Option<BookCreditText<'a>>) -> Self {
-        self.__unsafe_private_named.42 = value;
+        self._fields.42 = value;
         self
     }
 }
@@ -6586,12 +6589,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookDateCreated<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.43 = value.into();
+        self._fields.43 = value.into();
         self
     }
     /// Set the `dateCreated` field to an Option value (optional)
     pub fn maybe_date_created(mut self, value: Option<BookDateCreated<'a>>) -> Self {
-        self.__unsafe_private_named.43 = value;
+        self._fields.43 = value;
         self
     }
 }
@@ -6602,12 +6605,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookDateModified<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.44 = value.into();
+        self._fields.44 = value.into();
         self
     }
     /// Set the `dateModified` field to an Option value (optional)
     pub fn maybe_date_modified(mut self, value: Option<BookDateModified<'a>>) -> Self {
-        self.__unsafe_private_named.44 = value;
+        self._fields.44 = value;
         self
     }
 }
@@ -6618,12 +6621,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookDatePublished<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value.into();
+        self._fields.45 = value.into();
         self
     }
     /// Set the `datePublished` field to an Option value (optional)
     pub fn maybe_date_published(mut self, value: Option<BookDatePublished<'a>>) -> Self {
-        self.__unsafe_private_named.45 = value;
+        self._fields.45 = value;
         self
     }
 }
@@ -6631,12 +6634,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<BookDescription<'a>>>) -> Self {
-        self.__unsafe_private_named.46 = value.into();
+        self._fields.46 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<BookDescription<'a>>) -> Self {
-        self.__unsafe_private_named.46 = value;
+        self._fields.46 = value;
         self
     }
 }
@@ -6647,7 +6650,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookDigitalSourceType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.47 = value.into();
+        self._fields.47 = value.into();
         self
     }
     /// Set the `digitalSourceType` field to an Option value (optional)
@@ -6655,7 +6658,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookDigitalSourceType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.47 = value;
+        self._fields.47 = value;
         self
     }
 }
@@ -6666,7 +6669,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookDisambiguatingDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value.into();
+        self._fields.48 = value.into();
         self
     }
     /// Set the `disambiguatingDescription` field to an Option value (optional)
@@ -6674,7 +6677,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookDisambiguatingDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value;
+        self._fields.48 = value;
         self
     }
 }
@@ -6685,12 +6688,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookDiscussionUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.49 = value.into();
+        self._fields.49 = value.into();
         self
     }
     /// Set the `discussionUrl` field to an Option value (optional)
     pub fn maybe_discussion_url(mut self, value: Option<BookDiscussionUrl<'a>>) -> Self {
-        self.__unsafe_private_named.49 = value;
+        self._fields.49 = value;
         self
     }
 }
@@ -6698,12 +6701,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `editEIDR` field (optional)
     pub fn edit_eidr(mut self, value: impl Into<Option<BookEditEidr<'a>>>) -> Self {
-        self.__unsafe_private_named.50 = value.into();
+        self._fields.50 = value.into();
         self
     }
     /// Set the `editEIDR` field to an Option value (optional)
     pub fn maybe_edit_eidr(mut self, value: Option<BookEditEidr<'a>>) -> Self {
-        self.__unsafe_private_named.50 = value;
+        self._fields.50 = value;
         self
     }
 }
@@ -6711,12 +6714,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `editor` field (optional)
     pub fn editor(mut self, value: impl Into<Option<BookEditor<'a>>>) -> Self {
-        self.__unsafe_private_named.51 = value.into();
+        self._fields.51 = value.into();
         self
     }
     /// Set the `editor` field to an Option value (optional)
     pub fn maybe_editor(mut self, value: Option<BookEditor<'a>>) -> Self {
-        self.__unsafe_private_named.51 = value;
+        self._fields.51 = value;
         self
     }
 }
@@ -6727,7 +6730,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookEducationalAlignment<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.52 = value.into();
+        self._fields.52 = value.into();
         self
     }
     /// Set the `educationalAlignment` field to an Option value (optional)
@@ -6735,7 +6738,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookEducationalAlignment<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.52 = value;
+        self._fields.52 = value;
         self
     }
 }
@@ -6746,7 +6749,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookEducationalLevel<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.53 = value.into();
+        self._fields.53 = value.into();
         self
     }
     /// Set the `educationalLevel` field to an Option value (optional)
@@ -6754,7 +6757,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookEducationalLevel<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.53 = value;
+        self._fields.53 = value;
         self
     }
 }
@@ -6765,7 +6768,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookEducationalUse<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.54 = value.into();
+        self._fields.54 = value.into();
         self
     }
     /// Set the `educationalUse` field to an Option value (optional)
@@ -6773,7 +6776,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookEducationalUse<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.54 = value;
+        self._fields.54 = value;
         self
     }
 }
@@ -6781,12 +6784,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `encoding` field (optional)
     pub fn encoding(mut self, value: impl Into<Option<BookEncoding<'a>>>) -> Self {
-        self.__unsafe_private_named.55 = value.into();
+        self._fields.55 = value.into();
         self
     }
     /// Set the `encoding` field to an Option value (optional)
     pub fn maybe_encoding(mut self, value: Option<BookEncoding<'a>>) -> Self {
-        self.__unsafe_private_named.55 = value;
+        self._fields.55 = value;
         self
     }
 }
@@ -6797,7 +6800,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookEncodingFormat<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value.into();
+        self._fields.56 = value.into();
         self
     }
     /// Set the `encodingFormat` field to an Option value (optional)
@@ -6805,7 +6808,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookEncodingFormat<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value;
+        self._fields.56 = value;
         self
     }
 }
@@ -6813,12 +6816,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `encodings` field (optional)
     pub fn encodings(mut self, value: impl Into<Option<BookEncodings<'a>>>) -> Self {
-        self.__unsafe_private_named.57 = value.into();
+        self._fields.57 = value.into();
         self
     }
     /// Set the `encodings` field to an Option value (optional)
     pub fn maybe_encodings(mut self, value: Option<BookEncodings<'a>>) -> Self {
-        self.__unsafe_private_named.57 = value;
+        self._fields.57 = value;
         self
     }
 }
@@ -6829,7 +6832,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookExampleOfWork<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.58 = value.into();
+        self._fields.58 = value.into();
         self
     }
     /// Set the `exampleOfWork` field to an Option value (optional)
@@ -6837,7 +6840,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookExampleOfWork<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.58 = value;
+        self._fields.58 = value;
         self
     }
 }
@@ -6845,12 +6848,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `expires` field (optional)
     pub fn expires(mut self, value: impl Into<Option<BookExpires<'a>>>) -> Self {
-        self.__unsafe_private_named.59 = value.into();
+        self._fields.59 = value.into();
         self
     }
     /// Set the `expires` field to an Option value (optional)
     pub fn maybe_expires(mut self, value: Option<BookExpires<'a>>) -> Self {
-        self.__unsafe_private_named.59 = value;
+        self._fields.59 = value;
         self
     }
 }
@@ -6858,12 +6861,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `fileFormat` field (optional)
     pub fn file_format(mut self, value: impl Into<Option<BookFileFormat<'a>>>) -> Self {
-        self.__unsafe_private_named.60 = value.into();
+        self._fields.60 = value.into();
         self
     }
     /// Set the `fileFormat` field to an Option value (optional)
     pub fn maybe_file_format(mut self, value: Option<BookFileFormat<'a>>) -> Self {
-        self.__unsafe_private_named.60 = value;
+        self._fields.60 = value;
         self
     }
 }
@@ -6871,12 +6874,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `funder` field (optional)
     pub fn funder(mut self, value: impl Into<Option<BookFunder<'a>>>) -> Self {
-        self.__unsafe_private_named.61 = value.into();
+        self._fields.61 = value.into();
         self
     }
     /// Set the `funder` field to an Option value (optional)
     pub fn maybe_funder(mut self, value: Option<BookFunder<'a>>) -> Self {
-        self.__unsafe_private_named.61 = value;
+        self._fields.61 = value;
         self
     }
 }
@@ -6884,12 +6887,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<BookFunding<'a>>>) -> Self {
-        self.__unsafe_private_named.62 = value.into();
+        self._fields.62 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
     pub fn maybe_funding(mut self, value: Option<BookFunding<'a>>) -> Self {
-        self.__unsafe_private_named.62 = value;
+        self._fields.62 = value;
         self
     }
 }
@@ -6897,12 +6900,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<BookGenre<'a>>>) -> Self {
-        self.__unsafe_private_named.63 = value.into();
+        self._fields.63 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
     pub fn maybe_genre(mut self, value: Option<BookGenre<'a>>) -> Self {
-        self.__unsafe_private_named.63 = value;
+        self._fields.63 = value;
         self
     }
 }
@@ -6910,12 +6913,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `hasPart` field (optional)
     pub fn has_part(mut self, value: impl Into<Option<BookHasPart<'a>>>) -> Self {
-        self.__unsafe_private_named.64 = value.into();
+        self._fields.64 = value.into();
         self
     }
     /// Set the `hasPart` field to an Option value (optional)
     pub fn maybe_has_part(mut self, value: Option<BookHasPart<'a>>) -> Self {
-        self.__unsafe_private_named.64 = value;
+        self._fields.64 = value;
         self
     }
 }
@@ -6923,12 +6926,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `headline` field (optional)
     pub fn headline(mut self, value: impl Into<Option<BookHeadline<'a>>>) -> Self {
-        self.__unsafe_private_named.65 = value.into();
+        self._fields.65 = value.into();
         self
     }
     /// Set the `headline` field to an Option value (optional)
     pub fn maybe_headline(mut self, value: Option<BookHeadline<'a>>) -> Self {
-        self.__unsafe_private_named.65 = value;
+        self._fields.65 = value;
         self
     }
 }
@@ -6936,12 +6939,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `identifier` field (optional)
     pub fn identifier(mut self, value: impl Into<Option<BookIdentifier<'a>>>) -> Self {
-        self.__unsafe_private_named.66 = value.into();
+        self._fields.66 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
     pub fn maybe_identifier(mut self, value: Option<BookIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.66 = value;
+        self._fields.66 = value;
         self
     }
 }
@@ -6949,12 +6952,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `illustrator` field (optional)
     pub fn illustrator(mut self, value: impl Into<Option<BookIllustrator<'a>>>) -> Self {
-        self.__unsafe_private_named.67 = value.into();
+        self._fields.67 = value.into();
         self
     }
     /// Set the `illustrator` field to an Option value (optional)
     pub fn maybe_illustrator(mut self, value: Option<BookIllustrator<'a>>) -> Self {
-        self.__unsafe_private_named.67 = value;
+        self._fields.67 = value;
         self
     }
 }
@@ -6962,12 +6965,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<BookImage<'a>>>) -> Self {
-        self.__unsafe_private_named.68 = value.into();
+        self._fields.68 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<BookImage<'a>>) -> Self {
-        self.__unsafe_private_named.68 = value;
+        self._fields.68 = value;
         self
     }
 }
@@ -6975,12 +6978,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `inLanguage` field (optional)
     pub fn in_language(mut self, value: impl Into<Option<BookInLanguage<'a>>>) -> Self {
-        self.__unsafe_private_named.69 = value.into();
+        self._fields.69 = value.into();
         self
     }
     /// Set the `inLanguage` field to an Option value (optional)
     pub fn maybe_in_language(mut self, value: Option<BookInLanguage<'a>>) -> Self {
-        self.__unsafe_private_named.69 = value;
+        self._fields.69 = value;
         self
     }
 }
@@ -6991,7 +6994,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookInteractionStatistic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.70 = value.into();
+        self._fields.70 = value.into();
         self
     }
     /// Set the `interactionStatistic` field to an Option value (optional)
@@ -6999,7 +7002,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookInteractionStatistic<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.70 = value;
+        self._fields.70 = value;
         self
     }
 }
@@ -7010,7 +7013,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookInteractivityType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.71 = value.into();
+        self._fields.71 = value.into();
         self
     }
     /// Set the `interactivityType` field to an Option value (optional)
@@ -7018,7 +7021,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookInteractivityType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.71 = value;
+        self._fields.71 = value;
         self
     }
 }
@@ -7029,7 +7032,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookInterpretedAsClaim<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.72 = value.into();
+        self._fields.72 = value.into();
         self
     }
     /// Set the `interpretedAsClaim` field to an Option value (optional)
@@ -7037,7 +7040,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookInterpretedAsClaim<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.72 = value;
+        self._fields.72 = value;
         self
     }
 }
@@ -7048,7 +7051,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookIsAccessibleForFree<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.73 = value.into();
+        self._fields.73 = value.into();
         self
     }
     /// Set the `isAccessibleForFree` field to an Option value (optional)
@@ -7056,7 +7059,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookIsAccessibleForFree<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.73 = value;
+        self._fields.73 = value;
         self
     }
 }
@@ -7064,12 +7067,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `isBasedOn` field (optional)
     pub fn is_based_on(mut self, value: impl Into<Option<BookIsBasedOn<'a>>>) -> Self {
-        self.__unsafe_private_named.74 = value.into();
+        self._fields.74 = value.into();
         self
     }
     /// Set the `isBasedOn` field to an Option value (optional)
     pub fn maybe_is_based_on(mut self, value: Option<BookIsBasedOn<'a>>) -> Self {
-        self.__unsafe_private_named.74 = value;
+        self._fields.74 = value;
         self
     }
 }
@@ -7080,12 +7083,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookIsBasedOnUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.75 = value.into();
+        self._fields.75 = value.into();
         self
     }
     /// Set the `isBasedOnUrl` field to an Option value (optional)
     pub fn maybe_is_based_on_url(mut self, value: Option<BookIsBasedOnUrl<'a>>) -> Self {
-        self.__unsafe_private_named.75 = value;
+        self._fields.75 = value;
         self
     }
 }
@@ -7096,7 +7099,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookIsFamilyFriendly<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.76 = value.into();
+        self._fields.76 = value.into();
         self
     }
     /// Set the `isFamilyFriendly` field to an Option value (optional)
@@ -7104,7 +7107,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookIsFamilyFriendly<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.76 = value;
+        self._fields.76 = value;
         self
     }
 }
@@ -7112,12 +7115,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `isPartOf` field (optional)
     pub fn is_part_of(mut self, value: impl Into<Option<BookIsPartOf<'a>>>) -> Self {
-        self.__unsafe_private_named.77 = value.into();
+        self._fields.77 = value.into();
         self
     }
     /// Set the `isPartOf` field to an Option value (optional)
     pub fn maybe_is_part_of(mut self, value: Option<BookIsPartOf<'a>>) -> Self {
-        self.__unsafe_private_named.77 = value;
+        self._fields.77 = value;
         self
     }
 }
@@ -7125,12 +7128,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `isbn` field (optional)
     pub fn isbn(mut self, value: impl Into<Option<BookIsbn<'a>>>) -> Self {
-        self.__unsafe_private_named.78 = value.into();
+        self._fields.78 = value.into();
         self
     }
     /// Set the `isbn` field to an Option value (optional)
     pub fn maybe_isbn(mut self, value: Option<BookIsbn<'a>>) -> Self {
-        self.__unsafe_private_named.78 = value;
+        self._fields.78 = value;
         self
     }
 }
@@ -7138,12 +7141,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<BookKeywords<'a>>>) -> Self {
-        self.__unsafe_private_named.79 = value.into();
+        self._fields.79 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
     pub fn maybe_keywords(mut self, value: Option<BookKeywords<'a>>) -> Self {
-        self.__unsafe_private_named.79 = value;
+        self._fields.79 = value;
         self
     }
 }
@@ -7154,7 +7157,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookLearningResourceType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.80 = value.into();
+        self._fields.80 = value.into();
         self
     }
     /// Set the `learningResourceType` field to an Option value (optional)
@@ -7162,7 +7165,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookLearningResourceType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.80 = value;
+        self._fields.80 = value;
         self
     }
 }
@@ -7170,12 +7173,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `license` field (optional)
     pub fn license(mut self, value: impl Into<Option<BookLicense<'a>>>) -> Self {
-        self.__unsafe_private_named.81 = value.into();
+        self._fields.81 = value.into();
         self
     }
     /// Set the `license` field to an Option value (optional)
     pub fn maybe_license(mut self, value: Option<BookLicense<'a>>) -> Self {
-        self.__unsafe_private_named.81 = value;
+        self._fields.81 = value;
         self
     }
 }
@@ -7186,7 +7189,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookLocationCreated<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.82 = value.into();
+        self._fields.82 = value.into();
         self
     }
     /// Set the `locationCreated` field to an Option value (optional)
@@ -7194,7 +7197,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookLocationCreated<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.82 = value;
+        self._fields.82 = value;
         self
     }
 }
@@ -7202,12 +7205,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `mainEntity` field (optional)
     pub fn main_entity(mut self, value: impl Into<Option<BookMainEntity<'a>>>) -> Self {
-        self.__unsafe_private_named.83 = value.into();
+        self._fields.83 = value.into();
         self
     }
     /// Set the `mainEntity` field to an Option value (optional)
     pub fn maybe_main_entity(mut self, value: Option<BookMainEntity<'a>>) -> Self {
-        self.__unsafe_private_named.83 = value;
+        self._fields.83 = value;
         self
     }
 }
@@ -7218,7 +7221,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookMainEntityOfPage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.84 = value.into();
+        self._fields.84 = value.into();
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
@@ -7226,7 +7229,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookMainEntityOfPage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.84 = value;
+        self._fields.84 = value;
         self
     }
 }
@@ -7234,12 +7237,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `maintainer` field (optional)
     pub fn maintainer(mut self, value: impl Into<Option<BookMaintainer<'a>>>) -> Self {
-        self.__unsafe_private_named.85 = value.into();
+        self._fields.85 = value.into();
         self
     }
     /// Set the `maintainer` field to an Option value (optional)
     pub fn maybe_maintainer(mut self, value: Option<BookMaintainer<'a>>) -> Self {
-        self.__unsafe_private_named.85 = value;
+        self._fields.85 = value;
         self
     }
 }
@@ -7247,12 +7250,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `material` field (optional)
     pub fn material(mut self, value: impl Into<Option<BookMaterial<'a>>>) -> Self {
-        self.__unsafe_private_named.86 = value.into();
+        self._fields.86 = value.into();
         self
     }
     /// Set the `material` field to an Option value (optional)
     pub fn maybe_material(mut self, value: Option<BookMaterial<'a>>) -> Self {
-        self.__unsafe_private_named.86 = value;
+        self._fields.86 = value;
         self
     }
 }
@@ -7263,7 +7266,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookMaterialExtent<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.87 = value.into();
+        self._fields.87 = value.into();
         self
     }
     /// Set the `materialExtent` field to an Option value (optional)
@@ -7271,7 +7274,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookMaterialExtent<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.87 = value;
+        self._fields.87 = value;
         self
     }
 }
@@ -7279,12 +7282,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `mentions` field (optional)
     pub fn mentions(mut self, value: impl Into<Option<BookMentions<'a>>>) -> Self {
-        self.__unsafe_private_named.88 = value.into();
+        self._fields.88 = value.into();
         self
     }
     /// Set the `mentions` field to an Option value (optional)
     pub fn maybe_mentions(mut self, value: Option<BookMentions<'a>>) -> Self {
-        self.__unsafe_private_named.88 = value;
+        self._fields.88 = value;
         self
     }
 }
@@ -7292,12 +7295,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<BookName<'a>>>) -> Self {
-        self.__unsafe_private_named.89 = value.into();
+        self._fields.89 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<BookName<'a>>) -> Self {
-        self.__unsafe_private_named.89 = value;
+        self._fields.89 = value;
         self
     }
 }
@@ -7308,7 +7311,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookNumberOfPages<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.90 = value.into();
+        self._fields.90 = value.into();
         self
     }
     /// Set the `numberOfPages` field to an Option value (optional)
@@ -7316,7 +7319,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookNumberOfPages<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.90 = value;
+        self._fields.90 = value;
         self
     }
 }
@@ -7324,12 +7327,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `offers` field (optional)
     pub fn offers(mut self, value: impl Into<Option<BookOffers<'a>>>) -> Self {
-        self.__unsafe_private_named.91 = value.into();
+        self._fields.91 = value.into();
         self
     }
     /// Set the `offers` field to an Option value (optional)
     pub fn maybe_offers(mut self, value: Option<BookOffers<'a>>) -> Self {
-        self.__unsafe_private_named.91 = value;
+        self._fields.91 = value;
         self
     }
 }
@@ -7337,12 +7340,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `pattern` field (optional)
     pub fn pattern(mut self, value: impl Into<Option<BookPattern<'a>>>) -> Self {
-        self.__unsafe_private_named.92 = value.into();
+        self._fields.92 = value.into();
         self
     }
     /// Set the `pattern` field to an Option value (optional)
     pub fn maybe_pattern(mut self, value: Option<BookPattern<'a>>) -> Self {
-        self.__unsafe_private_named.92 = value;
+        self._fields.92 = value;
         self
     }
 }
@@ -7350,12 +7353,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `position` field (optional)
     pub fn position(mut self, value: impl Into<Option<BookPosition<'a>>>) -> Self {
-        self.__unsafe_private_named.93 = value.into();
+        self._fields.93 = value.into();
         self
     }
     /// Set the `position` field to an Option value (optional)
     pub fn maybe_position(mut self, value: Option<BookPosition<'a>>) -> Self {
-        self.__unsafe_private_named.93 = value;
+        self._fields.93 = value;
         self
     }
 }
@@ -7366,7 +7369,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookPotentialAction<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.94 = value.into();
+        self._fields.94 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
@@ -7374,7 +7377,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookPotentialAction<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.94 = value;
+        self._fields.94 = value;
         self
     }
 }
@@ -7382,12 +7385,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `producer` field (optional)
     pub fn producer(mut self, value: impl Into<Option<BookProducer<'a>>>) -> Self {
-        self.__unsafe_private_named.95 = value.into();
+        self._fields.95 = value.into();
         self
     }
     /// Set the `producer` field to an Option value (optional)
     pub fn maybe_producer(mut self, value: Option<BookProducer<'a>>) -> Self {
-        self.__unsafe_private_named.95 = value;
+        self._fields.95 = value;
         self
     }
 }
@@ -7395,12 +7398,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `provider` field (optional)
     pub fn provider(mut self, value: impl Into<Option<BookProvider<'a>>>) -> Self {
-        self.__unsafe_private_named.96 = value.into();
+        self._fields.96 = value.into();
         self
     }
     /// Set the `provider` field to an Option value (optional)
     pub fn maybe_provider(mut self, value: Option<BookProvider<'a>>) -> Self {
-        self.__unsafe_private_named.96 = value;
+        self._fields.96 = value;
         self
     }
 }
@@ -7408,12 +7411,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `publication` field (optional)
     pub fn publication(mut self, value: impl Into<Option<BookPublication<'a>>>) -> Self {
-        self.__unsafe_private_named.97 = value.into();
+        self._fields.97 = value.into();
         self
     }
     /// Set the `publication` field to an Option value (optional)
     pub fn maybe_publication(mut self, value: Option<BookPublication<'a>>) -> Self {
-        self.__unsafe_private_named.97 = value;
+        self._fields.97 = value;
         self
     }
 }
@@ -7421,12 +7424,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `publisher` field (optional)
     pub fn publisher(mut self, value: impl Into<Option<BookPublisher<'a>>>) -> Self {
-        self.__unsafe_private_named.98 = value.into();
+        self._fields.98 = value.into();
         self
     }
     /// Set the `publisher` field to an Option value (optional)
     pub fn maybe_publisher(mut self, value: Option<BookPublisher<'a>>) -> Self {
-        self.__unsafe_private_named.98 = value;
+        self._fields.98 = value;
         self
     }
 }
@@ -7437,7 +7440,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookPublisherImprint<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.99 = value.into();
+        self._fields.99 = value.into();
         self
     }
     /// Set the `publisherImprint` field to an Option value (optional)
@@ -7445,7 +7448,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookPublisherImprint<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.99 = value;
+        self._fields.99 = value;
         self
     }
 }
@@ -7456,7 +7459,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookPublishingPrinciples<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.100 = value.into();
+        self._fields.100 = value.into();
         self
     }
     /// Set the `publishingPrinciples` field to an Option value (optional)
@@ -7464,7 +7467,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookPublishingPrinciples<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.100 = value;
+        self._fields.100 = value;
         self
     }
 }
@@ -7472,12 +7475,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `recordedAt` field (optional)
     pub fn recorded_at(mut self, value: impl Into<Option<BookRecordedAt<'a>>>) -> Self {
-        self.__unsafe_private_named.101 = value.into();
+        self._fields.101 = value.into();
         self
     }
     /// Set the `recordedAt` field to an Option value (optional)
     pub fn maybe_recorded_at(mut self, value: Option<BookRecordedAt<'a>>) -> Self {
-        self.__unsafe_private_named.101 = value;
+        self._fields.101 = value;
         self
     }
 }
@@ -7488,12 +7491,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookReleasedEvent<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.102 = value.into();
+        self._fields.102 = value.into();
         self
     }
     /// Set the `releasedEvent` field to an Option value (optional)
     pub fn maybe_released_event(mut self, value: Option<BookReleasedEvent<'a>>) -> Self {
-        self.__unsafe_private_named.102 = value;
+        self._fields.102 = value;
         self
     }
 }
@@ -7501,12 +7504,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<BookReview<'a>>>) -> Self {
-        self.__unsafe_private_named.103 = value.into();
+        self._fields.103 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
     pub fn maybe_review(mut self, value: Option<BookReview<'a>>) -> Self {
-        self.__unsafe_private_named.103 = value;
+        self._fields.103 = value;
         self
     }
 }
@@ -7514,12 +7517,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `reviews` field (optional)
     pub fn reviews(mut self, value: impl Into<Option<BookReviews<'a>>>) -> Self {
-        self.__unsafe_private_named.104 = value.into();
+        self._fields.104 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
     pub fn maybe_reviews(mut self, value: Option<BookReviews<'a>>) -> Self {
-        self.__unsafe_private_named.104 = value;
+        self._fields.104 = value;
         self
     }
 }
@@ -7527,12 +7530,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<BookSameAs<'a>>>) -> Self {
-        self.__unsafe_private_named.105 = value.into();
+        self._fields.105 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
     pub fn maybe_same_as(mut self, value: Option<BookSameAs<'a>>) -> Self {
-        self.__unsafe_private_named.105 = value;
+        self._fields.105 = value;
         self
     }
 }
@@ -7543,12 +7546,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookSchemaVersion<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.106 = value.into();
+        self._fields.106 = value.into();
         self
     }
     /// Set the `schemaVersion` field to an Option value (optional)
     pub fn maybe_schema_version(mut self, value: Option<BookSchemaVersion<'a>>) -> Self {
-        self.__unsafe_private_named.106 = value;
+        self._fields.106 = value;
         self
     }
 }
@@ -7559,7 +7562,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookSdDatePublished<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.107 = value.into();
+        self._fields.107 = value.into();
         self
     }
     /// Set the `sdDatePublished` field to an Option value (optional)
@@ -7567,7 +7570,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookSdDatePublished<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.107 = value;
+        self._fields.107 = value;
         self
     }
 }
@@ -7575,12 +7578,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `sdLicense` field (optional)
     pub fn sd_license(mut self, value: impl Into<Option<BookSdLicense<'a>>>) -> Self {
-        self.__unsafe_private_named.108 = value.into();
+        self._fields.108 = value.into();
         self
     }
     /// Set the `sdLicense` field to an Option value (optional)
     pub fn maybe_sd_license(mut self, value: Option<BookSdLicense<'a>>) -> Self {
-        self.__unsafe_private_named.108 = value;
+        self._fields.108 = value;
         self
     }
 }
@@ -7591,12 +7594,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookSdPublisher<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.109 = value.into();
+        self._fields.109 = value.into();
         self
     }
     /// Set the `sdPublisher` field to an Option value (optional)
     pub fn maybe_sd_publisher(mut self, value: Option<BookSdPublisher<'a>>) -> Self {
-        self.__unsafe_private_named.109 = value;
+        self._fields.109 = value;
         self
     }
 }
@@ -7604,12 +7607,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<BookSize<'a>>>) -> Self {
-        self.__unsafe_private_named.110 = value.into();
+        self._fields.110 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
     pub fn maybe_size(mut self, value: Option<BookSize<'a>>) -> Self {
-        self.__unsafe_private_named.110 = value;
+        self._fields.110 = value;
         self
     }
 }
@@ -7620,7 +7623,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookSourceOrganization<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.111 = value.into();
+        self._fields.111 = value.into();
         self
     }
     /// Set the `sourceOrganization` field to an Option value (optional)
@@ -7628,7 +7631,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookSourceOrganization<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.111 = value;
+        self._fields.111 = value;
         self
     }
 }
@@ -7636,12 +7639,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `spatial` field (optional)
     pub fn spatial(mut self, value: impl Into<Option<BookSpatial<'a>>>) -> Self {
-        self.__unsafe_private_named.112 = value.into();
+        self._fields.112 = value.into();
         self
     }
     /// Set the `spatial` field to an Option value (optional)
     pub fn maybe_spatial(mut self, value: Option<BookSpatial<'a>>) -> Self {
-        self.__unsafe_private_named.112 = value;
+        self._fields.112 = value;
         self
     }
 }
@@ -7652,7 +7655,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookSpatialCoverage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.113 = value.into();
+        self._fields.113 = value.into();
         self
     }
     /// Set the `spatialCoverage` field to an Option value (optional)
@@ -7660,7 +7663,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookSpatialCoverage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.113 = value;
+        self._fields.113 = value;
         self
     }
 }
@@ -7668,12 +7671,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `sponsor` field (optional)
     pub fn sponsor(mut self, value: impl Into<Option<BookSponsor<'a>>>) -> Self {
-        self.__unsafe_private_named.114 = value.into();
+        self._fields.114 = value.into();
         self
     }
     /// Set the `sponsor` field to an Option value (optional)
     pub fn maybe_sponsor(mut self, value: Option<BookSponsor<'a>>) -> Self {
-        self.__unsafe_private_named.114 = value;
+        self._fields.114 = value;
         self
     }
 }
@@ -7681,12 +7684,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(mut self, value: impl Into<Option<BookSubjectOf<'a>>>) -> Self {
-        self.__unsafe_private_named.115 = value.into();
+        self._fields.115 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
     pub fn maybe_subject_of(mut self, value: Option<BookSubjectOf<'a>>) -> Self {
-        self.__unsafe_private_named.115 = value;
+        self._fields.115 = value;
         self
     }
 }
@@ -7694,12 +7697,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `teaches` field (optional)
     pub fn teaches(mut self, value: impl Into<Option<BookTeaches<'a>>>) -> Self {
-        self.__unsafe_private_named.116 = value.into();
+        self._fields.116 = value.into();
         self
     }
     /// Set the `teaches` field to an Option value (optional)
     pub fn maybe_teaches(mut self, value: Option<BookTeaches<'a>>) -> Self {
-        self.__unsafe_private_named.116 = value;
+        self._fields.116 = value;
         self
     }
 }
@@ -7707,12 +7710,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `temporal` field (optional)
     pub fn temporal(mut self, value: impl Into<Option<BookTemporal<'a>>>) -> Self {
-        self.__unsafe_private_named.117 = value.into();
+        self._fields.117 = value.into();
         self
     }
     /// Set the `temporal` field to an Option value (optional)
     pub fn maybe_temporal(mut self, value: Option<BookTemporal<'a>>) -> Self {
-        self.__unsafe_private_named.117 = value;
+        self._fields.117 = value;
         self
     }
 }
@@ -7723,7 +7726,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookTemporalCoverage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.118 = value.into();
+        self._fields.118 = value.into();
         self
     }
     /// Set the `temporalCoverage` field to an Option value (optional)
@@ -7731,7 +7734,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookTemporalCoverage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.118 = value;
+        self._fields.118 = value;
         self
     }
 }
@@ -7739,12 +7742,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<BookText<'a>>>) -> Self {
-        self.__unsafe_private_named.119 = value.into();
+        self._fields.119 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
     pub fn maybe_text(mut self, value: Option<BookText<'a>>) -> Self {
-        self.__unsafe_private_named.119 = value;
+        self._fields.119 = value;
         self
     }
 }
@@ -7752,12 +7755,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `thumbnail` field (optional)
     pub fn thumbnail(mut self, value: impl Into<Option<BookThumbnail<'a>>>) -> Self {
-        self.__unsafe_private_named.120 = value.into();
+        self._fields.120 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
     pub fn maybe_thumbnail(mut self, value: Option<BookThumbnail<'a>>) -> Self {
-        self.__unsafe_private_named.120 = value;
+        self._fields.120 = value;
         self
     }
 }
@@ -7768,12 +7771,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookThumbnailUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.121 = value.into();
+        self._fields.121 = value.into();
         self
     }
     /// Set the `thumbnailUrl` field to an Option value (optional)
     pub fn maybe_thumbnail_url(mut self, value: Option<BookThumbnailUrl<'a>>) -> Self {
-        self.__unsafe_private_named.121 = value;
+        self._fields.121 = value;
         self
     }
 }
@@ -7784,12 +7787,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookTimeRequired<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.122 = value.into();
+        self._fields.122 = value.into();
         self
     }
     /// Set the `timeRequired` field to an Option value (optional)
     pub fn maybe_time_required(mut self, value: Option<BookTimeRequired<'a>>) -> Self {
-        self.__unsafe_private_named.122 = value;
+        self._fields.122 = value;
         self
     }
 }
@@ -7800,7 +7803,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookTranslationOfWork<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.123 = value.into();
+        self._fields.123 = value.into();
         self
     }
     /// Set the `translationOfWork` field to an Option value (optional)
@@ -7808,7 +7811,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookTranslationOfWork<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.123 = value;
+        self._fields.123 = value;
         self
     }
 }
@@ -7816,12 +7819,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `translator` field (optional)
     pub fn translator(mut self, value: impl Into<Option<BookTranslator<'a>>>) -> Self {
-        self.__unsafe_private_named.124 = value.into();
+        self._fields.124 = value.into();
         self
     }
     /// Set the `translator` field to an Option value (optional)
     pub fn maybe_translator(mut self, value: Option<BookTranslator<'a>>) -> Self {
-        self.__unsafe_private_named.124 = value;
+        self._fields.124 = value;
         self
     }
 }
@@ -7832,7 +7835,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookTypicalAgeRange<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.125 = value.into();
+        self._fields.125 = value.into();
         self
     }
     /// Set the `typicalAgeRange` field to an Option value (optional)
@@ -7840,7 +7843,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookTypicalAgeRange<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.125 = value;
+        self._fields.125 = value;
         self
     }
 }
@@ -7848,12 +7851,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<BookUrl<'a>>>) -> Self {
-        self.__unsafe_private_named.126 = value.into();
+        self._fields.126 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<BookUrl<'a>>) -> Self {
-        self.__unsafe_private_named.126 = value;
+        self._fields.126 = value;
         self
     }
 }
@@ -7861,12 +7864,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `usageInfo` field (optional)
     pub fn usage_info(mut self, value: impl Into<Option<BookUsageInfo<'a>>>) -> Self {
-        self.__unsafe_private_named.127 = value.into();
+        self._fields.127 = value.into();
         self
     }
     /// Set the `usageInfo` field to an Option value (optional)
     pub fn maybe_usage_info(mut self, value: Option<BookUsageInfo<'a>>) -> Self {
-        self.__unsafe_private_named.127 = value;
+        self._fields.127 = value;
         self
     }
 }
@@ -7874,12 +7877,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `version` field (optional)
     pub fn version(mut self, value: impl Into<Option<BookVersion<'a>>>) -> Self {
-        self.__unsafe_private_named.128 = value.into();
+        self._fields.128 = value.into();
         self
     }
     /// Set the `version` field to an Option value (optional)
     pub fn maybe_version(mut self, value: Option<BookVersion<'a>>) -> Self {
-        self.__unsafe_private_named.128 = value;
+        self._fields.128 = value;
         self
     }
 }
@@ -7887,12 +7890,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `video` field (optional)
     pub fn video(mut self, value: impl Into<Option<BookVideo<'a>>>) -> Self {
-        self.__unsafe_private_named.129 = value.into();
+        self._fields.129 = value.into();
         self
     }
     /// Set the `video` field to an Option value (optional)
     pub fn maybe_video(mut self, value: Option<BookVideo<'a>>) -> Self {
-        self.__unsafe_private_named.129 = value;
+        self._fields.129 = value;
         self
     }
 }
@@ -7900,12 +7903,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
 impl<'a, S: book_state::State> BookBuilder<'a, S> {
     /// Set the `wordCount` field (optional)
     pub fn word_count(mut self, value: impl Into<Option<BookWordCount<'a>>>) -> Self {
-        self.__unsafe_private_named.130 = value.into();
+        self._fields.130 = value.into();
         self
     }
     /// Set the `wordCount` field to an Option value (optional)
     pub fn maybe_word_count(mut self, value: Option<BookWordCount<'a>>) -> Self {
-        self.__unsafe_private_named.130 = value;
+        self._fields.130 = value;
         self
     }
 }
@@ -7916,12 +7919,12 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookWorkExample<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.131 = value.into();
+        self._fields.131 = value.into();
         self
     }
     /// Set the `workExample` field to an Option value (optional)
     pub fn maybe_work_example(mut self, value: Option<BookWorkExample<'a>>) -> Self {
-        self.__unsafe_private_named.131 = value;
+        self._fields.131 = value;
         self
     }
 }
@@ -7932,7 +7935,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BookWorkTranslation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.132 = value.into();
+        self._fields.132 = value.into();
         self
     }
     /// Set the `workTranslation` field to an Option value (optional)
@@ -7940,7 +7943,7 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
         mut self,
         value: Option<BookWorkTranslation<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.132 = value;
+        self._fields.132 = value;
         self
     }
 }
@@ -7952,139 +7955,139 @@ where
     /// Build the final struct
     pub fn build(self) -> Book<'a> {
         Book {
-            about: self.__unsafe_private_named.0,
-            abridged: self.__unsafe_private_named.1,
-            r#abstract: self.__unsafe_private_named.2,
-            access_mode: self.__unsafe_private_named.3,
-            access_mode_sufficient: self.__unsafe_private_named.4,
-            accessibility_api: self.__unsafe_private_named.5,
-            accessibility_control: self.__unsafe_private_named.6,
-            accessibility_feature: self.__unsafe_private_named.7,
-            accessibility_hazard: self.__unsafe_private_named.8,
-            accessibility_summary: self.__unsafe_private_named.9,
-            accountable_person: self.__unsafe_private_named.10,
-            acquire_license_page: self.__unsafe_private_named.11,
-            additional_type: self.__unsafe_private_named.12,
-            aggregate_rating: self.__unsafe_private_named.13,
-            alternate_name: self.__unsafe_private_named.14,
-            alternative_headline: self.__unsafe_private_named.15,
-            archived_at: self.__unsafe_private_named.16,
-            assesses: self.__unsafe_private_named.17,
-            associated_media: self.__unsafe_private_named.18,
-            audience: self.__unsafe_private_named.19,
-            audio: self.__unsafe_private_named.20,
-            author: self.__unsafe_private_named.21,
-            award: self.__unsafe_private_named.22,
-            awards: self.__unsafe_private_named.23,
-            book_edition: self.__unsafe_private_named.24,
-            book_format: self.__unsafe_private_named.25,
-            character: self.__unsafe_private_named.26,
-            citation: self.__unsafe_private_named.27,
-            comment: self.__unsafe_private_named.28,
-            comment_count: self.__unsafe_private_named.29,
-            conditions_of_access: self.__unsafe_private_named.30,
-            content_location: self.__unsafe_private_named.31,
-            content_rating: self.__unsafe_private_named.32,
-            content_reference_time: self.__unsafe_private_named.33,
-            contributor: self.__unsafe_private_named.34,
-            copyright_holder: self.__unsafe_private_named.35,
-            copyright_notice: self.__unsafe_private_named.36,
-            copyright_year: self.__unsafe_private_named.37,
-            correction: self.__unsafe_private_named.38,
-            country_of_origin: self.__unsafe_private_named.39,
-            creative_work_status: self.__unsafe_private_named.40,
-            creator: self.__unsafe_private_named.41,
-            credit_text: self.__unsafe_private_named.42,
-            date_created: self.__unsafe_private_named.43,
-            date_modified: self.__unsafe_private_named.44,
-            date_published: self.__unsafe_private_named.45,
-            description: self.__unsafe_private_named.46,
-            digital_source_type: self.__unsafe_private_named.47,
-            disambiguating_description: self.__unsafe_private_named.48,
-            discussion_url: self.__unsafe_private_named.49,
-            edit_eidr: self.__unsafe_private_named.50,
-            editor: self.__unsafe_private_named.51,
-            educational_alignment: self.__unsafe_private_named.52,
-            educational_level: self.__unsafe_private_named.53,
-            educational_use: self.__unsafe_private_named.54,
-            encoding: self.__unsafe_private_named.55,
-            encoding_format: self.__unsafe_private_named.56,
-            encodings: self.__unsafe_private_named.57,
-            example_of_work: self.__unsafe_private_named.58,
-            expires: self.__unsafe_private_named.59,
-            file_format: self.__unsafe_private_named.60,
-            funder: self.__unsafe_private_named.61,
-            funding: self.__unsafe_private_named.62,
-            genre: self.__unsafe_private_named.63,
-            has_part: self.__unsafe_private_named.64,
-            headline: self.__unsafe_private_named.65,
-            identifier: self.__unsafe_private_named.66,
-            illustrator: self.__unsafe_private_named.67,
-            image: self.__unsafe_private_named.68,
-            in_language: self.__unsafe_private_named.69,
-            interaction_statistic: self.__unsafe_private_named.70,
-            interactivity_type: self.__unsafe_private_named.71,
-            interpreted_as_claim: self.__unsafe_private_named.72,
-            is_accessible_for_free: self.__unsafe_private_named.73,
-            is_based_on: self.__unsafe_private_named.74,
-            is_based_on_url: self.__unsafe_private_named.75,
-            is_family_friendly: self.__unsafe_private_named.76,
-            is_part_of: self.__unsafe_private_named.77,
-            isbn: self.__unsafe_private_named.78,
-            keywords: self.__unsafe_private_named.79,
-            learning_resource_type: self.__unsafe_private_named.80,
-            license: self.__unsafe_private_named.81,
-            location_created: self.__unsafe_private_named.82,
-            main_entity: self.__unsafe_private_named.83,
-            main_entity_of_page: self.__unsafe_private_named.84,
-            maintainer: self.__unsafe_private_named.85,
-            material: self.__unsafe_private_named.86,
-            material_extent: self.__unsafe_private_named.87,
-            mentions: self.__unsafe_private_named.88,
-            name: self.__unsafe_private_named.89,
-            number_of_pages: self.__unsafe_private_named.90,
-            offers: self.__unsafe_private_named.91,
-            pattern: self.__unsafe_private_named.92,
-            position: self.__unsafe_private_named.93,
-            potential_action: self.__unsafe_private_named.94,
-            producer: self.__unsafe_private_named.95,
-            provider: self.__unsafe_private_named.96,
-            publication: self.__unsafe_private_named.97,
-            publisher: self.__unsafe_private_named.98,
-            publisher_imprint: self.__unsafe_private_named.99,
-            publishing_principles: self.__unsafe_private_named.100,
-            recorded_at: self.__unsafe_private_named.101,
-            released_event: self.__unsafe_private_named.102,
-            review: self.__unsafe_private_named.103,
-            reviews: self.__unsafe_private_named.104,
-            same_as: self.__unsafe_private_named.105,
-            schema_version: self.__unsafe_private_named.106,
-            sd_date_published: self.__unsafe_private_named.107,
-            sd_license: self.__unsafe_private_named.108,
-            sd_publisher: self.__unsafe_private_named.109,
-            size: self.__unsafe_private_named.110,
-            source_organization: self.__unsafe_private_named.111,
-            spatial: self.__unsafe_private_named.112,
-            spatial_coverage: self.__unsafe_private_named.113,
-            sponsor: self.__unsafe_private_named.114,
-            subject_of: self.__unsafe_private_named.115,
-            teaches: self.__unsafe_private_named.116,
-            temporal: self.__unsafe_private_named.117,
-            temporal_coverage: self.__unsafe_private_named.118,
-            text: self.__unsafe_private_named.119,
-            thumbnail: self.__unsafe_private_named.120,
-            thumbnail_url: self.__unsafe_private_named.121,
-            time_required: self.__unsafe_private_named.122,
-            translation_of_work: self.__unsafe_private_named.123,
-            translator: self.__unsafe_private_named.124,
-            typical_age_range: self.__unsafe_private_named.125,
-            url: self.__unsafe_private_named.126,
-            usage_info: self.__unsafe_private_named.127,
-            version: self.__unsafe_private_named.128,
-            video: self.__unsafe_private_named.129,
-            word_count: self.__unsafe_private_named.130,
-            work_example: self.__unsafe_private_named.131,
-            work_translation: self.__unsafe_private_named.132,
+            about: self._fields.0,
+            abridged: self._fields.1,
+            r#abstract: self._fields.2,
+            access_mode: self._fields.3,
+            access_mode_sufficient: self._fields.4,
+            accessibility_api: self._fields.5,
+            accessibility_control: self._fields.6,
+            accessibility_feature: self._fields.7,
+            accessibility_hazard: self._fields.8,
+            accessibility_summary: self._fields.9,
+            accountable_person: self._fields.10,
+            acquire_license_page: self._fields.11,
+            additional_type: self._fields.12,
+            aggregate_rating: self._fields.13,
+            alternate_name: self._fields.14,
+            alternative_headline: self._fields.15,
+            archived_at: self._fields.16,
+            assesses: self._fields.17,
+            associated_media: self._fields.18,
+            audience: self._fields.19,
+            audio: self._fields.20,
+            author: self._fields.21,
+            award: self._fields.22,
+            awards: self._fields.23,
+            book_edition: self._fields.24,
+            book_format: self._fields.25,
+            character: self._fields.26,
+            citation: self._fields.27,
+            comment: self._fields.28,
+            comment_count: self._fields.29,
+            conditions_of_access: self._fields.30,
+            content_location: self._fields.31,
+            content_rating: self._fields.32,
+            content_reference_time: self._fields.33,
+            contributor: self._fields.34,
+            copyright_holder: self._fields.35,
+            copyright_notice: self._fields.36,
+            copyright_year: self._fields.37,
+            correction: self._fields.38,
+            country_of_origin: self._fields.39,
+            creative_work_status: self._fields.40,
+            creator: self._fields.41,
+            credit_text: self._fields.42,
+            date_created: self._fields.43,
+            date_modified: self._fields.44,
+            date_published: self._fields.45,
+            description: self._fields.46,
+            digital_source_type: self._fields.47,
+            disambiguating_description: self._fields.48,
+            discussion_url: self._fields.49,
+            edit_eidr: self._fields.50,
+            editor: self._fields.51,
+            educational_alignment: self._fields.52,
+            educational_level: self._fields.53,
+            educational_use: self._fields.54,
+            encoding: self._fields.55,
+            encoding_format: self._fields.56,
+            encodings: self._fields.57,
+            example_of_work: self._fields.58,
+            expires: self._fields.59,
+            file_format: self._fields.60,
+            funder: self._fields.61,
+            funding: self._fields.62,
+            genre: self._fields.63,
+            has_part: self._fields.64,
+            headline: self._fields.65,
+            identifier: self._fields.66,
+            illustrator: self._fields.67,
+            image: self._fields.68,
+            in_language: self._fields.69,
+            interaction_statistic: self._fields.70,
+            interactivity_type: self._fields.71,
+            interpreted_as_claim: self._fields.72,
+            is_accessible_for_free: self._fields.73,
+            is_based_on: self._fields.74,
+            is_based_on_url: self._fields.75,
+            is_family_friendly: self._fields.76,
+            is_part_of: self._fields.77,
+            isbn: self._fields.78,
+            keywords: self._fields.79,
+            learning_resource_type: self._fields.80,
+            license: self._fields.81,
+            location_created: self._fields.82,
+            main_entity: self._fields.83,
+            main_entity_of_page: self._fields.84,
+            maintainer: self._fields.85,
+            material: self._fields.86,
+            material_extent: self._fields.87,
+            mentions: self._fields.88,
+            name: self._fields.89,
+            number_of_pages: self._fields.90,
+            offers: self._fields.91,
+            pattern: self._fields.92,
+            position: self._fields.93,
+            potential_action: self._fields.94,
+            producer: self._fields.95,
+            provider: self._fields.96,
+            publication: self._fields.97,
+            publisher: self._fields.98,
+            publisher_imprint: self._fields.99,
+            publishing_principles: self._fields.100,
+            recorded_at: self._fields.101,
+            released_event: self._fields.102,
+            review: self._fields.103,
+            reviews: self._fields.104,
+            same_as: self._fields.105,
+            schema_version: self._fields.106,
+            sd_date_published: self._fields.107,
+            sd_license: self._fields.108,
+            sd_publisher: self._fields.109,
+            size: self._fields.110,
+            source_organization: self._fields.111,
+            spatial: self._fields.112,
+            spatial_coverage: self._fields.113,
+            sponsor: self._fields.114,
+            subject_of: self._fields.115,
+            teaches: self._fields.116,
+            temporal: self._fields.117,
+            temporal_coverage: self._fields.118,
+            text: self._fields.119,
+            thumbnail: self._fields.120,
+            thumbnail_url: self._fields.121,
+            time_required: self._fields.122,
+            translation_of_work: self._fields.123,
+            translator: self._fields.124,
+            typical_age_range: self._fields.125,
+            url: self._fields.126,
+            usage_info: self._fields.127,
+            version: self._fields.128,
+            video: self._fields.129,
+            word_count: self._fields.130,
+            work_example: self._fields.131,
+            work_translation: self._fields.132,
             extra_data: Default::default(),
         }
     }
@@ -8094,139 +8097,139 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Book<'a> {
         Book {
-            about: self.__unsafe_private_named.0,
-            abridged: self.__unsafe_private_named.1,
-            r#abstract: self.__unsafe_private_named.2,
-            access_mode: self.__unsafe_private_named.3,
-            access_mode_sufficient: self.__unsafe_private_named.4,
-            accessibility_api: self.__unsafe_private_named.5,
-            accessibility_control: self.__unsafe_private_named.6,
-            accessibility_feature: self.__unsafe_private_named.7,
-            accessibility_hazard: self.__unsafe_private_named.8,
-            accessibility_summary: self.__unsafe_private_named.9,
-            accountable_person: self.__unsafe_private_named.10,
-            acquire_license_page: self.__unsafe_private_named.11,
-            additional_type: self.__unsafe_private_named.12,
-            aggregate_rating: self.__unsafe_private_named.13,
-            alternate_name: self.__unsafe_private_named.14,
-            alternative_headline: self.__unsafe_private_named.15,
-            archived_at: self.__unsafe_private_named.16,
-            assesses: self.__unsafe_private_named.17,
-            associated_media: self.__unsafe_private_named.18,
-            audience: self.__unsafe_private_named.19,
-            audio: self.__unsafe_private_named.20,
-            author: self.__unsafe_private_named.21,
-            award: self.__unsafe_private_named.22,
-            awards: self.__unsafe_private_named.23,
-            book_edition: self.__unsafe_private_named.24,
-            book_format: self.__unsafe_private_named.25,
-            character: self.__unsafe_private_named.26,
-            citation: self.__unsafe_private_named.27,
-            comment: self.__unsafe_private_named.28,
-            comment_count: self.__unsafe_private_named.29,
-            conditions_of_access: self.__unsafe_private_named.30,
-            content_location: self.__unsafe_private_named.31,
-            content_rating: self.__unsafe_private_named.32,
-            content_reference_time: self.__unsafe_private_named.33,
-            contributor: self.__unsafe_private_named.34,
-            copyright_holder: self.__unsafe_private_named.35,
-            copyright_notice: self.__unsafe_private_named.36,
-            copyright_year: self.__unsafe_private_named.37,
-            correction: self.__unsafe_private_named.38,
-            country_of_origin: self.__unsafe_private_named.39,
-            creative_work_status: self.__unsafe_private_named.40,
-            creator: self.__unsafe_private_named.41,
-            credit_text: self.__unsafe_private_named.42,
-            date_created: self.__unsafe_private_named.43,
-            date_modified: self.__unsafe_private_named.44,
-            date_published: self.__unsafe_private_named.45,
-            description: self.__unsafe_private_named.46,
-            digital_source_type: self.__unsafe_private_named.47,
-            disambiguating_description: self.__unsafe_private_named.48,
-            discussion_url: self.__unsafe_private_named.49,
-            edit_eidr: self.__unsafe_private_named.50,
-            editor: self.__unsafe_private_named.51,
-            educational_alignment: self.__unsafe_private_named.52,
-            educational_level: self.__unsafe_private_named.53,
-            educational_use: self.__unsafe_private_named.54,
-            encoding: self.__unsafe_private_named.55,
-            encoding_format: self.__unsafe_private_named.56,
-            encodings: self.__unsafe_private_named.57,
-            example_of_work: self.__unsafe_private_named.58,
-            expires: self.__unsafe_private_named.59,
-            file_format: self.__unsafe_private_named.60,
-            funder: self.__unsafe_private_named.61,
-            funding: self.__unsafe_private_named.62,
-            genre: self.__unsafe_private_named.63,
-            has_part: self.__unsafe_private_named.64,
-            headline: self.__unsafe_private_named.65,
-            identifier: self.__unsafe_private_named.66,
-            illustrator: self.__unsafe_private_named.67,
-            image: self.__unsafe_private_named.68,
-            in_language: self.__unsafe_private_named.69,
-            interaction_statistic: self.__unsafe_private_named.70,
-            interactivity_type: self.__unsafe_private_named.71,
-            interpreted_as_claim: self.__unsafe_private_named.72,
-            is_accessible_for_free: self.__unsafe_private_named.73,
-            is_based_on: self.__unsafe_private_named.74,
-            is_based_on_url: self.__unsafe_private_named.75,
-            is_family_friendly: self.__unsafe_private_named.76,
-            is_part_of: self.__unsafe_private_named.77,
-            isbn: self.__unsafe_private_named.78,
-            keywords: self.__unsafe_private_named.79,
-            learning_resource_type: self.__unsafe_private_named.80,
-            license: self.__unsafe_private_named.81,
-            location_created: self.__unsafe_private_named.82,
-            main_entity: self.__unsafe_private_named.83,
-            main_entity_of_page: self.__unsafe_private_named.84,
-            maintainer: self.__unsafe_private_named.85,
-            material: self.__unsafe_private_named.86,
-            material_extent: self.__unsafe_private_named.87,
-            mentions: self.__unsafe_private_named.88,
-            name: self.__unsafe_private_named.89,
-            number_of_pages: self.__unsafe_private_named.90,
-            offers: self.__unsafe_private_named.91,
-            pattern: self.__unsafe_private_named.92,
-            position: self.__unsafe_private_named.93,
-            potential_action: self.__unsafe_private_named.94,
-            producer: self.__unsafe_private_named.95,
-            provider: self.__unsafe_private_named.96,
-            publication: self.__unsafe_private_named.97,
-            publisher: self.__unsafe_private_named.98,
-            publisher_imprint: self.__unsafe_private_named.99,
-            publishing_principles: self.__unsafe_private_named.100,
-            recorded_at: self.__unsafe_private_named.101,
-            released_event: self.__unsafe_private_named.102,
-            review: self.__unsafe_private_named.103,
-            reviews: self.__unsafe_private_named.104,
-            same_as: self.__unsafe_private_named.105,
-            schema_version: self.__unsafe_private_named.106,
-            sd_date_published: self.__unsafe_private_named.107,
-            sd_license: self.__unsafe_private_named.108,
-            sd_publisher: self.__unsafe_private_named.109,
-            size: self.__unsafe_private_named.110,
-            source_organization: self.__unsafe_private_named.111,
-            spatial: self.__unsafe_private_named.112,
-            spatial_coverage: self.__unsafe_private_named.113,
-            sponsor: self.__unsafe_private_named.114,
-            subject_of: self.__unsafe_private_named.115,
-            teaches: self.__unsafe_private_named.116,
-            temporal: self.__unsafe_private_named.117,
-            temporal_coverage: self.__unsafe_private_named.118,
-            text: self.__unsafe_private_named.119,
-            thumbnail: self.__unsafe_private_named.120,
-            thumbnail_url: self.__unsafe_private_named.121,
-            time_required: self.__unsafe_private_named.122,
-            translation_of_work: self.__unsafe_private_named.123,
-            translator: self.__unsafe_private_named.124,
-            typical_age_range: self.__unsafe_private_named.125,
-            url: self.__unsafe_private_named.126,
-            usage_info: self.__unsafe_private_named.127,
-            version: self.__unsafe_private_named.128,
-            video: self.__unsafe_private_named.129,
-            word_count: self.__unsafe_private_named.130,
-            work_example: self.__unsafe_private_named.131,
-            work_translation: self.__unsafe_private_named.132,
+            about: self._fields.0,
+            abridged: self._fields.1,
+            r#abstract: self._fields.2,
+            access_mode: self._fields.3,
+            access_mode_sufficient: self._fields.4,
+            accessibility_api: self._fields.5,
+            accessibility_control: self._fields.6,
+            accessibility_feature: self._fields.7,
+            accessibility_hazard: self._fields.8,
+            accessibility_summary: self._fields.9,
+            accountable_person: self._fields.10,
+            acquire_license_page: self._fields.11,
+            additional_type: self._fields.12,
+            aggregate_rating: self._fields.13,
+            alternate_name: self._fields.14,
+            alternative_headline: self._fields.15,
+            archived_at: self._fields.16,
+            assesses: self._fields.17,
+            associated_media: self._fields.18,
+            audience: self._fields.19,
+            audio: self._fields.20,
+            author: self._fields.21,
+            award: self._fields.22,
+            awards: self._fields.23,
+            book_edition: self._fields.24,
+            book_format: self._fields.25,
+            character: self._fields.26,
+            citation: self._fields.27,
+            comment: self._fields.28,
+            comment_count: self._fields.29,
+            conditions_of_access: self._fields.30,
+            content_location: self._fields.31,
+            content_rating: self._fields.32,
+            content_reference_time: self._fields.33,
+            contributor: self._fields.34,
+            copyright_holder: self._fields.35,
+            copyright_notice: self._fields.36,
+            copyright_year: self._fields.37,
+            correction: self._fields.38,
+            country_of_origin: self._fields.39,
+            creative_work_status: self._fields.40,
+            creator: self._fields.41,
+            credit_text: self._fields.42,
+            date_created: self._fields.43,
+            date_modified: self._fields.44,
+            date_published: self._fields.45,
+            description: self._fields.46,
+            digital_source_type: self._fields.47,
+            disambiguating_description: self._fields.48,
+            discussion_url: self._fields.49,
+            edit_eidr: self._fields.50,
+            editor: self._fields.51,
+            educational_alignment: self._fields.52,
+            educational_level: self._fields.53,
+            educational_use: self._fields.54,
+            encoding: self._fields.55,
+            encoding_format: self._fields.56,
+            encodings: self._fields.57,
+            example_of_work: self._fields.58,
+            expires: self._fields.59,
+            file_format: self._fields.60,
+            funder: self._fields.61,
+            funding: self._fields.62,
+            genre: self._fields.63,
+            has_part: self._fields.64,
+            headline: self._fields.65,
+            identifier: self._fields.66,
+            illustrator: self._fields.67,
+            image: self._fields.68,
+            in_language: self._fields.69,
+            interaction_statistic: self._fields.70,
+            interactivity_type: self._fields.71,
+            interpreted_as_claim: self._fields.72,
+            is_accessible_for_free: self._fields.73,
+            is_based_on: self._fields.74,
+            is_based_on_url: self._fields.75,
+            is_family_friendly: self._fields.76,
+            is_part_of: self._fields.77,
+            isbn: self._fields.78,
+            keywords: self._fields.79,
+            learning_resource_type: self._fields.80,
+            license: self._fields.81,
+            location_created: self._fields.82,
+            main_entity: self._fields.83,
+            main_entity_of_page: self._fields.84,
+            maintainer: self._fields.85,
+            material: self._fields.86,
+            material_extent: self._fields.87,
+            mentions: self._fields.88,
+            name: self._fields.89,
+            number_of_pages: self._fields.90,
+            offers: self._fields.91,
+            pattern: self._fields.92,
+            position: self._fields.93,
+            potential_action: self._fields.94,
+            producer: self._fields.95,
+            provider: self._fields.96,
+            publication: self._fields.97,
+            publisher: self._fields.98,
+            publisher_imprint: self._fields.99,
+            publishing_principles: self._fields.100,
+            recorded_at: self._fields.101,
+            released_event: self._fields.102,
+            review: self._fields.103,
+            reviews: self._fields.104,
+            same_as: self._fields.105,
+            schema_version: self._fields.106,
+            sd_date_published: self._fields.107,
+            sd_license: self._fields.108,
+            sd_publisher: self._fields.109,
+            size: self._fields.110,
+            source_organization: self._fields.111,
+            spatial: self._fields.112,
+            spatial_coverage: self._fields.113,
+            sponsor: self._fields.114,
+            subject_of: self._fields.115,
+            teaches: self._fields.116,
+            temporal: self._fields.117,
+            temporal_coverage: self._fields.118,
+            text: self._fields.119,
+            thumbnail: self._fields.120,
+            thumbnail_url: self._fields.121,
+            time_required: self._fields.122,
+            translation_of_work: self._fields.123,
+            translator: self._fields.124,
+            typical_age_range: self._fields.125,
+            url: self._fields.126,
+            usage_info: self._fields.127,
+            version: self._fields.128,
+            video: self._fields.129,
+            word_count: self._fields.130,
+            work_example: self._fields.131,
+            work_translation: self._fields.132,
             extra_data: Some(extra_data),
         }
     }

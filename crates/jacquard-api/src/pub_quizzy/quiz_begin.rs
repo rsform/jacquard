@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -116,80 +119,80 @@ pub mod quiz_begin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Quiz;
-        type League;
-        type StartedAt;
         type EndsAt;
+        type League;
+        type Quiz;
+        type StartedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Quiz = Unset;
-        type League = Unset;
-        type StartedAt = Unset;
         type EndsAt = Unset;
-    }
-    ///State transition - sets the `quiz` field to Set
-    pub struct SetQuiz<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuiz<S> {}
-    impl<S: State> State for SetQuiz<S> {
-        type Quiz = Set<members::quiz>;
-        type League = S::League;
-        type StartedAt = S::StartedAt;
-        type EndsAt = S::EndsAt;
-    }
-    ///State transition - sets the `league` field to Set
-    pub struct SetLeague<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLeague<S> {}
-    impl<S: State> State for SetLeague<S> {
-        type Quiz = S::Quiz;
-        type League = Set<members::league>;
-        type StartedAt = S::StartedAt;
-        type EndsAt = S::EndsAt;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
-        type Quiz = S::Quiz;
-        type League = S::League;
-        type StartedAt = Set<members::started_at>;
-        type EndsAt = S::EndsAt;
+        type League = Unset;
+        type Quiz = Unset;
+        type StartedAt = Unset;
     }
     ///State transition - sets the `ends_at` field to Set
     pub struct SetEndsAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEndsAt<S> {}
     impl<S: State> State for SetEndsAt<S> {
-        type Quiz = S::Quiz;
-        type League = S::League;
-        type StartedAt = S::StartedAt;
         type EndsAt = Set<members::ends_at>;
+        type League = S::League;
+        type Quiz = S::Quiz;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `league` field to Set
+    pub struct SetLeague<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLeague<S> {}
+    impl<S: State> State for SetLeague<S> {
+        type EndsAt = S::EndsAt;
+        type League = Set<members::league>;
+        type Quiz = S::Quiz;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `quiz` field to Set
+    pub struct SetQuiz<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuiz<S> {}
+    impl<S: State> State for SetQuiz<S> {
+        type EndsAt = S::EndsAt;
+        type League = S::League;
+        type Quiz = Set<members::quiz>;
+        type StartedAt = S::StartedAt;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type EndsAt = S::EndsAt;
+        type League = S::League;
+        type Quiz = S::Quiz;
+        type StartedAt = Set<members::started_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `quiz` field
-        pub struct quiz(());
-        ///Marker type for the `league` field
-        pub struct league(());
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
         ///Marker type for the `ends_at` field
         pub struct ends_at(());
+        ///Marker type for the `league` field
+        pub struct league(());
+        ///Marker type for the `quiz` field
+        pub struct quiz(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct QuizBeginBuilder<'a, S: quiz_begin_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<StrongRef<'a>>,
         Option<StrongRef<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> QuizBegin<'a> {
@@ -203,9 +206,9 @@ impl<'a> QuizBeginBuilder<'a, quiz_begin_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         QuizBeginBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -220,11 +223,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> QuizBeginBuilder<'a, quiz_begin_state::SetEndsAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         QuizBeginBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -239,11 +242,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> QuizBeginBuilder<'a, quiz_begin_state::SetLeague<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         QuizBeginBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -258,11 +261,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> QuizBeginBuilder<'a, quiz_begin_state::SetQuiz<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         QuizBeginBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -277,11 +280,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> QuizBeginBuilder<'a, quiz_begin_state::SetStartedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         QuizBeginBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -289,18 +292,18 @@ where
 impl<'a, S> QuizBeginBuilder<'a, S>
 where
     S: quiz_begin_state::State,
-    S::Quiz: quiz_begin_state::IsSet,
-    S::League: quiz_begin_state::IsSet,
-    S::StartedAt: quiz_begin_state::IsSet,
     S::EndsAt: quiz_begin_state::IsSet,
+    S::League: quiz_begin_state::IsSet,
+    S::Quiz: quiz_begin_state::IsSet,
+    S::StartedAt: quiz_begin_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> QuizBegin<'a> {
         QuizBegin {
-            ends_at: self.__unsafe_private_named.0.unwrap(),
-            league: self.__unsafe_private_named.1.unwrap(),
-            quiz: self.__unsafe_private_named.2.unwrap(),
-            started_at: self.__unsafe_private_named.3.unwrap(),
+            ends_at: self._fields.0.unwrap(),
+            league: self._fields.1.unwrap(),
+            quiz: self._fields.2.unwrap(),
+            started_at: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -313,10 +316,10 @@ where
         >,
     ) -> QuizBegin<'a> {
         QuizBegin {
-            ends_at: self.__unsafe_private_named.0.unwrap(),
-            league: self.__unsafe_private_named.1.unwrap(),
-            quiz: self.__unsafe_private_named.2.unwrap(),
-            started_at: self.__unsafe_private_named.3.unwrap(),
+            ends_at: self._fields.0.unwrap(),
+            league: self._fields.1.unwrap(),
+            quiz: self._fields.2.unwrap(),
+            started_at: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

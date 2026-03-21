@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::AtUri;
@@ -107,14 +110,9 @@ pub mod get_branch_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetBranchBuilder<'a, S: get_branch_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<AtUri<'a>>,
-        Option<i64>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<AtUri<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetBranch<'a> {
@@ -128,9 +126,9 @@ impl<'a> GetBranchBuilder<'a, get_branch_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetBranchBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -138,12 +136,12 @@ impl<'a> GetBranchBuilder<'a, get_branch_state::Empty> {
 impl<'a, S: get_branch_state::State> GetBranchBuilder<'a, S> {
     /// Set the `afterRkey` field (optional)
     pub fn after_rkey(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `afterRkey` field to an Option value (optional)
     pub fn maybe_after_rkey(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -151,12 +149,12 @@ impl<'a, S: get_branch_state::State> GetBranchBuilder<'a, S> {
 impl<'a, S: get_branch_state::State> GetBranchBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -171,11 +169,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> GetBranchBuilder<'a, get_branch_state::SetHead<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         GetBranchBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -183,12 +181,12 @@ where
 impl<'a, S: get_branch_state::State> GetBranchBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -201,10 +199,10 @@ where
     /// Build the final struct
     pub fn build(self) -> GetBranch<'a> {
         GetBranch {
-            after_rkey: self.__unsafe_private_named.0,
-            cursor: self.__unsafe_private_named.1,
-            head: self.__unsafe_private_named.2.unwrap(),
-            limit: self.__unsafe_private_named.3,
+            after_rkey: self._fields.0,
+            cursor: self._fields.1,
+            head: self._fields.2.unwrap(),
+            limit: self._fields.3,
         }
     }
 }

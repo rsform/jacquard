@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -150,9 +153,9 @@ pub mod like_state {
 
 /// Builder for constructing an instance of this type
 pub struct LikeBuilder<'a, S: like_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>, Option<Datetime>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>, Option<Datetime>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Like<'a> {
@@ -166,9 +169,9 @@ impl<'a> LikeBuilder<'a, like_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LikeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -176,12 +179,12 @@ impl<'a> LikeBuilder<'a, like_state::Empty> {
 impl<'a, S: like_state::State> LikeBuilder<'a, S> {
     /// Set the `bskyLikeUri` field (optional)
     pub fn bsky_like_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `bskyLikeUri` field to an Option value (optional)
     pub fn maybe_bsky_like_uri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -196,11 +199,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LikeBuilder<'a, like_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LikeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -215,11 +218,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> LikeBuilder<'a, like_state::SetSubject<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LikeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -233,9 +236,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Like<'a> {
         Like {
-            bsky_like_uri: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            subject: self.__unsafe_private_named.2.unwrap(),
+            bsky_like_uri: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            subject: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -248,9 +251,9 @@ where
         >,
     ) -> Like<'a> {
         Like {
-            bsky_like_uri: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            subject: self.__unsafe_private_named.2.unwrap(),
+            bsky_like_uri: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            subject: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -367,44 +370,44 @@ pub mod review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Fragrance;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Fragrance = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Fragrance = S::Fragrance;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `fragrance` field to Set
     pub struct SetFragrance<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFragrance<S> {}
     impl<S: State> State for SetFragrance<S> {
-        type CreatedAt = S::CreatedAt;
         type Fragrance = Set<members::fragrance>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Fragrance = S::Fragrance;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `fragrance` field
         pub struct fragrance(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ReviewBuilder<'a, S: review_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<i64>,
         Option<Datetime>,
         Option<i64>,
@@ -426,7 +429,7 @@ pub struct ReviewBuilder<'a, S: review_state::State> {
         Option<bool>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Review<'a> {
@@ -440,8 +443,8 @@ impl<'a> ReviewBuilder<'a, review_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ReviewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -463,7 +466,7 @@ impl<'a> ReviewBuilder<'a, review_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -471,12 +474,12 @@ impl<'a> ReviewBuilder<'a, review_state::Empty> {
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `complexity` field (optional)
     pub fn complexity(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `complexity` field to an Option value (optional)
     pub fn maybe_complexity(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -491,11 +494,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ReviewBuilder<'a, review_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ReviewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -503,12 +506,12 @@ where
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `drydownRating` field (optional)
     pub fn drydown_rating(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `drydownRating` field to an Option value (optional)
     pub fn maybe_drydown_rating(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -516,12 +519,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `elevation` field (optional)
     pub fn elevation(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `elevation` field to an Option value (optional)
     pub fn maybe_elevation(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -529,12 +532,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `endRating` field (optional)
     pub fn end_rating(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `endRating` field to an Option value (optional)
     pub fn maybe_end_rating(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -549,11 +552,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ReviewBuilder<'a, review_state::SetFragrance<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ReviewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -561,12 +564,12 @@ where
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `longevity` field (optional)
     pub fn longevity(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `longevity` field to an Option value (optional)
     pub fn maybe_longevity(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -574,12 +577,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `midProjection` field (optional)
     pub fn mid_projection(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `midProjection` field to an Option value (optional)
     pub fn maybe_mid_projection(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -587,12 +590,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `openingProjection` field (optional)
     pub fn opening_projection(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `openingProjection` field to an Option value (optional)
     pub fn maybe_opening_projection(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -600,12 +603,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `openingRating` field (optional)
     pub fn opening_rating(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `openingRating` field to an Option value (optional)
     pub fn maybe_opening_rating(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -613,12 +616,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `overallRating` field (optional)
     pub fn overall_rating(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `overallRating` field to an Option value (optional)
     pub fn maybe_overall_rating(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -626,12 +629,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `sillage` field (optional)
     pub fn sillage(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `sillage` field to an Option value (optional)
     pub fn maybe_sillage(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -639,12 +642,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `stage1Temp` field (optional)
     pub fn stage1_temp(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `stage1Temp` field to an Option value (optional)
     pub fn maybe_stage1_temp(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -652,12 +655,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `stage2CompletedAt` field (optional)
     pub fn stage2_completed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `stage2CompletedAt` field to an Option value (optional)
     pub fn maybe_stage2_completed_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -665,12 +668,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `stage2Temp` field (optional)
     pub fn stage2_temp(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `stage2Temp` field to an Option value (optional)
     pub fn maybe_stage2_temp(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -678,12 +681,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `stage3Temp` field (optional)
     pub fn stage3_temp(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `stage3Temp` field to an Option value (optional)
     pub fn maybe_stage3_temp(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -691,12 +694,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
     pub fn maybe_text(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -704,12 +707,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `uvIndex` field (optional)
     pub fn uv_index(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `uvIndex` field to an Option value (optional)
     pub fn maybe_uv_index(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -717,12 +720,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `weatherOptIn` field (optional)
     pub fn weather_opt_in(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `weatherOptIn` field to an Option value (optional)
     pub fn maybe_weather_opt_in(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -730,12 +733,12 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     /// Set the `weightedScore` field (optional)
     pub fn weighted_score(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `weightedScore` field to an Option value (optional)
     pub fn maybe_weighted_score(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -743,32 +746,32 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
 impl<'a, S> ReviewBuilder<'a, S>
 where
     S: review_state::State,
-    S::CreatedAt: review_state::IsSet,
     S::Fragrance: review_state::IsSet,
+    S::CreatedAt: review_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Review<'a> {
         Review {
-            complexity: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            drydown_rating: self.__unsafe_private_named.2,
-            elevation: self.__unsafe_private_named.3,
-            end_rating: self.__unsafe_private_named.4,
-            fragrance: self.__unsafe_private_named.5.unwrap(),
-            longevity: self.__unsafe_private_named.6,
-            mid_projection: self.__unsafe_private_named.7,
-            opening_projection: self.__unsafe_private_named.8,
-            opening_rating: self.__unsafe_private_named.9,
-            overall_rating: self.__unsafe_private_named.10,
-            sillage: self.__unsafe_private_named.11,
-            stage1_temp: self.__unsafe_private_named.12,
-            stage2_completed_at: self.__unsafe_private_named.13,
-            stage2_temp: self.__unsafe_private_named.14,
-            stage3_temp: self.__unsafe_private_named.15,
-            text: self.__unsafe_private_named.16,
-            uv_index: self.__unsafe_private_named.17,
-            weather_opt_in: self.__unsafe_private_named.18,
-            weighted_score: self.__unsafe_private_named.19,
+            complexity: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            drydown_rating: self._fields.2,
+            elevation: self._fields.3,
+            end_rating: self._fields.4,
+            fragrance: self._fields.5.unwrap(),
+            longevity: self._fields.6,
+            mid_projection: self._fields.7,
+            opening_projection: self._fields.8,
+            opening_rating: self._fields.9,
+            overall_rating: self._fields.10,
+            sillage: self._fields.11,
+            stage1_temp: self._fields.12,
+            stage2_completed_at: self._fields.13,
+            stage2_temp: self._fields.14,
+            stage3_temp: self._fields.15,
+            text: self._fields.16,
+            uv_index: self._fields.17,
+            weather_opt_in: self._fields.18,
+            weighted_score: self._fields.19,
             extra_data: Default::default(),
         }
     }
@@ -781,26 +784,26 @@ where
         >,
     ) -> Review<'a> {
         Review {
-            complexity: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            drydown_rating: self.__unsafe_private_named.2,
-            elevation: self.__unsafe_private_named.3,
-            end_rating: self.__unsafe_private_named.4,
-            fragrance: self.__unsafe_private_named.5.unwrap(),
-            longevity: self.__unsafe_private_named.6,
-            mid_projection: self.__unsafe_private_named.7,
-            opening_projection: self.__unsafe_private_named.8,
-            opening_rating: self.__unsafe_private_named.9,
-            overall_rating: self.__unsafe_private_named.10,
-            sillage: self.__unsafe_private_named.11,
-            stage1_temp: self.__unsafe_private_named.12,
-            stage2_completed_at: self.__unsafe_private_named.13,
-            stage2_temp: self.__unsafe_private_named.14,
-            stage3_temp: self.__unsafe_private_named.15,
-            text: self.__unsafe_private_named.16,
-            uv_index: self.__unsafe_private_named.17,
-            weather_opt_in: self.__unsafe_private_named.18,
-            weighted_score: self.__unsafe_private_named.19,
+            complexity: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            drydown_rating: self._fields.2,
+            elevation: self._fields.3,
+            end_rating: self._fields.4,
+            fragrance: self._fields.5.unwrap(),
+            longevity: self._fields.6,
+            mid_projection: self._fields.7,
+            opening_projection: self._fields.8,
+            opening_rating: self._fields.9,
+            overall_rating: self._fields.10,
+            sillage: self._fields.11,
+            stage1_temp: self._fields.12,
+            stage2_completed_at: self._fields.13,
+            stage2_temp: self._fields.14,
+            stage3_temp: self._fields.15,
+            text: self._fields.16,
+            uv_index: self._fields.17,
+            weather_opt_in: self._fields.18,
+            weighted_score: self._fields.19,
             extra_data: Some(extra_data),
         }
     }

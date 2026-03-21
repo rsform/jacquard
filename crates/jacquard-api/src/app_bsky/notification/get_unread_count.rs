@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::string::Datetime;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -73,8 +76,8 @@ pub mod get_unread_count_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetUnreadCountBuilder<S: get_unread_count_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>, Option<Datetime>),
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<Datetime>),
 }
 
 impl GetUnreadCount {
@@ -88,8 +91,8 @@ impl GetUnreadCountBuilder<get_unread_count_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetUnreadCountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
+            _state: PhantomData,
+            _fields: (None, None),
         }
     }
 }
@@ -97,12 +100,12 @@ impl GetUnreadCountBuilder<get_unread_count_state::Empty> {
 impl<S: get_unread_count_state::State> GetUnreadCountBuilder<S> {
     /// Set the `priority` field (optional)
     pub fn priority(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `priority` field to an Option value (optional)
     pub fn maybe_priority(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -110,12 +113,12 @@ impl<S: get_unread_count_state::State> GetUnreadCountBuilder<S> {
 impl<S: get_unread_count_state::State> GetUnreadCountBuilder<S> {
     /// Set the `seenAt` field (optional)
     pub fn seen_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `seenAt` field to an Option value (optional)
     pub fn maybe_seen_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -127,8 +130,8 @@ where
     /// Build the final struct
     pub fn build(self) -> GetUnreadCount {
         GetUnreadCount {
-            priority: self.__unsafe_private_named.0,
-            seen_at: self.__unsafe_private_named.1,
+            priority: self._fields.0,
+            seen_at: self._fields.1,
         }
     }
 }

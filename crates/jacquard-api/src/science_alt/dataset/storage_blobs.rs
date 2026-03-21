@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -161,9 +164,9 @@ pub mod blob_entry_state {
 
 /// Builder for constructing an instance of this type
 pub struct BlobEntryBuilder<'a, S: blob_entry_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<BlobRef<'a>>, Option<ShardChecksum<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<BlobRef<'a>>, Option<ShardChecksum<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> BlobEntry<'a> {
@@ -177,9 +180,9 @@ impl<'a> BlobEntryBuilder<'a, blob_entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BlobEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -194,11 +197,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> BlobEntryBuilder<'a, blob_entry_state::SetBlob<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BlobEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -206,12 +209,12 @@ where
 impl<'a, S: blob_entry_state::State> BlobEntryBuilder<'a, S> {
     /// Set the `checksum` field (optional)
     pub fn checksum(mut self, value: impl Into<Option<ShardChecksum<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `checksum` field to an Option value (optional)
     pub fn maybe_checksum(mut self, value: Option<ShardChecksum<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -224,8 +227,8 @@ where
     /// Build the final struct
     pub fn build(self) -> BlobEntry<'a> {
         BlobEntry {
-            blob: self.__unsafe_private_named.0.unwrap(),
-            checksum: self.__unsafe_private_named.1,
+            blob: self._fields.0.unwrap(),
+            checksum: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -238,8 +241,8 @@ where
         >,
     ) -> BlobEntry<'a> {
         BlobEntry {
-            blob: self.__unsafe_private_named.0.unwrap(),
-            checksum: self.__unsafe_private_named.1,
+            blob: self._fields.0.unwrap(),
+            checksum: self._fields.1,
             extra_data: Some(extra_data),
         }
     }
@@ -358,9 +361,9 @@ pub mod storage_blobs_state {
 
 /// Builder for constructing an instance of this type
 pub struct StorageBlobsBuilder<'a, S: storage_blobs_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<storage_blobs::BlobEntry<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<storage_blobs::BlobEntry<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> StorageBlobs<'a> {
@@ -374,9 +377,9 @@ impl<'a> StorageBlobsBuilder<'a, storage_blobs_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StorageBlobsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -391,11 +394,11 @@ where
         mut self,
         value: impl Into<Vec<storage_blobs::BlobEntry<'a>>>,
     ) -> StorageBlobsBuilder<'a, storage_blobs_state::SetBlobs<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         StorageBlobsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -408,7 +411,7 @@ where
     /// Build the final struct
     pub fn build(self) -> StorageBlobs<'a> {
         StorageBlobs {
-            blobs: self.__unsafe_private_named.0.unwrap(),
+            blobs: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -421,7 +424,7 @@ where
         >,
     ) -> StorageBlobs<'a> {
         StorageBlobs {
-            blobs: self.__unsafe_private_named.0.unwrap(),
+            blobs: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

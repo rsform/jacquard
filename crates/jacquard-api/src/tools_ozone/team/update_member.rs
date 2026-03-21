@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::Did;
@@ -234,13 +237,9 @@ pub mod update_member_state {
 
 /// Builder for constructing an instance of this type
 pub struct UpdateMemberBuilder<'a, S: update_member_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Did<'a>>,
-        Option<bool>,
-        Option<UpdateMemberRole<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<bool>, Option<UpdateMemberRole<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateMember<'a> {
@@ -254,9 +253,9 @@ impl<'a> UpdateMemberBuilder<'a, update_member_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateMemberBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -271,11 +270,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> UpdateMemberBuilder<'a, update_member_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         UpdateMemberBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -283,12 +282,12 @@ where
 impl<'a, S: update_member_state::State> UpdateMemberBuilder<'a, S> {
     /// Set the `disabled` field (optional)
     pub fn disabled(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `disabled` field to an Option value (optional)
     pub fn maybe_disabled(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -296,12 +295,12 @@ impl<'a, S: update_member_state::State> UpdateMemberBuilder<'a, S> {
 impl<'a, S: update_member_state::State> UpdateMemberBuilder<'a, S> {
     /// Set the `role` field (optional)
     pub fn role(mut self, value: impl Into<Option<UpdateMemberRole<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `role` field to an Option value (optional)
     pub fn maybe_role(mut self, value: Option<UpdateMemberRole<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -314,9 +313,9 @@ where
     /// Build the final struct
     pub fn build(self) -> UpdateMember<'a> {
         UpdateMember {
-            did: self.__unsafe_private_named.0.unwrap(),
-            disabled: self.__unsafe_private_named.1,
-            role: self.__unsafe_private_named.2,
+            did: self._fields.0.unwrap(),
+            disabled: self._fields.1,
+            role: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -329,9 +328,9 @@ where
         >,
     ) -> UpdateMember<'a> {
         UpdateMember {
-            did: self.__unsafe_private_named.0.unwrap(),
-            disabled: self.__unsafe_private_named.1,
-            role: self.__unsafe_private_named.2,
+            did: self._fields.0.unwrap(),
+            disabled: self._fields.1,
+            role: self._fields.2,
             extra_data: Some(extra_data),
         }
     }

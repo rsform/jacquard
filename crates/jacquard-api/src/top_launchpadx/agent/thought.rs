@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -154,14 +157,14 @@ pub mod thought_state {
 
 /// Builder for constructing an instance of this type
 pub struct ThoughtBuilder<'a, S: thought_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Thought<'a> {
@@ -175,9 +178,9 @@ impl<'a> ThoughtBuilder<'a, thought_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ThoughtBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -192,11 +195,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ThoughtBuilder<'a, thought_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ThoughtBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -204,12 +207,12 @@ where
 impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
     pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -217,12 +220,12 @@ impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
 impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
     /// Set the `subjectUri` field (optional)
     pub fn subject_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `subjectUri` field to an Option value (optional)
     pub fn maybe_subject_uri(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -237,11 +240,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ThoughtBuilder<'a, thought_state::SetWorkType<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ThoughtBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -255,10 +258,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Thought<'a> {
         Thought {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            note: self.__unsafe_private_named.1,
-            subject_uri: self.__unsafe_private_named.2,
-            work_type: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            note: self._fields.1,
+            subject_uri: self._fields.2,
+            work_type: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -271,10 +274,10 @@ where
         >,
     ) -> Thought<'a> {
         Thought {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            note: self.__unsafe_private_named.1,
-            subject_uri: self.__unsafe_private_named.2,
-            work_type: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            note: self._fields.1,
+            subject_uri: self._fields.2,
+            work_type: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

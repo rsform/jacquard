@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -113,14 +116,14 @@ pub mod external_state {
 
 /// Builder for constructing an instance of this type
 pub struct ExternalBuilder<'a, S: external_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<external::Thumb<'a>>,
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> External<'a> {
@@ -134,9 +137,9 @@ impl<'a> ExternalBuilder<'a, external_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ExternalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -144,12 +147,12 @@ impl<'a> ExternalBuilder<'a, external_state::Empty> {
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -157,12 +160,12 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `thumb` field (optional)
     pub fn thumb(mut self, value: impl Into<Option<external::Thumb<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `thumb` field to an Option value (optional)
     pub fn maybe_thumb(mut self, value: Option<external::Thumb<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -170,12 +173,12 @@ impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
 impl<'a, S: external_state::State> ExternalBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -190,11 +193,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ExternalBuilder<'a, external_state::SetUri<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ExternalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -207,10 +210,10 @@ where
     /// Build the final struct
     pub fn build(self) -> External<'a> {
         External {
-            description: self.__unsafe_private_named.0,
-            thumb: self.__unsafe_private_named.1,
-            title: self.__unsafe_private_named.2,
-            uri: self.__unsafe_private_named.3.unwrap(),
+            description: self._fields.0,
+            thumb: self._fields.1,
+            title: self._fields.2,
+            uri: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -223,10 +226,10 @@ where
         >,
     ) -> External<'a> {
         External {
-            description: self.__unsafe_private_named.0,
-            thumb: self.__unsafe_private_named.1,
-            title: self.__unsafe_private_named.2,
-            uri: self.__unsafe_private_named.3.unwrap(),
+            description: self._fields.0,
+            thumb: self._fields.1,
+            title: self._fields.2,
+            uri: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -356,9 +359,9 @@ pub mod thumb_state {
 
 /// Builder for constructing an instance of this type
 pub struct ThumbBuilder<'a, S: thumb_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Cid<'a>>, Option<UriValue<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Cid<'a>>, Option<UriValue<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Thumb<'a> {
@@ -372,9 +375,9 @@ impl<'a> ThumbBuilder<'a, thumb_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ThumbBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -389,11 +392,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> ThumbBuilder<'a, thumb_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ThumbBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -408,11 +411,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ThumbBuilder<'a, thumb_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ThumbBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -426,8 +429,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Thumb<'a> {
         Thumb {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -440,8 +443,8 @@ where
         >,
     ) -> Thumb<'a> {
         Thumb {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

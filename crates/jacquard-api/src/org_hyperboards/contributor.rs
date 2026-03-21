@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -166,8 +169,8 @@ pub mod contributor_state {
 
 /// Builder for constructing an instance of this type
 pub struct ContributorBuilder<'a, S: contributor_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<bool>,
         Option<StrongRef<'a>>,
         Option<Datetime>,
@@ -176,7 +179,7 @@ pub struct ContributorBuilder<'a, S: contributor_state::State> {
         Option<UriValue<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Contributor<'a> {
@@ -190,9 +193,9 @@ impl<'a> ContributorBuilder<'a, contributor_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ContributorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -200,12 +203,12 @@ impl<'a> ContributorBuilder<'a, contributor_state::Empty> {
 impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     /// Set the `circularImage` field (optional)
     pub fn circular_image(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `circularImage` field to an Option value (optional)
     pub fn maybe_circular_image(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -220,11 +223,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> ContributorBuilder<'a, contributor_state::SetContributorRef<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ContributorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -239,11 +242,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ContributorBuilder<'a, contributor_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ContributorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -251,12 +254,12 @@ where
 impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     /// Set the `hoverIframeUrl` field (optional)
     pub fn hover_iframe_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `hoverIframeUrl` field to an Option value (optional)
     pub fn maybe_hover_iframe_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -264,12 +267,12 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
 impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     /// Set the `hoverImageUrl` field (optional)
     pub fn hover_image_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `hoverImageUrl` field to an Option value (optional)
     pub fn maybe_hover_image_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -277,12 +280,12 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
 impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -290,12 +293,12 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
 impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     /// Set the `videoUrl` field (optional)
     pub fn video_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `videoUrl` field to an Option value (optional)
     pub fn maybe_video_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -309,13 +312,13 @@ where
     /// Build the final struct
     pub fn build(self) -> Contributor<'a> {
         Contributor {
-            circular_image: self.__unsafe_private_named.0,
-            contributor_ref: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            hover_iframe_url: self.__unsafe_private_named.3,
-            hover_image_url: self.__unsafe_private_named.4,
-            url: self.__unsafe_private_named.5,
-            video_url: self.__unsafe_private_named.6,
+            circular_image: self._fields.0,
+            contributor_ref: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            hover_iframe_url: self._fields.3,
+            hover_image_url: self._fields.4,
+            url: self._fields.5,
+            video_url: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -328,13 +331,13 @@ where
         >,
     ) -> Contributor<'a> {
         Contributor {
-            circular_image: self.__unsafe_private_named.0,
-            contributor_ref: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            hover_iframe_url: self.__unsafe_private_named.3,
-            hover_image_url: self.__unsafe_private_named.4,
-            url: self.__unsafe_private_named.5,
-            video_url: self.__unsafe_private_named.6,
+            circular_image: self._fields.0,
+            contributor_ref: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            hover_iframe_url: self._fields.3,
+            hover_image_url: self._fields.4,
+            url: self._fields.5,
+            video_url: self._fields.6,
             extra_data: Some(extra_data),
         }
     }

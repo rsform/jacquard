@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -1056,8 +1059,8 @@ pub mod contributor_config_state {
 
 /// Builder for constructing an instance of this type
 pub struct ContributorConfigBuilder<'a, S: contributor_config_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ContributorConfigContributor<'a>>,
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
@@ -1067,7 +1070,7 @@ pub struct ContributorConfigBuilder<'a, S: contributor_config_state::State> {
         Option<UriValue<'a>>,
         Option<ContributorConfigVideo<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ContributorConfig<'a> {
@@ -1081,9 +1084,9 @@ impl<'a> ContributorConfigBuilder<'a, contributor_config_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ContributorConfigBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1098,11 +1101,11 @@ where
         mut self,
         value: impl Into<ContributorConfigContributor<'a>>,
     ) -> ContributorConfigBuilder<'a, contributor_config_state::SetContributor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ContributorConfigBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1110,12 +1113,12 @@ where
 impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
     pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1123,12 +1126,12 @@ impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
 impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
     /// Set the `hoverIframeUrl` field (optional)
     pub fn hover_iframe_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `hoverIframeUrl` field to an Option value (optional)
     pub fn maybe_hover_iframe_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1139,7 +1142,7 @@ impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ContributorConfigHoverImage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `hoverImage` field to an Option value (optional)
@@ -1147,7 +1150,7 @@ impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
         mut self,
         value: Option<ContributorConfigHoverImage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1158,12 +1161,12 @@ impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ContributorConfigImage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<ContributorConfigImage<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1171,12 +1174,12 @@ impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
 impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
     /// Set the `override` field (optional)
     pub fn r#override(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `override` field to an Option value (optional)
     pub fn maybe_override(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1184,12 +1187,12 @@ impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
 impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1200,12 +1203,12 @@ impl<'a, S: contributor_config_state::State> ContributorConfigBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ContributorConfigVideo<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `video` field to an Option value (optional)
     pub fn maybe_video(mut self, value: Option<ContributorConfigVideo<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -1218,14 +1221,14 @@ where
     /// Build the final struct
     pub fn build(self) -> ContributorConfig<'a> {
         ContributorConfig {
-            contributor: self.__unsafe_private_named.0.unwrap(),
-            display_name: self.__unsafe_private_named.1,
-            hover_iframe_url: self.__unsafe_private_named.2,
-            hover_image: self.__unsafe_private_named.3,
-            image: self.__unsafe_private_named.4,
-            r#override: self.__unsafe_private_named.5,
-            url: self.__unsafe_private_named.6,
-            video: self.__unsafe_private_named.7,
+            contributor: self._fields.0.unwrap(),
+            display_name: self._fields.1,
+            hover_iframe_url: self._fields.2,
+            hover_image: self._fields.3,
+            image: self._fields.4,
+            r#override: self._fields.5,
+            url: self._fields.6,
+            video: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -1238,14 +1241,14 @@ where
         >,
     ) -> ContributorConfig<'a> {
         ContributorConfig {
-            contributor: self.__unsafe_private_named.0.unwrap(),
-            display_name: self.__unsafe_private_named.1,
-            hover_iframe_url: self.__unsafe_private_named.2,
-            hover_image: self.__unsafe_private_named.3,
-            image: self.__unsafe_private_named.4,
-            r#override: self.__unsafe_private_named.5,
-            url: self.__unsafe_private_named.6,
-            video: self.__unsafe_private_named.7,
+            contributor: self._fields.0.unwrap(),
+            display_name: self._fields.1,
+            hover_iframe_url: self._fields.2,
+            hover_image: self._fields.3,
+            image: self._fields.4,
+            r#override: self._fields.5,
+            url: self._fields.6,
+            video: self._fields.7,
             extra_data: Some(extra_data),
         }
     }
@@ -1297,14 +1300,14 @@ pub mod board_state {
 
 /// Builder for constructing an instance of this type
 pub struct BoardBuilder<'a, S: board_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<board::BoardConfig<'a>>,
         Option<Vec<board::ContributorConfig<'a>>>,
         Option<Datetime>,
         Option<StrongRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Board<'a> {
@@ -1318,9 +1321,9 @@ impl<'a> BoardBuilder<'a, board_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BoardBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1328,12 +1331,12 @@ impl<'a> BoardBuilder<'a, board_state::Empty> {
 impl<'a, S: board_state::State> BoardBuilder<'a, S> {
     /// Set the `config` field (optional)
     pub fn config(mut self, value: impl Into<Option<board::BoardConfig<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `config` field to an Option value (optional)
     pub fn maybe_config(mut self, value: Option<board::BoardConfig<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1344,7 +1347,7 @@ impl<'a, S: board_state::State> BoardBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<board::ContributorConfig<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `contributorConfigs` field to an Option value (optional)
@@ -1352,7 +1355,7 @@ impl<'a, S: board_state::State> BoardBuilder<'a, S> {
         mut self,
         value: Option<Vec<board::ContributorConfig<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1367,11 +1370,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> BoardBuilder<'a, board_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         BoardBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1386,11 +1389,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> BoardBuilder<'a, board_state::SetSubject<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         BoardBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1404,10 +1407,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Board<'a> {
         Board {
-            config: self.__unsafe_private_named.0,
-            contributor_configs: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            subject: self.__unsafe_private_named.3.unwrap(),
+            config: self._fields.0,
+            contributor_configs: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            subject: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1420,10 +1423,10 @@ where
         >,
     ) -> Board<'a> {
         Board {
-            config: self.__unsafe_private_named.0,
-            contributor_configs: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            subject: self.__unsafe_private_named.3.unwrap(),
+            config: self._fields.0,
+            contributor_configs: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            subject: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

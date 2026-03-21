@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::UriValue;
@@ -104,58 +107,58 @@ pub mod create_o_auth_client_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type SliceUri;
         type ClientName;
         type RedirectUris;
-        type SliceUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type SliceUri = Unset;
         type ClientName = Unset;
         type RedirectUris = Unset;
-        type SliceUri = Unset;
-    }
-    ///State transition - sets the `client_name` field to Set
-    pub struct SetClientName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClientName<S> {}
-    impl<S: State> State for SetClientName<S> {
-        type ClientName = Set<members::client_name>;
-        type RedirectUris = S::RedirectUris;
-        type SliceUri = S::SliceUri;
-    }
-    ///State transition - sets the `redirect_uris` field to Set
-    pub struct SetRedirectUris<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRedirectUris<S> {}
-    impl<S: State> State for SetRedirectUris<S> {
-        type ClientName = S::ClientName;
-        type RedirectUris = Set<members::redirect_uris>;
-        type SliceUri = S::SliceUri;
     }
     ///State transition - sets the `slice_uri` field to Set
     pub struct SetSliceUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSliceUri<S> {}
     impl<S: State> State for SetSliceUri<S> {
+        type SliceUri = Set<members::slice_uri>;
         type ClientName = S::ClientName;
         type RedirectUris = S::RedirectUris;
-        type SliceUri = Set<members::slice_uri>;
+    }
+    ///State transition - sets the `client_name` field to Set
+    pub struct SetClientName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetClientName<S> {}
+    impl<S: State> State for SetClientName<S> {
+        type SliceUri = S::SliceUri;
+        type ClientName = Set<members::client_name>;
+        type RedirectUris = S::RedirectUris;
+    }
+    ///State transition - sets the `redirect_uris` field to Set
+    pub struct SetRedirectUris<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRedirectUris<S> {}
+    impl<S: State> State for SetRedirectUris<S> {
+        type SliceUri = S::SliceUri;
+        type ClientName = S::ClientName;
+        type RedirectUris = Set<members::redirect_uris>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `slice_uri` field
+        pub struct slice_uri(());
         ///Marker type for the `client_name` field
         pub struct client_name(());
         ///Marker type for the `redirect_uris` field
         pub struct redirect_uris(());
-        ///Marker type for the `slice_uri` field
-        pub struct slice_uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CreateOAuthClientBuilder<'a, S: create_o_auth_client_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
         Option<Vec<CowStr<'a>>>,
@@ -167,7 +170,7 @@ pub struct CreateOAuthClientBuilder<'a, S: create_o_auth_client_state::State> {
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CreateOAuthClient<'a> {
@@ -181,20 +184,9 @@ impl<'a> CreateOAuthClientBuilder<'a, create_o_auth_client_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreateOAuthClientBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -209,11 +201,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CreateOAuthClientBuilder<'a, create_o_auth_client_state::SetClientName<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CreateOAuthClientBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -221,12 +213,12 @@ where
 impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
     /// Set the `clientUri` field (optional)
     pub fn client_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `clientUri` field to an Option value (optional)
     pub fn maybe_client_uri(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -234,12 +226,12 @@ impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
 impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
     /// Set the `grantTypes` field (optional)
     pub fn grant_types(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `grantTypes` field to an Option value (optional)
     pub fn maybe_grant_types(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -247,12 +239,12 @@ impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
 impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
     /// Set the `logoUri` field (optional)
     pub fn logo_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `logoUri` field to an Option value (optional)
     pub fn maybe_logo_uri(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -260,12 +252,12 @@ impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
 impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
     /// Set the `policyUri` field (optional)
     pub fn policy_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `policyUri` field to an Option value (optional)
     pub fn maybe_policy_uri(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -280,11 +272,11 @@ where
         mut self,
         value: impl Into<Vec<UriValue<'a>>>,
     ) -> CreateOAuthClientBuilder<'a, create_o_auth_client_state::SetRedirectUris<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         CreateOAuthClientBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -292,12 +284,12 @@ where
 impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
     /// Set the `responseTypes` field (optional)
     pub fn response_types(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `responseTypes` field to an Option value (optional)
     pub fn maybe_response_types(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -305,12 +297,12 @@ impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
 impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
     /// Set the `scope` field (optional)
     pub fn scope(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `scope` field to an Option value (optional)
     pub fn maybe_scope(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -325,11 +317,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CreateOAuthClientBuilder<'a, create_o_auth_client_state::SetSliceUri<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         CreateOAuthClientBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -337,12 +329,12 @@ where
 impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
     /// Set the `tosUri` field (optional)
     pub fn tos_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `tosUri` field to an Option value (optional)
     pub fn maybe_tos_uri(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -350,23 +342,23 @@ impl<'a, S: create_o_auth_client_state::State> CreateOAuthClientBuilder<'a, S> {
 impl<'a, S> CreateOAuthClientBuilder<'a, S>
 where
     S: create_o_auth_client_state::State,
+    S::SliceUri: create_o_auth_client_state::IsSet,
     S::ClientName: create_o_auth_client_state::IsSet,
     S::RedirectUris: create_o_auth_client_state::IsSet,
-    S::SliceUri: create_o_auth_client_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateOAuthClient<'a> {
         CreateOAuthClient {
-            client_name: self.__unsafe_private_named.0.unwrap(),
-            client_uri: self.__unsafe_private_named.1,
-            grant_types: self.__unsafe_private_named.2,
-            logo_uri: self.__unsafe_private_named.3,
-            policy_uri: self.__unsafe_private_named.4,
-            redirect_uris: self.__unsafe_private_named.5.unwrap(),
-            response_types: self.__unsafe_private_named.6,
-            scope: self.__unsafe_private_named.7,
-            slice_uri: self.__unsafe_private_named.8.unwrap(),
-            tos_uri: self.__unsafe_private_named.9,
+            client_name: self._fields.0.unwrap(),
+            client_uri: self._fields.1,
+            grant_types: self._fields.2,
+            logo_uri: self._fields.3,
+            policy_uri: self._fields.4,
+            redirect_uris: self._fields.5.unwrap(),
+            response_types: self._fields.6,
+            scope: self._fields.7,
+            slice_uri: self._fields.8.unwrap(),
+            tos_uri: self._fields.9,
             extra_data: Default::default(),
         }
     }
@@ -379,16 +371,16 @@ where
         >,
     ) -> CreateOAuthClient<'a> {
         CreateOAuthClient {
-            client_name: self.__unsafe_private_named.0.unwrap(),
-            client_uri: self.__unsafe_private_named.1,
-            grant_types: self.__unsafe_private_named.2,
-            logo_uri: self.__unsafe_private_named.3,
-            policy_uri: self.__unsafe_private_named.4,
-            redirect_uris: self.__unsafe_private_named.5.unwrap(),
-            response_types: self.__unsafe_private_named.6,
-            scope: self.__unsafe_private_named.7,
-            slice_uri: self.__unsafe_private_named.8.unwrap(),
-            tos_uri: self.__unsafe_private_named.9,
+            client_name: self._fields.0.unwrap(),
+            client_uri: self._fields.1,
+            grant_types: self._fields.2,
+            logo_uri: self._fields.3,
+            policy_uri: self._fields.4,
+            redirect_uris: self._fields.5.unwrap(),
+            response_types: self._fields.6,
+            scope: self._fields.7,
+            slice_uri: self._fields.8.unwrap(),
+            tos_uri: self._fields.9,
             extra_data: Some(extra_data),
         }
     }

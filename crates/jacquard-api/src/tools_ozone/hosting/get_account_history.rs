@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -438,63 +441,59 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Details;
         type CreatedBy;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Details = Unset;
         type CreatedBy = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `details` field to Set
-    pub struct SetDetails<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDetails<S> {}
-    impl<S: State> State for SetDetails<S> {
-        type Details = Set<members::details>;
-        type CreatedBy = S::CreatedBy;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `created_by` field to Set
-    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
-    impl<S: State> State for SetCreatedBy<S> {
-        type Details = S::Details;
-        type CreatedBy = Set<members::created_by>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Details = S::Details;
         type CreatedBy = S::CreatedBy;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `details` field to Set
+    pub struct SetDetails<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDetails<S> {}
+    impl<S: State> State for SetDetails<S> {
+        type CreatedAt = S::CreatedAt;
+        type Details = Set<members::details>;
+        type CreatedBy = S::CreatedBy;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
+    impl<S: State> State for SetCreatedBy<S> {
+        type CreatedAt = S::CreatedAt;
+        type Details = S::Details;
+        type CreatedBy = Set<members::created_by>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `details` field
         pub struct details(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EventBuilder<'a, S: event_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<EventDetails<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<CowStr<'a>>, Option<EventDetails<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Event<'a> {
@@ -508,9 +507,9 @@ impl<'a> EventBuilder<'a, event_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -525,11 +524,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> EventBuilder<'a, event_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -544,11 +543,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EventBuilder<'a, event_state::SetCreatedBy<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -563,11 +562,11 @@ where
         mut self,
         value: impl Into<EventDetails<'a>>,
     ) -> EventBuilder<'a, event_state::SetDetails<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -575,16 +574,16 @@ where
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
+    S::CreatedAt: event_state::IsSet,
     S::Details: event_state::IsSet,
     S::CreatedBy: event_state::IsSet,
-    S::CreatedAt: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
         Event {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            created_by: self.__unsafe_private_named.1.unwrap(),
-            details: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            created_by: self._fields.1.unwrap(),
+            details: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -597,9 +596,9 @@ where
         >,
     ) -> Event<'a> {
         Event {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            created_by: self.__unsafe_private_named.1.unwrap(),
-            details: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            created_by: self._fields.1.unwrap(),
+            details: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -639,9 +638,9 @@ pub mod handle_updated_state {
 
 /// Builder for constructing an instance of this type
 pub struct HandleUpdatedBuilder<'a, S: handle_updated_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Handle<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Handle<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> HandleUpdated<'a> {
@@ -655,9 +654,9 @@ impl<'a> HandleUpdatedBuilder<'a, handle_updated_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         HandleUpdatedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -672,11 +671,11 @@ where
         mut self,
         value: impl Into<Handle<'a>>,
     ) -> HandleUpdatedBuilder<'a, handle_updated_state::SetHandle<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         HandleUpdatedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -689,7 +688,7 @@ where
     /// Build the final struct
     pub fn build(self) -> HandleUpdated<'a> {
         HandleUpdated {
-            handle: self.__unsafe_private_named.0.unwrap(),
+            handle: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -702,7 +701,7 @@ where
         >,
     ) -> HandleUpdated<'a> {
         HandleUpdated {
-            handle: self.__unsafe_private_named.0.unwrap(),
+            handle: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -746,14 +745,9 @@ pub mod get_account_history_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetAccountHistoryBuilder<'a, S: get_account_history_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<CowStr<'a>>,
-        Option<Did<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<i64>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Did<'a>>, Option<Vec<CowStr<'a>>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetAccountHistory<'a> {
@@ -767,9 +761,9 @@ impl<'a> GetAccountHistoryBuilder<'a, get_account_history_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetAccountHistoryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -777,12 +771,12 @@ impl<'a> GetAccountHistoryBuilder<'a, get_account_history_state::Empty> {
 impl<'a, S: get_account_history_state::State> GetAccountHistoryBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -797,11 +791,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> GetAccountHistoryBuilder<'a, get_account_history_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GetAccountHistoryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -809,12 +803,12 @@ where
 impl<'a, S: get_account_history_state::State> GetAccountHistoryBuilder<'a, S> {
     /// Set the `events` field (optional)
     pub fn events(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `events` field to an Option value (optional)
     pub fn maybe_events(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -822,12 +816,12 @@ impl<'a, S: get_account_history_state::State> GetAccountHistoryBuilder<'a, S> {
 impl<'a, S: get_account_history_state::State> GetAccountHistoryBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -840,10 +834,10 @@ where
     /// Build the final struct
     pub fn build(self) -> GetAccountHistory<'a> {
         GetAccountHistory {
-            cursor: self.__unsafe_private_named.0,
-            did: self.__unsafe_private_named.1.unwrap(),
-            events: self.__unsafe_private_named.2,
-            limit: self.__unsafe_private_named.3,
+            cursor: self._fields.0,
+            did: self._fields.1.unwrap(),
+            events: self._fields.2,
+            limit: self._fields.3,
         }
     }
 }

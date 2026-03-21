@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -122,65 +125,65 @@ pub mod status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Status;
         type Pipeline;
+        type Status;
+        type CreatedAt;
         type Workflow;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Status = Unset;
         type Pipeline = Unset;
+        type Status = Unset;
+        type CreatedAt = Unset;
         type Workflow = Unset;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
+    ///State transition - sets the `pipeline` field to Set
+    pub struct SetPipeline<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPipeline<S> {}
+    impl<S: State> State for SetPipeline<S> {
+        type Pipeline = Set<members::pipeline>;
         type Status = S::Status;
-        type Pipeline = S::Pipeline;
+        type CreatedAt = S::CreatedAt;
         type Workflow = S::Workflow;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type CreatedAt = S::CreatedAt;
-        type Status = Set<members::status>;
         type Pipeline = S::Pipeline;
+        type Status = Set<members::status>;
+        type CreatedAt = S::CreatedAt;
         type Workflow = S::Workflow;
     }
-    ///State transition - sets the `pipeline` field to Set
-    pub struct SetPipeline<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPipeline<S> {}
-    impl<S: State> State for SetPipeline<S> {
-        type CreatedAt = S::CreatedAt;
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Pipeline = S::Pipeline;
         type Status = S::Status;
-        type Pipeline = Set<members::pipeline>;
+        type CreatedAt = Set<members::created_at>;
         type Workflow = S::Workflow;
     }
     ///State transition - sets the `workflow` field to Set
     pub struct SetWorkflow<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWorkflow<S> {}
     impl<S: State> State for SetWorkflow<S> {
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
         type Pipeline = S::Pipeline;
+        type Status = S::Status;
+        type CreatedAt = S::CreatedAt;
         type Workflow = Set<members::workflow>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `pipeline` field
         pub struct pipeline(());
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `workflow` field
         pub struct workflow(());
     }
@@ -188,8 +191,8 @@ pub mod status_state {
 
 /// Builder for constructing an instance of this type
 pub struct StatusBuilder<'a, S: status_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<i64>,
@@ -197,7 +200,7 @@ pub struct StatusBuilder<'a, S: status_state::State> {
         Option<CowStr<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Status<'a> {
@@ -211,9 +214,9 @@ impl<'a> StatusBuilder<'a, status_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -228,11 +231,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> StatusBuilder<'a, status_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         StatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -240,12 +243,12 @@ where
 impl<'a, S: status_state::State> StatusBuilder<'a, S> {
     /// Set the `error` field (optional)
     pub fn error(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `error` field to an Option value (optional)
     pub fn maybe_error(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -253,12 +256,12 @@ impl<'a, S: status_state::State> StatusBuilder<'a, S> {
 impl<'a, S: status_state::State> StatusBuilder<'a, S> {
     /// Set the `exitCode` field (optional)
     pub fn exit_code(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `exitCode` field to an Option value (optional)
     pub fn maybe_exit_code(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -273,11 +276,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> StatusBuilder<'a, status_state::SetPipeline<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         StatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -292,11 +295,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> StatusBuilder<'a, status_state::SetStatus<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         StatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -311,11 +314,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> StatusBuilder<'a, status_state::SetWorkflow<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         StatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -323,20 +326,20 @@ where
 impl<'a, S> StatusBuilder<'a, S>
 where
     S: status_state::State,
-    S::CreatedAt: status_state::IsSet,
-    S::Status: status_state::IsSet,
     S::Pipeline: status_state::IsSet,
+    S::Status: status_state::IsSet,
+    S::CreatedAt: status_state::IsSet,
     S::Workflow: status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Status<'a> {
         Status {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            error: self.__unsafe_private_named.1,
-            exit_code: self.__unsafe_private_named.2,
-            pipeline: self.__unsafe_private_named.3.unwrap(),
-            status: self.__unsafe_private_named.4.unwrap(),
-            workflow: self.__unsafe_private_named.5.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            error: self._fields.1,
+            exit_code: self._fields.2,
+            pipeline: self._fields.3.unwrap(),
+            status: self._fields.4.unwrap(),
+            workflow: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -349,12 +352,12 @@ where
         >,
     ) -> Status<'a> {
         Status {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            error: self.__unsafe_private_named.1,
-            exit_code: self.__unsafe_private_named.2,
-            pipeline: self.__unsafe_private_named.3.unwrap(),
-            status: self.__unsafe_private_named.4.unwrap(),
-            workflow: self.__unsafe_private_named.5.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            error: self._fields.1,
+            exit_code: self._fields.2,
+            pipeline: self._fields.3.unwrap(),
+            status: self._fields.4.unwrap(),
+            workflow: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::ident::AtIdentifier;
@@ -121,65 +124,65 @@ pub mod delete_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Repo;
         type Collection;
         type Rkey;
-        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Repo = Unset;
         type Collection = Unset;
         type Rkey = Unset;
-        type Repo = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type Rkey = S::Rkey;
-        type Repo = S::Repo;
-    }
-    ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRkey<S> {}
-    impl<S: State> State for SetRkey<S> {
-        type Collection = S::Collection;
-        type Rkey = Set<members::rkey>;
-        type Repo = S::Repo;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
+        type Repo = Set<members::repo>;
         type Collection = S::Collection;
         type Rkey = S::Rkey;
-        type Repo = Set<members::repo>;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Repo = S::Repo;
+        type Collection = Set<members::collection>;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRkey<S> {}
+    impl<S: State> State for SetRkey<S> {
+        type Repo = S::Repo;
+        type Collection = S::Collection;
+        type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `repo` field
+        pub struct repo(());
         ///Marker type for the `collection` field
         pub struct collection(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DeleteRecordBuilder<'a, S: delete_record_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Nsid<'a>>,
         Option<AtIdentifier<'a>>,
         Option<RecordKey<Rkey<'a>>>,
         Option<Cid<'a>>,
         Option<Cid<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DeleteRecord<'a> {
@@ -193,9 +196,9 @@ impl<'a> DeleteRecordBuilder<'a, delete_record_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeleteRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -210,11 +213,11 @@ where
         mut self,
         value: impl Into<Nsid<'a>>,
     ) -> DeleteRecordBuilder<'a, delete_record_state::SetCollection<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DeleteRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -229,11 +232,11 @@ where
         mut self,
         value: impl Into<AtIdentifier<'a>>,
     ) -> DeleteRecordBuilder<'a, delete_record_state::SetRepo<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DeleteRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -248,11 +251,11 @@ where
         mut self,
         value: impl Into<RecordKey<Rkey<'a>>>,
     ) -> DeleteRecordBuilder<'a, delete_record_state::SetRkey<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         DeleteRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -260,12 +263,12 @@ where
 impl<'a, S: delete_record_state::State> DeleteRecordBuilder<'a, S> {
     /// Set the `swapCommit` field (optional)
     pub fn swap_commit(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `swapCommit` field to an Option value (optional)
     pub fn maybe_swap_commit(mut self, value: Option<Cid<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -273,12 +276,12 @@ impl<'a, S: delete_record_state::State> DeleteRecordBuilder<'a, S> {
 impl<'a, S: delete_record_state::State> DeleteRecordBuilder<'a, S> {
     /// Set the `swapRecord` field (optional)
     pub fn swap_record(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `swapRecord` field to an Option value (optional)
     pub fn maybe_swap_record(mut self, value: Option<Cid<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -286,18 +289,18 @@ impl<'a, S: delete_record_state::State> DeleteRecordBuilder<'a, S> {
 impl<'a, S> DeleteRecordBuilder<'a, S>
 where
     S: delete_record_state::State,
+    S::Repo: delete_record_state::IsSet,
     S::Collection: delete_record_state::IsSet,
     S::Rkey: delete_record_state::IsSet,
-    S::Repo: delete_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeleteRecord<'a> {
         DeleteRecord {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            repo: self.__unsafe_private_named.1.unwrap(),
-            rkey: self.__unsafe_private_named.2.unwrap(),
-            swap_commit: self.__unsafe_private_named.3,
-            swap_record: self.__unsafe_private_named.4,
+            collection: self._fields.0.unwrap(),
+            repo: self._fields.1.unwrap(),
+            rkey: self._fields.2.unwrap(),
+            swap_commit: self._fields.3,
+            swap_record: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -310,11 +313,11 @@ where
         >,
     ) -> DeleteRecord<'a> {
         DeleteRecord {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            repo: self.__unsafe_private_named.1.unwrap(),
-            rkey: self.__unsafe_private_named.2.unwrap(),
-            swap_commit: self.__unsafe_private_named.3,
-            swap_record: self.__unsafe_private_named.4,
+            collection: self._fields.0.unwrap(),
+            repo: self._fields.1.unwrap(),
+            rkey: self._fields.2.unwrap(),
+            swap_commit: self._fields.3,
+            swap_record: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

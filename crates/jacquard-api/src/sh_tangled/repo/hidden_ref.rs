@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::AtUri;
@@ -82,59 +85,59 @@ pub mod hidden_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type ForkRef;
         type RemoteRef;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type ForkRef = Unset;
         type RemoteRef = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type ForkRef = S::ForkRef;
-        type RemoteRef = S::RemoteRef;
+        type Repo = Unset;
     }
     ///State transition - sets the `fork_ref` field to Set
     pub struct SetForkRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetForkRef<S> {}
     impl<S: State> State for SetForkRef<S> {
-        type Repo = S::Repo;
         type ForkRef = Set<members::fork_ref>;
         type RemoteRef = S::RemoteRef;
+        type Repo = S::Repo;
     }
     ///State transition - sets the `remote_ref` field to Set
     pub struct SetRemoteRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRemoteRef<S> {}
     impl<S: State> State for SetRemoteRef<S> {
-        type Repo = S::Repo;
         type ForkRef = S::ForkRef;
         type RemoteRef = Set<members::remote_ref>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type ForkRef = S::ForkRef;
+        type RemoteRef = S::RemoteRef;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `fork_ref` field
         pub struct fork_ref(());
         ///Marker type for the `remote_ref` field
         pub struct remote_ref(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct HiddenRefBuilder<'a, S: hidden_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> HiddenRef<'a> {
@@ -148,9 +151,9 @@ impl<'a> HiddenRefBuilder<'a, hidden_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         HiddenRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -165,11 +168,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> HiddenRefBuilder<'a, hidden_ref_state::SetForkRef<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         HiddenRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -184,11 +187,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> HiddenRefBuilder<'a, hidden_ref_state::SetRemoteRef<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         HiddenRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -203,11 +206,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> HiddenRefBuilder<'a, hidden_ref_state::SetRepo<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         HiddenRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -215,16 +218,16 @@ where
 impl<'a, S> HiddenRefBuilder<'a, S>
 where
     S: hidden_ref_state::State,
-    S::Repo: hidden_ref_state::IsSet,
     S::ForkRef: hidden_ref_state::IsSet,
     S::RemoteRef: hidden_ref_state::IsSet,
+    S::Repo: hidden_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> HiddenRef<'a> {
         HiddenRef {
-            fork_ref: self.__unsafe_private_named.0.unwrap(),
-            remote_ref: self.__unsafe_private_named.1.unwrap(),
-            repo: self.__unsafe_private_named.2.unwrap(),
+            fork_ref: self._fields.0.unwrap(),
+            remote_ref: self._fields.1.unwrap(),
+            repo: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -237,9 +240,9 @@ where
         >,
     ) -> HiddenRef<'a> {
         HiddenRef {
-            fork_ref: self.__unsafe_private_named.0.unwrap(),
-            remote_ref: self.__unsafe_private_named.1.unwrap(),
-            repo: self.__unsafe_private_named.2.unwrap(),
+            fork_ref: self._fields.0.unwrap(),
+            remote_ref: self._fields.1.unwrap(),
+            repo: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

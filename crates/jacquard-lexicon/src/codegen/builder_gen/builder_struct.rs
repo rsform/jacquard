@@ -39,7 +39,7 @@ pub fn generate_builder_struct(
     let phantom = resolved.phantom_data();
     let phantom_field = if has_lifetime {
         quote! {
-            _phantom: #phantom<&'a ()>,
+            _lifetime: #phantom<&'a ()>,
         }
     } else {
         quote! {}
@@ -58,8 +58,13 @@ pub fn generate_builder_struct(
     };
 
     // Generate Builder::new() constructor
-    let builder_constructor =
-        generate_builder_constructor(&builder_name, schema, has_lifetime, &state_mod_name, resolved);
+    let builder_constructor = generate_builder_constructor(
+        &builder_name,
+        schema,
+        has_lifetime,
+        &state_mod_name,
+        resolved,
+    );
 
     quote! {
         /// Builder for constructing an instance of this type
@@ -91,7 +96,13 @@ fn generate_field_declarations(
                 BuilderSchema::Object(obj) => {
                     let field_type = &obj.properties[field_name_str];
                     codegen
-                        .property_to_rust_type(nsid, type_name, field_name_str, field_type, &resolved)
+                        .property_to_rust_type(
+                            nsid,
+                            type_name,
+                            field_name_str,
+                            field_type,
+                            &resolved,
+                        )
                         .unwrap_or_else(|_| quote! { () })
                 }
                 BuilderSchema::Parameters(params) => {
@@ -113,8 +124,8 @@ fn generate_field_declarations(
         quote! {}
     } else {
         quote! {
-            _phantom_state: #phantom<fn() -> S>,
-            __unsafe_private_named: ( #(#field_types)* ),
+            _state: #phantom<fn() -> S>,
+            _fields: ( #(#field_types)* ),
         }
     }
 }
@@ -125,21 +136,21 @@ pub(super) fn get_params_rust_type(
     field_type: &crate::lexicon::LexXrpcParametersProperty<'static>,
     resolved: &crate::codegen::prettify::ResolvedImports,
 ) -> TokenStream {
-    use crate::lexicon::LexXrpcParametersProperty;
     use crate::codegen::prettify::CommonType;
+    use crate::lexicon::LexXrpcParametersProperty;
 
     match field_type {
         LexXrpcParametersProperty::Boolean(_) => quote! { bool },
         LexXrpcParametersProperty::Integer(_) => quote! { i64 },
         LexXrpcParametersProperty::String(s) => codegen.string_to_rust_type(s, resolved),
-        LexXrpcParametersProperty::Unknown(_) => {
-            resolved.type_tokens(&CommonType::Data)
-        }
+        LexXrpcParametersProperty::Unknown(_) => resolved.type_tokens(&CommonType::Data),
         LexXrpcParametersProperty::Array(arr) => {
             let item_type = match &arr.items {
                 crate::lexicon::LexPrimitiveArrayItem::Boolean(_) => quote! { bool },
                 crate::lexicon::LexPrimitiveArrayItem::Integer(_) => quote! { i64 },
-                crate::lexicon::LexPrimitiveArrayItem::String(s) => codegen.string_to_rust_type(s, resolved),
+                crate::lexicon::LexPrimitiveArrayItem::String(s) => {
+                    codegen.string_to_rust_type(s, resolved)
+                }
                 crate::lexicon::LexPrimitiveArrayItem::Unknown(_) => {
                     resolved.type_tokens(&CommonType::Data)
                 }
@@ -173,17 +184,17 @@ fn generate_builder_constructor(
     } else {
         (
             quote! {
-                _phantom_state: #phantom,
+                _state: #phantom,
             },
             quote! {
-                __unsafe_private_named: ( #(#none_values)* ),
+                _fields: ( #(#none_values)* ),
             },
         )
     };
 
     let phantom_lifetime = if has_lifetime {
         quote! {
-            _phantom: #phantom,
+            _lifetime: #phantom,
         }
     } else {
         quote! {}

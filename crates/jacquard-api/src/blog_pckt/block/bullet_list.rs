@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -77,9 +80,9 @@ pub mod bullet_list_state {
 
 /// Builder for constructing an instance of this type
 pub struct BulletListBuilder<'a, S: bullet_list_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<ListItem<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<ListItem<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> BulletList<'a> {
@@ -93,9 +96,9 @@ impl<'a> BulletListBuilder<'a, bullet_list_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BulletListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -110,11 +113,11 @@ where
         mut self,
         value: impl Into<Vec<ListItem<'a>>>,
     ) -> BulletListBuilder<'a, bullet_list_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BulletListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -127,7 +130,7 @@ where
     /// Build the final struct
     pub fn build(self) -> BulletList<'a> {
         BulletList {
-            content: self.__unsafe_private_named.0.unwrap(),
+            content: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -140,7 +143,7 @@ where
         >,
     ) -> BulletList<'a> {
         BulletList {
-            content: self.__unsafe_private_named.0.unwrap(),
+            content: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

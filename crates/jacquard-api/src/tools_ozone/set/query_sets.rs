@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -106,15 +109,15 @@ pub mod query_sets_state {
 
 /// Builder for constructing an instance of this type
 pub struct QuerySetsBuilder<'a, S: query_sets_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<i64>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> QuerySets<'a> {
@@ -128,9 +131,9 @@ impl<'a> QuerySetsBuilder<'a, query_sets_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         QuerySetsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -138,12 +141,12 @@ impl<'a> QuerySetsBuilder<'a, query_sets_state::Empty> {
 impl<'a, S: query_sets_state::State> QuerySetsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -151,12 +154,12 @@ impl<'a, S: query_sets_state::State> QuerySetsBuilder<'a, S> {
 impl<'a, S: query_sets_state::State> QuerySetsBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -164,12 +167,12 @@ impl<'a, S: query_sets_state::State> QuerySetsBuilder<'a, S> {
 impl<'a, S: query_sets_state::State> QuerySetsBuilder<'a, S> {
     /// Set the `namePrefix` field (optional)
     pub fn name_prefix(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `namePrefix` field to an Option value (optional)
     pub fn maybe_name_prefix(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -177,12 +180,12 @@ impl<'a, S: query_sets_state::State> QuerySetsBuilder<'a, S> {
 impl<'a, S: query_sets_state::State> QuerySetsBuilder<'a, S> {
     /// Set the `sortBy` field (optional)
     pub fn sort_by(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `sortBy` field to an Option value (optional)
     pub fn maybe_sort_by(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -190,12 +193,12 @@ impl<'a, S: query_sets_state::State> QuerySetsBuilder<'a, S> {
 impl<'a, S: query_sets_state::State> QuerySetsBuilder<'a, S> {
     /// Set the `sortDirection` field (optional)
     pub fn sort_direction(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `sortDirection` field to an Option value (optional)
     pub fn maybe_sort_direction(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -207,11 +210,11 @@ where
     /// Build the final struct
     pub fn build(self) -> QuerySets<'a> {
         QuerySets {
-            cursor: self.__unsafe_private_named.0,
-            limit: self.__unsafe_private_named.1,
-            name_prefix: self.__unsafe_private_named.2,
-            sort_by: self.__unsafe_private_named.3,
-            sort_direction: self.__unsafe_private_named.4,
+            cursor: self._fields.0,
+            limit: self._fields.1,
+            name_prefix: self._fields.2,
+            sort_by: self._fields.3,
+            sort_direction: self._fields.4,
         }
     }
 }

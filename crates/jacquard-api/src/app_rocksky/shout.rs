@@ -15,7 +15,11 @@ pub mod remove_shout;
 pub mod reply_shout;
 pub mod report_shout;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -283,14 +287,14 @@ pub mod shout_state {
 
 /// Builder for constructing an instance of this type
 pub struct ShoutBuilder<'a, S: shout_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<StrongRef<'a>>,
         Option<StrongRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Shout<'a> {
@@ -304,9 +308,9 @@ impl<'a> ShoutBuilder<'a, shout_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ShoutBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -321,11 +325,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ShoutBuilder<'a, shout_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ShoutBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -340,11 +344,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ShoutBuilder<'a, shout_state::SetMessage<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ShoutBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -352,12 +356,12 @@ where
 impl<'a, S: shout_state::State> ShoutBuilder<'a, S> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
     pub fn maybe_parent(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -372,11 +376,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> ShoutBuilder<'a, shout_state::SetSubject<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ShoutBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -391,10 +395,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Shout<'a> {
         Shout {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            message: self.__unsafe_private_named.1.unwrap(),
-            parent: self.__unsafe_private_named.2,
-            subject: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            message: self._fields.1.unwrap(),
+            parent: self._fields.2,
+            subject: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -407,10 +411,10 @@ where
         >,
     ) -> Shout<'a> {
         Shout {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            message: self.__unsafe_private_named.1.unwrap(),
-            parent: self.__unsafe_private_named.2,
-            subject: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            message: self._fields.1.unwrap(),
+            parent: self._fields.2,
+            subject: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

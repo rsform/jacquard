@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -5907,8 +5910,8 @@ pub mod api_reference_state {
 
 /// Builder for constructing an instance of this type
 pub struct ApiReferenceBuilder<'a, S: api_reference_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ApiReferenceAbout<'a>>,
         Option<ApiReferenceAbstract<'a>>,
         Option<ApiReferenceAccessMode<'a>>,
@@ -6051,7 +6054,7 @@ pub struct ApiReferenceBuilder<'a, S: api_reference_state::State> {
         Option<ApiReferenceWorkExample<'a>>,
         Option<ApiReferenceWorkTranslation<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ApiReference<'a> {
@@ -6065,8 +6068,8 @@ impl<'a> ApiReferenceBuilder<'a, api_reference_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ApiReferenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -6209,7 +6212,7 @@ impl<'a> ApiReferenceBuilder<'a, api_reference_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -6217,12 +6220,12 @@ impl<'a> ApiReferenceBuilder<'a, api_reference_state::Empty> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `about` field (optional)
     pub fn about(mut self, value: impl Into<Option<ApiReferenceAbout<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `about` field to an Option value (optional)
     pub fn maybe_about(mut self, value: Option<ApiReferenceAbout<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -6233,12 +6236,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAbstract<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `abstract` field to an Option value (optional)
     pub fn maybe_abstract(mut self, value: Option<ApiReferenceAbstract<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -6249,7 +6252,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAccessMode<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `accessMode` field to an Option value (optional)
@@ -6257,7 +6260,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceAccessMode<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -6268,7 +6271,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAccessModeSufficient<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `accessModeSufficient` field to an Option value (optional)
@@ -6276,7 +6279,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceAccessModeSufficient<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -6287,7 +6290,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAccessibilityApi<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `accessibilityAPI` field to an Option value (optional)
@@ -6295,7 +6298,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceAccessibilityApi<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -6306,7 +6309,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAccessibilityControl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `accessibilityControl` field to an Option value (optional)
@@ -6314,7 +6317,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceAccessibilityControl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -6325,7 +6328,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAccessibilityFeature<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `accessibilityFeature` field to an Option value (optional)
@@ -6333,7 +6336,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceAccessibilityFeature<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -6344,7 +6347,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAccessibilityHazard<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `accessibilityHazard` field to an Option value (optional)
@@ -6352,7 +6355,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceAccessibilityHazard<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -6363,7 +6366,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAccessibilitySummary<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `accessibilitySummary` field to an Option value (optional)
@@ -6371,7 +6374,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceAccessibilitySummary<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -6382,7 +6385,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAccountablePerson<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `accountablePerson` field to an Option value (optional)
@@ -6390,7 +6393,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceAccountablePerson<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -6401,7 +6404,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAcquireLicensePage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `acquireLicensePage` field to an Option value (optional)
@@ -6409,7 +6412,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceAcquireLicensePage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -6420,7 +6423,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAdditionalType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
@@ -6428,7 +6431,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceAdditionalType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -6439,7 +6442,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAggregateRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
@@ -6447,7 +6450,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceAggregateRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -6458,7 +6461,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAlternateName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
@@ -6466,7 +6469,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceAlternateName<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -6477,7 +6480,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAlternativeHeadline<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `alternativeHeadline` field to an Option value (optional)
@@ -6485,7 +6488,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceAlternativeHeadline<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -6496,7 +6499,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceArchivedAt<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `archivedAt` field to an Option value (optional)
@@ -6504,7 +6507,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceArchivedAt<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -6515,7 +6518,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceArticleBody<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `articleBody` field to an Option value (optional)
@@ -6523,7 +6526,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceArticleBody<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -6534,7 +6537,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceArticleSection<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `articleSection` field to an Option value (optional)
@@ -6542,7 +6545,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceArticleSection<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -6553,12 +6556,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAssembly<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `assembly` field to an Option value (optional)
     pub fn maybe_assembly(mut self, value: Option<ApiReferenceAssembly<'a>>) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -6569,7 +6572,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAssemblyVersion<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `assemblyVersion` field to an Option value (optional)
@@ -6577,7 +6580,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceAssemblyVersion<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -6588,12 +6591,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAssesses<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `assesses` field to an Option value (optional)
     pub fn maybe_assesses(mut self, value: Option<ApiReferenceAssesses<'a>>) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -6604,7 +6607,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAssociatedMedia<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `associatedMedia` field to an Option value (optional)
@@ -6612,7 +6615,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceAssociatedMedia<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -6623,12 +6626,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceAudience<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `audience` field to an Option value (optional)
     pub fn maybe_audience(mut self, value: Option<ApiReferenceAudience<'a>>) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -6636,12 +6639,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `audio` field (optional)
     pub fn audio(mut self, value: impl Into<Option<ApiReferenceAudio<'a>>>) -> Self {
-        self.__unsafe_private_named.23 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `audio` field to an Option value (optional)
     pub fn maybe_audio(mut self, value: Option<ApiReferenceAudio<'a>>) -> Self {
-        self.__unsafe_private_named.23 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -6649,12 +6652,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `author` field (optional)
     pub fn author(mut self, value: impl Into<Option<ApiReferenceAuthor<'a>>>) -> Self {
-        self.__unsafe_private_named.24 = value.into();
+        self._fields.24 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
     pub fn maybe_author(mut self, value: Option<ApiReferenceAuthor<'a>>) -> Self {
-        self.__unsafe_private_named.24 = value;
+        self._fields.24 = value;
         self
     }
 }
@@ -6662,12 +6665,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<ApiReferenceAward<'a>>>) -> Self {
-        self.__unsafe_private_named.25 = value.into();
+        self._fields.25 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
     pub fn maybe_award(mut self, value: Option<ApiReferenceAward<'a>>) -> Self {
-        self.__unsafe_private_named.25 = value;
+        self._fields.25 = value;
         self
     }
 }
@@ -6675,12 +6678,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<ApiReferenceAwards<'a>>>) -> Self {
-        self.__unsafe_private_named.26 = value.into();
+        self._fields.26 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
     pub fn maybe_awards(mut self, value: Option<ApiReferenceAwards<'a>>) -> Self {
-        self.__unsafe_private_named.26 = value;
+        self._fields.26 = value;
         self
     }
 }
@@ -6691,12 +6694,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceBackstory<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.27 = value.into();
+        self._fields.27 = value.into();
         self
     }
     /// Set the `backstory` field to an Option value (optional)
     pub fn maybe_backstory(mut self, value: Option<ApiReferenceBackstory<'a>>) -> Self {
-        self.__unsafe_private_named.27 = value;
+        self._fields.27 = value;
         self
     }
 }
@@ -6707,12 +6710,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceCharacter<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.28 = value.into();
+        self._fields.28 = value.into();
         self
     }
     /// Set the `character` field to an Option value (optional)
     pub fn maybe_character(mut self, value: Option<ApiReferenceCharacter<'a>>) -> Self {
-        self.__unsafe_private_named.28 = value;
+        self._fields.28 = value;
         self
     }
 }
@@ -6723,12 +6726,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceCitation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.29 = value.into();
+        self._fields.29 = value.into();
         self
     }
     /// Set the `citation` field to an Option value (optional)
     pub fn maybe_citation(mut self, value: Option<ApiReferenceCitation<'a>>) -> Self {
-        self.__unsafe_private_named.29 = value;
+        self._fields.29 = value;
         self
     }
 }
@@ -6736,12 +6739,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<ApiReferenceComment<'a>>>) -> Self {
-        self.__unsafe_private_named.30 = value.into();
+        self._fields.30 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
     pub fn maybe_comment(mut self, value: Option<ApiReferenceComment<'a>>) -> Self {
-        self.__unsafe_private_named.30 = value;
+        self._fields.30 = value;
         self
     }
 }
@@ -6752,7 +6755,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceCommentCount<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value.into();
+        self._fields.31 = value.into();
         self
     }
     /// Set the `commentCount` field to an Option value (optional)
@@ -6760,7 +6763,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceCommentCount<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value;
+        self._fields.31 = value;
         self
     }
 }
@@ -6771,7 +6774,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceConditionsOfAccess<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value.into();
+        self._fields.32 = value.into();
         self
     }
     /// Set the `conditionsOfAccess` field to an Option value (optional)
@@ -6779,7 +6782,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceConditionsOfAccess<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value;
+        self._fields.32 = value;
         self
     }
 }
@@ -6790,7 +6793,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceContentLocation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value.into();
+        self._fields.33 = value.into();
         self
     }
     /// Set the `contentLocation` field to an Option value (optional)
@@ -6798,7 +6801,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceContentLocation<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value;
+        self._fields.33 = value;
         self
     }
 }
@@ -6809,7 +6812,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceContentRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.34 = value.into();
+        self._fields.34 = value.into();
         self
     }
     /// Set the `contentRating` field to an Option value (optional)
@@ -6817,7 +6820,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceContentRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.34 = value;
+        self._fields.34 = value;
         self
     }
 }
@@ -6828,7 +6831,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceContentReferenceTime<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value.into();
+        self._fields.35 = value.into();
         self
     }
     /// Set the `contentReferenceTime` field to an Option value (optional)
@@ -6836,7 +6839,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceContentReferenceTime<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value;
+        self._fields.35 = value;
         self
     }
 }
@@ -6847,7 +6850,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceContributor<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value.into();
+        self._fields.36 = value.into();
         self
     }
     /// Set the `contributor` field to an Option value (optional)
@@ -6855,7 +6858,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceContributor<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value;
+        self._fields.36 = value;
         self
     }
 }
@@ -6866,7 +6869,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceCopyrightHolder<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.37 = value.into();
+        self._fields.37 = value.into();
         self
     }
     /// Set the `copyrightHolder` field to an Option value (optional)
@@ -6874,7 +6877,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceCopyrightHolder<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.37 = value;
+        self._fields.37 = value;
         self
     }
 }
@@ -6885,7 +6888,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceCopyrightNotice<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.38 = value.into();
+        self._fields.38 = value.into();
         self
     }
     /// Set the `copyrightNotice` field to an Option value (optional)
@@ -6893,7 +6896,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceCopyrightNotice<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.38 = value;
+        self._fields.38 = value;
         self
     }
 }
@@ -6904,7 +6907,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceCopyrightYear<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value.into();
+        self._fields.39 = value.into();
         self
     }
     /// Set the `copyrightYear` field to an Option value (optional)
@@ -6912,7 +6915,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceCopyrightYear<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value;
+        self._fields.39 = value;
         self
     }
 }
@@ -6923,7 +6926,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceCorrection<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.40 = value.into();
+        self._fields.40 = value.into();
         self
     }
     /// Set the `correction` field to an Option value (optional)
@@ -6931,7 +6934,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceCorrection<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.40 = value;
+        self._fields.40 = value;
         self
     }
 }
@@ -6942,7 +6945,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceCountryOfOrigin<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.41 = value.into();
+        self._fields.41 = value.into();
         self
     }
     /// Set the `countryOfOrigin` field to an Option value (optional)
@@ -6950,7 +6953,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceCountryOfOrigin<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.41 = value;
+        self._fields.41 = value;
         self
     }
 }
@@ -6961,7 +6964,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceCreativeWorkStatus<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.42 = value.into();
+        self._fields.42 = value.into();
         self
     }
     /// Set the `creativeWorkStatus` field to an Option value (optional)
@@ -6969,7 +6972,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceCreativeWorkStatus<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.42 = value;
+        self._fields.42 = value;
         self
     }
 }
@@ -6977,12 +6980,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `creator` field (optional)
     pub fn creator(mut self, value: impl Into<Option<ApiReferenceCreator<'a>>>) -> Self {
-        self.__unsafe_private_named.43 = value.into();
+        self._fields.43 = value.into();
         self
     }
     /// Set the `creator` field to an Option value (optional)
     pub fn maybe_creator(mut self, value: Option<ApiReferenceCreator<'a>>) -> Self {
-        self.__unsafe_private_named.43 = value;
+        self._fields.43 = value;
         self
     }
 }
@@ -6993,7 +6996,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceCreditText<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.44 = value.into();
+        self._fields.44 = value.into();
         self
     }
     /// Set the `creditText` field to an Option value (optional)
@@ -7001,7 +7004,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceCreditText<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.44 = value;
+        self._fields.44 = value;
         self
     }
 }
@@ -7012,7 +7015,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceDateCreated<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value.into();
+        self._fields.45 = value.into();
         self
     }
     /// Set the `dateCreated` field to an Option value (optional)
@@ -7020,7 +7023,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceDateCreated<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value;
+        self._fields.45 = value;
         self
     }
 }
@@ -7031,7 +7034,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceDateModified<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.46 = value.into();
+        self._fields.46 = value.into();
         self
     }
     /// Set the `dateModified` field to an Option value (optional)
@@ -7039,7 +7042,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceDateModified<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.46 = value;
+        self._fields.46 = value;
         self
     }
 }
@@ -7050,7 +7053,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceDatePublished<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.47 = value.into();
+        self._fields.47 = value.into();
         self
     }
     /// Set the `datePublished` field to an Option value (optional)
@@ -7058,7 +7061,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceDatePublished<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.47 = value;
+        self._fields.47 = value;
         self
     }
 }
@@ -7069,7 +7072,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceDependencies<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value.into();
+        self._fields.48 = value.into();
         self
     }
     /// Set the `dependencies` field to an Option value (optional)
@@ -7077,7 +7080,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceDependencies<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value;
+        self._fields.48 = value;
         self
     }
 }
@@ -7088,7 +7091,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.49 = value.into();
+        self._fields.49 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
@@ -7096,7 +7099,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.49 = value;
+        self._fields.49 = value;
         self
     }
 }
@@ -7107,7 +7110,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceDigitalSourceType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.50 = value.into();
+        self._fields.50 = value.into();
         self
     }
     /// Set the `digitalSourceType` field to an Option value (optional)
@@ -7115,7 +7118,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceDigitalSourceType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.50 = value;
+        self._fields.50 = value;
         self
     }
 }
@@ -7126,7 +7129,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceDisambiguatingDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.51 = value.into();
+        self._fields.51 = value.into();
         self
     }
     /// Set the `disambiguatingDescription` field to an Option value (optional)
@@ -7134,7 +7137,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceDisambiguatingDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.51 = value;
+        self._fields.51 = value;
         self
     }
 }
@@ -7145,7 +7148,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceDiscussionUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.52 = value.into();
+        self._fields.52 = value.into();
         self
     }
     /// Set the `discussionUrl` field to an Option value (optional)
@@ -7153,7 +7156,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceDiscussionUrl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.52 = value;
+        self._fields.52 = value;
         self
     }
 }
@@ -7164,12 +7167,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceEditEidr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.53 = value.into();
+        self._fields.53 = value.into();
         self
     }
     /// Set the `editEIDR` field to an Option value (optional)
     pub fn maybe_edit_eidr(mut self, value: Option<ApiReferenceEditEidr<'a>>) -> Self {
-        self.__unsafe_private_named.53 = value;
+        self._fields.53 = value;
         self
     }
 }
@@ -7177,12 +7180,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `editor` field (optional)
     pub fn editor(mut self, value: impl Into<Option<ApiReferenceEditor<'a>>>) -> Self {
-        self.__unsafe_private_named.54 = value.into();
+        self._fields.54 = value.into();
         self
     }
     /// Set the `editor` field to an Option value (optional)
     pub fn maybe_editor(mut self, value: Option<ApiReferenceEditor<'a>>) -> Self {
-        self.__unsafe_private_named.54 = value;
+        self._fields.54 = value;
         self
     }
 }
@@ -7193,7 +7196,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceEducationalAlignment<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.55 = value.into();
+        self._fields.55 = value.into();
         self
     }
     /// Set the `educationalAlignment` field to an Option value (optional)
@@ -7201,7 +7204,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceEducationalAlignment<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.55 = value;
+        self._fields.55 = value;
         self
     }
 }
@@ -7212,7 +7215,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceEducationalLevel<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value.into();
+        self._fields.56 = value.into();
         self
     }
     /// Set the `educationalLevel` field to an Option value (optional)
@@ -7220,7 +7223,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceEducationalLevel<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value;
+        self._fields.56 = value;
         self
     }
 }
@@ -7231,7 +7234,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceEducationalUse<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.57 = value.into();
+        self._fields.57 = value.into();
         self
     }
     /// Set the `educationalUse` field to an Option value (optional)
@@ -7239,7 +7242,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceEducationalUse<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.57 = value;
+        self._fields.57 = value;
         self
     }
 }
@@ -7250,12 +7253,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceEncoding<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.58 = value.into();
+        self._fields.58 = value.into();
         self
     }
     /// Set the `encoding` field to an Option value (optional)
     pub fn maybe_encoding(mut self, value: Option<ApiReferenceEncoding<'a>>) -> Self {
-        self.__unsafe_private_named.58 = value;
+        self._fields.58 = value;
         self
     }
 }
@@ -7266,7 +7269,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceEncodingFormat<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.59 = value.into();
+        self._fields.59 = value.into();
         self
     }
     /// Set the `encodingFormat` field to an Option value (optional)
@@ -7274,7 +7277,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceEncodingFormat<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.59 = value;
+        self._fields.59 = value;
         self
     }
 }
@@ -7285,12 +7288,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceEncodings<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.60 = value.into();
+        self._fields.60 = value.into();
         self
     }
     /// Set the `encodings` field to an Option value (optional)
     pub fn maybe_encodings(mut self, value: Option<ApiReferenceEncodings<'a>>) -> Self {
-        self.__unsafe_private_named.60 = value;
+        self._fields.60 = value;
         self
     }
 }
@@ -7301,7 +7304,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceExampleOfWork<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.61 = value.into();
+        self._fields.61 = value.into();
         self
     }
     /// Set the `exampleOfWork` field to an Option value (optional)
@@ -7309,7 +7312,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceExampleOfWork<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.61 = value;
+        self._fields.61 = value;
         self
     }
 }
@@ -7320,7 +7323,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceExecutableLibraryName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.62 = value.into();
+        self._fields.62 = value.into();
         self
     }
     /// Set the `executableLibraryName` field to an Option value (optional)
@@ -7328,7 +7331,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceExecutableLibraryName<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.62 = value;
+        self._fields.62 = value;
         self
     }
 }
@@ -7336,12 +7339,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `expires` field (optional)
     pub fn expires(mut self, value: impl Into<Option<ApiReferenceExpires<'a>>>) -> Self {
-        self.__unsafe_private_named.63 = value.into();
+        self._fields.63 = value.into();
         self
     }
     /// Set the `expires` field to an Option value (optional)
     pub fn maybe_expires(mut self, value: Option<ApiReferenceExpires<'a>>) -> Self {
-        self.__unsafe_private_named.63 = value;
+        self._fields.63 = value;
         self
     }
 }
@@ -7352,7 +7355,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceFileFormat<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.64 = value.into();
+        self._fields.64 = value.into();
         self
     }
     /// Set the `fileFormat` field to an Option value (optional)
@@ -7360,7 +7363,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceFileFormat<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.64 = value;
+        self._fields.64 = value;
         self
     }
 }
@@ -7368,12 +7371,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `funder` field (optional)
     pub fn funder(mut self, value: impl Into<Option<ApiReferenceFunder<'a>>>) -> Self {
-        self.__unsafe_private_named.65 = value.into();
+        self._fields.65 = value.into();
         self
     }
     /// Set the `funder` field to an Option value (optional)
     pub fn maybe_funder(mut self, value: Option<ApiReferenceFunder<'a>>) -> Self {
-        self.__unsafe_private_named.65 = value;
+        self._fields.65 = value;
         self
     }
 }
@@ -7381,12 +7384,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<ApiReferenceFunding<'a>>>) -> Self {
-        self.__unsafe_private_named.66 = value.into();
+        self._fields.66 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
     pub fn maybe_funding(mut self, value: Option<ApiReferenceFunding<'a>>) -> Self {
-        self.__unsafe_private_named.66 = value;
+        self._fields.66 = value;
         self
     }
 }
@@ -7394,12 +7397,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<ApiReferenceGenre<'a>>>) -> Self {
-        self.__unsafe_private_named.67 = value.into();
+        self._fields.67 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
     pub fn maybe_genre(mut self, value: Option<ApiReferenceGenre<'a>>) -> Self {
-        self.__unsafe_private_named.67 = value;
+        self._fields.67 = value;
         self
     }
 }
@@ -7410,12 +7413,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceHasPart<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.68 = value.into();
+        self._fields.68 = value.into();
         self
     }
     /// Set the `hasPart` field to an Option value (optional)
     pub fn maybe_has_part(mut self, value: Option<ApiReferenceHasPart<'a>>) -> Self {
-        self.__unsafe_private_named.68 = value;
+        self._fields.68 = value;
         self
     }
 }
@@ -7426,12 +7429,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceHeadline<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.69 = value.into();
+        self._fields.69 = value.into();
         self
     }
     /// Set the `headline` field to an Option value (optional)
     pub fn maybe_headline(mut self, value: Option<ApiReferenceHeadline<'a>>) -> Self {
-        self.__unsafe_private_named.69 = value;
+        self._fields.69 = value;
         self
     }
 }
@@ -7442,7 +7445,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceIdentifier<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.70 = value.into();
+        self._fields.70 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
@@ -7450,7 +7453,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceIdentifier<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.70 = value;
+        self._fields.70 = value;
         self
     }
 }
@@ -7458,12 +7461,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<ApiReferenceImage<'a>>>) -> Self {
-        self.__unsafe_private_named.71 = value.into();
+        self._fields.71 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<ApiReferenceImage<'a>>) -> Self {
-        self.__unsafe_private_named.71 = value;
+        self._fields.71 = value;
         self
     }
 }
@@ -7474,7 +7477,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceInLanguage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.72 = value.into();
+        self._fields.72 = value.into();
         self
     }
     /// Set the `inLanguage` field to an Option value (optional)
@@ -7482,7 +7485,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceInLanguage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.72 = value;
+        self._fields.72 = value;
         self
     }
 }
@@ -7493,7 +7496,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceInteractionStatistic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.73 = value.into();
+        self._fields.73 = value.into();
         self
     }
     /// Set the `interactionStatistic` field to an Option value (optional)
@@ -7501,7 +7504,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceInteractionStatistic<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.73 = value;
+        self._fields.73 = value;
         self
     }
 }
@@ -7512,7 +7515,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceInteractivityType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.74 = value.into();
+        self._fields.74 = value.into();
         self
     }
     /// Set the `interactivityType` field to an Option value (optional)
@@ -7520,7 +7523,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceInteractivityType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.74 = value;
+        self._fields.74 = value;
         self
     }
 }
@@ -7531,7 +7534,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceInterpretedAsClaim<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.75 = value.into();
+        self._fields.75 = value.into();
         self
     }
     /// Set the `interpretedAsClaim` field to an Option value (optional)
@@ -7539,7 +7542,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceInterpretedAsClaim<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.75 = value;
+        self._fields.75 = value;
         self
     }
 }
@@ -7550,7 +7553,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceIsAccessibleForFree<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.76 = value.into();
+        self._fields.76 = value.into();
         self
     }
     /// Set the `isAccessibleForFree` field to an Option value (optional)
@@ -7558,7 +7561,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceIsAccessibleForFree<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.76 = value;
+        self._fields.76 = value;
         self
     }
 }
@@ -7569,7 +7572,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceIsBasedOn<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.77 = value.into();
+        self._fields.77 = value.into();
         self
     }
     /// Set the `isBasedOn` field to an Option value (optional)
@@ -7577,7 +7580,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceIsBasedOn<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.77 = value;
+        self._fields.77 = value;
         self
     }
 }
@@ -7588,7 +7591,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceIsBasedOnUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.78 = value.into();
+        self._fields.78 = value.into();
         self
     }
     /// Set the `isBasedOnUrl` field to an Option value (optional)
@@ -7596,7 +7599,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceIsBasedOnUrl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.78 = value;
+        self._fields.78 = value;
         self
     }
 }
@@ -7607,7 +7610,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceIsFamilyFriendly<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.79 = value.into();
+        self._fields.79 = value.into();
         self
     }
     /// Set the `isFamilyFriendly` field to an Option value (optional)
@@ -7615,7 +7618,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceIsFamilyFriendly<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.79 = value;
+        self._fields.79 = value;
         self
     }
 }
@@ -7626,12 +7629,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceIsPartOf<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.80 = value.into();
+        self._fields.80 = value.into();
         self
     }
     /// Set the `isPartOf` field to an Option value (optional)
     pub fn maybe_is_part_of(mut self, value: Option<ApiReferenceIsPartOf<'a>>) -> Self {
-        self.__unsafe_private_named.80 = value;
+        self._fields.80 = value;
         self
     }
 }
@@ -7642,12 +7645,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceKeywords<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.81 = value.into();
+        self._fields.81 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
     pub fn maybe_keywords(mut self, value: Option<ApiReferenceKeywords<'a>>) -> Self {
-        self.__unsafe_private_named.81 = value;
+        self._fields.81 = value;
         self
     }
 }
@@ -7658,7 +7661,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceLearningResourceType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.82 = value.into();
+        self._fields.82 = value.into();
         self
     }
     /// Set the `learningResourceType` field to an Option value (optional)
@@ -7666,7 +7669,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceLearningResourceType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.82 = value;
+        self._fields.82 = value;
         self
     }
 }
@@ -7674,12 +7677,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `license` field (optional)
     pub fn license(mut self, value: impl Into<Option<ApiReferenceLicense<'a>>>) -> Self {
-        self.__unsafe_private_named.83 = value.into();
+        self._fields.83 = value.into();
         self
     }
     /// Set the `license` field to an Option value (optional)
     pub fn maybe_license(mut self, value: Option<ApiReferenceLicense<'a>>) -> Self {
-        self.__unsafe_private_named.83 = value;
+        self._fields.83 = value;
         self
     }
 }
@@ -7690,7 +7693,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceLocationCreated<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.84 = value.into();
+        self._fields.84 = value.into();
         self
     }
     /// Set the `locationCreated` field to an Option value (optional)
@@ -7698,7 +7701,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceLocationCreated<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.84 = value;
+        self._fields.84 = value;
         self
     }
 }
@@ -7709,7 +7712,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceMainEntity<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.85 = value.into();
+        self._fields.85 = value.into();
         self
     }
     /// Set the `mainEntity` field to an Option value (optional)
@@ -7717,7 +7720,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceMainEntity<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.85 = value;
+        self._fields.85 = value;
         self
     }
 }
@@ -7728,7 +7731,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceMainEntityOfPage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.86 = value.into();
+        self._fields.86 = value.into();
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
@@ -7736,7 +7739,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceMainEntityOfPage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.86 = value;
+        self._fields.86 = value;
         self
     }
 }
@@ -7747,7 +7750,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceMaintainer<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.87 = value.into();
+        self._fields.87 = value.into();
         self
     }
     /// Set the `maintainer` field to an Option value (optional)
@@ -7755,7 +7758,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceMaintainer<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.87 = value;
+        self._fields.87 = value;
         self
     }
 }
@@ -7766,12 +7769,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceMaterial<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.88 = value.into();
+        self._fields.88 = value.into();
         self
     }
     /// Set the `material` field to an Option value (optional)
     pub fn maybe_material(mut self, value: Option<ApiReferenceMaterial<'a>>) -> Self {
-        self.__unsafe_private_named.88 = value;
+        self._fields.88 = value;
         self
     }
 }
@@ -7782,7 +7785,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceMaterialExtent<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.89 = value.into();
+        self._fields.89 = value.into();
         self
     }
     /// Set the `materialExtent` field to an Option value (optional)
@@ -7790,7 +7793,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceMaterialExtent<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.89 = value;
+        self._fields.89 = value;
         self
     }
 }
@@ -7801,12 +7804,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceMentions<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.90 = value.into();
+        self._fields.90 = value.into();
         self
     }
     /// Set the `mentions` field to an Option value (optional)
     pub fn maybe_mentions(mut self, value: Option<ApiReferenceMentions<'a>>) -> Self {
-        self.__unsafe_private_named.90 = value;
+        self._fields.90 = value;
         self
     }
 }
@@ -7814,12 +7817,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<ApiReferenceName<'a>>>) -> Self {
-        self.__unsafe_private_named.91 = value.into();
+        self._fields.91 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<ApiReferenceName<'a>>) -> Self {
-        self.__unsafe_private_named.91 = value;
+        self._fields.91 = value;
         self
     }
 }
@@ -7827,12 +7830,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `offers` field (optional)
     pub fn offers(mut self, value: impl Into<Option<ApiReferenceOffers<'a>>>) -> Self {
-        self.__unsafe_private_named.92 = value.into();
+        self._fields.92 = value.into();
         self
     }
     /// Set the `offers` field to an Option value (optional)
     pub fn maybe_offers(mut self, value: Option<ApiReferenceOffers<'a>>) -> Self {
-        self.__unsafe_private_named.92 = value;
+        self._fields.92 = value;
         self
     }
 }
@@ -7843,12 +7846,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferencePageEnd<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.93 = value.into();
+        self._fields.93 = value.into();
         self
     }
     /// Set the `pageEnd` field to an Option value (optional)
     pub fn maybe_page_end(mut self, value: Option<ApiReferencePageEnd<'a>>) -> Self {
-        self.__unsafe_private_named.93 = value;
+        self._fields.93 = value;
         self
     }
 }
@@ -7859,12 +7862,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferencePageStart<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.94 = value.into();
+        self._fields.94 = value.into();
         self
     }
     /// Set the `pageStart` field to an Option value (optional)
     pub fn maybe_page_start(mut self, value: Option<ApiReferencePageStart<'a>>) -> Self {
-        self.__unsafe_private_named.94 = value;
+        self._fields.94 = value;
         self
     }
 }
@@ -7875,7 +7878,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferencePagination<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.95 = value.into();
+        self._fields.95 = value.into();
         self
     }
     /// Set the `pagination` field to an Option value (optional)
@@ -7883,7 +7886,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferencePagination<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.95 = value;
+        self._fields.95 = value;
         self
     }
 }
@@ -7891,12 +7894,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `pattern` field (optional)
     pub fn pattern(mut self, value: impl Into<Option<ApiReferencePattern<'a>>>) -> Self {
-        self.__unsafe_private_named.96 = value.into();
+        self._fields.96 = value.into();
         self
     }
     /// Set the `pattern` field to an Option value (optional)
     pub fn maybe_pattern(mut self, value: Option<ApiReferencePattern<'a>>) -> Self {
-        self.__unsafe_private_named.96 = value;
+        self._fields.96 = value;
         self
     }
 }
@@ -7907,12 +7910,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferencePosition<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.97 = value.into();
+        self._fields.97 = value.into();
         self
     }
     /// Set the `position` field to an Option value (optional)
     pub fn maybe_position(mut self, value: Option<ApiReferencePosition<'a>>) -> Self {
-        self.__unsafe_private_named.97 = value;
+        self._fields.97 = value;
         self
     }
 }
@@ -7923,7 +7926,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferencePotentialAction<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.98 = value.into();
+        self._fields.98 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
@@ -7931,7 +7934,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferencePotentialAction<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.98 = value;
+        self._fields.98 = value;
         self
     }
 }
@@ -7942,12 +7945,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceProducer<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.99 = value.into();
+        self._fields.99 = value.into();
         self
     }
     /// Set the `producer` field to an Option value (optional)
     pub fn maybe_producer(mut self, value: Option<ApiReferenceProducer<'a>>) -> Self {
-        self.__unsafe_private_named.99 = value;
+        self._fields.99 = value;
         self
     }
 }
@@ -7958,7 +7961,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceProficiencyLevel<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.100 = value.into();
+        self._fields.100 = value.into();
         self
     }
     /// Set the `proficiencyLevel` field to an Option value (optional)
@@ -7966,7 +7969,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceProficiencyLevel<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.100 = value;
+        self._fields.100 = value;
         self
     }
 }
@@ -7977,7 +7980,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceProgrammingModel<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.101 = value.into();
+        self._fields.101 = value.into();
         self
     }
     /// Set the `programmingModel` field to an Option value (optional)
@@ -7985,7 +7988,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceProgrammingModel<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.101 = value;
+        self._fields.101 = value;
         self
     }
 }
@@ -7996,12 +7999,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceProvider<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.102 = value.into();
+        self._fields.102 = value.into();
         self
     }
     /// Set the `provider` field to an Option value (optional)
     pub fn maybe_provider(mut self, value: Option<ApiReferenceProvider<'a>>) -> Self {
-        self.__unsafe_private_named.102 = value;
+        self._fields.102 = value;
         self
     }
 }
@@ -8012,7 +8015,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferencePublication<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.103 = value.into();
+        self._fields.103 = value.into();
         self
     }
     /// Set the `publication` field to an Option value (optional)
@@ -8020,7 +8023,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferencePublication<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.103 = value;
+        self._fields.103 = value;
         self
     }
 }
@@ -8031,12 +8034,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferencePublisher<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.104 = value.into();
+        self._fields.104 = value.into();
         self
     }
     /// Set the `publisher` field to an Option value (optional)
     pub fn maybe_publisher(mut self, value: Option<ApiReferencePublisher<'a>>) -> Self {
-        self.__unsafe_private_named.104 = value;
+        self._fields.104 = value;
         self
     }
 }
@@ -8047,7 +8050,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferencePublisherImprint<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.105 = value.into();
+        self._fields.105 = value.into();
         self
     }
     /// Set the `publisherImprint` field to an Option value (optional)
@@ -8055,7 +8058,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferencePublisherImprint<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.105 = value;
+        self._fields.105 = value;
         self
     }
 }
@@ -8066,7 +8069,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferencePublishingPrinciples<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.106 = value.into();
+        self._fields.106 = value.into();
         self
     }
     /// Set the `publishingPrinciples` field to an Option value (optional)
@@ -8074,7 +8077,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferencePublishingPrinciples<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.106 = value;
+        self._fields.106 = value;
         self
     }
 }
@@ -8085,7 +8088,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceRecordedAt<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.107 = value.into();
+        self._fields.107 = value.into();
         self
     }
     /// Set the `recordedAt` field to an Option value (optional)
@@ -8093,7 +8096,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceRecordedAt<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.107 = value;
+        self._fields.107 = value;
         self
     }
 }
@@ -8104,7 +8107,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceReleasedEvent<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.108 = value.into();
+        self._fields.108 = value.into();
         self
     }
     /// Set the `releasedEvent` field to an Option value (optional)
@@ -8112,7 +8115,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceReleasedEvent<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.108 = value;
+        self._fields.108 = value;
         self
     }
 }
@@ -8120,12 +8123,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<ApiReferenceReview<'a>>>) -> Self {
-        self.__unsafe_private_named.109 = value.into();
+        self._fields.109 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
     pub fn maybe_review(mut self, value: Option<ApiReferenceReview<'a>>) -> Self {
-        self.__unsafe_private_named.109 = value;
+        self._fields.109 = value;
         self
     }
 }
@@ -8133,12 +8136,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `reviews` field (optional)
     pub fn reviews(mut self, value: impl Into<Option<ApiReferenceReviews<'a>>>) -> Self {
-        self.__unsafe_private_named.110 = value.into();
+        self._fields.110 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
     pub fn maybe_reviews(mut self, value: Option<ApiReferenceReviews<'a>>) -> Self {
-        self.__unsafe_private_named.110 = value;
+        self._fields.110 = value;
         self
     }
 }
@@ -8146,12 +8149,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<ApiReferenceSameAs<'a>>>) -> Self {
-        self.__unsafe_private_named.111 = value.into();
+        self._fields.111 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
     pub fn maybe_same_as(mut self, value: Option<ApiReferenceSameAs<'a>>) -> Self {
-        self.__unsafe_private_named.111 = value;
+        self._fields.111 = value;
         self
     }
 }
@@ -8162,7 +8165,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceSchemaVersion<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.112 = value.into();
+        self._fields.112 = value.into();
         self
     }
     /// Set the `schemaVersion` field to an Option value (optional)
@@ -8170,7 +8173,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceSchemaVersion<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.112 = value;
+        self._fields.112 = value;
         self
     }
 }
@@ -8181,7 +8184,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceSdDatePublished<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.113 = value.into();
+        self._fields.113 = value.into();
         self
     }
     /// Set the `sdDatePublished` field to an Option value (optional)
@@ -8189,7 +8192,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceSdDatePublished<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.113 = value;
+        self._fields.113 = value;
         self
     }
 }
@@ -8200,12 +8203,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceSdLicense<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.114 = value.into();
+        self._fields.114 = value.into();
         self
     }
     /// Set the `sdLicense` field to an Option value (optional)
     pub fn maybe_sd_license(mut self, value: Option<ApiReferenceSdLicense<'a>>) -> Self {
-        self.__unsafe_private_named.114 = value;
+        self._fields.114 = value;
         self
     }
 }
@@ -8216,7 +8219,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceSdPublisher<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.115 = value.into();
+        self._fields.115 = value.into();
         self
     }
     /// Set the `sdPublisher` field to an Option value (optional)
@@ -8224,7 +8227,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceSdPublisher<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.115 = value;
+        self._fields.115 = value;
         self
     }
 }
@@ -8232,12 +8235,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<ApiReferenceSize<'a>>>) -> Self {
-        self.__unsafe_private_named.116 = value.into();
+        self._fields.116 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
     pub fn maybe_size(mut self, value: Option<ApiReferenceSize<'a>>) -> Self {
-        self.__unsafe_private_named.116 = value;
+        self._fields.116 = value;
         self
     }
 }
@@ -8248,7 +8251,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceSourceOrganization<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.117 = value.into();
+        self._fields.117 = value.into();
         self
     }
     /// Set the `sourceOrganization` field to an Option value (optional)
@@ -8256,7 +8259,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceSourceOrganization<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.117 = value;
+        self._fields.117 = value;
         self
     }
 }
@@ -8264,12 +8267,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `spatial` field (optional)
     pub fn spatial(mut self, value: impl Into<Option<ApiReferenceSpatial<'a>>>) -> Self {
-        self.__unsafe_private_named.118 = value.into();
+        self._fields.118 = value.into();
         self
     }
     /// Set the `spatial` field to an Option value (optional)
     pub fn maybe_spatial(mut self, value: Option<ApiReferenceSpatial<'a>>) -> Self {
-        self.__unsafe_private_named.118 = value;
+        self._fields.118 = value;
         self
     }
 }
@@ -8280,7 +8283,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceSpatialCoverage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.119 = value.into();
+        self._fields.119 = value.into();
         self
     }
     /// Set the `spatialCoverage` field to an Option value (optional)
@@ -8288,7 +8291,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceSpatialCoverage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.119 = value;
+        self._fields.119 = value;
         self
     }
 }
@@ -8299,12 +8302,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceSpeakable<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.120 = value.into();
+        self._fields.120 = value.into();
         self
     }
     /// Set the `speakable` field to an Option value (optional)
     pub fn maybe_speakable(mut self, value: Option<ApiReferenceSpeakable<'a>>) -> Self {
-        self.__unsafe_private_named.120 = value;
+        self._fields.120 = value;
         self
     }
 }
@@ -8312,12 +8315,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `sponsor` field (optional)
     pub fn sponsor(mut self, value: impl Into<Option<ApiReferenceSponsor<'a>>>) -> Self {
-        self.__unsafe_private_named.121 = value.into();
+        self._fields.121 = value.into();
         self
     }
     /// Set the `sponsor` field to an Option value (optional)
     pub fn maybe_sponsor(mut self, value: Option<ApiReferenceSponsor<'a>>) -> Self {
-        self.__unsafe_private_named.121 = value;
+        self._fields.121 = value;
         self
     }
 }
@@ -8328,12 +8331,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceSubjectOf<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.122 = value.into();
+        self._fields.122 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
     pub fn maybe_subject_of(mut self, value: Option<ApiReferenceSubjectOf<'a>>) -> Self {
-        self.__unsafe_private_named.122 = value;
+        self._fields.122 = value;
         self
     }
 }
@@ -8344,7 +8347,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceTargetPlatform<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.123 = value.into();
+        self._fields.123 = value.into();
         self
     }
     /// Set the `targetPlatform` field to an Option value (optional)
@@ -8352,7 +8355,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceTargetPlatform<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.123 = value;
+        self._fields.123 = value;
         self
     }
 }
@@ -8360,12 +8363,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `teaches` field (optional)
     pub fn teaches(mut self, value: impl Into<Option<ApiReferenceTeaches<'a>>>) -> Self {
-        self.__unsafe_private_named.124 = value.into();
+        self._fields.124 = value.into();
         self
     }
     /// Set the `teaches` field to an Option value (optional)
     pub fn maybe_teaches(mut self, value: Option<ApiReferenceTeaches<'a>>) -> Self {
-        self.__unsafe_private_named.124 = value;
+        self._fields.124 = value;
         self
     }
 }
@@ -8376,12 +8379,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceTemporal<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.125 = value.into();
+        self._fields.125 = value.into();
         self
     }
     /// Set the `temporal` field to an Option value (optional)
     pub fn maybe_temporal(mut self, value: Option<ApiReferenceTemporal<'a>>) -> Self {
-        self.__unsafe_private_named.125 = value;
+        self._fields.125 = value;
         self
     }
 }
@@ -8392,7 +8395,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceTemporalCoverage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.126 = value.into();
+        self._fields.126 = value.into();
         self
     }
     /// Set the `temporalCoverage` field to an Option value (optional)
@@ -8400,7 +8403,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceTemporalCoverage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.126 = value;
+        self._fields.126 = value;
         self
     }
 }
@@ -8408,12 +8411,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<ApiReferenceText<'a>>>) -> Self {
-        self.__unsafe_private_named.127 = value.into();
+        self._fields.127 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
     pub fn maybe_text(mut self, value: Option<ApiReferenceText<'a>>) -> Self {
-        self.__unsafe_private_named.127 = value;
+        self._fields.127 = value;
         self
     }
 }
@@ -8424,12 +8427,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceThumbnail<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.128 = value.into();
+        self._fields.128 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
     pub fn maybe_thumbnail(mut self, value: Option<ApiReferenceThumbnail<'a>>) -> Self {
-        self.__unsafe_private_named.128 = value;
+        self._fields.128 = value;
         self
     }
 }
@@ -8440,7 +8443,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceThumbnailUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.129 = value.into();
+        self._fields.129 = value.into();
         self
     }
     /// Set the `thumbnailUrl` field to an Option value (optional)
@@ -8448,7 +8451,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceThumbnailUrl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.129 = value;
+        self._fields.129 = value;
         self
     }
 }
@@ -8459,7 +8462,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceTimeRequired<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.130 = value.into();
+        self._fields.130 = value.into();
         self
     }
     /// Set the `timeRequired` field to an Option value (optional)
@@ -8467,7 +8470,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceTimeRequired<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.130 = value;
+        self._fields.130 = value;
         self
     }
 }
@@ -8478,7 +8481,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceTranslationOfWork<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.131 = value.into();
+        self._fields.131 = value.into();
         self
     }
     /// Set the `translationOfWork` field to an Option value (optional)
@@ -8486,7 +8489,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceTranslationOfWork<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.131 = value;
+        self._fields.131 = value;
         self
     }
 }
@@ -8497,7 +8500,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceTranslator<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.132 = value.into();
+        self._fields.132 = value.into();
         self
     }
     /// Set the `translator` field to an Option value (optional)
@@ -8505,7 +8508,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceTranslator<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.132 = value;
+        self._fields.132 = value;
         self
     }
 }
@@ -8516,7 +8519,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceTypicalAgeRange<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.133 = value.into();
+        self._fields.133 = value.into();
         self
     }
     /// Set the `typicalAgeRange` field to an Option value (optional)
@@ -8524,7 +8527,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceTypicalAgeRange<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.133 = value;
+        self._fields.133 = value;
         self
     }
 }
@@ -8532,12 +8535,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<ApiReferenceUrl<'a>>>) -> Self {
-        self.__unsafe_private_named.134 = value.into();
+        self._fields.134 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<ApiReferenceUrl<'a>>) -> Self {
-        self.__unsafe_private_named.134 = value;
+        self._fields.134 = value;
         self
     }
 }
@@ -8548,12 +8551,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceUsageInfo<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.135 = value.into();
+        self._fields.135 = value.into();
         self
     }
     /// Set the `usageInfo` field to an Option value (optional)
     pub fn maybe_usage_info(mut self, value: Option<ApiReferenceUsageInfo<'a>>) -> Self {
-        self.__unsafe_private_named.135 = value;
+        self._fields.135 = value;
         self
     }
 }
@@ -8561,12 +8564,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `version` field (optional)
     pub fn version(mut self, value: impl Into<Option<ApiReferenceVersion<'a>>>) -> Self {
-        self.__unsafe_private_named.136 = value.into();
+        self._fields.136 = value.into();
         self
     }
     /// Set the `version` field to an Option value (optional)
     pub fn maybe_version(mut self, value: Option<ApiReferenceVersion<'a>>) -> Self {
-        self.__unsafe_private_named.136 = value;
+        self._fields.136 = value;
         self
     }
 }
@@ -8574,12 +8577,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
 impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
     /// Set the `video` field (optional)
     pub fn video(mut self, value: impl Into<Option<ApiReferenceVideo<'a>>>) -> Self {
-        self.__unsafe_private_named.137 = value.into();
+        self._fields.137 = value.into();
         self
     }
     /// Set the `video` field to an Option value (optional)
     pub fn maybe_video(mut self, value: Option<ApiReferenceVideo<'a>>) -> Self {
-        self.__unsafe_private_named.137 = value;
+        self._fields.137 = value;
         self
     }
 }
@@ -8590,12 +8593,12 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceWordCount<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.138 = value.into();
+        self._fields.138 = value.into();
         self
     }
     /// Set the `wordCount` field to an Option value (optional)
     pub fn maybe_word_count(mut self, value: Option<ApiReferenceWordCount<'a>>) -> Self {
-        self.__unsafe_private_named.138 = value;
+        self._fields.138 = value;
         self
     }
 }
@@ -8606,7 +8609,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceWorkExample<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.139 = value.into();
+        self._fields.139 = value.into();
         self
     }
     /// Set the `workExample` field to an Option value (optional)
@@ -8614,7 +8617,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceWorkExample<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.139 = value;
+        self._fields.139 = value;
         self
     }
 }
@@ -8625,7 +8628,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ApiReferenceWorkTranslation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.140 = value.into();
+        self._fields.140 = value.into();
         self
     }
     /// Set the `workTranslation` field to an Option value (optional)
@@ -8633,7 +8636,7 @@ impl<'a, S: api_reference_state::State> ApiReferenceBuilder<'a, S> {
         mut self,
         value: Option<ApiReferenceWorkTranslation<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.140 = value;
+        self._fields.140 = value;
         self
     }
 }
@@ -8645,147 +8648,147 @@ where
     /// Build the final struct
     pub fn build(self) -> ApiReference<'a> {
         ApiReference {
-            about: self.__unsafe_private_named.0,
-            r#abstract: self.__unsafe_private_named.1,
-            access_mode: self.__unsafe_private_named.2,
-            access_mode_sufficient: self.__unsafe_private_named.3,
-            accessibility_api: self.__unsafe_private_named.4,
-            accessibility_control: self.__unsafe_private_named.5,
-            accessibility_feature: self.__unsafe_private_named.6,
-            accessibility_hazard: self.__unsafe_private_named.7,
-            accessibility_summary: self.__unsafe_private_named.8,
-            accountable_person: self.__unsafe_private_named.9,
-            acquire_license_page: self.__unsafe_private_named.10,
-            additional_type: self.__unsafe_private_named.11,
-            aggregate_rating: self.__unsafe_private_named.12,
-            alternate_name: self.__unsafe_private_named.13,
-            alternative_headline: self.__unsafe_private_named.14,
-            archived_at: self.__unsafe_private_named.15,
-            article_body: self.__unsafe_private_named.16,
-            article_section: self.__unsafe_private_named.17,
-            assembly: self.__unsafe_private_named.18,
-            assembly_version: self.__unsafe_private_named.19,
-            assesses: self.__unsafe_private_named.20,
-            associated_media: self.__unsafe_private_named.21,
-            audience: self.__unsafe_private_named.22,
-            audio: self.__unsafe_private_named.23,
-            author: self.__unsafe_private_named.24,
-            award: self.__unsafe_private_named.25,
-            awards: self.__unsafe_private_named.26,
-            backstory: self.__unsafe_private_named.27,
-            character: self.__unsafe_private_named.28,
-            citation: self.__unsafe_private_named.29,
-            comment: self.__unsafe_private_named.30,
-            comment_count: self.__unsafe_private_named.31,
-            conditions_of_access: self.__unsafe_private_named.32,
-            content_location: self.__unsafe_private_named.33,
-            content_rating: self.__unsafe_private_named.34,
-            content_reference_time: self.__unsafe_private_named.35,
-            contributor: self.__unsafe_private_named.36,
-            copyright_holder: self.__unsafe_private_named.37,
-            copyright_notice: self.__unsafe_private_named.38,
-            copyright_year: self.__unsafe_private_named.39,
-            correction: self.__unsafe_private_named.40,
-            country_of_origin: self.__unsafe_private_named.41,
-            creative_work_status: self.__unsafe_private_named.42,
-            creator: self.__unsafe_private_named.43,
-            credit_text: self.__unsafe_private_named.44,
-            date_created: self.__unsafe_private_named.45,
-            date_modified: self.__unsafe_private_named.46,
-            date_published: self.__unsafe_private_named.47,
-            dependencies: self.__unsafe_private_named.48,
-            description: self.__unsafe_private_named.49,
-            digital_source_type: self.__unsafe_private_named.50,
-            disambiguating_description: self.__unsafe_private_named.51,
-            discussion_url: self.__unsafe_private_named.52,
-            edit_eidr: self.__unsafe_private_named.53,
-            editor: self.__unsafe_private_named.54,
-            educational_alignment: self.__unsafe_private_named.55,
-            educational_level: self.__unsafe_private_named.56,
-            educational_use: self.__unsafe_private_named.57,
-            encoding: self.__unsafe_private_named.58,
-            encoding_format: self.__unsafe_private_named.59,
-            encodings: self.__unsafe_private_named.60,
-            example_of_work: self.__unsafe_private_named.61,
-            executable_library_name: self.__unsafe_private_named.62,
-            expires: self.__unsafe_private_named.63,
-            file_format: self.__unsafe_private_named.64,
-            funder: self.__unsafe_private_named.65,
-            funding: self.__unsafe_private_named.66,
-            genre: self.__unsafe_private_named.67,
-            has_part: self.__unsafe_private_named.68,
-            headline: self.__unsafe_private_named.69,
-            identifier: self.__unsafe_private_named.70,
-            image: self.__unsafe_private_named.71,
-            in_language: self.__unsafe_private_named.72,
-            interaction_statistic: self.__unsafe_private_named.73,
-            interactivity_type: self.__unsafe_private_named.74,
-            interpreted_as_claim: self.__unsafe_private_named.75,
-            is_accessible_for_free: self.__unsafe_private_named.76,
-            is_based_on: self.__unsafe_private_named.77,
-            is_based_on_url: self.__unsafe_private_named.78,
-            is_family_friendly: self.__unsafe_private_named.79,
-            is_part_of: self.__unsafe_private_named.80,
-            keywords: self.__unsafe_private_named.81,
-            learning_resource_type: self.__unsafe_private_named.82,
-            license: self.__unsafe_private_named.83,
-            location_created: self.__unsafe_private_named.84,
-            main_entity: self.__unsafe_private_named.85,
-            main_entity_of_page: self.__unsafe_private_named.86,
-            maintainer: self.__unsafe_private_named.87,
-            material: self.__unsafe_private_named.88,
-            material_extent: self.__unsafe_private_named.89,
-            mentions: self.__unsafe_private_named.90,
-            name: self.__unsafe_private_named.91,
-            offers: self.__unsafe_private_named.92,
-            page_end: self.__unsafe_private_named.93,
-            page_start: self.__unsafe_private_named.94,
-            pagination: self.__unsafe_private_named.95,
-            pattern: self.__unsafe_private_named.96,
-            position: self.__unsafe_private_named.97,
-            potential_action: self.__unsafe_private_named.98,
-            producer: self.__unsafe_private_named.99,
-            proficiency_level: self.__unsafe_private_named.100,
-            programming_model: self.__unsafe_private_named.101,
-            provider: self.__unsafe_private_named.102,
-            publication: self.__unsafe_private_named.103,
-            publisher: self.__unsafe_private_named.104,
-            publisher_imprint: self.__unsafe_private_named.105,
-            publishing_principles: self.__unsafe_private_named.106,
-            recorded_at: self.__unsafe_private_named.107,
-            released_event: self.__unsafe_private_named.108,
-            review: self.__unsafe_private_named.109,
-            reviews: self.__unsafe_private_named.110,
-            same_as: self.__unsafe_private_named.111,
-            schema_version: self.__unsafe_private_named.112,
-            sd_date_published: self.__unsafe_private_named.113,
-            sd_license: self.__unsafe_private_named.114,
-            sd_publisher: self.__unsafe_private_named.115,
-            size: self.__unsafe_private_named.116,
-            source_organization: self.__unsafe_private_named.117,
-            spatial: self.__unsafe_private_named.118,
-            spatial_coverage: self.__unsafe_private_named.119,
-            speakable: self.__unsafe_private_named.120,
-            sponsor: self.__unsafe_private_named.121,
-            subject_of: self.__unsafe_private_named.122,
-            target_platform: self.__unsafe_private_named.123,
-            teaches: self.__unsafe_private_named.124,
-            temporal: self.__unsafe_private_named.125,
-            temporal_coverage: self.__unsafe_private_named.126,
-            text: self.__unsafe_private_named.127,
-            thumbnail: self.__unsafe_private_named.128,
-            thumbnail_url: self.__unsafe_private_named.129,
-            time_required: self.__unsafe_private_named.130,
-            translation_of_work: self.__unsafe_private_named.131,
-            translator: self.__unsafe_private_named.132,
-            typical_age_range: self.__unsafe_private_named.133,
-            url: self.__unsafe_private_named.134,
-            usage_info: self.__unsafe_private_named.135,
-            version: self.__unsafe_private_named.136,
-            video: self.__unsafe_private_named.137,
-            word_count: self.__unsafe_private_named.138,
-            work_example: self.__unsafe_private_named.139,
-            work_translation: self.__unsafe_private_named.140,
+            about: self._fields.0,
+            r#abstract: self._fields.1,
+            access_mode: self._fields.2,
+            access_mode_sufficient: self._fields.3,
+            accessibility_api: self._fields.4,
+            accessibility_control: self._fields.5,
+            accessibility_feature: self._fields.6,
+            accessibility_hazard: self._fields.7,
+            accessibility_summary: self._fields.8,
+            accountable_person: self._fields.9,
+            acquire_license_page: self._fields.10,
+            additional_type: self._fields.11,
+            aggregate_rating: self._fields.12,
+            alternate_name: self._fields.13,
+            alternative_headline: self._fields.14,
+            archived_at: self._fields.15,
+            article_body: self._fields.16,
+            article_section: self._fields.17,
+            assembly: self._fields.18,
+            assembly_version: self._fields.19,
+            assesses: self._fields.20,
+            associated_media: self._fields.21,
+            audience: self._fields.22,
+            audio: self._fields.23,
+            author: self._fields.24,
+            award: self._fields.25,
+            awards: self._fields.26,
+            backstory: self._fields.27,
+            character: self._fields.28,
+            citation: self._fields.29,
+            comment: self._fields.30,
+            comment_count: self._fields.31,
+            conditions_of_access: self._fields.32,
+            content_location: self._fields.33,
+            content_rating: self._fields.34,
+            content_reference_time: self._fields.35,
+            contributor: self._fields.36,
+            copyright_holder: self._fields.37,
+            copyright_notice: self._fields.38,
+            copyright_year: self._fields.39,
+            correction: self._fields.40,
+            country_of_origin: self._fields.41,
+            creative_work_status: self._fields.42,
+            creator: self._fields.43,
+            credit_text: self._fields.44,
+            date_created: self._fields.45,
+            date_modified: self._fields.46,
+            date_published: self._fields.47,
+            dependencies: self._fields.48,
+            description: self._fields.49,
+            digital_source_type: self._fields.50,
+            disambiguating_description: self._fields.51,
+            discussion_url: self._fields.52,
+            edit_eidr: self._fields.53,
+            editor: self._fields.54,
+            educational_alignment: self._fields.55,
+            educational_level: self._fields.56,
+            educational_use: self._fields.57,
+            encoding: self._fields.58,
+            encoding_format: self._fields.59,
+            encodings: self._fields.60,
+            example_of_work: self._fields.61,
+            executable_library_name: self._fields.62,
+            expires: self._fields.63,
+            file_format: self._fields.64,
+            funder: self._fields.65,
+            funding: self._fields.66,
+            genre: self._fields.67,
+            has_part: self._fields.68,
+            headline: self._fields.69,
+            identifier: self._fields.70,
+            image: self._fields.71,
+            in_language: self._fields.72,
+            interaction_statistic: self._fields.73,
+            interactivity_type: self._fields.74,
+            interpreted_as_claim: self._fields.75,
+            is_accessible_for_free: self._fields.76,
+            is_based_on: self._fields.77,
+            is_based_on_url: self._fields.78,
+            is_family_friendly: self._fields.79,
+            is_part_of: self._fields.80,
+            keywords: self._fields.81,
+            learning_resource_type: self._fields.82,
+            license: self._fields.83,
+            location_created: self._fields.84,
+            main_entity: self._fields.85,
+            main_entity_of_page: self._fields.86,
+            maintainer: self._fields.87,
+            material: self._fields.88,
+            material_extent: self._fields.89,
+            mentions: self._fields.90,
+            name: self._fields.91,
+            offers: self._fields.92,
+            page_end: self._fields.93,
+            page_start: self._fields.94,
+            pagination: self._fields.95,
+            pattern: self._fields.96,
+            position: self._fields.97,
+            potential_action: self._fields.98,
+            producer: self._fields.99,
+            proficiency_level: self._fields.100,
+            programming_model: self._fields.101,
+            provider: self._fields.102,
+            publication: self._fields.103,
+            publisher: self._fields.104,
+            publisher_imprint: self._fields.105,
+            publishing_principles: self._fields.106,
+            recorded_at: self._fields.107,
+            released_event: self._fields.108,
+            review: self._fields.109,
+            reviews: self._fields.110,
+            same_as: self._fields.111,
+            schema_version: self._fields.112,
+            sd_date_published: self._fields.113,
+            sd_license: self._fields.114,
+            sd_publisher: self._fields.115,
+            size: self._fields.116,
+            source_organization: self._fields.117,
+            spatial: self._fields.118,
+            spatial_coverage: self._fields.119,
+            speakable: self._fields.120,
+            sponsor: self._fields.121,
+            subject_of: self._fields.122,
+            target_platform: self._fields.123,
+            teaches: self._fields.124,
+            temporal: self._fields.125,
+            temporal_coverage: self._fields.126,
+            text: self._fields.127,
+            thumbnail: self._fields.128,
+            thumbnail_url: self._fields.129,
+            time_required: self._fields.130,
+            translation_of_work: self._fields.131,
+            translator: self._fields.132,
+            typical_age_range: self._fields.133,
+            url: self._fields.134,
+            usage_info: self._fields.135,
+            version: self._fields.136,
+            video: self._fields.137,
+            word_count: self._fields.138,
+            work_example: self._fields.139,
+            work_translation: self._fields.140,
             extra_data: Default::default(),
         }
     }
@@ -8795,147 +8798,147 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ApiReference<'a> {
         ApiReference {
-            about: self.__unsafe_private_named.0,
-            r#abstract: self.__unsafe_private_named.1,
-            access_mode: self.__unsafe_private_named.2,
-            access_mode_sufficient: self.__unsafe_private_named.3,
-            accessibility_api: self.__unsafe_private_named.4,
-            accessibility_control: self.__unsafe_private_named.5,
-            accessibility_feature: self.__unsafe_private_named.6,
-            accessibility_hazard: self.__unsafe_private_named.7,
-            accessibility_summary: self.__unsafe_private_named.8,
-            accountable_person: self.__unsafe_private_named.9,
-            acquire_license_page: self.__unsafe_private_named.10,
-            additional_type: self.__unsafe_private_named.11,
-            aggregate_rating: self.__unsafe_private_named.12,
-            alternate_name: self.__unsafe_private_named.13,
-            alternative_headline: self.__unsafe_private_named.14,
-            archived_at: self.__unsafe_private_named.15,
-            article_body: self.__unsafe_private_named.16,
-            article_section: self.__unsafe_private_named.17,
-            assembly: self.__unsafe_private_named.18,
-            assembly_version: self.__unsafe_private_named.19,
-            assesses: self.__unsafe_private_named.20,
-            associated_media: self.__unsafe_private_named.21,
-            audience: self.__unsafe_private_named.22,
-            audio: self.__unsafe_private_named.23,
-            author: self.__unsafe_private_named.24,
-            award: self.__unsafe_private_named.25,
-            awards: self.__unsafe_private_named.26,
-            backstory: self.__unsafe_private_named.27,
-            character: self.__unsafe_private_named.28,
-            citation: self.__unsafe_private_named.29,
-            comment: self.__unsafe_private_named.30,
-            comment_count: self.__unsafe_private_named.31,
-            conditions_of_access: self.__unsafe_private_named.32,
-            content_location: self.__unsafe_private_named.33,
-            content_rating: self.__unsafe_private_named.34,
-            content_reference_time: self.__unsafe_private_named.35,
-            contributor: self.__unsafe_private_named.36,
-            copyright_holder: self.__unsafe_private_named.37,
-            copyright_notice: self.__unsafe_private_named.38,
-            copyright_year: self.__unsafe_private_named.39,
-            correction: self.__unsafe_private_named.40,
-            country_of_origin: self.__unsafe_private_named.41,
-            creative_work_status: self.__unsafe_private_named.42,
-            creator: self.__unsafe_private_named.43,
-            credit_text: self.__unsafe_private_named.44,
-            date_created: self.__unsafe_private_named.45,
-            date_modified: self.__unsafe_private_named.46,
-            date_published: self.__unsafe_private_named.47,
-            dependencies: self.__unsafe_private_named.48,
-            description: self.__unsafe_private_named.49,
-            digital_source_type: self.__unsafe_private_named.50,
-            disambiguating_description: self.__unsafe_private_named.51,
-            discussion_url: self.__unsafe_private_named.52,
-            edit_eidr: self.__unsafe_private_named.53,
-            editor: self.__unsafe_private_named.54,
-            educational_alignment: self.__unsafe_private_named.55,
-            educational_level: self.__unsafe_private_named.56,
-            educational_use: self.__unsafe_private_named.57,
-            encoding: self.__unsafe_private_named.58,
-            encoding_format: self.__unsafe_private_named.59,
-            encodings: self.__unsafe_private_named.60,
-            example_of_work: self.__unsafe_private_named.61,
-            executable_library_name: self.__unsafe_private_named.62,
-            expires: self.__unsafe_private_named.63,
-            file_format: self.__unsafe_private_named.64,
-            funder: self.__unsafe_private_named.65,
-            funding: self.__unsafe_private_named.66,
-            genre: self.__unsafe_private_named.67,
-            has_part: self.__unsafe_private_named.68,
-            headline: self.__unsafe_private_named.69,
-            identifier: self.__unsafe_private_named.70,
-            image: self.__unsafe_private_named.71,
-            in_language: self.__unsafe_private_named.72,
-            interaction_statistic: self.__unsafe_private_named.73,
-            interactivity_type: self.__unsafe_private_named.74,
-            interpreted_as_claim: self.__unsafe_private_named.75,
-            is_accessible_for_free: self.__unsafe_private_named.76,
-            is_based_on: self.__unsafe_private_named.77,
-            is_based_on_url: self.__unsafe_private_named.78,
-            is_family_friendly: self.__unsafe_private_named.79,
-            is_part_of: self.__unsafe_private_named.80,
-            keywords: self.__unsafe_private_named.81,
-            learning_resource_type: self.__unsafe_private_named.82,
-            license: self.__unsafe_private_named.83,
-            location_created: self.__unsafe_private_named.84,
-            main_entity: self.__unsafe_private_named.85,
-            main_entity_of_page: self.__unsafe_private_named.86,
-            maintainer: self.__unsafe_private_named.87,
-            material: self.__unsafe_private_named.88,
-            material_extent: self.__unsafe_private_named.89,
-            mentions: self.__unsafe_private_named.90,
-            name: self.__unsafe_private_named.91,
-            offers: self.__unsafe_private_named.92,
-            page_end: self.__unsafe_private_named.93,
-            page_start: self.__unsafe_private_named.94,
-            pagination: self.__unsafe_private_named.95,
-            pattern: self.__unsafe_private_named.96,
-            position: self.__unsafe_private_named.97,
-            potential_action: self.__unsafe_private_named.98,
-            producer: self.__unsafe_private_named.99,
-            proficiency_level: self.__unsafe_private_named.100,
-            programming_model: self.__unsafe_private_named.101,
-            provider: self.__unsafe_private_named.102,
-            publication: self.__unsafe_private_named.103,
-            publisher: self.__unsafe_private_named.104,
-            publisher_imprint: self.__unsafe_private_named.105,
-            publishing_principles: self.__unsafe_private_named.106,
-            recorded_at: self.__unsafe_private_named.107,
-            released_event: self.__unsafe_private_named.108,
-            review: self.__unsafe_private_named.109,
-            reviews: self.__unsafe_private_named.110,
-            same_as: self.__unsafe_private_named.111,
-            schema_version: self.__unsafe_private_named.112,
-            sd_date_published: self.__unsafe_private_named.113,
-            sd_license: self.__unsafe_private_named.114,
-            sd_publisher: self.__unsafe_private_named.115,
-            size: self.__unsafe_private_named.116,
-            source_organization: self.__unsafe_private_named.117,
-            spatial: self.__unsafe_private_named.118,
-            spatial_coverage: self.__unsafe_private_named.119,
-            speakable: self.__unsafe_private_named.120,
-            sponsor: self.__unsafe_private_named.121,
-            subject_of: self.__unsafe_private_named.122,
-            target_platform: self.__unsafe_private_named.123,
-            teaches: self.__unsafe_private_named.124,
-            temporal: self.__unsafe_private_named.125,
-            temporal_coverage: self.__unsafe_private_named.126,
-            text: self.__unsafe_private_named.127,
-            thumbnail: self.__unsafe_private_named.128,
-            thumbnail_url: self.__unsafe_private_named.129,
-            time_required: self.__unsafe_private_named.130,
-            translation_of_work: self.__unsafe_private_named.131,
-            translator: self.__unsafe_private_named.132,
-            typical_age_range: self.__unsafe_private_named.133,
-            url: self.__unsafe_private_named.134,
-            usage_info: self.__unsafe_private_named.135,
-            version: self.__unsafe_private_named.136,
-            video: self.__unsafe_private_named.137,
-            word_count: self.__unsafe_private_named.138,
-            work_example: self.__unsafe_private_named.139,
-            work_translation: self.__unsafe_private_named.140,
+            about: self._fields.0,
+            r#abstract: self._fields.1,
+            access_mode: self._fields.2,
+            access_mode_sufficient: self._fields.3,
+            accessibility_api: self._fields.4,
+            accessibility_control: self._fields.5,
+            accessibility_feature: self._fields.6,
+            accessibility_hazard: self._fields.7,
+            accessibility_summary: self._fields.8,
+            accountable_person: self._fields.9,
+            acquire_license_page: self._fields.10,
+            additional_type: self._fields.11,
+            aggregate_rating: self._fields.12,
+            alternate_name: self._fields.13,
+            alternative_headline: self._fields.14,
+            archived_at: self._fields.15,
+            article_body: self._fields.16,
+            article_section: self._fields.17,
+            assembly: self._fields.18,
+            assembly_version: self._fields.19,
+            assesses: self._fields.20,
+            associated_media: self._fields.21,
+            audience: self._fields.22,
+            audio: self._fields.23,
+            author: self._fields.24,
+            award: self._fields.25,
+            awards: self._fields.26,
+            backstory: self._fields.27,
+            character: self._fields.28,
+            citation: self._fields.29,
+            comment: self._fields.30,
+            comment_count: self._fields.31,
+            conditions_of_access: self._fields.32,
+            content_location: self._fields.33,
+            content_rating: self._fields.34,
+            content_reference_time: self._fields.35,
+            contributor: self._fields.36,
+            copyright_holder: self._fields.37,
+            copyright_notice: self._fields.38,
+            copyright_year: self._fields.39,
+            correction: self._fields.40,
+            country_of_origin: self._fields.41,
+            creative_work_status: self._fields.42,
+            creator: self._fields.43,
+            credit_text: self._fields.44,
+            date_created: self._fields.45,
+            date_modified: self._fields.46,
+            date_published: self._fields.47,
+            dependencies: self._fields.48,
+            description: self._fields.49,
+            digital_source_type: self._fields.50,
+            disambiguating_description: self._fields.51,
+            discussion_url: self._fields.52,
+            edit_eidr: self._fields.53,
+            editor: self._fields.54,
+            educational_alignment: self._fields.55,
+            educational_level: self._fields.56,
+            educational_use: self._fields.57,
+            encoding: self._fields.58,
+            encoding_format: self._fields.59,
+            encodings: self._fields.60,
+            example_of_work: self._fields.61,
+            executable_library_name: self._fields.62,
+            expires: self._fields.63,
+            file_format: self._fields.64,
+            funder: self._fields.65,
+            funding: self._fields.66,
+            genre: self._fields.67,
+            has_part: self._fields.68,
+            headline: self._fields.69,
+            identifier: self._fields.70,
+            image: self._fields.71,
+            in_language: self._fields.72,
+            interaction_statistic: self._fields.73,
+            interactivity_type: self._fields.74,
+            interpreted_as_claim: self._fields.75,
+            is_accessible_for_free: self._fields.76,
+            is_based_on: self._fields.77,
+            is_based_on_url: self._fields.78,
+            is_family_friendly: self._fields.79,
+            is_part_of: self._fields.80,
+            keywords: self._fields.81,
+            learning_resource_type: self._fields.82,
+            license: self._fields.83,
+            location_created: self._fields.84,
+            main_entity: self._fields.85,
+            main_entity_of_page: self._fields.86,
+            maintainer: self._fields.87,
+            material: self._fields.88,
+            material_extent: self._fields.89,
+            mentions: self._fields.90,
+            name: self._fields.91,
+            offers: self._fields.92,
+            page_end: self._fields.93,
+            page_start: self._fields.94,
+            pagination: self._fields.95,
+            pattern: self._fields.96,
+            position: self._fields.97,
+            potential_action: self._fields.98,
+            producer: self._fields.99,
+            proficiency_level: self._fields.100,
+            programming_model: self._fields.101,
+            provider: self._fields.102,
+            publication: self._fields.103,
+            publisher: self._fields.104,
+            publisher_imprint: self._fields.105,
+            publishing_principles: self._fields.106,
+            recorded_at: self._fields.107,
+            released_event: self._fields.108,
+            review: self._fields.109,
+            reviews: self._fields.110,
+            same_as: self._fields.111,
+            schema_version: self._fields.112,
+            sd_date_published: self._fields.113,
+            sd_license: self._fields.114,
+            sd_publisher: self._fields.115,
+            size: self._fields.116,
+            source_organization: self._fields.117,
+            spatial: self._fields.118,
+            spatial_coverage: self._fields.119,
+            speakable: self._fields.120,
+            sponsor: self._fields.121,
+            subject_of: self._fields.122,
+            target_platform: self._fields.123,
+            teaches: self._fields.124,
+            temporal: self._fields.125,
+            temporal_coverage: self._fields.126,
+            text: self._fields.127,
+            thumbnail: self._fields.128,
+            thumbnail_url: self._fields.129,
+            time_required: self._fields.130,
+            translation_of_work: self._fields.131,
+            translator: self._fields.132,
+            typical_age_range: self._fields.133,
+            url: self._fields.134,
+            usage_info: self._fields.135,
+            version: self._fields.136,
+            video: self._fields.137,
+            word_count: self._fields.138,
+            work_example: self._fields.139,
+            work_translation: self._fields.140,
             extra_data: Some(extra_data),
         }
     }

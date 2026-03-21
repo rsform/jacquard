@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -137,112 +140,112 @@ pub mod indexed_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Value;
+        type Uri;
+        type Cid;
+        type IndexedAt;
         type Did;
         type Collection;
-        type IndexedAt;
-        type Cid;
-        type Uri;
-        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Value = Unset;
+        type Uri = Unset;
+        type Cid = Unset;
+        type IndexedAt = Unset;
         type Did = Unset;
         type Collection = Unset;
-        type IndexedAt = Unset;
-        type Cid = Unset;
-        type Uri = Unset;
-        type Value = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Collection = S::Collection;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Did = S::Did;
-        type Collection = Set<members::collection>;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Did = S::Did;
-        type Collection = S::Collection;
-        type IndexedAt = Set<members::indexed_at>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Did = S::Did;
-        type Collection = S::Collection;
-        type IndexedAt = S::IndexedAt;
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Did = S::Did;
-        type Collection = S::Collection;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
-        type Uri = Set<members::uri>;
-        type Value = S::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
+        type Value = Set<members::value>;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
         type Did = S::Did;
         type Collection = S::Collection;
-        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Value = S::Value;
+        type Uri = Set<members::uri>;
         type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
+        type Did = S::Did;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Value = S::Value;
         type Uri = S::Uri;
-        type Value = Set<members::value>;
+        type Cid = Set<members::cid>;
+        type IndexedAt = S::IndexedAt;
+        type Did = S::Did;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Value = S::Value;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type IndexedAt = Set<members::indexed_at>;
+        type Did = S::Did;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Value = S::Value;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
+        type Did = Set<members::did>;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Value = S::Value;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
+        type Did = S::Did;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `collection` field
         pub struct collection(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `value` field
-        pub struct value(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct IndexedRecordBuilder<'a, S: indexed_record_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Cid<'a>>,
         Option<Nsid<'a>>,
         Option<Did<'a>>,
@@ -250,7 +253,7 @@ pub struct IndexedRecordBuilder<'a, S: indexed_record_state::State> {
         Option<AtUri<'a>>,
         Option<Data<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> IndexedRecord<'a> {
@@ -264,9 +267,9 @@ impl<'a> IndexedRecordBuilder<'a, indexed_record_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         IndexedRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -281,11 +284,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> IndexedRecordBuilder<'a, indexed_record_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         IndexedRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -300,11 +303,11 @@ where
         mut self,
         value: impl Into<Nsid<'a>>,
     ) -> IndexedRecordBuilder<'a, indexed_record_state::SetCollection<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         IndexedRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -319,11 +322,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> IndexedRecordBuilder<'a, indexed_record_state::SetDid<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         IndexedRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -338,11 +341,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> IndexedRecordBuilder<'a, indexed_record_state::SetIndexedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         IndexedRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -357,11 +360,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> IndexedRecordBuilder<'a, indexed_record_state::SetUri<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         IndexedRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -376,11 +379,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> IndexedRecordBuilder<'a, indexed_record_state::SetValue<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         IndexedRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -388,22 +391,22 @@ where
 impl<'a, S> IndexedRecordBuilder<'a, S>
 where
     S: indexed_record_state::State,
+    S::Value: indexed_record_state::IsSet,
+    S::Uri: indexed_record_state::IsSet,
+    S::Cid: indexed_record_state::IsSet,
+    S::IndexedAt: indexed_record_state::IsSet,
     S::Did: indexed_record_state::IsSet,
     S::Collection: indexed_record_state::IsSet,
-    S::IndexedAt: indexed_record_state::IsSet,
-    S::Cid: indexed_record_state::IsSet,
-    S::Uri: indexed_record_state::IsSet,
-    S::Value: indexed_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> IndexedRecord<'a> {
         IndexedRecord {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            collection: self.__unsafe_private_named.1.unwrap(),
-            did: self.__unsafe_private_named.2.unwrap(),
-            indexed_at: self.__unsafe_private_named.3.unwrap(),
-            uri: self.__unsafe_private_named.4.unwrap(),
-            value: self.__unsafe_private_named.5.unwrap(),
+            cid: self._fields.0.unwrap(),
+            collection: self._fields.1.unwrap(),
+            did: self._fields.2.unwrap(),
+            indexed_at: self._fields.3.unwrap(),
+            uri: self._fields.4.unwrap(),
+            value: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -413,12 +416,12 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> IndexedRecord<'a> {
         IndexedRecord {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            collection: self.__unsafe_private_named.1.unwrap(),
-            did: self.__unsafe_private_named.2.unwrap(),
-            indexed_at: self.__unsafe_private_named.3.unwrap(),
-            uri: self.__unsafe_private_named.4.unwrap(),
-            value: self.__unsafe_private_named.5.unwrap(),
+            cid: self._fields.0.unwrap(),
+            collection: self._fields.1.unwrap(),
+            did: self._fields.2.unwrap(),
+            indexed_at: self._fields.3.unwrap(),
+            uri: self._fields.4.unwrap(),
+            value: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

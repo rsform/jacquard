@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -344,48 +347,45 @@ pub mod identifiers_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Identifiers;
         type Work;
+        type Identifiers;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Identifiers = Unset;
         type Work = Unset;
-    }
-    ///State transition - sets the `identifiers` field to Set
-    pub struct SetIdentifiers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIdentifiers<S> {}
-    impl<S: State> State for SetIdentifiers<S> {
-        type Identifiers = Set<members::identifiers>;
-        type Work = S::Work;
+        type Identifiers = Unset;
     }
     ///State transition - sets the `work` field to Set
     pub struct SetWork<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWork<S> {}
     impl<S: State> State for SetWork<S> {
-        type Identifiers = S::Identifiers;
         type Work = Set<members::work>;
+        type Identifiers = S::Identifiers;
+    }
+    ///State transition - sets the `identifiers` field to Set
+    pub struct SetIdentifiers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIdentifiers<S> {}
+    impl<S: State> State for SetIdentifiers<S> {
+        type Work = S::Work;
+        type Identifiers = Set<members::identifiers>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `identifiers` field
-        pub struct identifiers(());
         ///Marker type for the `work` field
         pub struct work(());
+        ///Marker type for the `identifiers` field
+        pub struct identifiers(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct IdentifiersBuilder<'a, S: identifiers_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Vec<identifiers::Identifier<'a>>>,
-        Option<AtUri<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<identifiers::Identifier<'a>>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Identifiers<'a> {
@@ -399,9 +399,9 @@ impl<'a> IdentifiersBuilder<'a, identifiers_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         IdentifiersBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -416,11 +416,11 @@ where
         mut self,
         value: impl Into<Vec<identifiers::Identifier<'a>>>,
     ) -> IdentifiersBuilder<'a, identifiers_state::SetIdentifiers<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         IdentifiersBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -435,11 +435,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> IdentifiersBuilder<'a, identifiers_state::SetWork<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         IdentifiersBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -447,14 +447,14 @@ where
 impl<'a, S> IdentifiersBuilder<'a, S>
 where
     S: identifiers_state::State,
-    S::Identifiers: identifiers_state::IsSet,
     S::Work: identifiers_state::IsSet,
+    S::Identifiers: identifiers_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Identifiers<'a> {
         Identifiers {
-            identifiers: self.__unsafe_private_named.0.unwrap(),
-            work: self.__unsafe_private_named.1.unwrap(),
+            identifiers: self._fields.0.unwrap(),
+            work: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -467,8 +467,8 @@ where
         >,
     ) -> Identifiers<'a> {
         Identifiers {
-            identifiers: self.__unsafe_private_named.0.unwrap(),
-            work: self.__unsafe_private_named.1.unwrap(),
+            identifiers: self._fields.0.unwrap(),
+            work: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

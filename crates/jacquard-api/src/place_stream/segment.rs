@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -248,59 +251,59 @@ pub mod audio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Codec;
         type Rate;
         type Channels;
+        type Codec;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Codec = Unset;
         type Rate = Unset;
         type Channels = Unset;
-    }
-    ///State transition - sets the `codec` field to Set
-    pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCodec<S> {}
-    impl<S: State> State for SetCodec<S> {
-        type Codec = Set<members::codec>;
-        type Rate = S::Rate;
-        type Channels = S::Channels;
+        type Codec = Unset;
     }
     ///State transition - sets the `rate` field to Set
     pub struct SetRate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRate<S> {}
     impl<S: State> State for SetRate<S> {
-        type Codec = S::Codec;
         type Rate = Set<members::rate>;
         type Channels = S::Channels;
+        type Codec = S::Codec;
     }
     ///State transition - sets the `channels` field to Set
     pub struct SetChannels<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetChannels<S> {}
     impl<S: State> State for SetChannels<S> {
-        type Codec = S::Codec;
         type Rate = S::Rate;
         type Channels = Set<members::channels>;
+        type Codec = S::Codec;
+    }
+    ///State transition - sets the `codec` field to Set
+    pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCodec<S> {}
+    impl<S: State> State for SetCodec<S> {
+        type Rate = S::Rate;
+        type Channels = S::Channels;
+        type Codec = Set<members::codec>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `codec` field
-        pub struct codec(());
         ///Marker type for the `rate` field
         pub struct rate(());
         ///Marker type for the `channels` field
         pub struct channels(());
+        ///Marker type for the `codec` field
+        pub struct codec(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AudioBuilder<'a, S: audio_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<CowStr<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<CowStr<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Audio<'a> {
@@ -314,9 +317,9 @@ impl<'a> AudioBuilder<'a, audio_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AudioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -331,11 +334,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> AudioBuilder<'a, audio_state::SetChannels<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AudioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -350,11 +353,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AudioBuilder<'a, audio_state::SetCodec<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AudioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -369,11 +372,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> AudioBuilder<'a, audio_state::SetRate<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         AudioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -381,16 +384,16 @@ where
 impl<'a, S> AudioBuilder<'a, S>
 where
     S: audio_state::State,
-    S::Codec: audio_state::IsSet,
     S::Rate: audio_state::IsSet,
     S::Channels: audio_state::IsSet,
+    S::Codec: audio_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Audio<'a> {
         Audio {
-            channels: self.__unsafe_private_named.0.unwrap(),
-            codec: self.__unsafe_private_named.1.unwrap(),
-            rate: self.__unsafe_private_named.2.unwrap(),
+            channels: self._fields.0.unwrap(),
+            codec: self._fields.1.unwrap(),
+            rate: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -400,9 +403,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Audio<'a> {
         Audio {
-            channels: self.__unsafe_private_named.0.unwrap(),
-            codec: self.__unsafe_private_named.1.unwrap(),
-            rate: self.__unsafe_private_named.2.unwrap(),
+            channels: self._fields.0.unwrap(),
+            codec: self._fields.1.unwrap(),
+            rate: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -726,9 +729,9 @@ pub mod framerate_state {
 
 /// Builder for constructing an instance of this type
 pub struct FramerateBuilder<'a, S: framerate_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Framerate<'a> {
@@ -742,9 +745,9 @@ impl<'a> FramerateBuilder<'a, framerate_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FramerateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -759,11 +762,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> FramerateBuilder<'a, framerate_state::SetDen<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         FramerateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -778,11 +781,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> FramerateBuilder<'a, framerate_state::SetNum<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         FramerateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -796,8 +799,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Framerate<'a> {
         Framerate {
-            den: self.__unsafe_private_named.0.unwrap(),
-            num: self.__unsafe_private_named.1.unwrap(),
+            den: self._fields.0.unwrap(),
+            num: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -807,8 +810,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Framerate<'a> {
         Framerate {
-            den: self.__unsafe_private_named.0.unwrap(),
-            num: self.__unsafe_private_named.1.unwrap(),
+            den: self._fields.0.unwrap(),
+            num: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -826,8 +829,8 @@ pub mod segment_state {
     pub trait State: sealed::Sealed {
         type SigningKey;
         type StartTime;
-        type Creator;
         type Id;
+        type Creator;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -835,8 +838,8 @@ pub mod segment_state {
     impl State for Empty {
         type SigningKey = Unset;
         type StartTime = Unset;
-        type Creator = Unset;
         type Id = Unset;
+        type Creator = Unset;
     }
     ///State transition - sets the `signing_key` field to Set
     pub struct SetSigningKey<S: State = Empty>(PhantomData<fn() -> S>);
@@ -844,8 +847,8 @@ pub mod segment_state {
     impl<S: State> State for SetSigningKey<S> {
         type SigningKey = Set<members::signing_key>;
         type StartTime = S::StartTime;
-        type Creator = S::Creator;
         type Id = S::Id;
+        type Creator = S::Creator;
     }
     ///State transition - sets the `start_time` field to Set
     pub struct SetStartTime<S: State = Empty>(PhantomData<fn() -> S>);
@@ -853,17 +856,8 @@ pub mod segment_state {
     impl<S: State> State for SetStartTime<S> {
         type SigningKey = S::SigningKey;
         type StartTime = Set<members::start_time>;
+        type Id = S::Id;
         type Creator = S::Creator;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `creator` field to Set
-    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreator<S> {}
-    impl<S: State> State for SetCreator<S> {
-        type SigningKey = S::SigningKey;
-        type StartTime = S::StartTime;
-        type Creator = Set<members::creator>;
-        type Id = S::Id;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
@@ -871,8 +865,17 @@ pub mod segment_state {
     impl<S: State> State for SetId<S> {
         type SigningKey = S::SigningKey;
         type StartTime = S::StartTime;
-        type Creator = S::Creator;
         type Id = Set<members::id>;
+        type Creator = S::Creator;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreator<S> {}
+    impl<S: State> State for SetCreator<S> {
+        type SigningKey = S::SigningKey;
+        type StartTime = S::StartTime;
+        type Id = S::Id;
+        type Creator = Set<members::creator>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -881,17 +884,17 @@ pub mod segment_state {
         pub struct signing_key(());
         ///Marker type for the `start_time` field
         pub struct start_time(());
-        ///Marker type for the `creator` field
-        pub struct creator(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SegmentBuilder<'a, S: segment_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<segment::Audio<'a>>>,
         Option<ContentRights<'a>>,
         Option<ContentWarnings<'a>>,
@@ -904,7 +907,7 @@ pub struct SegmentBuilder<'a, S: segment_state::State> {
         Option<Datetime>,
         Option<Vec<segment::Video<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Segment<'a> {
@@ -918,21 +921,9 @@ impl<'a> SegmentBuilder<'a, segment_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SegmentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -940,12 +931,12 @@ impl<'a> SegmentBuilder<'a, segment_state::Empty> {
 impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
     /// Set the `audio` field (optional)
     pub fn audio(mut self, value: impl Into<Option<Vec<segment::Audio<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `audio` field to an Option value (optional)
     pub fn maybe_audio(mut self, value: Option<Vec<segment::Audio<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -956,12 +947,12 @@ impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ContentRights<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `contentRights` field to an Option value (optional)
     pub fn maybe_content_rights(mut self, value: Option<ContentRights<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -972,12 +963,12 @@ impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ContentWarnings<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `contentWarnings` field to an Option value (optional)
     pub fn maybe_content_warnings(mut self, value: Option<ContentWarnings<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -992,11 +983,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> SegmentBuilder<'a, segment_state::SetCreator<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         SegmentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1007,7 +998,7 @@ impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
         mut self,
         value: impl Into<Option<DistributionPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `distributionPolicy` field to an Option value (optional)
@@ -1015,7 +1006,7 @@ impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
         mut self,
         value: Option<DistributionPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1023,12 +1014,12 @@ impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
 impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
     /// Set the `duration` field (optional)
     pub fn duration(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `duration` field to an Option value (optional)
     pub fn maybe_duration(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1043,11 +1034,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SegmentBuilder<'a, segment_state::SetId<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         SegmentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1062,11 +1053,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SegmentBuilder<'a, segment_state::SetSigningKey<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         SegmentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1074,12 +1065,12 @@ where
 impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
     pub fn maybe_size(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -1094,11 +1085,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SegmentBuilder<'a, segment_state::SetStartTime<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         SegmentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1106,12 +1097,12 @@ where
 impl<'a, S: segment_state::State> SegmentBuilder<'a, S> {
     /// Set the `video` field (optional)
     pub fn video(mut self, value: impl Into<Option<Vec<segment::Video<'a>>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `video` field to an Option value (optional)
     pub fn maybe_video(mut self, value: Option<Vec<segment::Video<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -1121,23 +1112,23 @@ where
     S: segment_state::State,
     S::SigningKey: segment_state::IsSet,
     S::StartTime: segment_state::IsSet,
-    S::Creator: segment_state::IsSet,
     S::Id: segment_state::IsSet,
+    S::Creator: segment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Segment<'a> {
         Segment {
-            audio: self.__unsafe_private_named.0,
-            content_rights: self.__unsafe_private_named.1,
-            content_warnings: self.__unsafe_private_named.2,
-            creator: self.__unsafe_private_named.3.unwrap(),
-            distribution_policy: self.__unsafe_private_named.4,
-            duration: self.__unsafe_private_named.5,
-            id: self.__unsafe_private_named.6.unwrap(),
-            signing_key: self.__unsafe_private_named.7.unwrap(),
-            size: self.__unsafe_private_named.8,
-            start_time: self.__unsafe_private_named.9.unwrap(),
-            video: self.__unsafe_private_named.10,
+            audio: self._fields.0,
+            content_rights: self._fields.1,
+            content_warnings: self._fields.2,
+            creator: self._fields.3.unwrap(),
+            distribution_policy: self._fields.4,
+            duration: self._fields.5,
+            id: self._fields.6.unwrap(),
+            signing_key: self._fields.7.unwrap(),
+            size: self._fields.8,
+            start_time: self._fields.9.unwrap(),
+            video: self._fields.10,
             extra_data: Default::default(),
         }
     }
@@ -1147,17 +1138,17 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Segment<'a> {
         Segment {
-            audio: self.__unsafe_private_named.0,
-            content_rights: self.__unsafe_private_named.1,
-            content_warnings: self.__unsafe_private_named.2,
-            creator: self.__unsafe_private_named.3.unwrap(),
-            distribution_policy: self.__unsafe_private_named.4,
-            duration: self.__unsafe_private_named.5,
-            id: self.__unsafe_private_named.6.unwrap(),
-            signing_key: self.__unsafe_private_named.7.unwrap(),
-            size: self.__unsafe_private_named.8,
-            start_time: self.__unsafe_private_named.9.unwrap(),
-            video: self.__unsafe_private_named.10,
+            audio: self._fields.0,
+            content_rights: self._fields.1,
+            content_warnings: self._fields.2,
+            creator: self._fields.3.unwrap(),
+            distribution_policy: self._fields.4,
+            duration: self._fields.5,
+            id: self._fields.6.unwrap(),
+            signing_key: self._fields.7.unwrap(),
+            size: self._fields.8,
+            start_time: self._fields.9.unwrap(),
+            video: self._fields.10,
             extra_data: Some(extra_data),
         }
     }
@@ -1209,9 +1200,9 @@ pub mod segment_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct SegmentViewBuilder<'a, S: segment_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Cid<'a>>, Option<Data<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Cid<'a>>, Option<Data<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SegmentView<'a> {
@@ -1225,9 +1216,9 @@ impl<'a> SegmentViewBuilder<'a, segment_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SegmentViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1242,11 +1233,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> SegmentViewBuilder<'a, segment_view_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SegmentViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1261,11 +1252,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> SegmentViewBuilder<'a, segment_view_state::SetRecord<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SegmentViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1279,8 +1270,8 @@ where
     /// Build the final struct
     pub fn build(self) -> SegmentView<'a> {
         SegmentView {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            record: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0.unwrap(),
+            record: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1290,8 +1281,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> SegmentView<'a> {
         SegmentView {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            record: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0.unwrap(),
+            record: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1308,64 +1299,64 @@ pub mod video_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Width;
-        type Height;
         type Codec;
+        type Height;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Width = Unset;
-        type Height = Unset;
         type Codec = Unset;
+        type Height = Unset;
     }
     ///State transition - sets the `width` field to Set
     pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWidth<S> {}
     impl<S: State> State for SetWidth<S> {
         type Width = Set<members::width>;
+        type Codec = S::Codec;
         type Height = S::Height;
-        type Codec = S::Codec;
-    }
-    ///State transition - sets the `height` field to Set
-    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHeight<S> {}
-    impl<S: State> State for SetHeight<S> {
-        type Width = S::Width;
-        type Height = Set<members::height>;
-        type Codec = S::Codec;
     }
     ///State transition - sets the `codec` field to Set
     pub struct SetCodec<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCodec<S> {}
     impl<S: State> State for SetCodec<S> {
         type Width = S::Width;
-        type Height = S::Height;
         type Codec = Set<members::codec>;
+        type Height = S::Height;
+    }
+    ///State transition - sets the `height` field to Set
+    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHeight<S> {}
+    impl<S: State> State for SetHeight<S> {
+        type Width = S::Width;
+        type Codec = S::Codec;
+        type Height = Set<members::height>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `width` field
         pub struct width(());
-        ///Marker type for the `height` field
-        pub struct height(());
         ///Marker type for the `codec` field
         pub struct codec(());
+        ///Marker type for the `height` field
+        pub struct height(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct VideoBuilder<'a, S: video_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<bool>,
         Option<CowStr<'a>>,
         Option<segment::Framerate<'a>>,
         Option<i64>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Video<'a> {
@@ -1379,9 +1370,9 @@ impl<'a> VideoBuilder<'a, video_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         VideoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1389,12 +1380,12 @@ impl<'a> VideoBuilder<'a, video_state::Empty> {
 impl<'a, S: video_state::State> VideoBuilder<'a, S> {
     /// Set the `bframes` field (optional)
     pub fn bframes(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `bframes` field to an Option value (optional)
     pub fn maybe_bframes(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1409,11 +1400,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> VideoBuilder<'a, video_state::SetCodec<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         VideoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1424,12 +1415,12 @@ impl<'a, S: video_state::State> VideoBuilder<'a, S> {
         mut self,
         value: impl Into<Option<segment::Framerate<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `framerate` field to an Option value (optional)
     pub fn maybe_framerate(mut self, value: Option<segment::Framerate<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1444,11 +1435,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> VideoBuilder<'a, video_state::SetHeight<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         VideoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1463,11 +1454,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> VideoBuilder<'a, video_state::SetWidth<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         VideoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1476,17 +1467,17 @@ impl<'a, S> VideoBuilder<'a, S>
 where
     S: video_state::State,
     S::Width: video_state::IsSet,
-    S::Height: video_state::IsSet,
     S::Codec: video_state::IsSet,
+    S::Height: video_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Video<'a> {
         Video {
-            bframes: self.__unsafe_private_named.0,
-            codec: self.__unsafe_private_named.1.unwrap(),
-            framerate: self.__unsafe_private_named.2,
-            height: self.__unsafe_private_named.3.unwrap(),
-            width: self.__unsafe_private_named.4.unwrap(),
+            bframes: self._fields.0,
+            codec: self._fields.1.unwrap(),
+            framerate: self._fields.2,
+            height: self._fields.3.unwrap(),
+            width: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1496,11 +1487,11 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Video<'a> {
         Video {
-            bframes: self.__unsafe_private_named.0,
-            codec: self.__unsafe_private_named.1.unwrap(),
-            framerate: self.__unsafe_private_named.2,
-            height: self.__unsafe_private_named.3.unwrap(),
-            width: self.__unsafe_private_named.4.unwrap(),
+            bframes: self._fields.0,
+            codec: self._fields.1.unwrap(),
+            framerate: self._fields.2,
+            height: self._fields.3.unwrap(),
+            width: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

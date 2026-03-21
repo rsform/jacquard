@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -145,65 +148,65 @@ pub mod tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Description;
-        type CreatedAt;
         type Name;
+        type CreatedAt;
+        type Description;
         type Slug;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Description = Unset;
-        type CreatedAt = Unset;
         type Name = Unset;
+        type CreatedAt = Unset;
+        type Description = Unset;
         type Slug = Unset;
     }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Description = Set<members::description>;
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
         type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
+        type Description = S::Description;
         type Slug = S::Slug;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Description = S::Description;
-        type CreatedAt = Set<members::created_at>;
         type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
+        type Description = S::Description;
         type Slug = S::Slug;
     }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Description = S::Description;
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Name = S::Name;
         type CreatedAt = S::CreatedAt;
-        type Name = Set<members::name>;
+        type Description = Set<members::description>;
         type Slug = S::Slug;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Description = S::Description;
         type Slug = Set<members::slug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `description` field
-        pub struct description(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `description` field
+        pub struct description(());
         ///Marker type for the `slug` field
         pub struct slug(());
     }
@@ -211,14 +214,14 @@ pub mod tag_state {
 
 /// Builder for constructing an instance of this type
 pub struct TagBuilder<'a, S: tag_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Tag<'a> {
@@ -232,9 +235,9 @@ impl<'a> TagBuilder<'a, tag_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TagBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -249,11 +252,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> TagBuilder<'a, tag_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TagBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -268,11 +271,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TagBuilder<'a, tag_state::SetDescription<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TagBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -287,11 +290,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TagBuilder<'a, tag_state::SetName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         TagBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -306,11 +309,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TagBuilder<'a, tag_state::SetSlug<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         TagBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -318,18 +321,18 @@ where
 impl<'a, S> TagBuilder<'a, S>
 where
     S: tag_state::State,
-    S::Description: tag_state::IsSet,
-    S::CreatedAt: tag_state::IsSet,
     S::Name: tag_state::IsSet,
+    S::CreatedAt: tag_state::IsSet,
+    S::Description: tag_state::IsSet,
     S::Slug: tag_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tag<'a> {
         Tag {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
-            slug: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
+            slug: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -342,10 +345,10 @@ where
         >,
     ) -> Tag<'a> {
         Tag {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
-            slug: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
+            slug: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

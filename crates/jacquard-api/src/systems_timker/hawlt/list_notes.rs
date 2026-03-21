@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -137,9 +140,9 @@ pub mod list_notes_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListNotesBuilder<'a, S: list_notes_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>, Option<AtIdentifier<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<i64>, Option<AtIdentifier<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ListNotes<'a> {
@@ -153,9 +156,9 @@ impl<'a> ListNotesBuilder<'a, list_notes_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListNotesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -163,12 +166,12 @@ impl<'a> ListNotesBuilder<'a, list_notes_state::Empty> {
 impl<'a, S: list_notes_state::State> ListNotesBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -176,12 +179,12 @@ impl<'a, S: list_notes_state::State> ListNotesBuilder<'a, S> {
 impl<'a, S: list_notes_state::State> ListNotesBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -196,11 +199,11 @@ where
         mut self,
         value: impl Into<AtIdentifier<'a>>,
     ) -> ListNotesBuilder<'a, list_notes_state::SetRepo<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ListNotesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -213,9 +216,9 @@ where
     /// Build the final struct
     pub fn build(self) -> ListNotes<'a> {
         ListNotes {
-            cursor: self.__unsafe_private_named.0,
-            limit: self.__unsafe_private_named.1,
-            repo: self.__unsafe_private_named.2.unwrap(),
+            cursor: self._fields.0,
+            limit: self._fields.1,
+            repo: self._fields.2.unwrap(),
         }
     }
 }
@@ -230,80 +233,75 @@ pub mod note_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IndexedAt;
-        type Value;
-        type Cid;
         type Uri;
+        type Cid;
+        type Value;
+        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IndexedAt = Unset;
-        type Value = Unset;
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type IndexedAt = Set<members::indexed_at>;
-        type Value = S::Value;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type IndexedAt = S::IndexedAt;
-        type Value = Set<members::value>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type IndexedAt = S::IndexedAt;
-        type Value = S::Value;
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
+        type Cid = Unset;
+        type Value = Unset;
+        type IndexedAt = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type IndexedAt = S::IndexedAt;
-        type Value = S::Value;
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Value = S::Value;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Value = Set<members::value>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Value = S::Value;
+        type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `value` field
-        pub struct value(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct NoteViewBuilder<'a, S: note_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Cid<'a>>,
-        Option<Datetime>,
-        Option<AtUri<'a>>,
-        Option<Note<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Cid<'a>>, Option<Datetime>, Option<AtUri<'a>>, Option<Note<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> NoteView<'a> {
@@ -317,9 +315,9 @@ impl<'a> NoteViewBuilder<'a, note_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NoteViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -334,11 +332,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> NoteViewBuilder<'a, note_view_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         NoteViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -353,11 +351,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> NoteViewBuilder<'a, note_view_state::SetIndexedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         NoteViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -372,11 +370,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> NoteViewBuilder<'a, note_view_state::SetUri<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         NoteViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -391,11 +389,11 @@ where
         mut self,
         value: impl Into<Note<'a>>,
     ) -> NoteViewBuilder<'a, note_view_state::SetValue<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         NoteViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -403,18 +401,18 @@ where
 impl<'a, S> NoteViewBuilder<'a, S>
 where
     S: note_view_state::State,
-    S::IndexedAt: note_view_state::IsSet,
-    S::Value: note_view_state::IsSet,
-    S::Cid: note_view_state::IsSet,
     S::Uri: note_view_state::IsSet,
+    S::Cid: note_view_state::IsSet,
+    S::Value: note_view_state::IsSet,
+    S::IndexedAt: note_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NoteView<'a> {
         NoteView {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            indexed_at: self.__unsafe_private_named.1.unwrap(),
-            uri: self.__unsafe_private_named.2.unwrap(),
-            value: self.__unsafe_private_named.3.unwrap(),
+            cid: self._fields.0.unwrap(),
+            indexed_at: self._fields.1.unwrap(),
+            uri: self._fields.2.unwrap(),
+            value: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -427,10 +425,10 @@ where
         >,
     ) -> NoteView<'a> {
         NoteView {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            indexed_at: self.__unsafe_private_named.1.unwrap(),
-            uri: self.__unsafe_private_named.2.unwrap(),
-            value: self.__unsafe_private_named.3.unwrap(),
+            cid: self._fields.0.unwrap(),
+            indexed_at: self._fields.1.unwrap(),
+            uri: self._fields.2.unwrap(),
+            value: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

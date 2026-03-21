@@ -8,7 +8,11 @@
 pub mod get_playlist;
 pub mod get_playlists;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -25,10 +29,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_rocksky::song::SongViewBasic;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::song::SongViewBasic;
 /// A declaration of a playlist.
 
 #[lexicon]
@@ -186,7 +190,9 @@ pub struct PlaylistViewDetailed<'a> {
 }
 
 impl<'a> Playlist<'a> {
-    pub fn uri(uri: impl Into<CowStr<'a>>) -> Result<RecordUri<'a, PlaylistRecord>, UriError> {
+    pub fn uri(
+        uri: impl Into<CowStr<'a>>,
+    ) -> Result<RecordUri<'a, PlaylistRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new_cow(uri.into())?)
     }
 }
@@ -288,20 +294,25 @@ impl<'a> LexiconSchema for Playlist<'a> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("picture"),
-                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -352,7 +363,7 @@ impl<'a> LexiconSchema for PlaylistViewDetailed<'a> {
 
 pub mod playlist_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -396,8 +407,8 @@ pub mod playlist_state {
 
 /// Builder for constructing an instance of this type
 pub struct PlaylistBuilder<'a, S: playlist_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -408,7 +419,7 @@ pub struct PlaylistBuilder<'a, S: playlist_state::State> {
         Option<Vec<Data<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Playlist<'a> {
@@ -422,9 +433,9 @@ impl<'a> PlaylistBuilder<'a, playlist_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PlaylistBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -432,12 +443,12 @@ impl<'a> PlaylistBuilder<'a, playlist_state::Empty> {
 impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     /// Set the `appleMusicLink` field (optional)
     pub fn apple_music_link(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `appleMusicLink` field to an Option value (optional)
     pub fn maybe_apple_music_link(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -452,11 +463,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PlaylistBuilder<'a, playlist_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PlaylistBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -464,12 +475,12 @@ where
 impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -484,11 +495,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PlaylistBuilder<'a, playlist_state::SetName<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         PlaylistBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -496,12 +507,12 @@ where
 impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     /// Set the `picture` field (optional)
     pub fn picture(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `picture` field to an Option value (optional)
     pub fn maybe_picture(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -509,12 +520,12 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
 impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     /// Set the `spotifyLink` field (optional)
     pub fn spotify_link(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `spotifyLink` field to an Option value (optional)
     pub fn maybe_spotify_link(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -522,12 +533,12 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
 impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     /// Set the `tidalLink` field (optional)
     pub fn tidal_link(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `tidalLink` field to an Option value (optional)
     pub fn maybe_tidal_link(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -535,12 +546,12 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
 impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     /// Set the `tracks` field (optional)
     pub fn tracks(mut self, value: impl Into<Option<Vec<Data<'a>>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `tracks` field to an Option value (optional)
     pub fn maybe_tracks(mut self, value: Option<Vec<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -548,12 +559,12 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
 impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     /// Set the `youtubeLink` field (optional)
     pub fn youtube_link(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `youtubeLink` field to an Option value (optional)
     pub fn maybe_youtube_link(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -567,15 +578,15 @@ where
     /// Build the final struct
     pub fn build(self) -> Playlist<'a> {
         Playlist {
-            apple_music_link: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            name: self.__unsafe_private_named.3.unwrap(),
-            picture: self.__unsafe_private_named.4,
-            spotify_link: self.__unsafe_private_named.5,
-            tidal_link: self.__unsafe_private_named.6,
-            tracks: self.__unsafe_private_named.7,
-            youtube_link: self.__unsafe_private_named.8,
+            apple_music_link: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            name: self._fields.3.unwrap(),
+            picture: self._fields.4,
+            spotify_link: self._fields.5,
+            tidal_link: self._fields.6,
+            tracks: self._fields.7,
+            youtube_link: self._fields.8,
             extra_data: Default::default(),
         }
     }
@@ -585,25 +596,25 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Playlist<'a> {
         Playlist {
-            apple_music_link: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            name: self.__unsafe_private_named.3.unwrap(),
-            picture: self.__unsafe_private_named.4,
-            spotify_link: self.__unsafe_private_named.5,
-            tidal_link: self.__unsafe_private_named.6,
-            tracks: self.__unsafe_private_named.7,
-            youtube_link: self.__unsafe_private_named.8,
+            apple_music_link: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            name: self._fields.3.unwrap(),
+            picture: self._fields.4,
+            spotify_link: self._fields.5,
+            tidal_link: self._fields.6,
+            tracks: self._fields.7,
+            youtube_link: self._fields.8,
             extra_data: Some(extra_data),
         }
     }
 }
 
 fn lexicon_doc_app_rocksky_playlist() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.playlist"),
@@ -612,31 +623,35 @@ fn lexicon_doc_app_rocksky_playlist() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A declaration of a playlist.")),
+                    description: Some(
+                        CowStr::new_static("A declaration of a playlist."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("appleMusicLink"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The Apple Music link of the playlist.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The Apple Music link of the playlist."),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The date the playlist was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The date the playlist was created."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -644,9 +659,9 @@ fn lexicon_doc_app_rocksky_playlist() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The playlist description.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The playlist description."),
+                                    ),
                                     min_length: Some(1usize),
                                     max_length: Some(256usize),
                                     ..Default::default()
@@ -655,9 +670,9 @@ fn lexicon_doc_app_rocksky_playlist() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The name of the playlist.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The name of the playlist."),
+                                    ),
                                     min_length: Some(1usize),
                                     max_length: Some(512usize),
                                     ..Default::default()
@@ -665,34 +680,32 @@ fn lexicon_doc_app_rocksky_playlist() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("picture"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("spotifyLink"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The Spotify link of the playlist.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The Spotify link of the playlist."),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("tidalLink"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The Tidal link of the playlist.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The Tidal link of the playlist."),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("tracks"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "The tracks in the playlist.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The tracks in the playlist."),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("app.rocksky.song#record"),
                                         ..Default::default()
@@ -703,9 +716,9 @@ fn lexicon_doc_app_rocksky_playlist() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("youtubeLink"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The YouTube link of the playlist.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The YouTube link of the playlist."),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
@@ -723,10 +736,10 @@ fn lexicon_doc_app_rocksky_playlist() -> LexiconDoc<'static> {
 }
 
 fn lexicon_doc_app_rocksky_playlist_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.playlist.defs"),
@@ -735,18 +748,22 @@ fn lexicon_doc_app_rocksky_playlist_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("playlistViewBasic"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Basic view of a playlist, including its metadata",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Basic view of a playlist, including its metadata",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("coverImageUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The URL of the cover image for the playlist.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The URL of the cover image for the playlist.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -754,9 +771,11 @@ fn lexicon_doc_app_rocksky_playlist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The date and time when the playlist was created.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The date and time when the playlist was created.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -764,9 +783,11 @@ fn lexicon_doc_app_rocksky_playlist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("curatorAvatarUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The URL of the avatar image of the curator.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The URL of the avatar image of the curator.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -774,9 +795,11 @@ fn lexicon_doc_app_rocksky_playlist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("curatorDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The DID of the curator of the playlist.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The DID of the curator of the playlist.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::AtIdentifier),
                                 ..Default::default()
                             }),
@@ -784,9 +807,11 @@ fn lexicon_doc_app_rocksky_playlist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("curatorHandle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The handle of the curator of the playlist.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The handle of the curator of the playlist.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::AtIdentifier),
                                 ..Default::default()
                             }),
@@ -794,34 +819,38 @@ fn lexicon_doc_app_rocksky_playlist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("curatorName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The name of the curator of the playlist.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The name of the curator of the playlist.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "A description of the playlist.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("A description of the playlist."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The unique identifier of the playlist.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The unique identifier of the playlist."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("title"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The title of the playlist.")),
+                                description: Some(
+                                    CowStr::new_static("The title of the playlist."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -835,7 +864,9 @@ fn lexicon_doc_app_rocksky_playlist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The URI of the playlist.")),
+                                description: Some(
+                                    CowStr::new_static("The URI of the playlist."),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -848,18 +879,22 @@ fn lexicon_doc_app_rocksky_playlist_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("playlistViewDetailed"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Detailed view of a playlist, including its tracks and metadata",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Detailed view of a playlist, including its tracks and metadata",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("coverImageUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The URL of the cover image for the playlist.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The URL of the cover image for the playlist.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -867,9 +902,11 @@ fn lexicon_doc_app_rocksky_playlist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The date and time when the playlist was created.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The date and time when the playlist was created.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -877,9 +914,11 @@ fn lexicon_doc_app_rocksky_playlist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("curatorAvatarUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The URL of the avatar image of the curator.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The URL of the avatar image of the curator.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -887,9 +926,11 @@ fn lexicon_doc_app_rocksky_playlist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("curatorDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The DID of the curator of the playlist.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The DID of the curator of the playlist.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::AtIdentifier),
                                 ..Default::default()
                             }),
@@ -897,9 +938,11 @@ fn lexicon_doc_app_rocksky_playlist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("curatorHandle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The handle of the curator of the playlist.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The handle of the curator of the playlist.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::AtIdentifier),
                                 ..Default::default()
                             }),
@@ -907,43 +950,47 @@ fn lexicon_doc_app_rocksky_playlist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("curatorName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The name of the curator of the playlist.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The name of the curator of the playlist.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "A description of the playlist.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("A description of the playlist."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The unique identifier of the playlist.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The unique identifier of the playlist."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("title"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The title of the playlist.")),
+                                description: Some(
+                                    CowStr::new_static("The title of the playlist."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("tracks"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "A list of tracks in the playlist.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("A list of tracks in the playlist."),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static(
                                         "app.rocksky.song.defs#songViewBasic",
@@ -956,7 +1003,9 @@ fn lexicon_doc_app_rocksky_playlist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The URI of the playlist.")),
+                                description: Some(
+                                    CowStr::new_static("The URI of the playlist."),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),

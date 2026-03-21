@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_derive::IntoStatic;
@@ -71,9 +72,9 @@ pub mod delete_group_params_state {
 
 /// Builder for constructing an instance of this type
 pub struct DeleteGroupParamsBuilder<'a, S: delete_group_params_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DeleteGroupParams<'a> {
@@ -87,9 +88,9 @@ impl<'a> DeleteGroupParamsBuilder<'a, delete_group_params_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeleteGroupParamsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -97,12 +98,12 @@ impl<'a> DeleteGroupParamsBuilder<'a, delete_group_params_state::Empty> {
 impl<'a, S: delete_group_params_state::State> DeleteGroupParamsBuilder<'a, S> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `id` field to an Option value (optional)
     pub fn maybe_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -114,7 +115,7 @@ where
     /// Build the final struct
     pub fn build(self) -> DeleteGroupParams<'a> {
         DeleteGroupParams {
-            id: self.__unsafe_private_named.0,
+            id: self._fields.0,
         }
     }
 }

@@ -9,7 +9,11 @@ pub mod list_options;
 pub mod remove_options;
 pub mod upsert_option;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -290,112 +294,112 @@ pub mod defs_option_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Scope;
-        type CreatedBy;
-        type LastUpdatedBy;
         type Value;
-        type Key;
+        type LastUpdatedBy;
         type Did;
+        type Key;
+        type CreatedBy;
+        type Scope;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Scope = Unset;
-        type CreatedBy = Unset;
-        type LastUpdatedBy = Unset;
         type Value = Unset;
-        type Key = Unset;
+        type LastUpdatedBy = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `scope` field to Set
-    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScope<S> {}
-    impl<S: State> State for SetScope<S> {
-        type Scope = Set<members::scope>;
-        type CreatedBy = S::CreatedBy;
-        type LastUpdatedBy = S::LastUpdatedBy;
-        type Value = S::Value;
-        type Key = S::Key;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `created_by` field to Set
-    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
-    impl<S: State> State for SetCreatedBy<S> {
-        type Scope = S::Scope;
-        type CreatedBy = Set<members::created_by>;
-        type LastUpdatedBy = S::LastUpdatedBy;
-        type Value = S::Value;
-        type Key = S::Key;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `last_updated_by` field to Set
-    pub struct SetLastUpdatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdatedBy<S> {}
-    impl<S: State> State for SetLastUpdatedBy<S> {
-        type Scope = S::Scope;
-        type CreatedBy = S::CreatedBy;
-        type LastUpdatedBy = Set<members::last_updated_by>;
-        type Value = S::Value;
-        type Key = S::Key;
-        type Did = S::Did;
+        type Key = Unset;
+        type CreatedBy = Unset;
+        type Scope = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Scope = S::Scope;
-        type CreatedBy = S::CreatedBy;
-        type LastUpdatedBy = S::LastUpdatedBy;
         type Value = Set<members::value>;
-        type Key = S::Key;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Scope = S::Scope;
-        type CreatedBy = S::CreatedBy;
         type LastUpdatedBy = S::LastUpdatedBy;
-        type Value = S::Value;
-        type Key = Set<members::key>;
         type Did = S::Did;
+        type Key = S::Key;
+        type CreatedBy = S::CreatedBy;
+        type Scope = S::Scope;
+    }
+    ///State transition - sets the `last_updated_by` field to Set
+    pub struct SetLastUpdatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastUpdatedBy<S> {}
+    impl<S: State> State for SetLastUpdatedBy<S> {
+        type Value = S::Value;
+        type LastUpdatedBy = Set<members::last_updated_by>;
+        type Did = S::Did;
+        type Key = S::Key;
+        type CreatedBy = S::CreatedBy;
+        type Scope = S::Scope;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Scope = S::Scope;
-        type CreatedBy = S::CreatedBy;
-        type LastUpdatedBy = S::LastUpdatedBy;
         type Value = S::Value;
-        type Key = S::Key;
+        type LastUpdatedBy = S::LastUpdatedBy;
         type Did = Set<members::did>;
+        type Key = S::Key;
+        type CreatedBy = S::CreatedBy;
+        type Scope = S::Scope;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Value = S::Value;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Did = S::Did;
+        type Key = Set<members::key>;
+        type CreatedBy = S::CreatedBy;
+        type Scope = S::Scope;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
+    impl<S: State> State for SetCreatedBy<S> {
+        type Value = S::Value;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Did = S::Did;
+        type Key = S::Key;
+        type CreatedBy = Set<members::created_by>;
+        type Scope = S::Scope;
+    }
+    ///State transition - sets the `scope` field to Set
+    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScope<S> {}
+    impl<S: State> State for SetScope<S> {
+        type Value = S::Value;
+        type LastUpdatedBy = S::LastUpdatedBy;
+        type Did = S::Did;
+        type Key = S::Key;
+        type CreatedBy = S::CreatedBy;
+        type Scope = Set<members::scope>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `scope` field
-        pub struct scope(());
-        ///Marker type for the `created_by` field
-        pub struct created_by(());
-        ///Marker type for the `last_updated_by` field
-        pub struct last_updated_by(());
         ///Marker type for the `value` field
         pub struct value(());
-        ///Marker type for the `key` field
-        pub struct key(());
+        ///Marker type for the `last_updated_by` field
+        pub struct last_updated_by(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `key` field
+        pub struct key(());
+        ///Marker type for the `created_by` field
+        pub struct created_by(());
+        ///Marker type for the `scope` field
+        pub struct scope(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DefsOptionBuilder<'a, S: defs_option_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Did<'a>>,
         Option<CowStr<'a>>,
@@ -407,7 +411,7 @@ pub struct DefsOptionBuilder<'a, S: defs_option_state::State> {
         Option<Datetime>,
         Option<Data<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DefsOption<'a> {
@@ -421,20 +425,9 @@ impl<'a> DefsOptionBuilder<'a, defs_option_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DefsOptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -442,12 +435,12 @@ impl<'a> DefsOptionBuilder<'a, defs_option_state::Empty> {
 impl<'a, S: defs_option_state::State> DefsOptionBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -462,11 +455,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> DefsOptionBuilder<'a, defs_option_state::SetCreatedBy<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DefsOptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -474,12 +467,12 @@ where
 impl<'a, S: defs_option_state::State> DefsOptionBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -494,11 +487,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> DefsOptionBuilder<'a, defs_option_state::SetDid<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         DefsOptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -513,11 +506,11 @@ where
         mut self,
         value: impl Into<Nsid<'a>>,
     ) -> DefsOptionBuilder<'a, defs_option_state::SetKey<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         DefsOptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -532,11 +525,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> DefsOptionBuilder<'a, defs_option_state::SetLastUpdatedBy<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         DefsOptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -547,7 +540,7 @@ impl<'a, S: defs_option_state::State> DefsOptionBuilder<'a, S> {
         mut self,
         value: impl Into<Option<DefsOptionManagerRole<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `managerRole` field to an Option value (optional)
@@ -555,7 +548,7 @@ impl<'a, S: defs_option_state::State> DefsOptionBuilder<'a, S> {
         mut self,
         value: Option<DefsOptionManagerRole<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -570,11 +563,11 @@ where
         mut self,
         value: impl Into<DefsOptionScope<'a>>,
     ) -> DefsOptionBuilder<'a, defs_option_state::SetScope<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         DefsOptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -582,12 +575,12 @@ where
 impl<'a, S: defs_option_state::State> DefsOptionBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -602,11 +595,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> DefsOptionBuilder<'a, defs_option_state::SetValue<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         DefsOptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -614,26 +607,26 @@ where
 impl<'a, S> DefsOptionBuilder<'a, S>
 where
     S: defs_option_state::State,
-    S::Scope: defs_option_state::IsSet,
-    S::CreatedBy: defs_option_state::IsSet,
-    S::LastUpdatedBy: defs_option_state::IsSet,
     S::Value: defs_option_state::IsSet,
-    S::Key: defs_option_state::IsSet,
+    S::LastUpdatedBy: defs_option_state::IsSet,
     S::Did: defs_option_state::IsSet,
+    S::Key: defs_option_state::IsSet,
+    S::CreatedBy: defs_option_state::IsSet,
+    S::Scope: defs_option_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DefsOption<'a> {
         DefsOption {
-            created_at: self.__unsafe_private_named.0,
-            created_by: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            did: self.__unsafe_private_named.3.unwrap(),
-            key: self.__unsafe_private_named.4.unwrap(),
-            last_updated_by: self.__unsafe_private_named.5.unwrap(),
-            manager_role: self.__unsafe_private_named.6,
-            scope: self.__unsafe_private_named.7.unwrap(),
-            updated_at: self.__unsafe_private_named.8,
-            value: self.__unsafe_private_named.9.unwrap(),
+            created_at: self._fields.0,
+            created_by: self._fields.1.unwrap(),
+            description: self._fields.2,
+            did: self._fields.3.unwrap(),
+            key: self._fields.4.unwrap(),
+            last_updated_by: self._fields.5.unwrap(),
+            manager_role: self._fields.6,
+            scope: self._fields.7.unwrap(),
+            updated_at: self._fields.8,
+            value: self._fields.9.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -643,16 +636,16 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> DefsOption<'a> {
         DefsOption {
-            created_at: self.__unsafe_private_named.0,
-            created_by: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            did: self.__unsafe_private_named.3.unwrap(),
-            key: self.__unsafe_private_named.4.unwrap(),
-            last_updated_by: self.__unsafe_private_named.5.unwrap(),
-            manager_role: self.__unsafe_private_named.6,
-            scope: self.__unsafe_private_named.7.unwrap(),
-            updated_at: self.__unsafe_private_named.8,
-            value: self.__unsafe_private_named.9.unwrap(),
+            created_at: self._fields.0,
+            created_by: self._fields.1.unwrap(),
+            description: self._fields.2,
+            did: self._fields.3.unwrap(),
+            key: self._fields.4.unwrap(),
+            last_updated_by: self._fields.5.unwrap(),
+            manager_role: self._fields.6,
+            scope: self._fields.7.unwrap(),
+            updated_at: self._fields.8,
+            value: self._fields.9.unwrap(),
             extra_data: Some(extra_data),
         }
     }

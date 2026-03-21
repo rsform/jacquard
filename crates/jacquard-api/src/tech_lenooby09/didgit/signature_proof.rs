@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -293,112 +296,112 @@ pub mod signature_proof_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ObjectId;
-        type SignatureType;
-        type Signature;
-        type SignedAt;
         type Signer;
         type ObjectType;
+        type Signature;
+        type ObjectId;
+        type SignatureType;
+        type SignedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ObjectId = Unset;
-        type SignatureType = Unset;
-        type Signature = Unset;
-        type SignedAt = Unset;
         type Signer = Unset;
         type ObjectType = Unset;
-    }
-    ///State transition - sets the `object_id` field to Set
-    pub struct SetObjectId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObjectId<S> {}
-    impl<S: State> State for SetObjectId<S> {
-        type ObjectId = Set<members::object_id>;
-        type SignatureType = S::SignatureType;
-        type Signature = S::Signature;
-        type SignedAt = S::SignedAt;
-        type Signer = S::Signer;
-        type ObjectType = S::ObjectType;
-    }
-    ///State transition - sets the `signature_type` field to Set
-    pub struct SetSignatureType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignatureType<S> {}
-    impl<S: State> State for SetSignatureType<S> {
-        type ObjectId = S::ObjectId;
-        type SignatureType = Set<members::signature_type>;
-        type Signature = S::Signature;
-        type SignedAt = S::SignedAt;
-        type Signer = S::Signer;
-        type ObjectType = S::ObjectType;
-    }
-    ///State transition - sets the `signature` field to Set
-    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignature<S> {}
-    impl<S: State> State for SetSignature<S> {
-        type ObjectId = S::ObjectId;
-        type SignatureType = S::SignatureType;
-        type Signature = Set<members::signature>;
-        type SignedAt = S::SignedAt;
-        type Signer = S::Signer;
-        type ObjectType = S::ObjectType;
-    }
-    ///State transition - sets the `signed_at` field to Set
-    pub struct SetSignedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignedAt<S> {}
-    impl<S: State> State for SetSignedAt<S> {
-        type ObjectId = S::ObjectId;
-        type SignatureType = S::SignatureType;
-        type Signature = S::Signature;
-        type SignedAt = Set<members::signed_at>;
-        type Signer = S::Signer;
-        type ObjectType = S::ObjectType;
+        type Signature = Unset;
+        type ObjectId = Unset;
+        type SignatureType = Unset;
+        type SignedAt = Unset;
     }
     ///State transition - sets the `signer` field to Set
     pub struct SetSigner<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSigner<S> {}
     impl<S: State> State for SetSigner<S> {
-        type ObjectId = S::ObjectId;
-        type SignatureType = S::SignatureType;
-        type Signature = S::Signature;
-        type SignedAt = S::SignedAt;
         type Signer = Set<members::signer>;
         type ObjectType = S::ObjectType;
+        type Signature = S::Signature;
+        type ObjectId = S::ObjectId;
+        type SignatureType = S::SignatureType;
+        type SignedAt = S::SignedAt;
     }
     ///State transition - sets the `object_type` field to Set
     pub struct SetObjectType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetObjectType<S> {}
     impl<S: State> State for SetObjectType<S> {
-        type ObjectId = S::ObjectId;
-        type SignatureType = S::SignatureType;
-        type Signature = S::Signature;
-        type SignedAt = S::SignedAt;
         type Signer = S::Signer;
         type ObjectType = Set<members::object_type>;
+        type Signature = S::Signature;
+        type ObjectId = S::ObjectId;
+        type SignatureType = S::SignatureType;
+        type SignedAt = S::SignedAt;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignature<S> {}
+    impl<S: State> State for SetSignature<S> {
+        type Signer = S::Signer;
+        type ObjectType = S::ObjectType;
+        type Signature = Set<members::signature>;
+        type ObjectId = S::ObjectId;
+        type SignatureType = S::SignatureType;
+        type SignedAt = S::SignedAt;
+    }
+    ///State transition - sets the `object_id` field to Set
+    pub struct SetObjectId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObjectId<S> {}
+    impl<S: State> State for SetObjectId<S> {
+        type Signer = S::Signer;
+        type ObjectType = S::ObjectType;
+        type Signature = S::Signature;
+        type ObjectId = Set<members::object_id>;
+        type SignatureType = S::SignatureType;
+        type SignedAt = S::SignedAt;
+    }
+    ///State transition - sets the `signature_type` field to Set
+    pub struct SetSignatureType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignatureType<S> {}
+    impl<S: State> State for SetSignatureType<S> {
+        type Signer = S::Signer;
+        type ObjectType = S::ObjectType;
+        type Signature = S::Signature;
+        type ObjectId = S::ObjectId;
+        type SignatureType = Set<members::signature_type>;
+        type SignedAt = S::SignedAt;
+    }
+    ///State transition - sets the `signed_at` field to Set
+    pub struct SetSignedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignedAt<S> {}
+    impl<S: State> State for SetSignedAt<S> {
+        type Signer = S::Signer;
+        type ObjectType = S::ObjectType;
+        type Signature = S::Signature;
+        type ObjectId = S::ObjectId;
+        type SignatureType = S::SignatureType;
+        type SignedAt = Set<members::signed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `object_id` field
-        pub struct object_id(());
-        ///Marker type for the `signature_type` field
-        pub struct signature_type(());
-        ///Marker type for the `signature` field
-        pub struct signature(());
-        ///Marker type for the `signed_at` field
-        pub struct signed_at(());
         ///Marker type for the `signer` field
         pub struct signer(());
         ///Marker type for the `object_type` field
         pub struct object_type(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
+        ///Marker type for the `object_id` field
+        pub struct object_id(());
+        ///Marker type for the `signature_type` field
+        pub struct signature_type(());
+        ///Marker type for the `signed_at` field
+        pub struct signed_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SignatureProofBuilder<'a, S: signature_proof_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<SignatureProofObjectType<'a>>,
         Option<CowStr<'a>>,
@@ -407,7 +410,7 @@ pub struct SignatureProofBuilder<'a, S: signature_proof_state::State> {
         Option<i64>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SignatureProof<'a> {
@@ -421,9 +424,9 @@ impl<'a> SignatureProofBuilder<'a, signature_proof_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SignatureProofBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -438,11 +441,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SignatureProofBuilder<'a, signature_proof_state::SetObjectId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SignatureProofBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -457,11 +460,11 @@ where
         mut self,
         value: impl Into<SignatureProofObjectType<'a>>,
     ) -> SignatureProofBuilder<'a, signature_proof_state::SetObjectType<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SignatureProofBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -469,12 +472,12 @@ where
 impl<'a, S: signature_proof_state::State> SignatureProofBuilder<'a, S> {
     /// Set the `pdsEndpoint` field (optional)
     pub fn pds_endpoint(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `pdsEndpoint` field to an Option value (optional)
     pub fn maybe_pds_endpoint(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -489,11 +492,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SignatureProofBuilder<'a, signature_proof_state::SetSignature<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         SignatureProofBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -508,11 +511,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SignatureProofBuilder<'a, signature_proof_state::SetSignatureType<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         SignatureProofBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -527,11 +530,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SignatureProofBuilder<'a, signature_proof_state::SetSignedAt<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         SignatureProofBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -546,11 +549,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SignatureProofBuilder<'a, signature_proof_state::SetSigner<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         SignatureProofBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -558,23 +561,23 @@ where
 impl<'a, S> SignatureProofBuilder<'a, S>
 where
     S: signature_proof_state::State,
-    S::ObjectId: signature_proof_state::IsSet,
-    S::SignatureType: signature_proof_state::IsSet,
-    S::Signature: signature_proof_state::IsSet,
-    S::SignedAt: signature_proof_state::IsSet,
     S::Signer: signature_proof_state::IsSet,
     S::ObjectType: signature_proof_state::IsSet,
+    S::Signature: signature_proof_state::IsSet,
+    S::ObjectId: signature_proof_state::IsSet,
+    S::SignatureType: signature_proof_state::IsSet,
+    S::SignedAt: signature_proof_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SignatureProof<'a> {
         SignatureProof {
-            object_id: self.__unsafe_private_named.0.unwrap(),
-            object_type: self.__unsafe_private_named.1.unwrap(),
-            pds_endpoint: self.__unsafe_private_named.2,
-            signature: self.__unsafe_private_named.3.unwrap(),
-            signature_type: self.__unsafe_private_named.4.unwrap(),
-            signed_at: self.__unsafe_private_named.5.unwrap(),
-            signer: self.__unsafe_private_named.6.unwrap(),
+            object_id: self._fields.0.unwrap(),
+            object_type: self._fields.1.unwrap(),
+            pds_endpoint: self._fields.2,
+            signature: self._fields.3.unwrap(),
+            signature_type: self._fields.4.unwrap(),
+            signed_at: self._fields.5.unwrap(),
+            signer: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -587,13 +590,13 @@ where
         >,
     ) -> SignatureProof<'a> {
         SignatureProof {
-            object_id: self.__unsafe_private_named.0.unwrap(),
-            object_type: self.__unsafe_private_named.1.unwrap(),
-            pds_endpoint: self.__unsafe_private_named.2,
-            signature: self.__unsafe_private_named.3.unwrap(),
-            signature_type: self.__unsafe_private_named.4.unwrap(),
-            signed_at: self.__unsafe_private_named.5.unwrap(),
-            signer: self.__unsafe_private_named.6.unwrap(),
+            object_id: self._fields.0.unwrap(),
+            object_type: self._fields.1.unwrap(),
+            pds_endpoint: self._fields.2,
+            signature: self._fields.3.unwrap(),
+            signature_type: self._fields.4.unwrap(),
+            signed_at: self._fields.5.unwrap(),
+            signer: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

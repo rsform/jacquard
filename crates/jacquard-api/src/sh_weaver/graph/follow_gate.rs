@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -146,9 +149,9 @@ pub mod follow_gate_state {
 
 /// Builder for constructing an instance of this type
 pub struct FollowGateBuilder<'a, S: follow_gate_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<bool>, Option<bool>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<bool>, Option<bool>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> FollowGate<'a> {
@@ -162,9 +165,9 @@ impl<'a> FollowGateBuilder<'a, follow_gate_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FollowGateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -179,11 +182,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> FollowGateBuilder<'a, follow_gate_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         FollowGateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -191,12 +194,12 @@ where
 impl<'a, S: follow_gate_state::State> FollowGateBuilder<'a, S> {
     /// Set the `invalidatePrior` field (optional)
     pub fn invalidate_prior(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `invalidatePrior` field to an Option value (optional)
     pub fn maybe_invalidate_prior(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -204,12 +207,12 @@ impl<'a, S: follow_gate_state::State> FollowGateBuilder<'a, S> {
 impl<'a, S: follow_gate_state::State> FollowGateBuilder<'a, S> {
     /// Set the `requireApproval` field (optional)
     pub fn require_approval(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `requireApproval` field to an Option value (optional)
     pub fn maybe_require_approval(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -222,9 +225,9 @@ where
     /// Build the final struct
     pub fn build(self) -> FollowGate<'a> {
         FollowGate {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            invalidate_prior: self.__unsafe_private_named.1.or_else(|| Some(false)),
-            require_approval: self.__unsafe_private_named.2.or_else(|| Some(false)),
+            created_at: self._fields.0.unwrap(),
+            invalidate_prior: self._fields.1.or_else(|| Some(false)),
+            require_approval: self._fields.2.or_else(|| Some(false)),
             extra_data: Default::default(),
         }
     }
@@ -237,9 +240,9 @@ where
         >,
     ) -> FollowGate<'a> {
         FollowGate {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            invalidate_prior: self.__unsafe_private_named.1.or_else(|| Some(false)),
-            require_approval: self.__unsafe_private_named.2.or_else(|| Some(false)),
+            created_at: self._fields.0.unwrap(),
+            invalidate_prior: self._fields.1.or_else(|| Some(false)),
+            require_approval: self._fields.2.or_else(|| Some(false)),
             extra_data: Some(extra_data),
         }
     }

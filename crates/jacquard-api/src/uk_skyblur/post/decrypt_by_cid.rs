@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::{Did, Cid, UriValue};
@@ -80,80 +83,80 @@ pub mod decrypt_by_cid_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Cid;
-        type Password;
+        type Repo;
         type Pds;
+        type Password;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Cid = Unset;
-        type Password = Unset;
+        type Repo = Unset;
         type Pds = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Cid = S::Cid;
-        type Password = S::Password;
-        type Pds = S::Pds;
+        type Password = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Repo = S::Repo;
         type Cid = Set<members::cid>;
-        type Password = S::Password;
-        type Pds = S::Pds;
-    }
-    ///State transition - sets the `password` field to Set
-    pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPassword<S> {}
-    impl<S: State> State for SetPassword<S> {
         type Repo = S::Repo;
-        type Cid = S::Cid;
-        type Password = Set<members::password>;
         type Pds = S::Pds;
+        type Password = S::Password;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Cid = S::Cid;
+        type Repo = Set<members::repo>;
+        type Pds = S::Pds;
+        type Password = S::Password;
     }
     ///State transition - sets the `pds` field to Set
     pub struct SetPds<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPds<S> {}
     impl<S: State> State for SetPds<S> {
-        type Repo = S::Repo;
         type Cid = S::Cid;
-        type Password = S::Password;
+        type Repo = S::Repo;
         type Pds = Set<members::pds>;
+        type Password = S::Password;
+    }
+    ///State transition - sets the `password` field to Set
+    pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPassword<S> {}
+    impl<S: State> State for SetPassword<S> {
+        type Cid = S::Cid;
+        type Repo = S::Repo;
+        type Pds = S::Pds;
+        type Password = Set<members::password>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `password` field
-        pub struct password(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
         ///Marker type for the `pds` field
         pub struct pds(());
+        ///Marker type for the `password` field
+        pub struct password(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DecryptByCidBuilder<'a, S: decrypt_by_cid_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Cid<'a>>,
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
         Option<Did<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DecryptByCid<'a> {
@@ -167,9 +170,9 @@ impl<'a> DecryptByCidBuilder<'a, decrypt_by_cid_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DecryptByCidBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -184,11 +187,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> DecryptByCidBuilder<'a, decrypt_by_cid_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DecryptByCidBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -203,11 +206,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DecryptByCidBuilder<'a, decrypt_by_cid_state::SetPassword<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DecryptByCidBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -222,11 +225,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> DecryptByCidBuilder<'a, decrypt_by_cid_state::SetPds<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         DecryptByCidBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -241,11 +244,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> DecryptByCidBuilder<'a, decrypt_by_cid_state::SetRepo<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         DecryptByCidBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -253,18 +256,18 @@ where
 impl<'a, S> DecryptByCidBuilder<'a, S>
 where
     S: decrypt_by_cid_state::State,
-    S::Repo: decrypt_by_cid_state::IsSet,
     S::Cid: decrypt_by_cid_state::IsSet,
-    S::Password: decrypt_by_cid_state::IsSet,
+    S::Repo: decrypt_by_cid_state::IsSet,
     S::Pds: decrypt_by_cid_state::IsSet,
+    S::Password: decrypt_by_cid_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DecryptByCid<'a> {
         DecryptByCid {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            password: self.__unsafe_private_named.1.unwrap(),
-            pds: self.__unsafe_private_named.2.unwrap(),
-            repo: self.__unsafe_private_named.3.unwrap(),
+            cid: self._fields.0.unwrap(),
+            password: self._fields.1.unwrap(),
+            pds: self._fields.2.unwrap(),
+            repo: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -277,10 +280,10 @@ where
         >,
     ) -> DecryptByCid<'a> {
         DecryptByCid {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            password: self.__unsafe_private_named.1.unwrap(),
-            pds: self.__unsafe_private_named.2.unwrap(),
-            repo: self.__unsafe_private_named.3.unwrap(),
+            cid: self._fields.0.unwrap(),
+            password: self._fields.1.unwrap(),
+            pds: self._fields.2.unwrap(),
+            repo: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

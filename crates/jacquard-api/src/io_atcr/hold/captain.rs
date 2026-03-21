@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -138,92 +141,92 @@ pub mod captain_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EnableBlueskyPosts;
-        type DeployedAt;
         type Public;
-        type Owner;
+        type EnableBlueskyPosts;
         type AllowAllCrew;
+        type DeployedAt;
+        type Owner;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EnableBlueskyPosts = Unset;
-        type DeployedAt = Unset;
         type Public = Unset;
-        type Owner = Unset;
+        type EnableBlueskyPosts = Unset;
         type AllowAllCrew = Unset;
-    }
-    ///State transition - sets the `enable_bluesky_posts` field to Set
-    pub struct SetEnableBlueskyPosts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEnableBlueskyPosts<S> {}
-    impl<S: State> State for SetEnableBlueskyPosts<S> {
-        type EnableBlueskyPosts = Set<members::enable_bluesky_posts>;
-        type DeployedAt = S::DeployedAt;
-        type Public = S::Public;
-        type Owner = S::Owner;
-        type AllowAllCrew = S::AllowAllCrew;
-    }
-    ///State transition - sets the `deployed_at` field to Set
-    pub struct SetDeployedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDeployedAt<S> {}
-    impl<S: State> State for SetDeployedAt<S> {
-        type EnableBlueskyPosts = S::EnableBlueskyPosts;
-        type DeployedAt = Set<members::deployed_at>;
-        type Public = S::Public;
-        type Owner = S::Owner;
-        type AllowAllCrew = S::AllowAllCrew;
+        type DeployedAt = Unset;
+        type Owner = Unset;
     }
     ///State transition - sets the `public` field to Set
     pub struct SetPublic<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPublic<S> {}
     impl<S: State> State for SetPublic<S> {
-        type EnableBlueskyPosts = S::EnableBlueskyPosts;
-        type DeployedAt = S::DeployedAt;
         type Public = Set<members::public>;
-        type Owner = S::Owner;
-        type AllowAllCrew = S::AllowAllCrew;
-    }
-    ///State transition - sets the `owner` field to Set
-    pub struct SetOwner<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOwner<S> {}
-    impl<S: State> State for SetOwner<S> {
         type EnableBlueskyPosts = S::EnableBlueskyPosts;
-        type DeployedAt = S::DeployedAt;
-        type Public = S::Public;
-        type Owner = Set<members::owner>;
         type AllowAllCrew = S::AllowAllCrew;
+        type DeployedAt = S::DeployedAt;
+        type Owner = S::Owner;
+    }
+    ///State transition - sets the `enable_bluesky_posts` field to Set
+    pub struct SetEnableBlueskyPosts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEnableBlueskyPosts<S> {}
+    impl<S: State> State for SetEnableBlueskyPosts<S> {
+        type Public = S::Public;
+        type EnableBlueskyPosts = Set<members::enable_bluesky_posts>;
+        type AllowAllCrew = S::AllowAllCrew;
+        type DeployedAt = S::DeployedAt;
+        type Owner = S::Owner;
     }
     ///State transition - sets the `allow_all_crew` field to Set
     pub struct SetAllowAllCrew<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAllowAllCrew<S> {}
     impl<S: State> State for SetAllowAllCrew<S> {
-        type EnableBlueskyPosts = S::EnableBlueskyPosts;
-        type DeployedAt = S::DeployedAt;
         type Public = S::Public;
-        type Owner = S::Owner;
+        type EnableBlueskyPosts = S::EnableBlueskyPosts;
         type AllowAllCrew = Set<members::allow_all_crew>;
+        type DeployedAt = S::DeployedAt;
+        type Owner = S::Owner;
+    }
+    ///State transition - sets the `deployed_at` field to Set
+    pub struct SetDeployedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDeployedAt<S> {}
+    impl<S: State> State for SetDeployedAt<S> {
+        type Public = S::Public;
+        type EnableBlueskyPosts = S::EnableBlueskyPosts;
+        type AllowAllCrew = S::AllowAllCrew;
+        type DeployedAt = Set<members::deployed_at>;
+        type Owner = S::Owner;
+    }
+    ///State transition - sets the `owner` field to Set
+    pub struct SetOwner<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOwner<S> {}
+    impl<S: State> State for SetOwner<S> {
+        type Public = S::Public;
+        type EnableBlueskyPosts = S::EnableBlueskyPosts;
+        type AllowAllCrew = S::AllowAllCrew;
+        type DeployedAt = S::DeployedAt;
+        type Owner = Set<members::owner>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `enable_bluesky_posts` field
-        pub struct enable_bluesky_posts(());
-        ///Marker type for the `deployed_at` field
-        pub struct deployed_at(());
         ///Marker type for the `public` field
         pub struct public(());
-        ///Marker type for the `owner` field
-        pub struct owner(());
+        ///Marker type for the `enable_bluesky_posts` field
+        pub struct enable_bluesky_posts(());
         ///Marker type for the `allow_all_crew` field
         pub struct allow_all_crew(());
+        ///Marker type for the `deployed_at` field
+        pub struct deployed_at(());
+        ///Marker type for the `owner` field
+        pub struct owner(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CaptainBuilder<'a, S: captain_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<bool>,
         Option<Datetime>,
         Option<bool>,
@@ -233,7 +236,7 @@ pub struct CaptainBuilder<'a, S: captain_state::State> {
         Option<Did<'a>>,
         Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Captain<'a> {
@@ -247,9 +250,9 @@ impl<'a> CaptainBuilder<'a, captain_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CaptainBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -264,11 +267,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> CaptainBuilder<'a, captain_state::SetAllowAllCrew<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CaptainBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -283,11 +286,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CaptainBuilder<'a, captain_state::SetDeployedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CaptainBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -302,11 +305,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> CaptainBuilder<'a, captain_state::SetEnableBlueskyPosts<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CaptainBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -321,11 +324,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> CaptainBuilder<'a, captain_state::SetOwner<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         CaptainBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -340,11 +343,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> CaptainBuilder<'a, captain_state::SetPublic<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         CaptainBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -352,12 +355,12 @@ where
 impl<'a, S: captain_state::State> CaptainBuilder<'a, S> {
     /// Set the `region` field (optional)
     pub fn region(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `region` field to an Option value (optional)
     pub fn maybe_region(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -365,12 +368,12 @@ impl<'a, S: captain_state::State> CaptainBuilder<'a, S> {
 impl<'a, S: captain_state::State> CaptainBuilder<'a, S> {
     /// Set the `successor` field (optional)
     pub fn successor(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `successor` field to an Option value (optional)
     pub fn maybe_successor(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -381,7 +384,7 @@ impl<'a, S: captain_state::State> CaptainBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `supporterBadgeTiers` field to an Option value (optional)
@@ -389,7 +392,7 @@ impl<'a, S: captain_state::State> CaptainBuilder<'a, S> {
         mut self,
         value: Option<Vec<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -397,23 +400,23 @@ impl<'a, S: captain_state::State> CaptainBuilder<'a, S> {
 impl<'a, S> CaptainBuilder<'a, S>
 where
     S: captain_state::State,
-    S::EnableBlueskyPosts: captain_state::IsSet,
-    S::DeployedAt: captain_state::IsSet,
     S::Public: captain_state::IsSet,
-    S::Owner: captain_state::IsSet,
+    S::EnableBlueskyPosts: captain_state::IsSet,
     S::AllowAllCrew: captain_state::IsSet,
+    S::DeployedAt: captain_state::IsSet,
+    S::Owner: captain_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Captain<'a> {
         Captain {
-            allow_all_crew: self.__unsafe_private_named.0.unwrap(),
-            deployed_at: self.__unsafe_private_named.1.unwrap(),
-            enable_bluesky_posts: self.__unsafe_private_named.2.unwrap(),
-            owner: self.__unsafe_private_named.3.unwrap(),
-            public: self.__unsafe_private_named.4.unwrap(),
-            region: self.__unsafe_private_named.5,
-            successor: self.__unsafe_private_named.6,
-            supporter_badge_tiers: self.__unsafe_private_named.7,
+            allow_all_crew: self._fields.0.unwrap(),
+            deployed_at: self._fields.1.unwrap(),
+            enable_bluesky_posts: self._fields.2.unwrap(),
+            owner: self._fields.3.unwrap(),
+            public: self._fields.4.unwrap(),
+            region: self._fields.5,
+            successor: self._fields.6,
+            supporter_badge_tiers: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -426,14 +429,14 @@ where
         >,
     ) -> Captain<'a> {
         Captain {
-            allow_all_crew: self.__unsafe_private_named.0.unwrap(),
-            deployed_at: self.__unsafe_private_named.1.unwrap(),
-            enable_bluesky_posts: self.__unsafe_private_named.2.unwrap(),
-            owner: self.__unsafe_private_named.3.unwrap(),
-            public: self.__unsafe_private_named.4.unwrap(),
-            region: self.__unsafe_private_named.5,
-            successor: self.__unsafe_private_named.6,
-            supporter_badge_tiers: self.__unsafe_private_named.7,
+            allow_all_crew: self._fields.0.unwrap(),
+            deployed_at: self._fields.1.unwrap(),
+            enable_bluesky_posts: self._fields.2.unwrap(),
+            owner: self._fields.3.unwrap(),
+            public: self._fields.4.unwrap(),
+            region: self._fields.5,
+            successor: self._fields.6,
+            supporter_badge_tiers: self._fields.7,
             extra_data: Some(extra_data),
         }
     }

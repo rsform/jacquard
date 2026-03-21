@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -158,58 +161,58 @@ pub mod fact_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Args;
         type CreatedAt;
         type Predicate;
+        type Args;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Args = Unset;
         type CreatedAt = Unset;
         type Predicate = Unset;
-    }
-    ///State transition - sets the `args` field to Set
-    pub struct SetArgs<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArgs<S> {}
-    impl<S: State> State for SetArgs<S> {
-        type Args = Set<members::args>;
-        type CreatedAt = S::CreatedAt;
-        type Predicate = S::Predicate;
+        type Args = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Args = S::Args;
         type CreatedAt = Set<members::created_at>;
         type Predicate = S::Predicate;
+        type Args = S::Args;
     }
     ///State transition - sets the `predicate` field to Set
     pub struct SetPredicate<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPredicate<S> {}
     impl<S: State> State for SetPredicate<S> {
-        type Args = S::Args;
         type CreatedAt = S::CreatedAt;
         type Predicate = Set<members::predicate>;
+        type Args = S::Args;
+    }
+    ///State transition - sets the `args` field to Set
+    pub struct SetArgs<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArgs<S> {}
+    impl<S: State> State for SetArgs<S> {
+        type CreatedAt = S::CreatedAt;
+        type Predicate = S::Predicate;
+        type Args = Set<members::args>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `args` field
-        pub struct args(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `predicate` field
         pub struct predicate(());
+        ///Marker type for the `args` field
+        pub struct args(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FactBuilder<'a, S: fact_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
@@ -219,7 +222,7 @@ pub struct FactBuilder<'a, S: fact_state::State> {
         Option<CowStr<'a>>,
         Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Fact<'a> {
@@ -233,9 +236,9 @@ impl<'a> FactBuilder<'a, fact_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FactBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -250,11 +253,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> FactBuilder<'a, fact_state::SetArgs<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         FactBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -262,12 +265,12 @@ where
 impl<'a, S: fact_state::State> FactBuilder<'a, S> {
     /// Set the `confidence` field (optional)
     pub fn confidence(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `confidence` field to an Option value (optional)
     pub fn maybe_confidence(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -282,11 +285,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> FactBuilder<'a, fact_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         FactBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -294,12 +297,12 @@ where
 impl<'a, S: fact_state::State> FactBuilder<'a, S> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `expiresAt` field to an Option value (optional)
     pub fn maybe_expires_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -314,11 +317,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> FactBuilder<'a, fact_state::SetPredicate<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         FactBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -326,12 +329,12 @@ where
 impl<'a, S: fact_state::State> FactBuilder<'a, S> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
     pub fn maybe_source(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -339,12 +342,12 @@ impl<'a, S: fact_state::State> FactBuilder<'a, S> {
 impl<'a, S: fact_state::State> FactBuilder<'a, S> {
     /// Set the `supersedes` field (optional)
     pub fn supersedes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `supersedes` field to an Option value (optional)
     pub fn maybe_supersedes(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -352,12 +355,12 @@ impl<'a, S: fact_state::State> FactBuilder<'a, S> {
 impl<'a, S: fact_state::State> FactBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -365,21 +368,21 @@ impl<'a, S: fact_state::State> FactBuilder<'a, S> {
 impl<'a, S> FactBuilder<'a, S>
 where
     S: fact_state::State,
-    S::Args: fact_state::IsSet,
     S::CreatedAt: fact_state::IsSet,
     S::Predicate: fact_state::IsSet,
+    S::Args: fact_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Fact<'a> {
         Fact {
-            args: self.__unsafe_private_named.0.unwrap(),
-            confidence: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            expires_at: self.__unsafe_private_named.3,
-            predicate: self.__unsafe_private_named.4.unwrap(),
-            source: self.__unsafe_private_named.5,
-            supersedes: self.__unsafe_private_named.6,
-            tags: self.__unsafe_private_named.7,
+            args: self._fields.0.unwrap(),
+            confidence: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            expires_at: self._fields.3,
+            predicate: self._fields.4.unwrap(),
+            source: self._fields.5,
+            supersedes: self._fields.6,
+            tags: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -392,14 +395,14 @@ where
         >,
     ) -> Fact<'a> {
         Fact {
-            args: self.__unsafe_private_named.0.unwrap(),
-            confidence: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            expires_at: self.__unsafe_private_named.3,
-            predicate: self.__unsafe_private_named.4.unwrap(),
-            source: self.__unsafe_private_named.5,
-            supersedes: self.__unsafe_private_named.6,
-            tags: self.__unsafe_private_named.7,
+            args: self._fields.0.unwrap(),
+            confidence: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            expires_at: self._fields.3,
+            predicate: self._fields.4.unwrap(),
+            source: self._fields.5,
+            supersedes: self._fields.6,
+            tags: self._fields.7,
             extra_data: Some(extra_data),
         }
     }

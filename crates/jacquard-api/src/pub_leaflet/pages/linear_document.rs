@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -345,9 +348,9 @@ pub mod block_state {
 
 /// Builder for constructing an instance of this type
 pub struct BlockBuilder<'a, S: block_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<BlockAlignment<'a>>, Option<BlockBlock<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<BlockAlignment<'a>>, Option<BlockBlock<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Block<'a> {
@@ -361,9 +364,9 @@ impl<'a> BlockBuilder<'a, block_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -371,12 +374,12 @@ impl<'a> BlockBuilder<'a, block_state::Empty> {
 impl<'a, S: block_state::State> BlockBuilder<'a, S> {
     /// Set the `alignment` field (optional)
     pub fn alignment(mut self, value: impl Into<Option<BlockAlignment<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `alignment` field to an Option value (optional)
     pub fn maybe_alignment(mut self, value: Option<BlockAlignment<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -391,11 +394,11 @@ where
         mut self,
         value: impl Into<BlockBlock<'a>>,
     ) -> BlockBuilder<'a, block_state::SetBlock<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         BlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -408,8 +411,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Block<'a> {
         Block {
-            alignment: self.__unsafe_private_named.0,
-            block: self.__unsafe_private_named.1.unwrap(),
+            alignment: self._fields.0,
+            block: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -422,8 +425,8 @@ where
         >,
     ) -> Block<'a> {
         Block {
-            alignment: self.__unsafe_private_named.0,
-            block: self.__unsafe_private_named.1.unwrap(),
+            alignment: self._fields.0,
+            block: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -617,12 +620,9 @@ pub mod linear_document_state {
 
 /// Builder for constructing an instance of this type
 pub struct LinearDocumentBuilder<'a, S: linear_document_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Vec<linear_document::Block<'a>>>,
-        Option<CowStr<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<linear_document::Block<'a>>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LinearDocument<'a> {
@@ -636,9 +636,9 @@ impl<'a> LinearDocumentBuilder<'a, linear_document_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LinearDocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -653,11 +653,11 @@ where
         mut self,
         value: impl Into<Vec<linear_document::Block<'a>>>,
     ) -> LinearDocumentBuilder<'a, linear_document_state::SetBlocks<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LinearDocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -665,12 +665,12 @@ where
 impl<'a, S: linear_document_state::State> LinearDocumentBuilder<'a, S> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `id` field to an Option value (optional)
     pub fn maybe_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -683,8 +683,8 @@ where
     /// Build the final struct
     pub fn build(self) -> LinearDocument<'a> {
         LinearDocument {
-            blocks: self.__unsafe_private_named.0.unwrap(),
-            id: self.__unsafe_private_named.1,
+            blocks: self._fields.0.unwrap(),
+            id: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -697,8 +697,8 @@ where
         >,
     ) -> LinearDocument<'a> {
         LinearDocument {
-            blocks: self.__unsafe_private_named.0.unwrap(),
-            id: self.__unsafe_private_named.1,
+            blocks: self._fields.0.unwrap(),
+            id: self._fields.1,
             extra_data: Some(extra_data),
         }
     }
@@ -750,9 +750,9 @@ pub mod position_state {
 
 /// Builder for constructing an instance of this type
 pub struct PositionBuilder<'a, S: position_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<i64>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<i64>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Position<'a> {
@@ -766,9 +766,9 @@ impl<'a> PositionBuilder<'a, position_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PositionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -783,11 +783,11 @@ where
         mut self,
         value: impl Into<Vec<i64>>,
     ) -> PositionBuilder<'a, position_state::SetBlock<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PositionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -802,11 +802,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PositionBuilder<'a, position_state::SetOffset<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PositionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -820,8 +820,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Position<'a> {
         Position {
-            block: self.__unsafe_private_named.0.unwrap(),
-            offset: self.__unsafe_private_named.1.unwrap(),
+            block: self._fields.0.unwrap(),
+            offset: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -834,8 +834,8 @@ where
         >,
     ) -> Position<'a> {
         Position {
-            block: self.__unsafe_private_named.0.unwrap(),
-            offset: self.__unsafe_private_named.1.unwrap(),
+            block: self._fields.0.unwrap(),
+            offset: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -851,48 +851,48 @@ pub mod quote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Start;
         type End;
+        type Start;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Start = Unset;
         type End = Unset;
-    }
-    ///State transition - sets the `start` field to Set
-    pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStart<S> {}
-    impl<S: State> State for SetStart<S> {
-        type Start = Set<members::start>;
-        type End = S::End;
+        type Start = Unset;
     }
     ///State transition - sets the `end` field to Set
     pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEnd<S> {}
     impl<S: State> State for SetEnd<S> {
-        type Start = S::Start;
         type End = Set<members::end>;
+        type Start = S::Start;
+    }
+    ///State transition - sets the `start` field to Set
+    pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStart<S> {}
+    impl<S: State> State for SetStart<S> {
+        type End = S::End;
+        type Start = Set<members::start>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `start` field
-        pub struct start(());
         ///Marker type for the `end` field
         pub struct end(());
+        ///Marker type for the `start` field
+        pub struct start(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct QuoteBuilder<'a, S: quote_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<linear_document::Position<'a>>,
         Option<linear_document::Position<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Quote<'a> {
@@ -906,9 +906,9 @@ impl<'a> QuoteBuilder<'a, quote_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         QuoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -923,11 +923,11 @@ where
         mut self,
         value: impl Into<linear_document::Position<'a>>,
     ) -> QuoteBuilder<'a, quote_state::SetEnd<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         QuoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -942,11 +942,11 @@ where
         mut self,
         value: impl Into<linear_document::Position<'a>>,
     ) -> QuoteBuilder<'a, quote_state::SetStart<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         QuoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -954,14 +954,14 @@ where
 impl<'a, S> QuoteBuilder<'a, S>
 where
     S: quote_state::State,
-    S::Start: quote_state::IsSet,
     S::End: quote_state::IsSet,
+    S::Start: quote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Quote<'a> {
         Quote {
-            end: self.__unsafe_private_named.0.unwrap(),
-            start: self.__unsafe_private_named.1.unwrap(),
+            end: self._fields.0.unwrap(),
+            start: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -974,8 +974,8 @@ where
         >,
     ) -> Quote<'a> {
         Quote {
-            end: self.__unsafe_private_named.0.unwrap(),
-            start: self.__unsafe_private_named.1.unwrap(),
+            end: self._fields.0.unwrap(),
+            start: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

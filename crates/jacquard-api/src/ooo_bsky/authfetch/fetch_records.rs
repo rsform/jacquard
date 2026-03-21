@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -129,9 +132,9 @@ pub mod fetch_records_state {
 
 /// Builder for constructing an instance of this type
 pub struct FetchRecordsBuilder<'a, S: fetch_records_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<AtUri<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<AtUri<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> FetchRecords<'a> {
@@ -145,9 +148,9 @@ impl<'a> FetchRecordsBuilder<'a, fetch_records_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FetchRecordsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -162,11 +165,11 @@ where
         mut self,
         value: impl Into<Vec<AtUri<'a>>>,
     ) -> FetchRecordsBuilder<'a, fetch_records_state::SetUris<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         FetchRecordsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -179,7 +182,7 @@ where
     /// Build the final struct
     pub fn build(self) -> FetchRecords<'a> {
         FetchRecords {
-            uris: self.__unsafe_private_named.0.unwrap(),
+            uris: self._fields.0.unwrap(),
         }
     }
 }
@@ -194,59 +197,59 @@ pub mod fetch_records_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Strategy;
         type Uri;
         type Record;
-        type Strategy;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Strategy = Unset;
         type Uri = Unset;
         type Record = Unset;
-        type Strategy = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Record = S::Record;
-        type Strategy = S::Strategy;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Uri = S::Uri;
-        type Record = Set<members::record>;
-        type Strategy = S::Strategy;
     }
     ///State transition - sets the `strategy` field to Set
     pub struct SetStrategy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStrategy<S> {}
     impl<S: State> State for SetStrategy<S> {
+        type Strategy = Set<members::strategy>;
         type Uri = S::Uri;
         type Record = S::Record;
-        type Strategy = Set<members::strategy>;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Strategy = S::Strategy;
+        type Uri = Set<members::uri>;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Strategy = S::Strategy;
+        type Uri = S::Uri;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `strategy` field
+        pub struct strategy(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `record` field
         pub struct record(());
-        ///Marker type for the `strategy` field
-        pub struct strategy(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FetchRecordsResultBuilder<'a, S: fetch_records_result_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Data<'a>>, Option<Strategy<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Data<'a>>, Option<Strategy<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> FetchRecordsResult<'a> {
@@ -260,9 +263,9 @@ impl<'a> FetchRecordsResultBuilder<'a, fetch_records_result_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FetchRecordsResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -277,11 +280,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> FetchRecordsResultBuilder<'a, fetch_records_result_state::SetRecord<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         FetchRecordsResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -296,11 +299,11 @@ where
         mut self,
         value: impl Into<Strategy<'a>>,
     ) -> FetchRecordsResultBuilder<'a, fetch_records_result_state::SetStrategy<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         FetchRecordsResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -315,11 +318,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> FetchRecordsResultBuilder<'a, fetch_records_result_state::SetUri<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         FetchRecordsResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -327,16 +330,16 @@ where
 impl<'a, S> FetchRecordsResultBuilder<'a, S>
 where
     S: fetch_records_result_state::State,
+    S::Strategy: fetch_records_result_state::IsSet,
     S::Uri: fetch_records_result_state::IsSet,
     S::Record: fetch_records_result_state::IsSet,
-    S::Strategy: fetch_records_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> FetchRecordsResult<'a> {
         FetchRecordsResult {
-            record: self.__unsafe_private_named.0.unwrap(),
-            strategy: self.__unsafe_private_named.1.unwrap(),
-            uri: self.__unsafe_private_named.2.unwrap(),
+            record: self._fields.0.unwrap(),
+            strategy: self._fields.1.unwrap(),
+            uri: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -346,9 +349,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> FetchRecordsResult<'a> {
         FetchRecordsResult {
-            record: self.__unsafe_private_named.0.unwrap(),
-            strategy: self.__unsafe_private_named.1.unwrap(),
-            uri: self.__unsafe_private_named.2.unwrap(),
+            record: self._fields.0.unwrap(),
+            strategy: self._fields.1.unwrap(),
+            uri: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

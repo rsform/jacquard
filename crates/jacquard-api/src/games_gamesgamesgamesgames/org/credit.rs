@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -180,15 +183,15 @@ pub mod credit_state {
 
 /// Builder for constructing an instance of this type
 pub struct CreditBuilder<'a, S: credit_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<StrongRef<'a>>,
         Option<StrongRef<'a>>,
         Option<Vec<CompanyRole<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Credit<'a> {
@@ -202,9 +205,9 @@ impl<'a> CreditBuilder<'a, credit_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreditBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -212,12 +215,12 @@ impl<'a> CreditBuilder<'a, credit_state::Empty> {
 impl<'a, S: credit_state::State> CreditBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -225,12 +228,12 @@ impl<'a, S: credit_state::State> CreditBuilder<'a, S> {
 impl<'a, S: credit_state::State> CreditBuilder<'a, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
     pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -245,11 +248,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> CreditBuilder<'a, credit_state::SetGame<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CreditBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -264,11 +267,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> CreditBuilder<'a, credit_state::SetOrg<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         CreditBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -283,11 +286,11 @@ where
         mut self,
         value: impl Into<Vec<CompanyRole<'a>>>,
     ) -> CreditBuilder<'a, credit_state::SetRoles<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         CreditBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -302,11 +305,11 @@ where
     /// Build the final struct
     pub fn build(self) -> Credit<'a> {
         Credit {
-            created_at: self.__unsafe_private_named.0,
-            display_name: self.__unsafe_private_named.1,
-            game: self.__unsafe_private_named.2.unwrap(),
-            org: self.__unsafe_private_named.3.unwrap(),
-            roles: self.__unsafe_private_named.4.unwrap(),
+            created_at: self._fields.0,
+            display_name: self._fields.1,
+            game: self._fields.2.unwrap(),
+            org: self._fields.3.unwrap(),
+            roles: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -319,11 +322,11 @@ where
         >,
     ) -> Credit<'a> {
         Credit {
-            created_at: self.__unsafe_private_named.0,
-            display_name: self.__unsafe_private_named.1,
-            game: self.__unsafe_private_named.2.unwrap(),
-            org: self.__unsafe_private_named.3.unwrap(),
-            roles: self.__unsafe_private_named.4.unwrap(),
+            created_at: self._fields.0,
+            display_name: self._fields.1,
+            game: self._fields.2.unwrap(),
+            org: self._fields.3.unwrap(),
+            roles: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

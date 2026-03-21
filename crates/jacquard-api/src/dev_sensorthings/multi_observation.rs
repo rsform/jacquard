@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -421,74 +424,74 @@ pub mod multi_observation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type PhenomenonTime;
-        type Sensor;
         type Entries;
         type Thing;
+        type Sensor;
+        type PhenomenonTime;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type PhenomenonTime = Unset;
-        type Sensor = Unset;
         type Entries = Unset;
         type Thing = Unset;
-    }
-    ///State transition - sets the `phenomenon_time` field to Set
-    pub struct SetPhenomenonTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPhenomenonTime<S> {}
-    impl<S: State> State for SetPhenomenonTime<S> {
-        type PhenomenonTime = Set<members::phenomenon_time>;
-        type Sensor = S::Sensor;
-        type Entries = S::Entries;
-        type Thing = S::Thing;
-    }
-    ///State transition - sets the `sensor` field to Set
-    pub struct SetSensor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSensor<S> {}
-    impl<S: State> State for SetSensor<S> {
-        type PhenomenonTime = S::PhenomenonTime;
-        type Sensor = Set<members::sensor>;
-        type Entries = S::Entries;
-        type Thing = S::Thing;
+        type Sensor = Unset;
+        type PhenomenonTime = Unset;
     }
     ///State transition - sets the `entries` field to Set
     pub struct SetEntries<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEntries<S> {}
     impl<S: State> State for SetEntries<S> {
-        type PhenomenonTime = S::PhenomenonTime;
-        type Sensor = S::Sensor;
         type Entries = Set<members::entries>;
         type Thing = S::Thing;
+        type Sensor = S::Sensor;
+        type PhenomenonTime = S::PhenomenonTime;
     }
     ///State transition - sets the `thing` field to Set
     pub struct SetThing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetThing<S> {}
     impl<S: State> State for SetThing<S> {
-        type PhenomenonTime = S::PhenomenonTime;
-        type Sensor = S::Sensor;
         type Entries = S::Entries;
         type Thing = Set<members::thing>;
+        type Sensor = S::Sensor;
+        type PhenomenonTime = S::PhenomenonTime;
+    }
+    ///State transition - sets the `sensor` field to Set
+    pub struct SetSensor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSensor<S> {}
+    impl<S: State> State for SetSensor<S> {
+        type Entries = S::Entries;
+        type Thing = S::Thing;
+        type Sensor = Set<members::sensor>;
+        type PhenomenonTime = S::PhenomenonTime;
+    }
+    ///State transition - sets the `phenomenon_time` field to Set
+    pub struct SetPhenomenonTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPhenomenonTime<S> {}
+    impl<S: State> State for SetPhenomenonTime<S> {
+        type Entries = S::Entries;
+        type Thing = S::Thing;
+        type Sensor = S::Sensor;
+        type PhenomenonTime = Set<members::phenomenon_time>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `phenomenon_time` field
-        pub struct phenomenon_time(());
-        ///Marker type for the `sensor` field
-        pub struct sensor(());
         ///Marker type for the `entries` field
         pub struct entries(());
         ///Marker type for the `thing` field
         pub struct thing(());
+        ///Marker type for the `sensor` field
+        pub struct sensor(());
+        ///Marker type for the `phenomenon_time` field
+        pub struct phenomenon_time(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MultiObservationBuilder<'a, S: multi_observation_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<AtUri<'a>>>,
         Option<Vec<multi_observation::MultiObservationEntry<'a>>>,
         Option<Datetime>,
@@ -498,7 +501,7 @@ pub struct MultiObservationBuilder<'a, S: multi_observation_state::State> {
         Option<AtUri<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> MultiObservation<'a> {
@@ -512,9 +515,9 @@ impl<'a> MultiObservationBuilder<'a, multi_observation_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MultiObservationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -522,12 +525,12 @@ impl<'a> MultiObservationBuilder<'a, multi_observation_state::Empty> {
 impl<'a, S: multi_observation_state::State> MultiObservationBuilder<'a, S> {
     /// Set the `derivedFrom` field (optional)
     pub fn derived_from(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `derivedFrom` field to an Option value (optional)
     pub fn maybe_derived_from(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -542,11 +545,11 @@ where
         mut self,
         value: impl Into<Vec<multi_observation::MultiObservationEntry<'a>>>,
     ) -> MultiObservationBuilder<'a, multi_observation_state::SetEntries<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MultiObservationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -561,11 +564,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> MultiObservationBuilder<'a, multi_observation_state::SetPhenomenonTime<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         MultiObservationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -573,12 +576,12 @@ where
 impl<'a, S: multi_observation_state::State> MultiObservationBuilder<'a, S> {
     /// Set the `phenomenonTimeEnd` field (optional)
     pub fn phenomenon_time_end(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `phenomenonTimeEnd` field to an Option value (optional)
     pub fn maybe_phenomenon_time_end(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -589,7 +592,7 @@ impl<'a, S: multi_observation_state::State> MultiObservationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MultiObservationResultQuality<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `resultQuality` field to an Option value (optional)
@@ -597,7 +600,7 @@ impl<'a, S: multi_observation_state::State> MultiObservationBuilder<'a, S> {
         mut self,
         value: Option<MultiObservationResultQuality<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -605,12 +608,12 @@ impl<'a, S: multi_observation_state::State> MultiObservationBuilder<'a, S> {
 impl<'a, S: multi_observation_state::State> MultiObservationBuilder<'a, S> {
     /// Set the `resultTime` field (optional)
     pub fn result_time(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `resultTime` field to an Option value (optional)
     pub fn maybe_result_time(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -625,11 +628,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> MultiObservationBuilder<'a, multi_observation_state::SetSensor<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         MultiObservationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -644,11 +647,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> MultiObservationBuilder<'a, multi_observation_state::SetThing<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         MultiObservationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -656,22 +659,22 @@ where
 impl<'a, S> MultiObservationBuilder<'a, S>
 where
     S: multi_observation_state::State,
-    S::PhenomenonTime: multi_observation_state::IsSet,
-    S::Sensor: multi_observation_state::IsSet,
     S::Entries: multi_observation_state::IsSet,
     S::Thing: multi_observation_state::IsSet,
+    S::Sensor: multi_observation_state::IsSet,
+    S::PhenomenonTime: multi_observation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MultiObservation<'a> {
         MultiObservation {
-            derived_from: self.__unsafe_private_named.0,
-            entries: self.__unsafe_private_named.1.unwrap(),
-            phenomenon_time: self.__unsafe_private_named.2.unwrap(),
-            phenomenon_time_end: self.__unsafe_private_named.3,
-            result_quality: self.__unsafe_private_named.4,
-            result_time: self.__unsafe_private_named.5,
-            sensor: self.__unsafe_private_named.6.unwrap(),
-            thing: self.__unsafe_private_named.7.unwrap(),
+            derived_from: self._fields.0,
+            entries: self._fields.1.unwrap(),
+            phenomenon_time: self._fields.2.unwrap(),
+            phenomenon_time_end: self._fields.3,
+            result_quality: self._fields.4,
+            result_time: self._fields.5,
+            sensor: self._fields.6.unwrap(),
+            thing: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -681,14 +684,14 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> MultiObservation<'a> {
         MultiObservation {
-            derived_from: self.__unsafe_private_named.0,
-            entries: self.__unsafe_private_named.1.unwrap(),
-            phenomenon_time: self.__unsafe_private_named.2.unwrap(),
-            phenomenon_time_end: self.__unsafe_private_named.3,
-            result_quality: self.__unsafe_private_named.4,
-            result_time: self.__unsafe_private_named.5,
-            sensor: self.__unsafe_private_named.6.unwrap(),
-            thing: self.__unsafe_private_named.7.unwrap(),
+            derived_from: self._fields.0,
+            entries: self._fields.1.unwrap(),
+            phenomenon_time: self._fields.2.unwrap(),
+            phenomenon_time_end: self._fields.3,
+            result_quality: self._fields.4,
+            result_time: self._fields.5,
+            sensor: self._fields.6.unwrap(),
+            thing: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -923,64 +926,64 @@ pub mod multi_observation_entry_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ObservedProperty;
-        type UnitOfMeasurement;
         type Result;
+        type UnitOfMeasurement;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ObservedProperty = Unset;
-        type UnitOfMeasurement = Unset;
         type Result = Unset;
+        type UnitOfMeasurement = Unset;
     }
     ///State transition - sets the `observed_property` field to Set
     pub struct SetObservedProperty<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetObservedProperty<S> {}
     impl<S: State> State for SetObservedProperty<S> {
         type ObservedProperty = Set<members::observed_property>;
+        type Result = S::Result;
         type UnitOfMeasurement = S::UnitOfMeasurement;
-        type Result = S::Result;
-    }
-    ///State transition - sets the `unit_of_measurement` field to Set
-    pub struct SetUnitOfMeasurement<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUnitOfMeasurement<S> {}
-    impl<S: State> State for SetUnitOfMeasurement<S> {
-        type ObservedProperty = S::ObservedProperty;
-        type UnitOfMeasurement = Set<members::unit_of_measurement>;
-        type Result = S::Result;
     }
     ///State transition - sets the `result` field to Set
     pub struct SetResult<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetResult<S> {}
     impl<S: State> State for SetResult<S> {
         type ObservedProperty = S::ObservedProperty;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
         type Result = Set<members::result>;
+        type UnitOfMeasurement = S::UnitOfMeasurement;
+    }
+    ///State transition - sets the `unit_of_measurement` field to Set
+    pub struct SetUnitOfMeasurement<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUnitOfMeasurement<S> {}
+    impl<S: State> State for SetUnitOfMeasurement<S> {
+        type ObservedProperty = S::ObservedProperty;
+        type Result = S::Result;
+        type UnitOfMeasurement = Set<members::unit_of_measurement>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `observed_property` field
         pub struct observed_property(());
-        ///Marker type for the `unit_of_measurement` field
-        pub struct unit_of_measurement(());
         ///Marker type for the `result` field
         pub struct result(());
+        ///Marker type for the `unit_of_measurement` field
+        pub struct unit_of_measurement(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MultiObservationEntryBuilder<'a, S: multi_observation_entry_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AtUri<'a>>,
         Option<MultiObservationEntryResult<'a>>,
         Option<MultiObservationEntryResultQuality<'a>>,
         Option<i64>,
         Option<UnitOfMeasurement<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> MultiObservationEntry<'a> {
@@ -997,9 +1000,9 @@ impl<'a> MultiObservationEntryBuilder<'a, multi_observation_entry_state::Empty> 
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MultiObservationEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1017,11 +1020,11 @@ where
         'a,
         multi_observation_entry_state::SetObservedProperty<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MultiObservationEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1036,11 +1039,11 @@ where
         mut self,
         value: impl Into<MultiObservationEntryResult<'a>>,
     ) -> MultiObservationEntryBuilder<'a, multi_observation_entry_state::SetResult<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MultiObservationEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1051,7 +1054,7 @@ impl<'a, S: multi_observation_entry_state::State> MultiObservationEntryBuilder<'
         mut self,
         value: impl Into<Option<MultiObservationEntryResultQuality<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `resultQuality` field to an Option value (optional)
@@ -1059,7 +1062,7 @@ impl<'a, S: multi_observation_entry_state::State> MultiObservationEntryBuilder<'
         mut self,
         value: Option<MultiObservationEntryResultQuality<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1067,12 +1070,12 @@ impl<'a, S: multi_observation_entry_state::State> MultiObservationEntryBuilder<'
 impl<'a, S: multi_observation_entry_state::State> MultiObservationEntryBuilder<'a, S> {
     /// Set the `resultScaleFactor` field (optional)
     pub fn result_scale_factor(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `resultScaleFactor` field to an Option value (optional)
     pub fn maybe_result_scale_factor(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1090,11 +1093,11 @@ where
         'a,
         multi_observation_entry_state::SetUnitOfMeasurement<S>,
     > {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         MultiObservationEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1103,17 +1106,17 @@ impl<'a, S> MultiObservationEntryBuilder<'a, S>
 where
     S: multi_observation_entry_state::State,
     S::ObservedProperty: multi_observation_entry_state::IsSet,
-    S::UnitOfMeasurement: multi_observation_entry_state::IsSet,
     S::Result: multi_observation_entry_state::IsSet,
+    S::UnitOfMeasurement: multi_observation_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MultiObservationEntry<'a> {
         MultiObservationEntry {
-            observed_property: self.__unsafe_private_named.0.unwrap(),
-            result: self.__unsafe_private_named.1.unwrap(),
-            result_quality: self.__unsafe_private_named.2,
-            result_scale_factor: self.__unsafe_private_named.3,
-            unit_of_measurement: self.__unsafe_private_named.4.unwrap(),
+            observed_property: self._fields.0.unwrap(),
+            result: self._fields.1.unwrap(),
+            result_quality: self._fields.2,
+            result_scale_factor: self._fields.3,
+            unit_of_measurement: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1123,11 +1126,11 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> MultiObservationEntry<'a> {
         MultiObservationEntry {
-            observed_property: self.__unsafe_private_named.0.unwrap(),
-            result: self.__unsafe_private_named.1.unwrap(),
-            result_quality: self.__unsafe_private_named.2,
-            result_scale_factor: self.__unsafe_private_named.3,
-            unit_of_measurement: self.__unsafe_private_named.4.unwrap(),
+            observed_property: self._fields.0.unwrap(),
+            result: self._fields.1.unwrap(),
+            result_quality: self._fields.2,
+            result_scale_factor: self._fields.3,
+            unit_of_measurement: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::Did;
@@ -101,9 +102,9 @@ pub mod get_manifest_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetManifestBuilder<'a, S: get_manifest_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetManifest<'a> {
@@ -117,9 +118,9 @@ impl<'a> GetManifestBuilder<'a, get_manifest_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -134,11 +135,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> GetManifestBuilder<'a, get_manifest_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -153,11 +154,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GetManifestBuilder<'a, get_manifest_state::SetPlatform<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GetManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -171,8 +172,8 @@ where
     /// Build the final struct
     pub fn build(self) -> GetManifest<'a> {
         GetManifest {
-            did: self.__unsafe_private_named.0.unwrap(),
-            platform: self.__unsafe_private_named.1.unwrap(),
+            did: self._fields.0.unwrap(),
+            platform: self._fields.1.unwrap(),
         }
     }
 }

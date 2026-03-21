@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -331,9 +334,9 @@ pub mod ref_sys_by_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct RefSysByRefBuilder<'a, S: ref_sys_by_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<UriValue<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<UriValue<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RefSysByRef<'a> {
@@ -347,9 +350,9 @@ impl<'a> RefSysByRefBuilder<'a, ref_sys_by_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RefSysByRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -357,12 +360,12 @@ impl<'a> RefSysByRefBuilder<'a, ref_sys_by_ref_state::Empty> {
 impl<'a, S: ref_sys_by_ref_state::State> RefSysByRefBuilder<'a, S> {
     /// Set the `epoch` field (optional)
     pub fn epoch(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `epoch` field to an Option value (optional)
     pub fn maybe_epoch(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -377,11 +380,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> RefSysByRefBuilder<'a, ref_sys_by_ref_state::SetHref<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RefSysByRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -394,8 +397,8 @@ where
     /// Build the final struct
     pub fn build(self) -> RefSysByRef<'a> {
         RefSysByRef {
-            epoch: self.__unsafe_private_named.0,
-            href: self.__unsafe_private_named.1.unwrap(),
+            epoch: self._fields.0,
+            href: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -408,8 +411,8 @@ where
         >,
     ) -> RefSysByRef<'a> {
         RefSysByRef {
-            epoch: self.__unsafe_private_named.0,
-            href: self.__unsafe_private_named.1.unwrap(),
+            epoch: self._fields.0,
+            href: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -449,9 +452,9 @@ pub mod single_ref_sys_state {
 
 /// Builder for constructing an instance of this type
 pub struct SingleRefSysBuilder<'a, S: single_ref_sys_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<SingleRefSysRefSys<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<SingleRefSysRefSys<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SingleRefSys<'a> {
@@ -465,9 +468,9 @@ impl<'a> SingleRefSysBuilder<'a, single_ref_sys_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SingleRefSysBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -482,11 +485,11 @@ where
         mut self,
         value: impl Into<SingleRefSysRefSys<'a>>,
     ) -> SingleRefSysBuilder<'a, single_ref_sys_state::SetRefSys<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SingleRefSysBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -499,7 +502,7 @@ where
     /// Build the final struct
     pub fn build(self) -> SingleRefSys<'a> {
         SingleRefSys {
-            ref_sys: self.__unsafe_private_named.0.unwrap(),
+            ref_sys: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -512,7 +515,7 @@ where
         >,
     ) -> SingleRefSys<'a> {
         SingleRefSys {
-            ref_sys: self.__unsafe_private_named.0.unwrap(),
+            ref_sys: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

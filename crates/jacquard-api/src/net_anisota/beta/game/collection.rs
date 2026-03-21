@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -305,8 +308,8 @@ pub mod collection_state {
     pub trait State: sealed::Sealed {
         type Quantity;
         type SpecimenId;
-        type AcquiredAt;
         type CreatedAt;
+        type AcquiredAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -314,8 +317,8 @@ pub mod collection_state {
     impl State for Empty {
         type Quantity = Unset;
         type SpecimenId = Unset;
-        type AcquiredAt = Unset;
         type CreatedAt = Unset;
+        type AcquiredAt = Unset;
     }
     ///State transition - sets the `quantity` field to Set
     pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
@@ -323,8 +326,8 @@ pub mod collection_state {
     impl<S: State> State for SetQuantity<S> {
         type Quantity = Set<members::quantity>;
         type SpecimenId = S::SpecimenId;
-        type AcquiredAt = S::AcquiredAt;
         type CreatedAt = S::CreatedAt;
+        type AcquiredAt = S::AcquiredAt;
     }
     ///State transition - sets the `specimen_id` field to Set
     pub struct SetSpecimenId<S: State = Empty>(PhantomData<fn() -> S>);
@@ -332,17 +335,8 @@ pub mod collection_state {
     impl<S: State> State for SetSpecimenId<S> {
         type Quantity = S::Quantity;
         type SpecimenId = Set<members::specimen_id>;
+        type CreatedAt = S::CreatedAt;
         type AcquiredAt = S::AcquiredAt;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `acquired_at` field to Set
-    pub struct SetAcquiredAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAcquiredAt<S> {}
-    impl<S: State> State for SetAcquiredAt<S> {
-        type Quantity = S::Quantity;
-        type SpecimenId = S::SpecimenId;
-        type AcquiredAt = Set<members::acquired_at>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -350,8 +344,17 @@ pub mod collection_state {
     impl<S: State> State for SetCreatedAt<S> {
         type Quantity = S::Quantity;
         type SpecimenId = S::SpecimenId;
-        type AcquiredAt = S::AcquiredAt;
         type CreatedAt = Set<members::created_at>;
+        type AcquiredAt = S::AcquiredAt;
+    }
+    ///State transition - sets the `acquired_at` field to Set
+    pub struct SetAcquiredAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAcquiredAt<S> {}
+    impl<S: State> State for SetAcquiredAt<S> {
+        type Quantity = S::Quantity;
+        type SpecimenId = S::SpecimenId;
+        type CreatedAt = S::CreatedAt;
+        type AcquiredAt = Set<members::acquired_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -360,17 +363,17 @@ pub mod collection_state {
         pub struct quantity(());
         ///Marker type for the `specimen_id` field
         pub struct specimen_id(());
-        ///Marker type for the `acquired_at` field
-        pub struct acquired_at(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `acquired_at` field
+        pub struct acquired_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CollectionBuilder<'a, S: collection_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<Datetime>,
@@ -389,7 +392,7 @@ pub struct CollectionBuilder<'a, S: collection_state::State> {
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Collection<'a> {
@@ -403,8 +406,8 @@ impl<'a> CollectionBuilder<'a, collection_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CollectionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -423,7 +426,7 @@ impl<'a> CollectionBuilder<'a, collection_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -438,11 +441,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CollectionBuilder<'a, collection_state::SetAcquiredAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CollectionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -450,12 +453,12 @@ where
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `commonName` field (optional)
     pub fn common_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `commonName` field to an Option value (optional)
     pub fn maybe_common_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -470,11 +473,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CollectionBuilder<'a, collection_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CollectionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -482,12 +485,12 @@ where
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `family` field (optional)
     pub fn family(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `family` field to an Option value (optional)
     pub fn maybe_family(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -495,12 +498,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `genus` field (optional)
     pub fn genus(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `genus` field to an Option value (optional)
     pub fn maybe_genus(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -508,12 +511,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `lastModified` field (optional)
     pub fn last_modified(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `lastModified` field to an Option value (optional)
     pub fn maybe_last_modified(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -521,12 +524,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `lastSeen` field (optional)
     pub fn last_seen(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `lastSeen` field to an Option value (optional)
     pub fn maybe_last_seen(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -534,12 +537,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `logRecordUri` field (optional)
     pub fn log_record_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `logRecordUri` field to an Option value (optional)
     pub fn maybe_log_record_uri(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -554,11 +557,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CollectionBuilder<'a, collection_state::SetQuantity<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         CollectionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -566,12 +569,12 @@ where
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `rarity` field (optional)
     pub fn rarity(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `rarity` field to an Option value (optional)
     pub fn maybe_rarity(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -579,12 +582,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `scientificName` field (optional)
     pub fn scientific_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `scientificName` field to an Option value (optional)
     pub fn maybe_scientific_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -592,12 +595,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
     pub fn maybe_source(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -608,7 +611,7 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
         mut self,
         value: impl Into<Option<collection::SourceDetails<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `sourceDetails` field to an Option value (optional)
@@ -616,7 +619,7 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
         mut self,
         value: Option<collection::SourceDetails<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -624,12 +627,12 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `species` field (optional)
     pub fn species(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `species` field to an Option value (optional)
     pub fn maybe_species(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -640,7 +643,7 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
         mut self,
         value: impl Into<Option<collection::SpecimenData<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `specimenData` field to an Option value (optional)
@@ -648,7 +651,7 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
         mut self,
         value: Option<collection::SpecimenData<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -663,11 +666,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CollectionBuilder<'a, collection_state::SetSpecimenId<S>> {
-        self.__unsafe_private_named.15 = Option::Some(value.into());
+        self._fields.15 = Option::Some(value.into());
         CollectionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -675,12 +678,12 @@ where
 impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -690,29 +693,29 @@ where
     S: collection_state::State,
     S::Quantity: collection_state::IsSet,
     S::SpecimenId: collection_state::IsSet,
-    S::AcquiredAt: collection_state::IsSet,
     S::CreatedAt: collection_state::IsSet,
+    S::AcquiredAt: collection_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Collection<'a> {
         Collection {
-            acquired_at: self.__unsafe_private_named.0.unwrap(),
-            common_name: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            family: self.__unsafe_private_named.3,
-            genus: self.__unsafe_private_named.4,
-            last_modified: self.__unsafe_private_named.5,
-            last_seen: self.__unsafe_private_named.6,
-            log_record_uri: self.__unsafe_private_named.7,
-            quantity: self.__unsafe_private_named.8.unwrap(),
-            rarity: self.__unsafe_private_named.9,
-            scientific_name: self.__unsafe_private_named.10,
-            source: self.__unsafe_private_named.11,
-            source_details: self.__unsafe_private_named.12,
-            species: self.__unsafe_private_named.13,
-            specimen_data: self.__unsafe_private_named.14,
-            specimen_id: self.__unsafe_private_named.15.unwrap(),
-            status: self.__unsafe_private_named.16,
+            acquired_at: self._fields.0.unwrap(),
+            common_name: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            family: self._fields.3,
+            genus: self._fields.4,
+            last_modified: self._fields.5,
+            last_seen: self._fields.6,
+            log_record_uri: self._fields.7,
+            quantity: self._fields.8.unwrap(),
+            rarity: self._fields.9,
+            scientific_name: self._fields.10,
+            source: self._fields.11,
+            source_details: self._fields.12,
+            species: self._fields.13,
+            specimen_data: self._fields.14,
+            specimen_id: self._fields.15.unwrap(),
+            status: self._fields.16,
             extra_data: Default::default(),
         }
     }
@@ -725,23 +728,23 @@ where
         >,
     ) -> Collection<'a> {
         Collection {
-            acquired_at: self.__unsafe_private_named.0.unwrap(),
-            common_name: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            family: self.__unsafe_private_named.3,
-            genus: self.__unsafe_private_named.4,
-            last_modified: self.__unsafe_private_named.5,
-            last_seen: self.__unsafe_private_named.6,
-            log_record_uri: self.__unsafe_private_named.7,
-            quantity: self.__unsafe_private_named.8.unwrap(),
-            rarity: self.__unsafe_private_named.9,
-            scientific_name: self.__unsafe_private_named.10,
-            source: self.__unsafe_private_named.11,
-            source_details: self.__unsafe_private_named.12,
-            species: self.__unsafe_private_named.13,
-            specimen_data: self.__unsafe_private_named.14,
-            specimen_id: self.__unsafe_private_named.15.unwrap(),
-            status: self.__unsafe_private_named.16,
+            acquired_at: self._fields.0.unwrap(),
+            common_name: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            family: self._fields.3,
+            genus: self._fields.4,
+            last_modified: self._fields.5,
+            last_seen: self._fields.6,
+            log_record_uri: self._fields.7,
+            quantity: self._fields.8.unwrap(),
+            rarity: self._fields.9,
+            scientific_name: self._fields.10,
+            source: self._fields.11,
+            source_details: self._fields.12,
+            species: self._fields.13,
+            specimen_data: self._fields.14,
+            specimen_id: self._fields.15.unwrap(),
+            status: self._fields.16,
             extra_data: Some(extra_data),
         }
     }

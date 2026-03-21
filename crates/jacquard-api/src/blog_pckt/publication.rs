@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -131,9 +134,9 @@ pub mod publication_state {
 
 /// Builder for constructing an instance of this type
 pub struct PublicationBuilder<'a, S: publication_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<StrongRef<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<StrongRef<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Publication<'a> {
@@ -147,9 +150,9 @@ impl<'a> PublicationBuilder<'a, publication_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PublicationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -164,11 +167,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> PublicationBuilder<'a, publication_state::SetPublication<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PublicationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -181,7 +184,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Publication<'a> {
         Publication {
-            publication: self.__unsafe_private_named.0.unwrap(),
+            publication: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -194,7 +197,7 @@ where
         >,
     ) -> Publication<'a> {
         Publication {
-            publication: self.__unsafe_private_named.0.unwrap(),
+            publication: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

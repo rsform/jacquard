@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -570,9 +573,9 @@ pub mod lens_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type SourceSchema;
-        type TargetSchema;
         type GetterCode;
+        type TargetSchema;
+        type SourceSchema;
         type PutterCode;
         type CreatedAt;
     }
@@ -581,9 +584,9 @@ pub mod lens_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type SourceSchema = Unset;
-        type TargetSchema = Unset;
         type GetterCode = Unset;
+        type TargetSchema = Unset;
+        type SourceSchema = Unset;
         type PutterCode = Unset;
         type CreatedAt = Unset;
     }
@@ -592,31 +595,9 @@ pub mod lens_state {
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
-        type SourceSchema = S::SourceSchema;
+        type GetterCode = S::GetterCode;
         type TargetSchema = S::TargetSchema;
-        type GetterCode = S::GetterCode;
-        type PutterCode = S::PutterCode;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `source_schema` field to Set
-    pub struct SetSourceSchema<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSourceSchema<S> {}
-    impl<S: State> State for SetSourceSchema<S> {
-        type Name = S::Name;
-        type SourceSchema = Set<members::source_schema>;
-        type TargetSchema = S::TargetSchema;
-        type GetterCode = S::GetterCode;
-        type PutterCode = S::PutterCode;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `target_schema` field to Set
-    pub struct SetTargetSchema<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTargetSchema<S> {}
-    impl<S: State> State for SetTargetSchema<S> {
-        type Name = S::Name;
         type SourceSchema = S::SourceSchema;
-        type TargetSchema = Set<members::target_schema>;
-        type GetterCode = S::GetterCode;
         type PutterCode = S::PutterCode;
         type CreatedAt = S::CreatedAt;
     }
@@ -625,9 +606,31 @@ pub mod lens_state {
     impl<S: State> sealed::Sealed for SetGetterCode<S> {}
     impl<S: State> State for SetGetterCode<S> {
         type Name = S::Name;
-        type SourceSchema = S::SourceSchema;
-        type TargetSchema = S::TargetSchema;
         type GetterCode = Set<members::getter_code>;
+        type TargetSchema = S::TargetSchema;
+        type SourceSchema = S::SourceSchema;
+        type PutterCode = S::PutterCode;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `target_schema` field to Set
+    pub struct SetTargetSchema<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTargetSchema<S> {}
+    impl<S: State> State for SetTargetSchema<S> {
+        type Name = S::Name;
+        type GetterCode = S::GetterCode;
+        type TargetSchema = Set<members::target_schema>;
+        type SourceSchema = S::SourceSchema;
+        type PutterCode = S::PutterCode;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `source_schema` field to Set
+    pub struct SetSourceSchema<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSourceSchema<S> {}
+    impl<S: State> State for SetSourceSchema<S> {
+        type Name = S::Name;
+        type GetterCode = S::GetterCode;
+        type TargetSchema = S::TargetSchema;
+        type SourceSchema = Set<members::source_schema>;
         type PutterCode = S::PutterCode;
         type CreatedAt = S::CreatedAt;
     }
@@ -636,9 +639,9 @@ pub mod lens_state {
     impl<S: State> sealed::Sealed for SetPutterCode<S> {}
     impl<S: State> State for SetPutterCode<S> {
         type Name = S::Name;
-        type SourceSchema = S::SourceSchema;
-        type TargetSchema = S::TargetSchema;
         type GetterCode = S::GetterCode;
+        type TargetSchema = S::TargetSchema;
+        type SourceSchema = S::SourceSchema;
         type PutterCode = Set<members::putter_code>;
         type CreatedAt = S::CreatedAt;
     }
@@ -647,9 +650,9 @@ pub mod lens_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Name = S::Name;
-        type SourceSchema = S::SourceSchema;
-        type TargetSchema = S::TargetSchema;
         type GetterCode = S::GetterCode;
+        type TargetSchema = S::TargetSchema;
+        type SourceSchema = S::SourceSchema;
         type PutterCode = S::PutterCode;
         type CreatedAt = Set<members::created_at>;
     }
@@ -658,12 +661,12 @@ pub mod lens_state {
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `source_schema` field
-        pub struct source_schema(());
-        ///Marker type for the `target_schema` field
-        pub struct target_schema(());
         ///Marker type for the `getter_code` field
         pub struct getter_code(());
+        ///Marker type for the `target_schema` field
+        pub struct target_schema(());
+        ///Marker type for the `source_schema` field
+        pub struct source_schema(());
         ///Marker type for the `putter_code` field
         pub struct putter_code(());
         ///Marker type for the `created_at` field
@@ -673,8 +676,8 @@ pub mod lens_state {
 
 /// Builder for constructing an instance of this type
 pub struct LensBuilder<'a, S: lens_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<lens::CodeReference<'a>>,
@@ -687,7 +690,7 @@ pub struct LensBuilder<'a, S: lens_state::State> {
         Option<AtUri<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Lens<'a> {
@@ -701,21 +704,9 @@ impl<'a> LensBuilder<'a, lens_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LensBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -730,11 +721,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LensBuilder<'a, lens_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LensBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -742,12 +733,12 @@ where
 impl<'a, S: lens_state::State> LensBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -762,11 +753,11 @@ where
         mut self,
         value: impl Into<lens::CodeReference<'a>>,
     ) -> LensBuilder<'a, lens_state::SetGetterCode<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LensBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -774,12 +765,12 @@ where
 impl<'a, S: lens_state::State> LensBuilder<'a, S> {
     /// Set the `language` field (optional)
     pub fn language(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `language` field to an Option value (optional)
     pub fn maybe_language(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -787,12 +778,12 @@ impl<'a, S: lens_state::State> LensBuilder<'a, S> {
 impl<'a, S: lens_state::State> LensBuilder<'a, S> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<lens::LensMetadata<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
     pub fn maybe_metadata(mut self, value: Option<lens::LensMetadata<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -807,11 +798,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LensBuilder<'a, lens_state::SetName<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         LensBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -826,11 +817,11 @@ where
         mut self,
         value: impl Into<lens::CodeReference<'a>>,
     ) -> LensBuilder<'a, lens_state::SetPutterCode<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         LensBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -845,11 +836,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> LensBuilder<'a, lens_state::SetSourceSchema<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         LensBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -860,12 +851,12 @@ impl<'a, S: lens_state::State> LensBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `sourceSchemaVersion` field to an Option value (optional)
     pub fn maybe_source_schema_version(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -880,11 +871,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> LensBuilder<'a, lens_state::SetTargetSchema<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         LensBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -895,12 +886,12 @@ impl<'a, S: lens_state::State> LensBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `targetSchemaVersion` field to an Option value (optional)
     pub fn maybe_target_schema_version(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -909,26 +900,26 @@ impl<'a, S> LensBuilder<'a, S>
 where
     S: lens_state::State,
     S::Name: lens_state::IsSet,
-    S::SourceSchema: lens_state::IsSet,
-    S::TargetSchema: lens_state::IsSet,
     S::GetterCode: lens_state::IsSet,
+    S::TargetSchema: lens_state::IsSet,
+    S::SourceSchema: lens_state::IsSet,
     S::PutterCode: lens_state::IsSet,
     S::CreatedAt: lens_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lens<'a> {
         Lens {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            getter_code: self.__unsafe_private_named.2.unwrap(),
-            language: self.__unsafe_private_named.3,
-            metadata: self.__unsafe_private_named.4,
-            name: self.__unsafe_private_named.5.unwrap(),
-            putter_code: self.__unsafe_private_named.6.unwrap(),
-            source_schema: self.__unsafe_private_named.7.unwrap(),
-            source_schema_version: self.__unsafe_private_named.8,
-            target_schema: self.__unsafe_private_named.9.unwrap(),
-            target_schema_version: self.__unsafe_private_named.10,
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1,
+            getter_code: self._fields.2.unwrap(),
+            language: self._fields.3,
+            metadata: self._fields.4,
+            name: self._fields.5.unwrap(),
+            putter_code: self._fields.6.unwrap(),
+            source_schema: self._fields.7.unwrap(),
+            source_schema_version: self._fields.8,
+            target_schema: self._fields.9.unwrap(),
+            target_schema_version: self._fields.10,
             extra_data: Default::default(),
         }
     }
@@ -941,17 +932,17 @@ where
         >,
     ) -> Lens<'a> {
         Lens {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            getter_code: self.__unsafe_private_named.2.unwrap(),
-            language: self.__unsafe_private_named.3,
-            metadata: self.__unsafe_private_named.4,
-            name: self.__unsafe_private_named.5.unwrap(),
-            putter_code: self.__unsafe_private_named.6.unwrap(),
-            source_schema: self.__unsafe_private_named.7.unwrap(),
-            source_schema_version: self.__unsafe_private_named.8,
-            target_schema: self.__unsafe_private_named.9.unwrap(),
-            target_schema_version: self.__unsafe_private_named.10,
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1,
+            getter_code: self._fields.2.unwrap(),
+            language: self._fields.3,
+            metadata: self._fields.4,
+            name: self._fields.5.unwrap(),
+            putter_code: self._fields.6.unwrap(),
+            source_schema: self._fields.7.unwrap(),
+            source_schema_version: self._fields.8,
+            target_schema: self._fields.9.unwrap(),
+            target_schema_version: self._fields.10,
             extra_data: Some(extra_data),
         }
     }

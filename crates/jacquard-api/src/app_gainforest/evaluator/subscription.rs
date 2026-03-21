@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -138,50 +141,50 @@ pub mod subscription_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Evaluator;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Evaluator = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Evaluator = S::Evaluator;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `evaluator` field to Set
     pub struct SetEvaluator<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEvaluator<S> {}
     impl<S: State> State for SetEvaluator<S> {
-        type CreatedAt = S::CreatedAt;
         type Evaluator = Set<members::evaluator>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Evaluator = S::Evaluator;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `evaluator` field
         pub struct evaluator(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SubscriptionBuilder<'a, S: subscription_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<CowStr<'a>>>,
         Option<Datetime>,
         Option<Vec<CowStr<'a>>>,
         Option<Did<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Subscription<'a> {
@@ -195,9 +198,9 @@ impl<'a> SubscriptionBuilder<'a, subscription_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SubscriptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -205,12 +208,12 @@ impl<'a> SubscriptionBuilder<'a, subscription_state::Empty> {
 impl<'a, S: subscription_state::State> SubscriptionBuilder<'a, S> {
     /// Set the `collections` field (optional)
     pub fn collections(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `collections` field to an Option value (optional)
     pub fn maybe_collections(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -225,11 +228,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SubscriptionBuilder<'a, subscription_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SubscriptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -240,12 +243,12 @@ impl<'a, S: subscription_state::State> SubscriptionBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `evaluationTypes` field to an Option value (optional)
     pub fn maybe_evaluation_types(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -260,11 +263,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> SubscriptionBuilder<'a, subscription_state::SetEvaluator<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         SubscriptionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -272,16 +275,16 @@ where
 impl<'a, S> SubscriptionBuilder<'a, S>
 where
     S: subscription_state::State,
-    S::CreatedAt: subscription_state::IsSet,
     S::Evaluator: subscription_state::IsSet,
+    S::CreatedAt: subscription_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Subscription<'a> {
         Subscription {
-            collections: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            evaluation_types: self.__unsafe_private_named.2,
-            evaluator: self.__unsafe_private_named.3.unwrap(),
+            collections: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            evaluation_types: self._fields.2,
+            evaluator: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -294,10 +297,10 @@ where
         >,
     ) -> Subscription<'a> {
         Subscription {
-            collections: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            evaluation_types: self.__unsafe_private_named.2,
-            evaluator: self.__unsafe_private_named.3.unwrap(),
+            collections: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            evaluation_types: self._fields.2,
+            evaluator: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

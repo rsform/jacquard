@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -4107,8 +4110,8 @@ pub mod music_group_state {
 
 /// Builder for constructing an instance of this type
 pub struct MusicGroupBuilder<'a, S: music_group_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<MusicGroupAcceptedPaymentMethod<'a>>,
         Option<MusicGroupActionableFeedbackPolicy<'a>>,
         Option<MusicGroupAdditionalType<'a>>,
@@ -4205,7 +4208,7 @@ pub struct MusicGroupBuilder<'a, S: music_group_state::State> {
         Option<MusicGroupUrl<'a>>,
         Option<MusicGroupVatId<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> MusicGroup<'a> {
@@ -4219,8 +4222,8 @@ impl<'a> MusicGroupBuilder<'a, music_group_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MusicGroupBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -4317,7 +4320,7 @@ impl<'a> MusicGroupBuilder<'a, music_group_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4328,7 +4331,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupAcceptedPaymentMethod<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `acceptedPaymentMethod` field to an Option value (optional)
@@ -4336,7 +4339,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupAcceptedPaymentMethod<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -4347,7 +4350,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupActionableFeedbackPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `actionableFeedbackPolicy` field to an Option value (optional)
@@ -4355,7 +4358,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupActionableFeedbackPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -4366,7 +4369,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupAdditionalType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
@@ -4374,7 +4377,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupAdditionalType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -4382,12 +4385,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `address` field (optional)
     pub fn address(mut self, value: impl Into<Option<MusicGroupAddress<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `address` field to an Option value (optional)
     pub fn maybe_address(mut self, value: Option<MusicGroupAddress<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -4398,7 +4401,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupAgentInteractionStatistic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `agentInteractionStatistic` field to an Option value (optional)
@@ -4406,7 +4409,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupAgentInteractionStatistic<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -4417,7 +4420,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupAggregateRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
@@ -4425,7 +4428,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupAggregateRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -4433,12 +4436,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `album` field (optional)
     pub fn album(mut self, value: impl Into<Option<MusicGroupAlbum<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `album` field to an Option value (optional)
     pub fn maybe_album(mut self, value: Option<MusicGroupAlbum<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -4446,12 +4449,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `albums` field (optional)
     pub fn albums(mut self, value: impl Into<Option<MusicGroupAlbums<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `albums` field to an Option value (optional)
     pub fn maybe_albums(mut self, value: Option<MusicGroupAlbums<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -4462,7 +4465,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupAlternateName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
@@ -4470,7 +4473,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupAlternateName<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -4478,12 +4481,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `alumni` field (optional)
     pub fn alumni(mut self, value: impl Into<Option<MusicGroupAlumni<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `alumni` field to an Option value (optional)
     pub fn maybe_alumni(mut self, value: Option<MusicGroupAlumni<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -4494,12 +4497,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupAreaServed<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `areaServed` field to an Option value (optional)
     pub fn maybe_area_served(mut self, value: Option<MusicGroupAreaServed<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -4507,12 +4510,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<MusicGroupAward<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
     pub fn maybe_award(mut self, value: Option<MusicGroupAward<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -4520,12 +4523,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<MusicGroupAwards<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
     pub fn maybe_awards(mut self, value: Option<MusicGroupAwards<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -4533,12 +4536,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `brand` field (optional)
     pub fn brand(mut self, value: impl Into<Option<MusicGroupBrand<'a>>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `brand` field to an Option value (optional)
     pub fn maybe_brand(mut self, value: Option<MusicGroupBrand<'a>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -4549,7 +4552,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupCompanyRegistration<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `companyRegistration` field to an Option value (optional)
@@ -4557,7 +4560,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupCompanyRegistration<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -4568,7 +4571,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupContactPoint<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `contactPoint` field to an Option value (optional)
@@ -4576,7 +4579,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupContactPoint<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -4587,7 +4590,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupContactPoints<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `contactPoints` field to an Option value (optional)
@@ -4595,7 +4598,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupContactPoints<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -4606,7 +4609,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupCorrectionsPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `correctionsPolicy` field to an Option value (optional)
@@ -4614,7 +4617,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupCorrectionsPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -4625,12 +4628,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupDepartment<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `department` field to an Option value (optional)
     pub fn maybe_department(mut self, value: Option<MusicGroupDepartment<'a>>) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -4641,7 +4644,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
@@ -4649,7 +4652,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -4660,7 +4663,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupDisambiguatingDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `disambiguatingDescription` field to an Option value (optional)
@@ -4668,7 +4671,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupDisambiguatingDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -4679,7 +4682,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupDissolutionDate<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `dissolutionDate` field to an Option value (optional)
@@ -4687,7 +4690,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupDissolutionDate<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -4698,7 +4701,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupDiversityPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `diversityPolicy` field to an Option value (optional)
@@ -4706,7 +4709,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupDiversityPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -4717,7 +4720,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupDiversityStaffingReport<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.23 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `diversityStaffingReport` field to an Option value (optional)
@@ -4725,7 +4728,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupDiversityStaffingReport<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.23 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -4733,12 +4736,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `duns` field (optional)
     pub fn duns(mut self, value: impl Into<Option<MusicGroupDuns<'a>>>) -> Self {
-        self.__unsafe_private_named.24 = value.into();
+        self._fields.24 = value.into();
         self
     }
     /// Set the `duns` field to an Option value (optional)
     pub fn maybe_duns(mut self, value: Option<MusicGroupDuns<'a>>) -> Self {
-        self.__unsafe_private_named.24 = value;
+        self._fields.24 = value;
         self
     }
 }
@@ -4746,12 +4749,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `email` field (optional)
     pub fn email(mut self, value: impl Into<Option<MusicGroupEmail<'a>>>) -> Self {
-        self.__unsafe_private_named.25 = value.into();
+        self._fields.25 = value.into();
         self
     }
     /// Set the `email` field to an Option value (optional)
     pub fn maybe_email(mut self, value: Option<MusicGroupEmail<'a>>) -> Self {
-        self.__unsafe_private_named.25 = value;
+        self._fields.25 = value;
         self
     }
 }
@@ -4759,12 +4762,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `employee` field (optional)
     pub fn employee(mut self, value: impl Into<Option<MusicGroupEmployee<'a>>>) -> Self {
-        self.__unsafe_private_named.26 = value.into();
+        self._fields.26 = value.into();
         self
     }
     /// Set the `employee` field to an Option value (optional)
     pub fn maybe_employee(mut self, value: Option<MusicGroupEmployee<'a>>) -> Self {
-        self.__unsafe_private_named.26 = value;
+        self._fields.26 = value;
         self
     }
 }
@@ -4775,12 +4778,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupEmployees<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.27 = value.into();
+        self._fields.27 = value.into();
         self
     }
     /// Set the `employees` field to an Option value (optional)
     pub fn maybe_employees(mut self, value: Option<MusicGroupEmployees<'a>>) -> Self {
-        self.__unsafe_private_named.27 = value;
+        self._fields.27 = value;
         self
     }
 }
@@ -4791,7 +4794,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupEthicsPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.28 = value.into();
+        self._fields.28 = value.into();
         self
     }
     /// Set the `ethicsPolicy` field to an Option value (optional)
@@ -4799,7 +4802,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupEthicsPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.28 = value;
+        self._fields.28 = value;
         self
     }
 }
@@ -4807,12 +4810,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `event` field (optional)
     pub fn event(mut self, value: impl Into<Option<MusicGroupEvent<'a>>>) -> Self {
-        self.__unsafe_private_named.29 = value.into();
+        self._fields.29 = value.into();
         self
     }
     /// Set the `event` field to an Option value (optional)
     pub fn maybe_event(mut self, value: Option<MusicGroupEvent<'a>>) -> Self {
-        self.__unsafe_private_named.29 = value;
+        self._fields.29 = value;
         self
     }
 }
@@ -4820,12 +4823,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `events` field (optional)
     pub fn events(mut self, value: impl Into<Option<MusicGroupEvents<'a>>>) -> Self {
-        self.__unsafe_private_named.30 = value.into();
+        self._fields.30 = value.into();
         self
     }
     /// Set the `events` field to an Option value (optional)
     pub fn maybe_events(mut self, value: Option<MusicGroupEvents<'a>>) -> Self {
-        self.__unsafe_private_named.30 = value;
+        self._fields.30 = value;
         self
     }
 }
@@ -4836,12 +4839,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupFaxNumber<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value.into();
+        self._fields.31 = value.into();
         self
     }
     /// Set the `faxNumber` field to an Option value (optional)
     pub fn maybe_fax_number(mut self, value: Option<MusicGroupFaxNumber<'a>>) -> Self {
-        self.__unsafe_private_named.31 = value;
+        self._fields.31 = value;
         self
     }
 }
@@ -4849,12 +4852,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `founder` field (optional)
     pub fn founder(mut self, value: impl Into<Option<MusicGroupFounder<'a>>>) -> Self {
-        self.__unsafe_private_named.32 = value.into();
+        self._fields.32 = value.into();
         self
     }
     /// Set the `founder` field to an Option value (optional)
     pub fn maybe_founder(mut self, value: Option<MusicGroupFounder<'a>>) -> Self {
-        self.__unsafe_private_named.32 = value;
+        self._fields.32 = value;
         self
     }
 }
@@ -4862,12 +4865,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `founders` field (optional)
     pub fn founders(mut self, value: impl Into<Option<MusicGroupFounders<'a>>>) -> Self {
-        self.__unsafe_private_named.33 = value.into();
+        self._fields.33 = value.into();
         self
     }
     /// Set the `founders` field to an Option value (optional)
     pub fn maybe_founders(mut self, value: Option<MusicGroupFounders<'a>>) -> Self {
-        self.__unsafe_private_named.33 = value;
+        self._fields.33 = value;
         self
     }
 }
@@ -4878,7 +4881,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupFoundingDate<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.34 = value.into();
+        self._fields.34 = value.into();
         self
     }
     /// Set the `foundingDate` field to an Option value (optional)
@@ -4886,7 +4889,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupFoundingDate<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.34 = value;
+        self._fields.34 = value;
         self
     }
 }
@@ -4897,7 +4900,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupFoundingLocation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value.into();
+        self._fields.35 = value.into();
         self
     }
     /// Set the `foundingLocation` field to an Option value (optional)
@@ -4905,7 +4908,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupFoundingLocation<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value;
+        self._fields.35 = value;
         self
     }
 }
@@ -4913,12 +4916,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `funder` field (optional)
     pub fn funder(mut self, value: impl Into<Option<MusicGroupFunder<'a>>>) -> Self {
-        self.__unsafe_private_named.36 = value.into();
+        self._fields.36 = value.into();
         self
     }
     /// Set the `funder` field to an Option value (optional)
     pub fn maybe_funder(mut self, value: Option<MusicGroupFunder<'a>>) -> Self {
-        self.__unsafe_private_named.36 = value;
+        self._fields.36 = value;
         self
     }
 }
@@ -4926,12 +4929,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<MusicGroupFunding<'a>>>) -> Self {
-        self.__unsafe_private_named.37 = value.into();
+        self._fields.37 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
     pub fn maybe_funding(mut self, value: Option<MusicGroupFunding<'a>>) -> Self {
-        self.__unsafe_private_named.37 = value;
+        self._fields.37 = value;
         self
     }
 }
@@ -4939,12 +4942,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<MusicGroupGenre<'a>>>) -> Self {
-        self.__unsafe_private_named.38 = value.into();
+        self._fields.38 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
     pub fn maybe_genre(mut self, value: Option<MusicGroupGenre<'a>>) -> Self {
-        self.__unsafe_private_named.38 = value;
+        self._fields.38 = value;
         self
     }
 }
@@ -4955,7 +4958,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupGlobalLocationNumber<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value.into();
+        self._fields.39 = value.into();
         self
     }
     /// Set the `globalLocationNumber` field to an Option value (optional)
@@ -4963,7 +4966,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupGlobalLocationNumber<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value;
+        self._fields.39 = value;
         self
     }
 }
@@ -4974,7 +4977,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupHasCertification<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.40 = value.into();
+        self._fields.40 = value.into();
         self
     }
     /// Set the `hasCertification` field to an Option value (optional)
@@ -4982,7 +4985,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupHasCertification<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.40 = value;
+        self._fields.40 = value;
         self
     }
 }
@@ -4993,7 +4996,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupHasCredential<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.41 = value.into();
+        self._fields.41 = value.into();
         self
     }
     /// Set the `hasCredential` field to an Option value (optional)
@@ -5001,7 +5004,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupHasCredential<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.41 = value;
+        self._fields.41 = value;
         self
     }
 }
@@ -5012,7 +5015,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupHasGs1DigitalLink<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.42 = value.into();
+        self._fields.42 = value.into();
         self
     }
     /// Set the `hasGS1DigitalLink` field to an Option value (optional)
@@ -5020,7 +5023,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupHasGs1DigitalLink<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.42 = value;
+        self._fields.42 = value;
         self
     }
 }
@@ -5031,7 +5034,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupHasMemberProgram<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.43 = value.into();
+        self._fields.43 = value.into();
         self
     }
     /// Set the `hasMemberProgram` field to an Option value (optional)
@@ -5039,7 +5042,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupHasMemberProgram<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.43 = value;
+        self._fields.43 = value;
         self
     }
 }
@@ -5050,7 +5053,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupHasMerchantReturnPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.44 = value.into();
+        self._fields.44 = value.into();
         self
     }
     /// Set the `hasMerchantReturnPolicy` field to an Option value (optional)
@@ -5058,7 +5061,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupHasMerchantReturnPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.44 = value;
+        self._fields.44 = value;
         self
     }
 }
@@ -5069,7 +5072,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupHasOfferCatalog<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value.into();
+        self._fields.45 = value.into();
         self
     }
     /// Set the `hasOfferCatalog` field to an Option value (optional)
@@ -5077,7 +5080,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupHasOfferCatalog<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value;
+        self._fields.45 = value;
         self
     }
 }
@@ -5085,12 +5088,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `hasPOS` field (optional)
     pub fn has_pos(mut self, value: impl Into<Option<MusicGroupHasPos<'a>>>) -> Self {
-        self.__unsafe_private_named.46 = value.into();
+        self._fields.46 = value.into();
         self
     }
     /// Set the `hasPOS` field to an Option value (optional)
     pub fn maybe_has_pos(mut self, value: Option<MusicGroupHasPos<'a>>) -> Self {
-        self.__unsafe_private_named.46 = value;
+        self._fields.46 = value;
         self
     }
 }
@@ -5101,7 +5104,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupHasProductReturnPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.47 = value.into();
+        self._fields.47 = value.into();
         self
     }
     /// Set the `hasProductReturnPolicy` field to an Option value (optional)
@@ -5109,7 +5112,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupHasProductReturnPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.47 = value;
+        self._fields.47 = value;
         self
     }
 }
@@ -5120,7 +5123,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupHasShippingService<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value.into();
+        self._fields.48 = value.into();
         self
     }
     /// Set the `hasShippingService` field to an Option value (optional)
@@ -5128,7 +5131,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupHasShippingService<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value;
+        self._fields.48 = value;
         self
     }
 }
@@ -5139,12 +5142,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupIdentifier<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.49 = value.into();
+        self._fields.49 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
     pub fn maybe_identifier(mut self, value: Option<MusicGroupIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.49 = value;
+        self._fields.49 = value;
         self
     }
 }
@@ -5152,12 +5155,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<MusicGroupImage<'a>>>) -> Self {
-        self.__unsafe_private_named.50 = value.into();
+        self._fields.50 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<MusicGroupImage<'a>>) -> Self {
-        self.__unsafe_private_named.50 = value;
+        self._fields.50 = value;
         self
     }
 }
@@ -5168,7 +5171,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupInteractionStatistic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.51 = value.into();
+        self._fields.51 = value.into();
         self
     }
     /// Set the `interactionStatistic` field to an Option value (optional)
@@ -5176,7 +5179,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupInteractionStatistic<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.51 = value;
+        self._fields.51 = value;
         self
     }
 }
@@ -5184,12 +5187,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `isicV4` field (optional)
     pub fn isic_v4(mut self, value: impl Into<Option<MusicGroupIsicV4<'a>>>) -> Self {
-        self.__unsafe_private_named.52 = value.into();
+        self._fields.52 = value.into();
         self
     }
     /// Set the `isicV4` field to an Option value (optional)
     pub fn maybe_isic_v4(mut self, value: Option<MusicGroupIsicV4<'a>>) -> Self {
-        self.__unsafe_private_named.52 = value;
+        self._fields.52 = value;
         self
     }
 }
@@ -5200,7 +5203,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupIso6523Code<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.53 = value.into();
+        self._fields.53 = value.into();
         self
     }
     /// Set the `iso6523Code` field to an Option value (optional)
@@ -5208,7 +5211,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupIso6523Code<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.53 = value;
+        self._fields.53 = value;
         self
     }
 }
@@ -5216,12 +5219,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<MusicGroupKeywords<'a>>>) -> Self {
-        self.__unsafe_private_named.54 = value.into();
+        self._fields.54 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
     pub fn maybe_keywords(mut self, value: Option<MusicGroupKeywords<'a>>) -> Self {
-        self.__unsafe_private_named.54 = value;
+        self._fields.54 = value;
         self
     }
 }
@@ -5232,12 +5235,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupKnowsAbout<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.55 = value.into();
+        self._fields.55 = value.into();
         self
     }
     /// Set the `knowsAbout` field to an Option value (optional)
     pub fn maybe_knows_about(mut self, value: Option<MusicGroupKnowsAbout<'a>>) -> Self {
-        self.__unsafe_private_named.55 = value;
+        self._fields.55 = value;
         self
     }
 }
@@ -5248,7 +5251,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupKnowsLanguage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value.into();
+        self._fields.56 = value.into();
         self
     }
     /// Set the `knowsLanguage` field to an Option value (optional)
@@ -5256,7 +5259,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupKnowsLanguage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value;
+        self._fields.56 = value;
         self
     }
 }
@@ -5267,7 +5270,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupLegalAddress<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.57 = value.into();
+        self._fields.57 = value.into();
         self
     }
     /// Set the `legalAddress` field to an Option value (optional)
@@ -5275,7 +5278,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupLegalAddress<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.57 = value;
+        self._fields.57 = value;
         self
     }
 }
@@ -5286,12 +5289,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupLegalName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.58 = value.into();
+        self._fields.58 = value.into();
         self
     }
     /// Set the `legalName` field to an Option value (optional)
     pub fn maybe_legal_name(mut self, value: Option<MusicGroupLegalName<'a>>) -> Self {
-        self.__unsafe_private_named.58 = value;
+        self._fields.58 = value;
         self
     }
 }
@@ -5302,7 +5305,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupLegalRepresentative<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.59 = value.into();
+        self._fields.59 = value.into();
         self
     }
     /// Set the `legalRepresentative` field to an Option value (optional)
@@ -5310,7 +5313,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupLegalRepresentative<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.59 = value;
+        self._fields.59 = value;
         self
     }
 }
@@ -5318,12 +5321,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `leiCode` field (optional)
     pub fn lei_code(mut self, value: impl Into<Option<MusicGroupLeiCode<'a>>>) -> Self {
-        self.__unsafe_private_named.60 = value.into();
+        self._fields.60 = value.into();
         self
     }
     /// Set the `leiCode` field to an Option value (optional)
     pub fn maybe_lei_code(mut self, value: Option<MusicGroupLeiCode<'a>>) -> Self {
-        self.__unsafe_private_named.60 = value;
+        self._fields.60 = value;
         self
     }
 }
@@ -5331,12 +5334,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<MusicGroupLocation<'a>>>) -> Self {
-        self.__unsafe_private_named.61 = value.into();
+        self._fields.61 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
     pub fn maybe_location(mut self, value: Option<MusicGroupLocation<'a>>) -> Self {
-        self.__unsafe_private_named.61 = value;
+        self._fields.61 = value;
         self
     }
 }
@@ -5344,12 +5347,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `logo` field (optional)
     pub fn logo(mut self, value: impl Into<Option<MusicGroupLogo<'a>>>) -> Self {
-        self.__unsafe_private_named.62 = value.into();
+        self._fields.62 = value.into();
         self
     }
     /// Set the `logo` field to an Option value (optional)
     pub fn maybe_logo(mut self, value: Option<MusicGroupLogo<'a>>) -> Self {
-        self.__unsafe_private_named.62 = value;
+        self._fields.62 = value;
         self
     }
 }
@@ -5360,7 +5363,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupMainEntityOfPage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.63 = value.into();
+        self._fields.63 = value.into();
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
@@ -5368,7 +5371,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupMainEntityOfPage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.63 = value;
+        self._fields.63 = value;
         self
     }
 }
@@ -5379,12 +5382,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupMakesOffer<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.64 = value.into();
+        self._fields.64 = value.into();
         self
     }
     /// Set the `makesOffer` field to an Option value (optional)
     pub fn maybe_makes_offer(mut self, value: Option<MusicGroupMakesOffer<'a>>) -> Self {
-        self.__unsafe_private_named.64 = value;
+        self._fields.64 = value;
         self
     }
 }
@@ -5392,12 +5395,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `member` field (optional)
     pub fn member(mut self, value: impl Into<Option<MusicGroupMember<'a>>>) -> Self {
-        self.__unsafe_private_named.65 = value.into();
+        self._fields.65 = value.into();
         self
     }
     /// Set the `member` field to an Option value (optional)
     pub fn maybe_member(mut self, value: Option<MusicGroupMember<'a>>) -> Self {
-        self.__unsafe_private_named.65 = value;
+        self._fields.65 = value;
         self
     }
 }
@@ -5408,12 +5411,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupMemberOf<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.66 = value.into();
+        self._fields.66 = value.into();
         self
     }
     /// Set the `memberOf` field to an Option value (optional)
     pub fn maybe_member_of(mut self, value: Option<MusicGroupMemberOf<'a>>) -> Self {
-        self.__unsafe_private_named.66 = value;
+        self._fields.66 = value;
         self
     }
 }
@@ -5421,12 +5424,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `members` field (optional)
     pub fn members(mut self, value: impl Into<Option<MusicGroupMembers<'a>>>) -> Self {
-        self.__unsafe_private_named.67 = value.into();
+        self._fields.67 = value.into();
         self
     }
     /// Set the `members` field to an Option value (optional)
     pub fn maybe_members(mut self, value: Option<MusicGroupMembers<'a>>) -> Self {
-        self.__unsafe_private_named.67 = value;
+        self._fields.67 = value;
         self
     }
 }
@@ -5437,7 +5440,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupMusicGroupMember<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.68 = value.into();
+        self._fields.68 = value.into();
         self
     }
     /// Set the `musicGroupMember` field to an Option value (optional)
@@ -5445,7 +5448,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupMusicGroupMember<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.68 = value;
+        self._fields.68 = value;
         self
     }
 }
@@ -5453,12 +5456,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `naics` field (optional)
     pub fn naics(mut self, value: impl Into<Option<MusicGroupNaics<'a>>>) -> Self {
-        self.__unsafe_private_named.69 = value.into();
+        self._fields.69 = value.into();
         self
     }
     /// Set the `naics` field to an Option value (optional)
     pub fn maybe_naics(mut self, value: Option<MusicGroupNaics<'a>>) -> Self {
-        self.__unsafe_private_named.69 = value;
+        self._fields.69 = value;
         self
     }
 }
@@ -5466,12 +5469,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<MusicGroupName<'a>>>) -> Self {
-        self.__unsafe_private_named.70 = value.into();
+        self._fields.70 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<MusicGroupName<'a>>) -> Self {
-        self.__unsafe_private_named.70 = value;
+        self._fields.70 = value;
         self
     }
 }
@@ -5482,7 +5485,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupNonprofitStatus<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.71 = value.into();
+        self._fields.71 = value.into();
         self
     }
     /// Set the `nonprofitStatus` field to an Option value (optional)
@@ -5490,7 +5493,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupNonprofitStatus<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.71 = value;
+        self._fields.71 = value;
         self
     }
 }
@@ -5501,7 +5504,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupNumberOfEmployees<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.72 = value.into();
+        self._fields.72 = value.into();
         self
     }
     /// Set the `numberOfEmployees` field to an Option value (optional)
@@ -5509,7 +5512,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupNumberOfEmployees<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.72 = value;
+        self._fields.72 = value;
         self
     }
 }
@@ -5520,7 +5523,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupOwnershipFundingInfo<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.73 = value.into();
+        self._fields.73 = value.into();
         self
     }
     /// Set the `ownershipFundingInfo` field to an Option value (optional)
@@ -5528,7 +5531,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupOwnershipFundingInfo<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.73 = value;
+        self._fields.73 = value;
         self
     }
 }
@@ -5536,12 +5539,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `owns` field (optional)
     pub fn owns(mut self, value: impl Into<Option<MusicGroupOwns<'a>>>) -> Self {
-        self.__unsafe_private_named.74 = value.into();
+        self._fields.74 = value.into();
         self
     }
     /// Set the `owns` field to an Option value (optional)
     pub fn maybe_owns(mut self, value: Option<MusicGroupOwns<'a>>) -> Self {
-        self.__unsafe_private_named.74 = value;
+        self._fields.74 = value;
         self
     }
 }
@@ -5552,7 +5555,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupParentOrganization<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.75 = value.into();
+        self._fields.75 = value.into();
         self
     }
     /// Set the `parentOrganization` field to an Option value (optional)
@@ -5560,7 +5563,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupParentOrganization<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.75 = value;
+        self._fields.75 = value;
         self
     }
 }
@@ -5571,7 +5574,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupPotentialAction<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.76 = value.into();
+        self._fields.76 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
@@ -5579,7 +5582,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupPotentialAction<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.76 = value;
+        self._fields.76 = value;
         self
     }
 }
@@ -5590,7 +5593,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupPublishingPrinciples<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.77 = value.into();
+        self._fields.77 = value.into();
         self
     }
     /// Set the `publishingPrinciples` field to an Option value (optional)
@@ -5598,7 +5601,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupPublishingPrinciples<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.77 = value;
+        self._fields.77 = value;
         self
     }
 }
@@ -5606,12 +5609,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<MusicGroupReview<'a>>>) -> Self {
-        self.__unsafe_private_named.78 = value.into();
+        self._fields.78 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
     pub fn maybe_review(mut self, value: Option<MusicGroupReview<'a>>) -> Self {
-        self.__unsafe_private_named.78 = value;
+        self._fields.78 = value;
         self
     }
 }
@@ -5619,12 +5622,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `reviews` field (optional)
     pub fn reviews(mut self, value: impl Into<Option<MusicGroupReviews<'a>>>) -> Self {
-        self.__unsafe_private_named.79 = value.into();
+        self._fields.79 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
     pub fn maybe_reviews(mut self, value: Option<MusicGroupReviews<'a>>) -> Self {
-        self.__unsafe_private_named.79 = value;
+        self._fields.79 = value;
         self
     }
 }
@@ -5632,12 +5635,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<MusicGroupSameAs<'a>>>) -> Self {
-        self.__unsafe_private_named.80 = value.into();
+        self._fields.80 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
     pub fn maybe_same_as(mut self, value: Option<MusicGroupSameAs<'a>>) -> Self {
-        self.__unsafe_private_named.80 = value;
+        self._fields.80 = value;
         self
     }
 }
@@ -5645,12 +5648,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `seeks` field (optional)
     pub fn seeks(mut self, value: impl Into<Option<MusicGroupSeeks<'a>>>) -> Self {
-        self.__unsafe_private_named.81 = value.into();
+        self._fields.81 = value.into();
         self
     }
     /// Set the `seeks` field to an Option value (optional)
     pub fn maybe_seeks(mut self, value: Option<MusicGroupSeeks<'a>>) -> Self {
-        self.__unsafe_private_named.81 = value;
+        self._fields.81 = value;
         self
     }
 }
@@ -5661,7 +5664,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupServiceArea<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.82 = value.into();
+        self._fields.82 = value.into();
         self
     }
     /// Set the `serviceArea` field to an Option value (optional)
@@ -5669,7 +5672,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupServiceArea<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.82 = value;
+        self._fields.82 = value;
         self
     }
 }
@@ -5677,12 +5680,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `skills` field (optional)
     pub fn skills(mut self, value: impl Into<Option<MusicGroupSkills<'a>>>) -> Self {
-        self.__unsafe_private_named.83 = value.into();
+        self._fields.83 = value.into();
         self
     }
     /// Set the `skills` field to an Option value (optional)
     pub fn maybe_skills(mut self, value: Option<MusicGroupSkills<'a>>) -> Self {
-        self.__unsafe_private_named.83 = value;
+        self._fields.83 = value;
         self
     }
 }
@@ -5690,12 +5693,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `slogan` field (optional)
     pub fn slogan(mut self, value: impl Into<Option<MusicGroupSlogan<'a>>>) -> Self {
-        self.__unsafe_private_named.84 = value.into();
+        self._fields.84 = value.into();
         self
     }
     /// Set the `slogan` field to an Option value (optional)
     pub fn maybe_slogan(mut self, value: Option<MusicGroupSlogan<'a>>) -> Self {
-        self.__unsafe_private_named.84 = value;
+        self._fields.84 = value;
         self
     }
 }
@@ -5703,12 +5706,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `sponsor` field (optional)
     pub fn sponsor(mut self, value: impl Into<Option<MusicGroupSponsor<'a>>>) -> Self {
-        self.__unsafe_private_named.85 = value.into();
+        self._fields.85 = value.into();
         self
     }
     /// Set the `sponsor` field to an Option value (optional)
     pub fn maybe_sponsor(mut self, value: Option<MusicGroupSponsor<'a>>) -> Self {
-        self.__unsafe_private_named.85 = value;
+        self._fields.85 = value;
         self
     }
 }
@@ -5719,7 +5722,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupSubOrganization<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.86 = value.into();
+        self._fields.86 = value.into();
         self
     }
     /// Set the `subOrganization` field to an Option value (optional)
@@ -5727,7 +5730,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupSubOrganization<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.86 = value;
+        self._fields.86 = value;
         self
     }
 }
@@ -5738,12 +5741,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupSubjectOf<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.87 = value.into();
+        self._fields.87 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
     pub fn maybe_subject_of(mut self, value: Option<MusicGroupSubjectOf<'a>>) -> Self {
-        self.__unsafe_private_named.87 = value;
+        self._fields.87 = value;
         self
     }
 }
@@ -5751,12 +5754,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `taxID` field (optional)
     pub fn tax_id(mut self, value: impl Into<Option<MusicGroupTaxId<'a>>>) -> Self {
-        self.__unsafe_private_named.88 = value.into();
+        self._fields.88 = value.into();
         self
     }
     /// Set the `taxID` field to an Option value (optional)
     pub fn maybe_tax_id(mut self, value: Option<MusicGroupTaxId<'a>>) -> Self {
-        self.__unsafe_private_named.88 = value;
+        self._fields.88 = value;
         self
     }
 }
@@ -5767,12 +5770,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupTelephone<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.89 = value.into();
+        self._fields.89 = value.into();
         self
     }
     /// Set the `telephone` field to an Option value (optional)
     pub fn maybe_telephone(mut self, value: Option<MusicGroupTelephone<'a>>) -> Self {
-        self.__unsafe_private_named.89 = value;
+        self._fields.89 = value;
         self
     }
 }
@@ -5780,12 +5783,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `track` field (optional)
     pub fn track(mut self, value: impl Into<Option<MusicGroupTrack<'a>>>) -> Self {
-        self.__unsafe_private_named.90 = value.into();
+        self._fields.90 = value.into();
         self
     }
     /// Set the `track` field to an Option value (optional)
     pub fn maybe_track(mut self, value: Option<MusicGroupTrack<'a>>) -> Self {
-        self.__unsafe_private_named.90 = value;
+        self._fields.90 = value;
         self
     }
 }
@@ -5793,12 +5796,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `tracks` field (optional)
     pub fn tracks(mut self, value: impl Into<Option<MusicGroupTracks<'a>>>) -> Self {
-        self.__unsafe_private_named.91 = value.into();
+        self._fields.91 = value.into();
         self
     }
     /// Set the `tracks` field to an Option value (optional)
     pub fn maybe_tracks(mut self, value: Option<MusicGroupTracks<'a>>) -> Self {
-        self.__unsafe_private_named.91 = value;
+        self._fields.91 = value;
         self
     }
 }
@@ -5809,7 +5812,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicGroupUnnamedSourcesPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.92 = value.into();
+        self._fields.92 = value.into();
         self
     }
     /// Set the `unnamedSourcesPolicy` field to an Option value (optional)
@@ -5817,7 +5820,7 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
         mut self,
         value: Option<MusicGroupUnnamedSourcesPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.92 = value;
+        self._fields.92 = value;
         self
     }
 }
@@ -5825,12 +5828,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<MusicGroupUrl<'a>>>) -> Self {
-        self.__unsafe_private_named.93 = value.into();
+        self._fields.93 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<MusicGroupUrl<'a>>) -> Self {
-        self.__unsafe_private_named.93 = value;
+        self._fields.93 = value;
         self
     }
 }
@@ -5838,12 +5841,12 @@ impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
 impl<'a, S: music_group_state::State> MusicGroupBuilder<'a, S> {
     /// Set the `vatID` field (optional)
     pub fn vat_id(mut self, value: impl Into<Option<MusicGroupVatId<'a>>>) -> Self {
-        self.__unsafe_private_named.94 = value.into();
+        self._fields.94 = value.into();
         self
     }
     /// Set the `vatID` field to an Option value (optional)
     pub fn maybe_vat_id(mut self, value: Option<MusicGroupVatId<'a>>) -> Self {
-        self.__unsafe_private_named.94 = value;
+        self._fields.94 = value;
         self
     }
 }
@@ -5855,101 +5858,101 @@ where
     /// Build the final struct
     pub fn build(self) -> MusicGroup<'a> {
         MusicGroup {
-            accepted_payment_method: self.__unsafe_private_named.0,
-            actionable_feedback_policy: self.__unsafe_private_named.1,
-            additional_type: self.__unsafe_private_named.2,
-            address: self.__unsafe_private_named.3,
-            agent_interaction_statistic: self.__unsafe_private_named.4,
-            aggregate_rating: self.__unsafe_private_named.5,
-            album: self.__unsafe_private_named.6,
-            albums: self.__unsafe_private_named.7,
-            alternate_name: self.__unsafe_private_named.8,
-            alumni: self.__unsafe_private_named.9,
-            area_served: self.__unsafe_private_named.10,
-            award: self.__unsafe_private_named.11,
-            awards: self.__unsafe_private_named.12,
-            brand: self.__unsafe_private_named.13,
-            company_registration: self.__unsafe_private_named.14,
-            contact_point: self.__unsafe_private_named.15,
-            contact_points: self.__unsafe_private_named.16,
-            corrections_policy: self.__unsafe_private_named.17,
-            department: self.__unsafe_private_named.18,
-            description: self.__unsafe_private_named.19,
-            disambiguating_description: self.__unsafe_private_named.20,
-            dissolution_date: self.__unsafe_private_named.21,
-            diversity_policy: self.__unsafe_private_named.22,
-            diversity_staffing_report: self.__unsafe_private_named.23,
-            duns: self.__unsafe_private_named.24,
-            email: self.__unsafe_private_named.25,
-            employee: self.__unsafe_private_named.26,
-            employees: self.__unsafe_private_named.27,
-            ethics_policy: self.__unsafe_private_named.28,
-            event: self.__unsafe_private_named.29,
-            events: self.__unsafe_private_named.30,
-            fax_number: self.__unsafe_private_named.31,
-            founder: self.__unsafe_private_named.32,
-            founders: self.__unsafe_private_named.33,
-            founding_date: self.__unsafe_private_named.34,
-            founding_location: self.__unsafe_private_named.35,
-            funder: self.__unsafe_private_named.36,
-            funding: self.__unsafe_private_named.37,
-            genre: self.__unsafe_private_named.38,
-            global_location_number: self.__unsafe_private_named.39,
-            has_certification: self.__unsafe_private_named.40,
-            has_credential: self.__unsafe_private_named.41,
-            has_gs1_digital_link: self.__unsafe_private_named.42,
-            has_member_program: self.__unsafe_private_named.43,
-            has_merchant_return_policy: self.__unsafe_private_named.44,
-            has_offer_catalog: self.__unsafe_private_named.45,
-            has_pos: self.__unsafe_private_named.46,
-            has_product_return_policy: self.__unsafe_private_named.47,
-            has_shipping_service: self.__unsafe_private_named.48,
-            identifier: self.__unsafe_private_named.49,
-            image: self.__unsafe_private_named.50,
-            interaction_statistic: self.__unsafe_private_named.51,
-            isic_v4: self.__unsafe_private_named.52,
-            iso6523_code: self.__unsafe_private_named.53,
-            keywords: self.__unsafe_private_named.54,
-            knows_about: self.__unsafe_private_named.55,
-            knows_language: self.__unsafe_private_named.56,
-            legal_address: self.__unsafe_private_named.57,
-            legal_name: self.__unsafe_private_named.58,
-            legal_representative: self.__unsafe_private_named.59,
-            lei_code: self.__unsafe_private_named.60,
-            location: self.__unsafe_private_named.61,
-            logo: self.__unsafe_private_named.62,
-            main_entity_of_page: self.__unsafe_private_named.63,
-            makes_offer: self.__unsafe_private_named.64,
-            member: self.__unsafe_private_named.65,
-            member_of: self.__unsafe_private_named.66,
-            members: self.__unsafe_private_named.67,
-            music_group_member: self.__unsafe_private_named.68,
-            naics: self.__unsafe_private_named.69,
-            name: self.__unsafe_private_named.70,
-            nonprofit_status: self.__unsafe_private_named.71,
-            number_of_employees: self.__unsafe_private_named.72,
-            ownership_funding_info: self.__unsafe_private_named.73,
-            owns: self.__unsafe_private_named.74,
-            parent_organization: self.__unsafe_private_named.75,
-            potential_action: self.__unsafe_private_named.76,
-            publishing_principles: self.__unsafe_private_named.77,
-            review: self.__unsafe_private_named.78,
-            reviews: self.__unsafe_private_named.79,
-            same_as: self.__unsafe_private_named.80,
-            seeks: self.__unsafe_private_named.81,
-            service_area: self.__unsafe_private_named.82,
-            skills: self.__unsafe_private_named.83,
-            slogan: self.__unsafe_private_named.84,
-            sponsor: self.__unsafe_private_named.85,
-            sub_organization: self.__unsafe_private_named.86,
-            subject_of: self.__unsafe_private_named.87,
-            tax_id: self.__unsafe_private_named.88,
-            telephone: self.__unsafe_private_named.89,
-            track: self.__unsafe_private_named.90,
-            tracks: self.__unsafe_private_named.91,
-            unnamed_sources_policy: self.__unsafe_private_named.92,
-            url: self.__unsafe_private_named.93,
-            vat_id: self.__unsafe_private_named.94,
+            accepted_payment_method: self._fields.0,
+            actionable_feedback_policy: self._fields.1,
+            additional_type: self._fields.2,
+            address: self._fields.3,
+            agent_interaction_statistic: self._fields.4,
+            aggregate_rating: self._fields.5,
+            album: self._fields.6,
+            albums: self._fields.7,
+            alternate_name: self._fields.8,
+            alumni: self._fields.9,
+            area_served: self._fields.10,
+            award: self._fields.11,
+            awards: self._fields.12,
+            brand: self._fields.13,
+            company_registration: self._fields.14,
+            contact_point: self._fields.15,
+            contact_points: self._fields.16,
+            corrections_policy: self._fields.17,
+            department: self._fields.18,
+            description: self._fields.19,
+            disambiguating_description: self._fields.20,
+            dissolution_date: self._fields.21,
+            diversity_policy: self._fields.22,
+            diversity_staffing_report: self._fields.23,
+            duns: self._fields.24,
+            email: self._fields.25,
+            employee: self._fields.26,
+            employees: self._fields.27,
+            ethics_policy: self._fields.28,
+            event: self._fields.29,
+            events: self._fields.30,
+            fax_number: self._fields.31,
+            founder: self._fields.32,
+            founders: self._fields.33,
+            founding_date: self._fields.34,
+            founding_location: self._fields.35,
+            funder: self._fields.36,
+            funding: self._fields.37,
+            genre: self._fields.38,
+            global_location_number: self._fields.39,
+            has_certification: self._fields.40,
+            has_credential: self._fields.41,
+            has_gs1_digital_link: self._fields.42,
+            has_member_program: self._fields.43,
+            has_merchant_return_policy: self._fields.44,
+            has_offer_catalog: self._fields.45,
+            has_pos: self._fields.46,
+            has_product_return_policy: self._fields.47,
+            has_shipping_service: self._fields.48,
+            identifier: self._fields.49,
+            image: self._fields.50,
+            interaction_statistic: self._fields.51,
+            isic_v4: self._fields.52,
+            iso6523_code: self._fields.53,
+            keywords: self._fields.54,
+            knows_about: self._fields.55,
+            knows_language: self._fields.56,
+            legal_address: self._fields.57,
+            legal_name: self._fields.58,
+            legal_representative: self._fields.59,
+            lei_code: self._fields.60,
+            location: self._fields.61,
+            logo: self._fields.62,
+            main_entity_of_page: self._fields.63,
+            makes_offer: self._fields.64,
+            member: self._fields.65,
+            member_of: self._fields.66,
+            members: self._fields.67,
+            music_group_member: self._fields.68,
+            naics: self._fields.69,
+            name: self._fields.70,
+            nonprofit_status: self._fields.71,
+            number_of_employees: self._fields.72,
+            ownership_funding_info: self._fields.73,
+            owns: self._fields.74,
+            parent_organization: self._fields.75,
+            potential_action: self._fields.76,
+            publishing_principles: self._fields.77,
+            review: self._fields.78,
+            reviews: self._fields.79,
+            same_as: self._fields.80,
+            seeks: self._fields.81,
+            service_area: self._fields.82,
+            skills: self._fields.83,
+            slogan: self._fields.84,
+            sponsor: self._fields.85,
+            sub_organization: self._fields.86,
+            subject_of: self._fields.87,
+            tax_id: self._fields.88,
+            telephone: self._fields.89,
+            track: self._fields.90,
+            tracks: self._fields.91,
+            unnamed_sources_policy: self._fields.92,
+            url: self._fields.93,
+            vat_id: self._fields.94,
             extra_data: Default::default(),
         }
     }
@@ -5959,101 +5962,101 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> MusicGroup<'a> {
         MusicGroup {
-            accepted_payment_method: self.__unsafe_private_named.0,
-            actionable_feedback_policy: self.__unsafe_private_named.1,
-            additional_type: self.__unsafe_private_named.2,
-            address: self.__unsafe_private_named.3,
-            agent_interaction_statistic: self.__unsafe_private_named.4,
-            aggregate_rating: self.__unsafe_private_named.5,
-            album: self.__unsafe_private_named.6,
-            albums: self.__unsafe_private_named.7,
-            alternate_name: self.__unsafe_private_named.8,
-            alumni: self.__unsafe_private_named.9,
-            area_served: self.__unsafe_private_named.10,
-            award: self.__unsafe_private_named.11,
-            awards: self.__unsafe_private_named.12,
-            brand: self.__unsafe_private_named.13,
-            company_registration: self.__unsafe_private_named.14,
-            contact_point: self.__unsafe_private_named.15,
-            contact_points: self.__unsafe_private_named.16,
-            corrections_policy: self.__unsafe_private_named.17,
-            department: self.__unsafe_private_named.18,
-            description: self.__unsafe_private_named.19,
-            disambiguating_description: self.__unsafe_private_named.20,
-            dissolution_date: self.__unsafe_private_named.21,
-            diversity_policy: self.__unsafe_private_named.22,
-            diversity_staffing_report: self.__unsafe_private_named.23,
-            duns: self.__unsafe_private_named.24,
-            email: self.__unsafe_private_named.25,
-            employee: self.__unsafe_private_named.26,
-            employees: self.__unsafe_private_named.27,
-            ethics_policy: self.__unsafe_private_named.28,
-            event: self.__unsafe_private_named.29,
-            events: self.__unsafe_private_named.30,
-            fax_number: self.__unsafe_private_named.31,
-            founder: self.__unsafe_private_named.32,
-            founders: self.__unsafe_private_named.33,
-            founding_date: self.__unsafe_private_named.34,
-            founding_location: self.__unsafe_private_named.35,
-            funder: self.__unsafe_private_named.36,
-            funding: self.__unsafe_private_named.37,
-            genre: self.__unsafe_private_named.38,
-            global_location_number: self.__unsafe_private_named.39,
-            has_certification: self.__unsafe_private_named.40,
-            has_credential: self.__unsafe_private_named.41,
-            has_gs1_digital_link: self.__unsafe_private_named.42,
-            has_member_program: self.__unsafe_private_named.43,
-            has_merchant_return_policy: self.__unsafe_private_named.44,
-            has_offer_catalog: self.__unsafe_private_named.45,
-            has_pos: self.__unsafe_private_named.46,
-            has_product_return_policy: self.__unsafe_private_named.47,
-            has_shipping_service: self.__unsafe_private_named.48,
-            identifier: self.__unsafe_private_named.49,
-            image: self.__unsafe_private_named.50,
-            interaction_statistic: self.__unsafe_private_named.51,
-            isic_v4: self.__unsafe_private_named.52,
-            iso6523_code: self.__unsafe_private_named.53,
-            keywords: self.__unsafe_private_named.54,
-            knows_about: self.__unsafe_private_named.55,
-            knows_language: self.__unsafe_private_named.56,
-            legal_address: self.__unsafe_private_named.57,
-            legal_name: self.__unsafe_private_named.58,
-            legal_representative: self.__unsafe_private_named.59,
-            lei_code: self.__unsafe_private_named.60,
-            location: self.__unsafe_private_named.61,
-            logo: self.__unsafe_private_named.62,
-            main_entity_of_page: self.__unsafe_private_named.63,
-            makes_offer: self.__unsafe_private_named.64,
-            member: self.__unsafe_private_named.65,
-            member_of: self.__unsafe_private_named.66,
-            members: self.__unsafe_private_named.67,
-            music_group_member: self.__unsafe_private_named.68,
-            naics: self.__unsafe_private_named.69,
-            name: self.__unsafe_private_named.70,
-            nonprofit_status: self.__unsafe_private_named.71,
-            number_of_employees: self.__unsafe_private_named.72,
-            ownership_funding_info: self.__unsafe_private_named.73,
-            owns: self.__unsafe_private_named.74,
-            parent_organization: self.__unsafe_private_named.75,
-            potential_action: self.__unsafe_private_named.76,
-            publishing_principles: self.__unsafe_private_named.77,
-            review: self.__unsafe_private_named.78,
-            reviews: self.__unsafe_private_named.79,
-            same_as: self.__unsafe_private_named.80,
-            seeks: self.__unsafe_private_named.81,
-            service_area: self.__unsafe_private_named.82,
-            skills: self.__unsafe_private_named.83,
-            slogan: self.__unsafe_private_named.84,
-            sponsor: self.__unsafe_private_named.85,
-            sub_organization: self.__unsafe_private_named.86,
-            subject_of: self.__unsafe_private_named.87,
-            tax_id: self.__unsafe_private_named.88,
-            telephone: self.__unsafe_private_named.89,
-            track: self.__unsafe_private_named.90,
-            tracks: self.__unsafe_private_named.91,
-            unnamed_sources_policy: self.__unsafe_private_named.92,
-            url: self.__unsafe_private_named.93,
-            vat_id: self.__unsafe_private_named.94,
+            accepted_payment_method: self._fields.0,
+            actionable_feedback_policy: self._fields.1,
+            additional_type: self._fields.2,
+            address: self._fields.3,
+            agent_interaction_statistic: self._fields.4,
+            aggregate_rating: self._fields.5,
+            album: self._fields.6,
+            albums: self._fields.7,
+            alternate_name: self._fields.8,
+            alumni: self._fields.9,
+            area_served: self._fields.10,
+            award: self._fields.11,
+            awards: self._fields.12,
+            brand: self._fields.13,
+            company_registration: self._fields.14,
+            contact_point: self._fields.15,
+            contact_points: self._fields.16,
+            corrections_policy: self._fields.17,
+            department: self._fields.18,
+            description: self._fields.19,
+            disambiguating_description: self._fields.20,
+            dissolution_date: self._fields.21,
+            diversity_policy: self._fields.22,
+            diversity_staffing_report: self._fields.23,
+            duns: self._fields.24,
+            email: self._fields.25,
+            employee: self._fields.26,
+            employees: self._fields.27,
+            ethics_policy: self._fields.28,
+            event: self._fields.29,
+            events: self._fields.30,
+            fax_number: self._fields.31,
+            founder: self._fields.32,
+            founders: self._fields.33,
+            founding_date: self._fields.34,
+            founding_location: self._fields.35,
+            funder: self._fields.36,
+            funding: self._fields.37,
+            genre: self._fields.38,
+            global_location_number: self._fields.39,
+            has_certification: self._fields.40,
+            has_credential: self._fields.41,
+            has_gs1_digital_link: self._fields.42,
+            has_member_program: self._fields.43,
+            has_merchant_return_policy: self._fields.44,
+            has_offer_catalog: self._fields.45,
+            has_pos: self._fields.46,
+            has_product_return_policy: self._fields.47,
+            has_shipping_service: self._fields.48,
+            identifier: self._fields.49,
+            image: self._fields.50,
+            interaction_statistic: self._fields.51,
+            isic_v4: self._fields.52,
+            iso6523_code: self._fields.53,
+            keywords: self._fields.54,
+            knows_about: self._fields.55,
+            knows_language: self._fields.56,
+            legal_address: self._fields.57,
+            legal_name: self._fields.58,
+            legal_representative: self._fields.59,
+            lei_code: self._fields.60,
+            location: self._fields.61,
+            logo: self._fields.62,
+            main_entity_of_page: self._fields.63,
+            makes_offer: self._fields.64,
+            member: self._fields.65,
+            member_of: self._fields.66,
+            members: self._fields.67,
+            music_group_member: self._fields.68,
+            naics: self._fields.69,
+            name: self._fields.70,
+            nonprofit_status: self._fields.71,
+            number_of_employees: self._fields.72,
+            ownership_funding_info: self._fields.73,
+            owns: self._fields.74,
+            parent_organization: self._fields.75,
+            potential_action: self._fields.76,
+            publishing_principles: self._fields.77,
+            review: self._fields.78,
+            reviews: self._fields.79,
+            same_as: self._fields.80,
+            seeks: self._fields.81,
+            service_area: self._fields.82,
+            skills: self._fields.83,
+            slogan: self._fields.84,
+            sponsor: self._fields.85,
+            sub_organization: self._fields.86,
+            subject_of: self._fields.87,
+            tax_id: self._fields.88,
+            telephone: self._fields.89,
+            track: self._fields.90,
+            tracks: self._fields.91,
+            unnamed_sources_policy: self._fields.92,
+            url: self._fields.93,
+            vat_id: self._fields.94,
             extra_data: Some(extra_data),
         }
     }

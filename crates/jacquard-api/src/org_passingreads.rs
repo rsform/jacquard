@@ -8,7 +8,11 @@
 pub mod actor;
 pub mod book;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -193,9 +197,9 @@ pub mod actor_state {
 
 /// Builder for constructing an instance of this type
 pub struct ActorBuilder<'a, S: actor_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>, Option<CowStr<'a>>, Option<Handle<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<CowStr<'a>>, Option<Handle<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Actor<'a> {
@@ -209,9 +213,9 @@ impl<'a> ActorBuilder<'a, actor_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ActorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -226,11 +230,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> ActorBuilder<'a, actor_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ActorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -238,12 +242,12 @@ where
 impl<'a, S: actor_state::State> ActorBuilder<'a, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
     pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -251,12 +255,12 @@ impl<'a, S: actor_state::State> ActorBuilder<'a, S> {
 impl<'a, S: actor_state::State> ActorBuilder<'a, S> {
     /// Set the `handle` field (optional)
     pub fn handle(mut self, value: impl Into<Option<Handle<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `handle` field to an Option value (optional)
     pub fn maybe_handle(mut self, value: Option<Handle<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -269,9 +273,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Actor<'a> {
         Actor {
-            did: self.__unsafe_private_named.0.unwrap(),
-            display_name: self.__unsafe_private_named.1,
-            handle: self.__unsafe_private_named.2,
+            did: self._fields.0.unwrap(),
+            display_name: self._fields.1,
+            handle: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -284,9 +288,9 @@ where
         >,
     ) -> Actor<'a> {
         Actor {
-            did: self.__unsafe_private_named.0.unwrap(),
-            display_name: self.__unsafe_private_named.1,
-            handle: self.__unsafe_private_named.2,
+            did: self._fields.0.unwrap(),
+            display_name: self._fields.1,
+            handle: self._fields.2,
             extra_data: Some(extra_data),
         }
     }
@@ -469,9 +473,9 @@ pub mod aspect_ratio_state {
 
 /// Builder for constructing an instance of this type
 pub struct AspectRatioBuilder<'a, S: aspect_ratio_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> AspectRatio<'a> {
@@ -485,9 +489,9 @@ impl<'a> AspectRatioBuilder<'a, aspect_ratio_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AspectRatioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -502,11 +506,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetHeight<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AspectRatioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -521,11 +525,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetWidth<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AspectRatioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -539,8 +543,8 @@ where
     /// Build the final struct
     pub fn build(self) -> AspectRatio<'a> {
         AspectRatio {
-            height: self.__unsafe_private_named.0.unwrap(),
-            width: self.__unsafe_private_named.1.unwrap(),
+            height: self._fields.0.unwrap(),
+            width: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -553,8 +557,8 @@ where
         >,
     ) -> AspectRatio<'a> {
         AspectRatio {
-            height: self.__unsafe_private_named.0.unwrap(),
-            width: self.__unsafe_private_named.1.unwrap(),
+            height: self._fields.0.unwrap(),
+            width: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -570,45 +574,45 @@ pub mod location_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BookCount;
         type H3;
+        type BookCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BookCount = Unset;
         type H3 = Unset;
-    }
-    ///State transition - sets the `book_count` field to Set
-    pub struct SetBookCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBookCount<S> {}
-    impl<S: State> State for SetBookCount<S> {
-        type BookCount = Set<members::book_count>;
-        type H3 = S::H3;
+        type BookCount = Unset;
     }
     ///State transition - sets the `h3` field to Set
     pub struct SetH3<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetH3<S> {}
     impl<S: State> State for SetH3<S> {
-        type BookCount = S::BookCount;
         type H3 = Set<members::h3>;
+        type BookCount = S::BookCount;
+    }
+    ///State transition - sets the `book_count` field to Set
+    pub struct SetBookCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBookCount<S> {}
+    impl<S: State> State for SetBookCount<S> {
+        type H3 = S::H3;
+        type BookCount = Set<members::book_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `book_count` field
-        pub struct book_count(());
         ///Marker type for the `h3` field
         pub struct h3(());
+        ///Marker type for the `book_count` field
+        pub struct book_count(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LocationEntryBuilder<'a, S: location_entry_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LocationEntry<'a> {
@@ -622,9 +626,9 @@ impl<'a> LocationEntryBuilder<'a, location_entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LocationEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -639,11 +643,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> LocationEntryBuilder<'a, location_entry_state::SetBookCount<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LocationEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -658,11 +662,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LocationEntryBuilder<'a, location_entry_state::SetH3<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LocationEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -670,14 +674,14 @@ where
 impl<'a, S> LocationEntryBuilder<'a, S>
 where
     S: location_entry_state::State,
-    S::BookCount: location_entry_state::IsSet,
     S::H3: location_entry_state::IsSet,
+    S::BookCount: location_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LocationEntry<'a> {
         LocationEntry {
-            book_count: self.__unsafe_private_named.0.unwrap(),
-            h3: self.__unsafe_private_named.1.unwrap(),
+            book_count: self._fields.0.unwrap(),
+            h3: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -690,8 +694,8 @@ where
         >,
     ) -> LocationEntry<'a> {
         LocationEntry {
-            book_count: self.__unsafe_private_named.0.unwrap(),
-            h3: self.__unsafe_private_named.1.unwrap(),
+            book_count: self._fields.0.unwrap(),
+            h3: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

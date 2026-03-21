@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -191,65 +194,65 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SimNames;
-        type CreatedAt;
         type ActorDid;
+        type CreatedAt;
+        type SimNames;
         type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SimNames = Unset;
-        type CreatedAt = Unset;
         type ActorDid = Unset;
+        type CreatedAt = Unset;
+        type SimNames = Unset;
         type Type = Unset;
     }
-    ///State transition - sets the `sim_names` field to Set
-    pub struct SetSimNames<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSimNames<S> {}
-    impl<S: State> State for SetSimNames<S> {
-        type SimNames = Set<members::sim_names>;
+    ///State transition - sets the `actor_did` field to Set
+    pub struct SetActorDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActorDid<S> {}
+    impl<S: State> State for SetActorDid<S> {
+        type ActorDid = Set<members::actor_did>;
         type CreatedAt = S::CreatedAt;
-        type ActorDid = S::ActorDid;
+        type SimNames = S::SimNames;
         type Type = S::Type;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type SimNames = S::SimNames;
-        type CreatedAt = Set<members::created_at>;
         type ActorDid = S::ActorDid;
+        type CreatedAt = Set<members::created_at>;
+        type SimNames = S::SimNames;
         type Type = S::Type;
     }
-    ///State transition - sets the `actor_did` field to Set
-    pub struct SetActorDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActorDid<S> {}
-    impl<S: State> State for SetActorDid<S> {
-        type SimNames = S::SimNames;
+    ///State transition - sets the `sim_names` field to Set
+    pub struct SetSimNames<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSimNames<S> {}
+    impl<S: State> State for SetSimNames<S> {
+        type ActorDid = S::ActorDid;
         type CreatedAt = S::CreatedAt;
-        type ActorDid = Set<members::actor_did>;
+        type SimNames = Set<members::sim_names>;
         type Type = S::Type;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type SimNames = S::SimNames;
-        type CreatedAt = S::CreatedAt;
         type ActorDid = S::ActorDid;
+        type CreatedAt = S::CreatedAt;
+        type SimNames = S::SimNames;
         type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `sim_names` field
-        pub struct sim_names(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `actor_did` field
         pub struct actor_did(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `sim_names` field
+        pub struct sim_names(());
         ///Marker type for the `type` field
         pub struct r#type(());
     }
@@ -257,8 +260,8 @@ pub mod event_state {
 
 /// Builder for constructing an instance of this type
 pub struct EventBuilder<'a, S: event_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
@@ -269,7 +272,7 @@ pub struct EventBuilder<'a, S: event_state::State> {
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Event<'a> {
@@ -283,19 +286,9 @@ impl<'a> EventBuilder<'a, event_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -310,11 +303,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EventBuilder<'a, event_state::SetActorDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -322,12 +315,12 @@ where
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `content` field (optional)
     pub fn content(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `content` field to an Option value (optional)
     pub fn maybe_content(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -342,11 +335,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> EventBuilder<'a, event_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -354,12 +347,12 @@ where
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `proposalTitle` field (optional)
     pub fn proposal_title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `proposalTitle` field to an Option value (optional)
     pub fn maybe_proposal_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -367,12 +360,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `round` field (optional)
     pub fn round(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `round` field to an Option value (optional)
     pub fn maybe_round(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -387,11 +380,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> EventBuilder<'a, event_state::SetSimNames<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -399,12 +392,12 @@ where
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `simUris` field (optional)
     pub fn sim_uris(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `simUris` field to an Option value (optional)
     pub fn maybe_sim_uris(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -419,11 +412,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EventBuilder<'a, event_state::SetType<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -431,12 +424,12 @@ where
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `userMessage` field (optional)
     pub fn user_message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `userMessage` field to an Option value (optional)
     pub fn maybe_user_message(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -444,23 +437,23 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
-    S::SimNames: event_state::IsSet,
-    S::CreatedAt: event_state::IsSet,
     S::ActorDid: event_state::IsSet,
+    S::CreatedAt: event_state::IsSet,
+    S::SimNames: event_state::IsSet,
     S::Type: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
         Event {
-            actor_did: self.__unsafe_private_named.0.unwrap(),
-            content: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            proposal_title: self.__unsafe_private_named.3,
-            round: self.__unsafe_private_named.4,
-            sim_names: self.__unsafe_private_named.5.unwrap(),
-            sim_uris: self.__unsafe_private_named.6,
-            r#type: self.__unsafe_private_named.7.unwrap(),
-            user_message: self.__unsafe_private_named.8,
+            actor_did: self._fields.0.unwrap(),
+            content: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            proposal_title: self._fields.3,
+            round: self._fields.4,
+            sim_names: self._fields.5.unwrap(),
+            sim_uris: self._fields.6,
+            r#type: self._fields.7.unwrap(),
+            user_message: self._fields.8,
             extra_data: Default::default(),
         }
     }
@@ -473,15 +466,15 @@ where
         >,
     ) -> Event<'a> {
         Event {
-            actor_did: self.__unsafe_private_named.0.unwrap(),
-            content: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            proposal_title: self.__unsafe_private_named.3,
-            round: self.__unsafe_private_named.4,
-            sim_names: self.__unsafe_private_named.5.unwrap(),
-            sim_uris: self.__unsafe_private_named.6,
-            r#type: self.__unsafe_private_named.7.unwrap(),
-            user_message: self.__unsafe_private_named.8,
+            actor_did: self._fields.0.unwrap(),
+            content: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            proposal_title: self._fields.3,
+            round: self._fields.4,
+            sim_names: self._fields.5.unwrap(),
+            sim_uris: self._fields.6,
+            r#type: self._fields.7.unwrap(),
+            user_message: self._fields.8,
             extra_data: Some(extra_data),
         }
     }

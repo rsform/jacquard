@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -418,44 +421,44 @@ pub mod recording_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artists;
         type Title;
+        type Artists;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artists = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `artists` field to Set
-    pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtists<S> {}
-    impl<S: State> State for SetArtists<S> {
-        type Artists = Set<members::artists>;
-        type Title = S::Title;
+        type Artists = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Artists = S::Artists;
         type Title = Set<members::title>;
+        type Artists = S::Artists;
+    }
+    ///State transition - sets the `artists` field to Set
+    pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtists<S> {}
+    impl<S: State> State for SetArtists<S> {
+        type Title = S::Title;
+        type Artists = Set<members::artists>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artists` field
-        pub struct artists(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `artists` field
+        pub struct artists(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RecordingBuilder<'a, S: recording_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<recording::Artist<'a>>>,
         Option<BlobRef<'a>>,
         Option<i64>,
@@ -464,7 +467,7 @@ pub struct RecordingBuilder<'a, S: recording_state::State> {
         Option<Song<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Recording<'a> {
@@ -478,9 +481,9 @@ impl<'a> RecordingBuilder<'a, recording_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RecordingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -495,11 +498,11 @@ where
         mut self,
         value: impl Into<Vec<recording::Artist<'a>>>,
     ) -> RecordingBuilder<'a, recording_state::SetArtists<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RecordingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -507,12 +510,12 @@ where
 impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
     /// Set the `audioFile` field (optional)
     pub fn audio_file(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `audioFile` field to an Option value (optional)
     pub fn maybe_audio_file(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -520,12 +523,12 @@ impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
 impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
     /// Set the `duration` field (optional)
     pub fn duration(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `duration` field to an Option value (optional)
     pub fn maybe_duration(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -533,12 +536,12 @@ impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
 impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
     /// Set the `isrc` field (optional)
     pub fn isrc(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `isrc` field to an Option value (optional)
     pub fn maybe_isrc(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -549,7 +552,7 @@ impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
         mut self,
         value: impl Into<Option<recording::MasterOwnerInfo<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `masterOwner` field to an Option value (optional)
@@ -557,7 +560,7 @@ impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
         mut self,
         value: Option<recording::MasterOwnerInfo<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -565,12 +568,12 @@ impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
 impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
     /// Set the `song` field (optional)
     pub fn song(mut self, value: impl Into<Option<Song<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `song` field to an Option value (optional)
     pub fn maybe_song(mut self, value: Option<Song<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -585,11 +588,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RecordingBuilder<'a, recording_state::SetTitle<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         RecordingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -597,19 +600,19 @@ where
 impl<'a, S> RecordingBuilder<'a, S>
 where
     S: recording_state::State,
-    S::Artists: recording_state::IsSet,
     S::Title: recording_state::IsSet,
+    S::Artists: recording_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Recording<'a> {
         Recording {
-            artists: self.__unsafe_private_named.0.unwrap(),
-            audio_file: self.__unsafe_private_named.1,
-            duration: self.__unsafe_private_named.2,
-            isrc: self.__unsafe_private_named.3,
-            master_owner: self.__unsafe_private_named.4,
-            song: self.__unsafe_private_named.5,
-            title: self.__unsafe_private_named.6.unwrap(),
+            artists: self._fields.0.unwrap(),
+            audio_file: self._fields.1,
+            duration: self._fields.2,
+            isrc: self._fields.3,
+            master_owner: self._fields.4,
+            song: self._fields.5,
+            title: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -622,13 +625,13 @@ where
         >,
     ) -> Recording<'a> {
         Recording {
-            artists: self.__unsafe_private_named.0.unwrap(),
-            audio_file: self.__unsafe_private_named.1,
-            duration: self.__unsafe_private_named.2,
-            isrc: self.__unsafe_private_named.3,
-            master_owner: self.__unsafe_private_named.4,
-            song: self.__unsafe_private_named.5,
-            title: self.__unsafe_private_named.6.unwrap(),
+            artists: self._fields.0.unwrap(),
+            audio_file: self._fields.1,
+            duration: self._fields.2,
+            isrc: self._fields.3,
+            master_owner: self._fields.4,
+            song: self._fields.5,
+            title: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -206,58 +209,58 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type AspectRatio;
         type Image;
+        type AspectRatio;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type AspectRatio = Unset;
         type Image = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type AspectRatio = S::AspectRatio;
-        type Image = S::Image;
-    }
-    ///State transition - sets the `aspect_ratio` field to Set
-    pub struct SetAspectRatio<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAspectRatio<S> {}
-    impl<S: State> State for SetAspectRatio<S> {
-        type CreatedAt = S::CreatedAt;
-        type AspectRatio = Set<members::aspect_ratio>;
-        type Image = S::Image;
+        type AspectRatio = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
-        type CreatedAt = S::CreatedAt;
-        type AspectRatio = S::AspectRatio;
         type Image = Set<members::image>;
+        type AspectRatio = S::AspectRatio;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `aspect_ratio` field to Set
+    pub struct SetAspectRatio<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAspectRatio<S> {}
+    impl<S: State> State for SetAspectRatio<S> {
+        type Image = S::Image;
+        type AspectRatio = Set<members::aspect_ratio>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Image = S::Image;
+        type AspectRatio = S::AspectRatio;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `aspect_ratio` field
-        pub struct aspect_ratio(());
         ///Marker type for the `image` field
         pub struct image(());
+        ///Marker type for the `aspect_ratio` field
+        pub struct aspect_ratio(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PostBuilder<'a, S: post_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AspectRatio<'a>>,
         Option<Datetime>,
         Option<BlobRef<'a>>,
@@ -266,7 +269,7 @@ pub struct PostBuilder<'a, S: post_state::State> {
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Post<'a> {
@@ -280,9 +283,9 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -297,11 +300,11 @@ where
         mut self,
         value: impl Into<AspectRatio<'a>>,
     ) -> PostBuilder<'a, post_state::SetAspectRatio<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -316,11 +319,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PostBuilder<'a, post_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -335,11 +338,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> PostBuilder<'a, post_state::SetImage<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -347,12 +350,12 @@ where
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `linkedPost` field (optional)
     pub fn linked_post(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `linkedPost` field to an Option value (optional)
     pub fn maybe_linked_post(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -360,12 +363,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
     pub fn maybe_subject(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -373,12 +376,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -386,12 +389,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
     pub fn maybe_text(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -399,20 +402,20 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::CreatedAt: post_state::IsSet,
-    S::AspectRatio: post_state::IsSet,
     S::Image: post_state::IsSet,
+    S::AspectRatio: post_state::IsSet,
+    S::CreatedAt: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
         Post {
-            aspect_ratio: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            image: self.__unsafe_private_named.2.unwrap(),
-            linked_post: self.__unsafe_private_named.3,
-            subject: self.__unsafe_private_named.4,
-            tags: self.__unsafe_private_named.5,
-            text: self.__unsafe_private_named.6,
+            aspect_ratio: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            image: self._fields.2.unwrap(),
+            linked_post: self._fields.3,
+            subject: self._fields.4,
+            tags: self._fields.5,
+            text: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -425,13 +428,13 @@ where
         >,
     ) -> Post<'a> {
         Post {
-            aspect_ratio: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            image: self.__unsafe_private_named.2.unwrap(),
-            linked_post: self.__unsafe_private_named.3,
-            subject: self.__unsafe_private_named.4,
-            tags: self.__unsafe_private_named.5,
-            text: self.__unsafe_private_named.6,
+            aspect_ratio: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            image: self._fields.2.unwrap(),
+            linked_post: self._fields.3,
+            subject: self._fields.4,
+            tags: self._fields.5,
+            text: self._fields.6,
             extra_data: Some(extra_data),
         }
     }

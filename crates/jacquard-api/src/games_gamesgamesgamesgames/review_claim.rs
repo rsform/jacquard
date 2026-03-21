@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::AtUri;
@@ -165,50 +168,50 @@ pub mod review_claim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Claim;
         type Status;
+        type Claim;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Claim = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `claim` field to Set
-    pub struct SetClaim<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClaim<S> {}
-    impl<S: State> State for SetClaim<S> {
-        type Claim = Set<members::claim>;
-        type Status = S::Status;
+        type Claim = Unset;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type Claim = S::Claim;
         type Status = Set<members::status>;
+        type Claim = S::Claim;
+    }
+    ///State transition - sets the `claim` field to Set
+    pub struct SetClaim<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetClaim<S> {}
+    impl<S: State> State for SetClaim<S> {
+        type Status = S::Status;
+        type Claim = Set<members::claim>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `claim` field
-        pub struct claim(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `claim` field
+        pub struct claim(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ReviewClaimBuilder<'a, S: review_claim_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<AtUri<'a>>>,
         Option<StrongRef<'a>>,
         Option<CowStr<'a>>,
         Option<ReviewClaimStatus<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ReviewClaim<'a> {
@@ -222,9 +225,9 @@ impl<'a> ReviewClaimBuilder<'a, review_claim_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ReviewClaimBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -232,12 +235,12 @@ impl<'a> ReviewClaimBuilder<'a, review_claim_state::Empty> {
 impl<'a, S: review_claim_state::State> ReviewClaimBuilder<'a, S> {
     /// Set the `approvedGames` field (optional)
     pub fn approved_games(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `approvedGames` field to an Option value (optional)
     pub fn maybe_approved_games(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -252,11 +255,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> ReviewClaimBuilder<'a, review_claim_state::SetClaim<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ReviewClaimBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -264,12 +267,12 @@ where
 impl<'a, S: review_claim_state::State> ReviewClaimBuilder<'a, S> {
     /// Set the `reason` field (optional)
     pub fn reason(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `reason` field to an Option value (optional)
     pub fn maybe_reason(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -284,11 +287,11 @@ where
         mut self,
         value: impl Into<ReviewClaimStatus<'a>>,
     ) -> ReviewClaimBuilder<'a, review_claim_state::SetStatus<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ReviewClaimBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -296,16 +299,16 @@ where
 impl<'a, S> ReviewClaimBuilder<'a, S>
 where
     S: review_claim_state::State,
-    S::Claim: review_claim_state::IsSet,
     S::Status: review_claim_state::IsSet,
+    S::Claim: review_claim_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReviewClaim<'a> {
         ReviewClaim {
-            approved_games: self.__unsafe_private_named.0,
-            claim: self.__unsafe_private_named.1.unwrap(),
-            reason: self.__unsafe_private_named.2,
-            status: self.__unsafe_private_named.3.unwrap(),
+            approved_games: self._fields.0,
+            claim: self._fields.1.unwrap(),
+            reason: self._fields.2,
+            status: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -318,10 +321,10 @@ where
         >,
     ) -> ReviewClaim<'a> {
         ReviewClaim {
-            approved_games: self.__unsafe_private_named.0,
-            claim: self.__unsafe_private_named.1.unwrap(),
-            reason: self.__unsafe_private_named.2,
-            status: self.__unsafe_private_named.3.unwrap(),
+            approved_games: self._fields.0,
+            claim: self._fields.1.unwrap(),
+            reason: self._fields.2,
+            status: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

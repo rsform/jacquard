@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -523,65 +526,65 @@ pub mod blob_reference_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type MediaType;
         type Size;
         type Digest;
-        type MediaType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type MediaType = Unset;
         type Size = Unset;
         type Digest = Unset;
-        type MediaType = Unset;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Size = Set<members::size>;
-        type Digest = S::Digest;
-        type MediaType = S::MediaType;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type Size = S::Size;
-        type Digest = Set<members::digest>;
-        type MediaType = S::MediaType;
     }
     ///State transition - sets the `media_type` field to Set
     pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMediaType<S> {}
     impl<S: State> State for SetMediaType<S> {
+        type MediaType = Set<members::media_type>;
         type Size = S::Size;
         type Digest = S::Digest;
-        type MediaType = Set<members::media_type>;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type MediaType = S::MediaType;
+        type Size = Set<members::size>;
+        type Digest = S::Digest;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type MediaType = S::MediaType;
+        type Size = S::Size;
+        type Digest = Set<members::digest>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `media_type` field
+        pub struct media_type(());
         ///Marker type for the `size` field
         pub struct size(());
         ///Marker type for the `digest` field
         pub struct digest(());
-        ///Marker type for the `media_type` field
-        pub struct media_type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BlobReferenceBuilder<'a, S: blob_reference_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Data<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<i64>,
         Option<Vec<UriValue<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> BlobReference<'a> {
@@ -595,9 +598,9 @@ impl<'a> BlobReferenceBuilder<'a, blob_reference_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BlobReferenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -605,12 +608,12 @@ impl<'a> BlobReferenceBuilder<'a, blob_reference_state::Empty> {
 impl<'a, S: blob_reference_state::State> BlobReferenceBuilder<'a, S> {
     /// Set the `annotations` field (optional)
     pub fn annotations(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `annotations` field to an Option value (optional)
     pub fn maybe_annotations(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -625,11 +628,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BlobReferenceBuilder<'a, blob_reference_state::SetDigest<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         BlobReferenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -644,11 +647,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BlobReferenceBuilder<'a, blob_reference_state::SetMediaType<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         BlobReferenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -663,11 +666,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> BlobReferenceBuilder<'a, blob_reference_state::SetSize<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         BlobReferenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -675,12 +678,12 @@ where
 impl<'a, S: blob_reference_state::State> BlobReferenceBuilder<'a, S> {
     /// Set the `urls` field (optional)
     pub fn urls(mut self, value: impl Into<Option<Vec<UriValue<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `urls` field to an Option value (optional)
     pub fn maybe_urls(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -688,18 +691,18 @@ impl<'a, S: blob_reference_state::State> BlobReferenceBuilder<'a, S> {
 impl<'a, S> BlobReferenceBuilder<'a, S>
 where
     S: blob_reference_state::State,
+    S::MediaType: blob_reference_state::IsSet,
     S::Size: blob_reference_state::IsSet,
     S::Digest: blob_reference_state::IsSet,
-    S::MediaType: blob_reference_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BlobReference<'a> {
         BlobReference {
-            annotations: self.__unsafe_private_named.0,
-            digest: self.__unsafe_private_named.1.unwrap(),
-            media_type: self.__unsafe_private_named.2.unwrap(),
-            size: self.__unsafe_private_named.3.unwrap(),
-            urls: self.__unsafe_private_named.4,
+            annotations: self._fields.0,
+            digest: self._fields.1.unwrap(),
+            media_type: self._fields.2.unwrap(),
+            size: self._fields.3.unwrap(),
+            urls: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -709,11 +712,11 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> BlobReference<'a> {
         BlobReference {
-            annotations: self.__unsafe_private_named.0,
-            digest: self.__unsafe_private_named.1.unwrap(),
-            media_type: self.__unsafe_private_named.2.unwrap(),
-            size: self.__unsafe_private_named.3.unwrap(),
-            urls: self.__unsafe_private_named.4,
+            annotations: self._fields.0,
+            digest: self._fields.1.unwrap(),
+            media_type: self._fields.2.unwrap(),
+            size: self._fields.3.unwrap(),
+            urls: self._fields.4,
             extra_data: Some(extra_data),
         }
     }
@@ -1111,83 +1114,83 @@ pub mod manifest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type SchemaVersion;
         type Digest;
+        type SchemaVersion;
         type MediaType;
+        type CreatedAt;
         type Repository;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type SchemaVersion = Unset;
         type Digest = Unset;
+        type SchemaVersion = Unset;
         type MediaType = Unset;
+        type CreatedAt = Unset;
         type Repository = Unset;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type Digest = Set<members::digest>;
         type SchemaVersion = S::SchemaVersion;
-        type Digest = S::Digest;
         type MediaType = S::MediaType;
+        type CreatedAt = S::CreatedAt;
         type Repository = S::Repository;
     }
     ///State transition - sets the `schema_version` field to Set
     pub struct SetSchemaVersion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSchemaVersion<S> {}
     impl<S: State> State for SetSchemaVersion<S> {
-        type CreatedAt = S::CreatedAt;
-        type SchemaVersion = Set<members::schema_version>;
         type Digest = S::Digest;
+        type SchemaVersion = Set<members::schema_version>;
         type MediaType = S::MediaType;
-        type Repository = S::Repository;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
         type CreatedAt = S::CreatedAt;
-        type SchemaVersion = S::SchemaVersion;
-        type Digest = Set<members::digest>;
-        type MediaType = S::MediaType;
         type Repository = S::Repository;
     }
     ///State transition - sets the `media_type` field to Set
     pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMediaType<S> {}
     impl<S: State> State for SetMediaType<S> {
-        type CreatedAt = S::CreatedAt;
-        type SchemaVersion = S::SchemaVersion;
         type Digest = S::Digest;
+        type SchemaVersion = S::SchemaVersion;
         type MediaType = Set<members::media_type>;
+        type CreatedAt = S::CreatedAt;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Digest = S::Digest;
+        type SchemaVersion = S::SchemaVersion;
+        type MediaType = S::MediaType;
+        type CreatedAt = Set<members::created_at>;
         type Repository = S::Repository;
     }
     ///State transition - sets the `repository` field to Set
     pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepository<S> {}
     impl<S: State> State for SetRepository<S> {
-        type CreatedAt = S::CreatedAt;
-        type SchemaVersion = S::SchemaVersion;
         type Digest = S::Digest;
+        type SchemaVersion = S::SchemaVersion;
         type MediaType = S::MediaType;
+        type CreatedAt = S::CreatedAt;
         type Repository = Set<members::repository>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `schema_version` field
-        pub struct schema_version(());
         ///Marker type for the `digest` field
         pub struct digest(());
+        ///Marker type for the `schema_version` field
+        pub struct schema_version(());
         ///Marker type for the `media_type` field
         pub struct media_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `repository` field
         pub struct repository(());
     }
@@ -1195,8 +1198,8 @@ pub mod manifest_state {
 
 /// Builder for constructing an instance of this type
 pub struct ManifestBuilder<'a, S: manifest_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Data<'a>>,
         Option<manifest::BlobReference<'a>>,
         Option<Datetime>,
@@ -1211,7 +1214,7 @@ pub struct ManifestBuilder<'a, S: manifest_state::State> {
         Option<i64>,
         Option<manifest::BlobReference<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Manifest<'a> {
@@ -1225,8 +1228,8 @@ impl<'a> ManifestBuilder<'a, manifest_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -1241,7 +1244,7 @@ impl<'a> ManifestBuilder<'a, manifest_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1249,12 +1252,12 @@ impl<'a> ManifestBuilder<'a, manifest_state::Empty> {
 impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `annotations` field (optional)
     pub fn annotations(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `annotations` field to an Option value (optional)
     pub fn maybe_annotations(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1265,12 +1268,12 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
         mut self,
         value: impl Into<Option<manifest::BlobReference<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `config` field to an Option value (optional)
     pub fn maybe_config(mut self, value: Option<manifest::BlobReference<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1285,11 +1288,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ManifestBuilder<'a, manifest_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1304,11 +1307,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ManifestBuilder<'a, manifest_state::SetDigest<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1316,12 +1319,12 @@ where
 impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `holdDid` field (optional)
     pub fn hold_did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `holdDid` field to an Option value (optional)
     pub fn maybe_hold_did(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1329,12 +1332,12 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
 impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `holdEndpoint` field (optional)
     pub fn hold_endpoint(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `holdEndpoint` field to an Option value (optional)
     pub fn maybe_hold_endpoint(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1345,7 +1348,7 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<manifest::BlobReference<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `layers` field to an Option value (optional)
@@ -1353,7 +1356,7 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
         mut self,
         value: Option<Vec<manifest::BlobReference<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1361,12 +1364,12 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
 impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     /// Set the `manifestBlob` field (optional)
     pub fn manifest_blob(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `manifestBlob` field to an Option value (optional)
     pub fn maybe_manifest_blob(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -1377,7 +1380,7 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<manifest::ManifestReference<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `manifests` field to an Option value (optional)
@@ -1385,7 +1388,7 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
         mut self,
         value: Option<Vec<manifest::ManifestReference<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -1400,11 +1403,11 @@ where
         mut self,
         value: impl Into<ManifestMediaType<'a>>,
     ) -> ManifestBuilder<'a, manifest_state::SetMediaType<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         ManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1419,11 +1422,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ManifestBuilder<'a, manifest_state::SetRepository<S>> {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         ManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1438,11 +1441,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ManifestBuilder<'a, manifest_state::SetSchemaVersion<S>> {
-        self.__unsafe_private_named.11 = Option::Some(value.into());
+        self._fields.11 = Option::Some(value.into());
         ManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1453,12 +1456,12 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
         mut self,
         value: impl Into<Option<manifest::BlobReference<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
     pub fn maybe_subject(mut self, value: Option<manifest::BlobReference<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -1466,28 +1469,28 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
 impl<'a, S> ManifestBuilder<'a, S>
 where
     S: manifest_state::State,
-    S::CreatedAt: manifest_state::IsSet,
-    S::SchemaVersion: manifest_state::IsSet,
     S::Digest: manifest_state::IsSet,
+    S::SchemaVersion: manifest_state::IsSet,
     S::MediaType: manifest_state::IsSet,
+    S::CreatedAt: manifest_state::IsSet,
     S::Repository: manifest_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Manifest<'a> {
         Manifest {
-            annotations: self.__unsafe_private_named.0,
-            config: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            digest: self.__unsafe_private_named.3.unwrap(),
-            hold_did: self.__unsafe_private_named.4,
-            hold_endpoint: self.__unsafe_private_named.5,
-            layers: self.__unsafe_private_named.6,
-            manifest_blob: self.__unsafe_private_named.7,
-            manifests: self.__unsafe_private_named.8,
-            media_type: self.__unsafe_private_named.9.unwrap(),
-            repository: self.__unsafe_private_named.10.unwrap(),
-            schema_version: self.__unsafe_private_named.11.unwrap(),
-            subject: self.__unsafe_private_named.12,
+            annotations: self._fields.0,
+            config: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            digest: self._fields.3.unwrap(),
+            hold_did: self._fields.4,
+            hold_endpoint: self._fields.5,
+            layers: self._fields.6,
+            manifest_blob: self._fields.7,
+            manifests: self._fields.8,
+            media_type: self._fields.9.unwrap(),
+            repository: self._fields.10.unwrap(),
+            schema_version: self._fields.11.unwrap(),
+            subject: self._fields.12,
             extra_data: Default::default(),
         }
     }
@@ -1497,19 +1500,19 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Manifest<'a> {
         Manifest {
-            annotations: self.__unsafe_private_named.0,
-            config: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            digest: self.__unsafe_private_named.3.unwrap(),
-            hold_did: self.__unsafe_private_named.4,
-            hold_endpoint: self.__unsafe_private_named.5,
-            layers: self.__unsafe_private_named.6,
-            manifest_blob: self.__unsafe_private_named.7,
-            manifests: self.__unsafe_private_named.8,
-            media_type: self.__unsafe_private_named.9.unwrap(),
-            repository: self.__unsafe_private_named.10.unwrap(),
-            schema_version: self.__unsafe_private_named.11.unwrap(),
-            subject: self.__unsafe_private_named.12,
+            annotations: self._fields.0,
+            config: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            digest: self._fields.3.unwrap(),
+            hold_did: self._fields.4,
+            hold_endpoint: self._fields.5,
+            layers: self._fields.6,
+            manifest_blob: self._fields.7,
+            manifests: self._fields.8,
+            media_type: self._fields.9.unwrap(),
+            repository: self._fields.10.unwrap(),
+            schema_version: self._fields.11.unwrap(),
+            subject: self._fields.12,
             extra_data: Some(extra_data),
         }
     }
@@ -1525,65 +1528,65 @@ pub mod manifest_reference_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MediaType;
-        type Size;
         type Digest;
+        type Size;
+        type MediaType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MediaType = Unset;
-        type Size = Unset;
         type Digest = Unset;
-    }
-    ///State transition - sets the `media_type` field to Set
-    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMediaType<S> {}
-    impl<S: State> State for SetMediaType<S> {
-        type MediaType = Set<members::media_type>;
-        type Size = S::Size;
-        type Digest = S::Digest;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type MediaType = S::MediaType;
-        type Size = Set<members::size>;
-        type Digest = S::Digest;
+        type Size = Unset;
+        type MediaType = Unset;
     }
     ///State transition - sets the `digest` field to Set
     pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDigest<S> {}
     impl<S: State> State for SetDigest<S> {
-        type MediaType = S::MediaType;
-        type Size = S::Size;
         type Digest = Set<members::digest>;
+        type Size = S::Size;
+        type MediaType = S::MediaType;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type Digest = S::Digest;
+        type Size = Set<members::size>;
+        type MediaType = S::MediaType;
+    }
+    ///State transition - sets the `media_type` field to Set
+    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMediaType<S> {}
+    impl<S: State> State for SetMediaType<S> {
+        type Digest = S::Digest;
+        type Size = S::Size;
+        type MediaType = Set<members::media_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `media_type` field
-        pub struct media_type(());
-        ///Marker type for the `size` field
-        pub struct size(());
         ///Marker type for the `digest` field
         pub struct digest(());
+        ///Marker type for the `size` field
+        pub struct size(());
+        ///Marker type for the `media_type` field
+        pub struct media_type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ManifestReferenceBuilder<'a, S: manifest_reference_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Data<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<manifest::Platform<'a>>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ManifestReference<'a> {
@@ -1597,9 +1600,9 @@ impl<'a> ManifestReferenceBuilder<'a, manifest_reference_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ManifestReferenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1607,12 +1610,12 @@ impl<'a> ManifestReferenceBuilder<'a, manifest_reference_state::Empty> {
 impl<'a, S: manifest_reference_state::State> ManifestReferenceBuilder<'a, S> {
     /// Set the `annotations` field (optional)
     pub fn annotations(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `annotations` field to an Option value (optional)
     pub fn maybe_annotations(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1627,11 +1630,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ManifestReferenceBuilder<'a, manifest_reference_state::SetDigest<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ManifestReferenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1646,11 +1649,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ManifestReferenceBuilder<'a, manifest_reference_state::SetMediaType<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ManifestReferenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1658,12 +1661,12 @@ where
 impl<'a, S: manifest_reference_state::State> ManifestReferenceBuilder<'a, S> {
     /// Set the `platform` field (optional)
     pub fn platform(mut self, value: impl Into<Option<manifest::Platform<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `platform` field to an Option value (optional)
     pub fn maybe_platform(mut self, value: Option<manifest::Platform<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1678,11 +1681,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ManifestReferenceBuilder<'a, manifest_reference_state::SetSize<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ManifestReferenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1690,18 +1693,18 @@ where
 impl<'a, S> ManifestReferenceBuilder<'a, S>
 where
     S: manifest_reference_state::State,
-    S::MediaType: manifest_reference_state::IsSet,
-    S::Size: manifest_reference_state::IsSet,
     S::Digest: manifest_reference_state::IsSet,
+    S::Size: manifest_reference_state::IsSet,
+    S::MediaType: manifest_reference_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ManifestReference<'a> {
         ManifestReference {
-            annotations: self.__unsafe_private_named.0,
-            digest: self.__unsafe_private_named.1.unwrap(),
-            media_type: self.__unsafe_private_named.2.unwrap(),
-            platform: self.__unsafe_private_named.3,
-            size: self.__unsafe_private_named.4.unwrap(),
+            annotations: self._fields.0,
+            digest: self._fields.1.unwrap(),
+            media_type: self._fields.2.unwrap(),
+            platform: self._fields.3,
+            size: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1711,11 +1714,11 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ManifestReference<'a> {
         ManifestReference {
-            annotations: self.__unsafe_private_named.0,
-            digest: self.__unsafe_private_named.1.unwrap(),
-            media_type: self.__unsafe_private_named.2.unwrap(),
-            platform: self.__unsafe_private_named.3,
-            size: self.__unsafe_private_named.4.unwrap(),
+            annotations: self._fields.0,
+            digest: self._fields.1.unwrap(),
+            media_type: self._fields.2.unwrap(),
+            platform: self._fields.3,
+            size: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

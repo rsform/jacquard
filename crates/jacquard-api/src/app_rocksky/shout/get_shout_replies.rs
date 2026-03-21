@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -93,9 +96,9 @@ pub mod get_shout_replies_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetShoutRepliesBuilder<'a, S: get_shout_replies_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetShoutReplies<'a> {
@@ -109,9 +112,9 @@ impl<'a> GetShoutRepliesBuilder<'a, get_shout_replies_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetShoutRepliesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -119,12 +122,12 @@ impl<'a> GetShoutRepliesBuilder<'a, get_shout_replies_state::Empty> {
 impl<'a, S: get_shout_replies_state::State> GetShoutRepliesBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -132,12 +135,12 @@ impl<'a, S: get_shout_replies_state::State> GetShoutRepliesBuilder<'a, S> {
 impl<'a, S: get_shout_replies_state::State> GetShoutRepliesBuilder<'a, S> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `offset` field to an Option value (optional)
     pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -152,11 +155,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> GetShoutRepliesBuilder<'a, get_shout_replies_state::SetUri<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         GetShoutRepliesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -169,9 +172,9 @@ where
     /// Build the final struct
     pub fn build(self) -> GetShoutReplies<'a> {
         GetShoutReplies {
-            limit: self.__unsafe_private_named.0,
-            offset: self.__unsafe_private_named.1,
-            uri: self.__unsafe_private_named.2.unwrap(),
+            limit: self._fields.0,
+            offset: self._fields.1,
+            uri: self._fields.2.unwrap(),
         }
     }
 }

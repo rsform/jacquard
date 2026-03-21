@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::string::Handle;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -82,9 +85,9 @@ pub mod update_handle_state {
 
 /// Builder for constructing an instance of this type
 pub struct UpdateHandleBuilder<'a, S: update_handle_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Handle<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Handle<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateHandle<'a> {
@@ -98,9 +101,9 @@ impl<'a> UpdateHandleBuilder<'a, update_handle_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateHandleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -115,11 +118,11 @@ where
         mut self,
         value: impl Into<Handle<'a>>,
     ) -> UpdateHandleBuilder<'a, update_handle_state::SetHandle<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         UpdateHandleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -132,7 +135,7 @@ where
     /// Build the final struct
     pub fn build(self) -> UpdateHandle<'a> {
         UpdateHandle {
-            handle: self.__unsafe_private_named.0.unwrap(),
+            handle: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -145,7 +148,7 @@ where
         >,
     ) -> UpdateHandle<'a> {
         UpdateHandle {
-            handle: self.__unsafe_private_named.0.unwrap(),
+            handle: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

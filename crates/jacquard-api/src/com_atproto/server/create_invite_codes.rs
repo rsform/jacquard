@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -107,45 +110,45 @@ pub mod account_codes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Codes;
         type Account;
+        type Codes;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Codes = Unset;
         type Account = Unset;
-    }
-    ///State transition - sets the `codes` field to Set
-    pub struct SetCodes<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCodes<S> {}
-    impl<S: State> State for SetCodes<S> {
-        type Codes = Set<members::codes>;
-        type Account = S::Account;
+        type Codes = Unset;
     }
     ///State transition - sets the `account` field to Set
     pub struct SetAccount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAccount<S> {}
     impl<S: State> State for SetAccount<S> {
-        type Codes = S::Codes;
         type Account = Set<members::account>;
+        type Codes = S::Codes;
+    }
+    ///State transition - sets the `codes` field to Set
+    pub struct SetCodes<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCodes<S> {}
+    impl<S: State> State for SetCodes<S> {
+        type Account = S::Account;
+        type Codes = Set<members::codes>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `codes` field
-        pub struct codes(());
         ///Marker type for the `account` field
         pub struct account(());
+        ///Marker type for the `codes` field
+        pub struct codes(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AccountCodesBuilder<'a, S: account_codes_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<Vec<CowStr<'a>>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Vec<CowStr<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> AccountCodes<'a> {
@@ -159,9 +162,9 @@ impl<'a> AccountCodesBuilder<'a, account_codes_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AccountCodesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -176,11 +179,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AccountCodesBuilder<'a, account_codes_state::SetAccount<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AccountCodesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -195,11 +198,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> AccountCodesBuilder<'a, account_codes_state::SetCodes<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AccountCodesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -207,14 +210,14 @@ where
 impl<'a, S> AccountCodesBuilder<'a, S>
 where
     S: account_codes_state::State,
-    S::Codes: account_codes_state::IsSet,
     S::Account: account_codes_state::IsSet,
+    S::Codes: account_codes_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AccountCodes<'a> {
         AccountCodes {
-            account: self.__unsafe_private_named.0.unwrap(),
-            codes: self.__unsafe_private_named.1.unwrap(),
+            account: self._fields.0.unwrap(),
+            codes: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -227,8 +230,8 @@ where
         >,
     ) -> AccountCodes<'a> {
         AccountCodes {
-            account: self.__unsafe_private_named.0.unwrap(),
-            codes: self.__unsafe_private_named.1.unwrap(),
+            account: self._fields.0.unwrap(),
+            codes: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -377,9 +380,9 @@ pub mod create_invite_codes_state {
 
 /// Builder for constructing an instance of this type
 pub struct CreateInviteCodesBuilder<'a, S: create_invite_codes_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<Vec<Did<'a>>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<Vec<Did<'a>>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CreateInviteCodes<'a> {
@@ -393,9 +396,9 @@ impl<'a> CreateInviteCodesBuilder<'a, create_invite_codes_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreateInviteCodesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -410,11 +413,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CreateInviteCodesBuilder<'a, create_invite_codes_state::SetCodeCount<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CreateInviteCodesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -422,12 +425,12 @@ where
 impl<'a, S: create_invite_codes_state::State> CreateInviteCodesBuilder<'a, S> {
     /// Set the `forAccounts` field (optional)
     pub fn for_accounts(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `forAccounts` field to an Option value (optional)
     pub fn maybe_for_accounts(mut self, value: Option<Vec<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -442,11 +445,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CreateInviteCodesBuilder<'a, create_invite_codes_state::SetUseCount<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CreateInviteCodesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -460,9 +463,9 @@ where
     /// Build the final struct
     pub fn build(self) -> CreateInviteCodes<'a> {
         CreateInviteCodes {
-            code_count: self.__unsafe_private_named.0.unwrap(),
-            for_accounts: self.__unsafe_private_named.1,
-            use_count: self.__unsafe_private_named.2.unwrap(),
+            code_count: self._fields.0.unwrap(),
+            for_accounts: self._fields.1,
+            use_count: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -475,9 +478,9 @@ where
         >,
     ) -> CreateInviteCodes<'a> {
         CreateInviteCodes {
-            code_count: self.__unsafe_private_named.0.unwrap(),
-            for_accounts: self.__unsafe_private_named.1,
-            use_count: self.__unsafe_private_named.2.unwrap(),
+            code_count: self._fields.0.unwrap(),
+            for_accounts: self._fields.1,
+            use_count: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

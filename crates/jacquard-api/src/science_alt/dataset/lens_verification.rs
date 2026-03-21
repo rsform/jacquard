@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -376,74 +379,74 @@ pub mod lens_verification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Lens;
         type VerificationMethod;
-        type LensCommit;
         type CreatedAt;
+        type Lens;
+        type LensCommit;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Lens = Unset;
         type VerificationMethod = Unset;
-        type LensCommit = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `lens` field to Set
-    pub struct SetLens<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLens<S> {}
-    impl<S: State> State for SetLens<S> {
-        type Lens = Set<members::lens>;
-        type VerificationMethod = S::VerificationMethod;
-        type LensCommit = S::LensCommit;
-        type CreatedAt = S::CreatedAt;
+        type Lens = Unset;
+        type LensCommit = Unset;
     }
     ///State transition - sets the `verification_method` field to Set
     pub struct SetVerificationMethod<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVerificationMethod<S> {}
     impl<S: State> State for SetVerificationMethod<S> {
-        type Lens = S::Lens;
         type VerificationMethod = Set<members::verification_method>;
-        type LensCommit = S::LensCommit;
         type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `lens_commit` field to Set
-    pub struct SetLensCommit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLensCommit<S> {}
-    impl<S: State> State for SetLensCommit<S> {
         type Lens = S::Lens;
-        type VerificationMethod = S::VerificationMethod;
-        type LensCommit = Set<members::lens_commit>;
-        type CreatedAt = S::CreatedAt;
+        type LensCommit = S::LensCommit;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Lens = S::Lens;
         type VerificationMethod = S::VerificationMethod;
-        type LensCommit = S::LensCommit;
         type CreatedAt = Set<members::created_at>;
+        type Lens = S::Lens;
+        type LensCommit = S::LensCommit;
+    }
+    ///State transition - sets the `lens` field to Set
+    pub struct SetLens<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLens<S> {}
+    impl<S: State> State for SetLens<S> {
+        type VerificationMethod = S::VerificationMethod;
+        type CreatedAt = S::CreatedAt;
+        type Lens = Set<members::lens>;
+        type LensCommit = S::LensCommit;
+    }
+    ///State transition - sets the `lens_commit` field to Set
+    pub struct SetLensCommit<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLensCommit<S> {}
+    impl<S: State> State for SetLensCommit<S> {
+        type VerificationMethod = S::VerificationMethod;
+        type CreatedAt = S::CreatedAt;
+        type Lens = S::Lens;
+        type LensCommit = Set<members::lens_commit>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lens` field
-        pub struct lens(());
         ///Marker type for the `verification_method` field
         pub struct verification_method(());
-        ///Marker type for the `lens_commit` field
-        pub struct lens_commit(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `lens` field
+        pub struct lens(());
+        ///Marker type for the `lens_commit` field
+        pub struct lens_commit(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LensVerificationBuilder<'a, S: lens_verification_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<lens_verification::CodeHash<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -452,7 +455,7 @@ pub struct LensVerificationBuilder<'a, S: lens_verification_state::State> {
         Option<CodeReference<'a>>,
         Option<VerificationMethod<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LensVerification<'a> {
@@ -466,9 +469,9 @@ impl<'a> LensVerificationBuilder<'a, lens_verification_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LensVerificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -479,7 +482,7 @@ impl<'a, S: lens_verification_state::State> LensVerificationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<lens_verification::CodeHash<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `codeHash` field to an Option value (optional)
@@ -487,7 +490,7 @@ impl<'a, S: lens_verification_state::State> LensVerificationBuilder<'a, S> {
         mut self,
         value: Option<lens_verification::CodeHash<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -502,11 +505,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LensVerificationBuilder<'a, lens_verification_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LensVerificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -514,12 +517,12 @@ where
 impl<'a, S: lens_verification_state::State> LensVerificationBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -534,11 +537,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> LensVerificationBuilder<'a, lens_verification_state::SetLens<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         LensVerificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -553,11 +556,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LensVerificationBuilder<'a, lens_verification_state::SetLensCommit<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         LensVerificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -565,12 +568,12 @@ where
 impl<'a, S: lens_verification_state::State> LensVerificationBuilder<'a, S> {
     /// Set the `proofRef` field (optional)
     pub fn proof_ref(mut self, value: impl Into<Option<CodeReference<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `proofRef` field to an Option value (optional)
     pub fn maybe_proof_ref(mut self, value: Option<CodeReference<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -585,11 +588,11 @@ where
         mut self,
         value: impl Into<VerificationMethod<'a>>,
     ) -> LensVerificationBuilder<'a, lens_verification_state::SetVerificationMethod<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         LensVerificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -597,21 +600,21 @@ where
 impl<'a, S> LensVerificationBuilder<'a, S>
 where
     S: lens_verification_state::State,
-    S::Lens: lens_verification_state::IsSet,
     S::VerificationMethod: lens_verification_state::IsSet,
-    S::LensCommit: lens_verification_state::IsSet,
     S::CreatedAt: lens_verification_state::IsSet,
+    S::Lens: lens_verification_state::IsSet,
+    S::LensCommit: lens_verification_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LensVerification<'a> {
         LensVerification {
-            code_hash: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            lens: self.__unsafe_private_named.3.unwrap(),
-            lens_commit: self.__unsafe_private_named.4.unwrap(),
-            proof_ref: self.__unsafe_private_named.5,
-            verification_method: self.__unsafe_private_named.6.unwrap(),
+            code_hash: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            lens: self._fields.3.unwrap(),
+            lens_commit: self._fields.4.unwrap(),
+            proof_ref: self._fields.5,
+            verification_method: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -624,13 +627,13 @@ where
         >,
     ) -> LensVerification<'a> {
         LensVerification {
-            code_hash: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            lens: self.__unsafe_private_named.3.unwrap(),
-            lens_commit: self.__unsafe_private_named.4.unwrap(),
-            proof_ref: self.__unsafe_private_named.5,
-            verification_method: self.__unsafe_private_named.6.unwrap(),
+            code_hash: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            lens: self._fields.3.unwrap(),
+            lens_commit: self._fields.4.unwrap(),
+            proof_ref: self._fields.5,
+            verification_method: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

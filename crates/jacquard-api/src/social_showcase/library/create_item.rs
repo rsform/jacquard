@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::UriValue;
@@ -185,74 +188,74 @@ pub mod create_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Visibility;
         type Title;
-        type Tags;
         type Images;
+        type Visibility;
+        type Tags;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Visibility = Unset;
         type Title = Unset;
-        type Tags = Unset;
         type Images = Unset;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type Visibility = Set<members::visibility>;
-        type Title = S::Title;
-        type Tags = S::Tags;
-        type Images = S::Images;
+        type Visibility = Unset;
+        type Tags = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Visibility = S::Visibility;
         type Title = Set<members::title>;
-        type Tags = S::Tags;
         type Images = S::Images;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
         type Visibility = S::Visibility;
-        type Title = S::Title;
-        type Tags = Set<members::tags>;
-        type Images = S::Images;
+        type Tags = S::Tags;
     }
     ///State transition - sets the `images` field to Set
     pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImages<S> {}
     impl<S: State> State for SetImages<S> {
-        type Visibility = S::Visibility;
         type Title = S::Title;
-        type Tags = S::Tags;
         type Images = Set<members::images>;
+        type Visibility = S::Visibility;
+        type Tags = S::Tags;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVisibility<S> {}
+    impl<S: State> State for SetVisibility<S> {
+        type Title = S::Title;
+        type Images = S::Images;
+        type Visibility = Set<members::visibility>;
+        type Tags = S::Tags;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTags<S> {}
+    impl<S: State> State for SetTags<S> {
+        type Title = S::Title;
+        type Images = S::Images;
+        type Visibility = S::Visibility;
+        type Tags = Set<members::tags>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `tags` field
-        pub struct tags(());
         ///Marker type for the `images` field
         pub struct images(());
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CreateItemBuilder<'a, S: create_item_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
@@ -262,7 +265,7 @@ pub struct CreateItemBuilder<'a, S: create_item_state::State> {
         Option<CowStr<'a>>,
         Option<CreateItemVisibility<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CreateItem<'a> {
@@ -276,9 +279,9 @@ impl<'a> CreateItemBuilder<'a, create_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreateItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -286,12 +289,12 @@ impl<'a> CreateItemBuilder<'a, create_item_state::Empty> {
 impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
     pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -299,12 +302,12 @@ impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
 impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -312,12 +315,12 @@ impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
 impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
     /// Set the `externalLink` field (optional)
     pub fn external_link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `externalLink` field to an Option value (optional)
     pub fn maybe_external_link(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -332,11 +335,11 @@ where
         mut self,
         value: impl Into<Vec<ItemImage<'a>>>,
     ) -> CreateItemBuilder<'a, create_item_state::SetImages<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         CreateItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -344,12 +347,12 @@ where
 impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
     pub fn maybe_metadata(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -364,11 +367,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> CreateItemBuilder<'a, create_item_state::SetTags<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         CreateItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -383,11 +386,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CreateItemBuilder<'a, create_item_state::SetTitle<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         CreateItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -402,11 +405,11 @@ where
         mut self,
         value: impl Into<CreateItemVisibility<'a>>,
     ) -> CreateItemBuilder<'a, create_item_state::SetVisibility<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         CreateItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -414,22 +417,22 @@ where
 impl<'a, S> CreateItemBuilder<'a, S>
 where
     S: create_item_state::State,
-    S::Visibility: create_item_state::IsSet,
     S::Title: create_item_state::IsSet,
-    S::Tags: create_item_state::IsSet,
     S::Images: create_item_state::IsSet,
+    S::Visibility: create_item_state::IsSet,
+    S::Tags: create_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateItem<'a> {
         CreateItem {
-            category: self.__unsafe_private_named.0,
-            description: self.__unsafe_private_named.1,
-            external_link: self.__unsafe_private_named.2,
-            images: self.__unsafe_private_named.3.unwrap(),
-            metadata: self.__unsafe_private_named.4,
-            tags: self.__unsafe_private_named.5.unwrap(),
-            title: self.__unsafe_private_named.6.unwrap(),
-            visibility: self.__unsafe_private_named.7.unwrap(),
+            category: self._fields.0,
+            description: self._fields.1,
+            external_link: self._fields.2,
+            images: self._fields.3.unwrap(),
+            metadata: self._fields.4,
+            tags: self._fields.5.unwrap(),
+            title: self._fields.6.unwrap(),
+            visibility: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -439,14 +442,14 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> CreateItem<'a> {
         CreateItem {
-            category: self.__unsafe_private_named.0,
-            description: self.__unsafe_private_named.1,
-            external_link: self.__unsafe_private_named.2,
-            images: self.__unsafe_private_named.3.unwrap(),
-            metadata: self.__unsafe_private_named.4,
-            tags: self.__unsafe_private_named.5.unwrap(),
-            title: self.__unsafe_private_named.6.unwrap(),
-            visibility: self.__unsafe_private_named.7.unwrap(),
+            category: self._fields.0,
+            description: self._fields.1,
+            external_link: self._fields.2,
+            images: self._fields.3.unwrap(),
+            metadata: self._fields.4,
+            tags: self._fields.5.unwrap(),
+            title: self._fields.6.unwrap(),
+            visibility: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }

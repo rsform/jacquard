@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -299,8 +302,8 @@ pub mod entry_state {
 
 /// Builder for constructing an instance of this type
 pub struct EntryBuilder<'a, S: entry_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<bool>,
         Option<SelfLabels<'a>>,
@@ -310,7 +313,7 @@ pub struct EntryBuilder<'a, S: entry_state::State> {
         Option<StrongRef<'a>>,
         Option<EntryVisibility<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Entry<'a> {
@@ -324,9 +327,9 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -341,11 +344,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EntryBuilder<'a, entry_state::SetDatetime<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -353,12 +356,12 @@ where
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `hadHiatus` field (optional)
     pub fn had_hiatus(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `hadHiatus` field to an Option value (optional)
     pub fn maybe_had_hiatus(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -366,12 +369,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -379,12 +382,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
     pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -392,12 +395,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `subjects` field (optional)
     pub fn subjects(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `subjects` field to an Option value (optional)
     pub fn maybe_subjects(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -405,12 +408,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<Tag<'a>>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<Tag<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -418,12 +421,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `via` field (optional)
     pub fn via(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `via` field to an Option value (optional)
     pub fn maybe_via(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -431,12 +434,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `visibility` field (optional)
     pub fn visibility(mut self, value: impl Into<Option<EntryVisibility<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
     pub fn maybe_visibility(mut self, value: Option<EntryVisibility<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -449,14 +452,14 @@ where
     /// Build the final struct
     pub fn build(self) -> Entry<'a> {
         Entry {
-            datetime: self.__unsafe_private_named.0.unwrap(),
-            had_hiatus: self.__unsafe_private_named.1.or_else(|| Some(false)),
-            labels: self.__unsafe_private_named.2,
-            note: self.__unsafe_private_named.3,
-            subjects: self.__unsafe_private_named.4,
-            tags: self.__unsafe_private_named.5,
-            via: self.__unsafe_private_named.6,
-            visibility: self.__unsafe_private_named.7,
+            datetime: self._fields.0.unwrap(),
+            had_hiatus: self._fields.1.or_else(|| Some(false)),
+            labels: self._fields.2,
+            note: self._fields.3,
+            subjects: self._fields.4,
+            tags: self._fields.5,
+            via: self._fields.6,
+            visibility: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -469,14 +472,14 @@ where
         >,
     ) -> Entry<'a> {
         Entry {
-            datetime: self.__unsafe_private_named.0.unwrap(),
-            had_hiatus: self.__unsafe_private_named.1.or_else(|| Some(false)),
-            labels: self.__unsafe_private_named.2,
-            note: self.__unsafe_private_named.3,
-            subjects: self.__unsafe_private_named.4,
-            tags: self.__unsafe_private_named.5,
-            via: self.__unsafe_private_named.6,
-            visibility: self.__unsafe_private_named.7,
+            datetime: self._fields.0.unwrap(),
+            had_hiatus: self._fields.1.or_else(|| Some(false)),
+            labels: self._fields.2,
+            note: self._fields.3,
+            subjects: self._fields.4,
+            tags: self._fields.5,
+            via: self._fields.6,
+            visibility: self._fields.7,
             extra_data: Some(extra_data),
         }
     }

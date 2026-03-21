@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::Did;
@@ -83,63 +86,58 @@ pub mod get_stripe_intent_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Amount;
-        type Id;
         type Iss;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Amount = Unset;
-        type Id = Unset;
         type Iss = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `amount` field to Set
     pub struct SetAmount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAmount<S> {}
     impl<S: State> State for SetAmount<S> {
         type Amount = Set<members::amount>;
+        type Iss = S::Iss;
         type Id = S::Id;
-        type Iss = S::Iss;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Amount = S::Amount;
-        type Id = Set<members::id>;
-        type Iss = S::Iss;
     }
     ///State transition - sets the `iss` field to Set
     pub struct SetIss<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIss<S> {}
     impl<S: State> State for SetIss<S> {
         type Amount = S::Amount;
-        type Id = S::Id;
         type Iss = Set<members::iss>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Amount = S::Amount;
+        type Iss = S::Iss;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `amount` field
         pub struct amount(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `iss` field
         pub struct iss(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetStripeIntentBuilder<'a, S: get_stripe_intent_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<i64>,
-        Option<CowStr<'a>>,
-        Option<Did<'a>>,
-        Option<CowStr<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<CowStr<'a>>, Option<Did<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetStripeIntent<'a> {
@@ -153,9 +151,9 @@ impl<'a> GetStripeIntentBuilder<'a, get_stripe_intent_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetStripeIntentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -170,11 +168,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> GetStripeIntentBuilder<'a, get_stripe_intent_state::SetAmount<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetStripeIntentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -189,11 +187,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GetStripeIntentBuilder<'a, get_stripe_intent_state::SetId<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GetStripeIntentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -208,11 +206,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> GetStripeIntentBuilder<'a, get_stripe_intent_state::SetIss<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         GetStripeIntentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -220,12 +218,12 @@ where
 impl<'a, S: get_stripe_intent_state::State> GetStripeIntentBuilder<'a, S> {
     /// Set the `token` field (optional)
     pub fn token(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `token` field to an Option value (optional)
     pub fn maybe_token(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -234,16 +232,16 @@ impl<'a, S> GetStripeIntentBuilder<'a, S>
 where
     S: get_stripe_intent_state::State,
     S::Amount: get_stripe_intent_state::IsSet,
-    S::Id: get_stripe_intent_state::IsSet,
     S::Iss: get_stripe_intent_state::IsSet,
+    S::Id: get_stripe_intent_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetStripeIntent<'a> {
         GetStripeIntent {
-            amount: self.__unsafe_private_named.0.unwrap(),
-            id: self.__unsafe_private_named.1.unwrap(),
-            iss: self.__unsafe_private_named.2.unwrap(),
-            token: self.__unsafe_private_named.3,
+            amount: self._fields.0.unwrap(),
+            id: self._fields.1.unwrap(),
+            iss: self._fields.2.unwrap(),
+            token: self._fields.3,
         }
     }
 }

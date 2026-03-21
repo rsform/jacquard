@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::deps::bytes::Bytes;
@@ -144,45 +145,45 @@ pub mod get_blob_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Path;
         type Repo;
+        type Path;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Path = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `path` field to Set
-    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPath<S> {}
-    impl<S: State> State for SetPath<S> {
-        type Path = Set<members::path>;
-        type Repo = S::Repo;
+        type Path = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Path = S::Path;
         type Repo = Set<members::repo>;
+        type Path = S::Path;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPath<S> {}
+    impl<S: State> State for SetPath<S> {
+        type Repo = S::Repo;
+        type Path = Set<members::path>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `path` field
-        pub struct path(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `path` field
+        pub struct path(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GetBlobBuilder<'a, S: get_blob_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetBlob<'a> {
@@ -196,9 +197,9 @@ impl<'a> GetBlobBuilder<'a, get_blob_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetBlobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -213,11 +214,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GetBlobBuilder<'a, get_blob_state::SetPath<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetBlobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -225,12 +226,12 @@ where
 impl<'a, S: get_blob_state::State> GetBlobBuilder<'a, S> {
     /// Set the `ref` field (optional)
     pub fn r#ref(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `ref` field to an Option value (optional)
     pub fn maybe_ref(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -245,11 +246,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> GetBlobBuilder<'a, get_blob_state::SetRepo<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         GetBlobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -257,15 +258,15 @@ where
 impl<'a, S> GetBlobBuilder<'a, S>
 where
     S: get_blob_state::State,
-    S::Path: get_blob_state::IsSet,
     S::Repo: get_blob_state::IsSet,
+    S::Path: get_blob_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetBlob<'a> {
         GetBlob {
-            path: self.__unsafe_private_named.0.unwrap(),
-            r#ref: self.__unsafe_private_named.1,
-            repo: self.__unsafe_private_named.2.unwrap(),
+            path: self._fields.0.unwrap(),
+            r#ref: self._fields.1,
+            repo: self._fields.2.unwrap(),
         }
     }
 }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -645,9 +648,9 @@ pub mod body_external_state {
 
 /// Builder for constructing an instance of this type
 pub struct BodyExternalBuilder<'a, S: body_external_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> BodyExternal<'a> {
@@ -661,9 +664,9 @@ impl<'a> BodyExternalBuilder<'a, body_external_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BodyExternalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -678,11 +681,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> BodyExternalBuilder<'a, body_external_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BodyExternalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -695,7 +698,7 @@ where
     /// Build the final struct
     pub fn build(self) -> BodyExternal<'a> {
         BodyExternal {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -705,7 +708,7 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> BodyExternal<'a> {
         BodyExternal {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1045,9 +1048,9 @@ pub mod body_template_state {
 
 /// Builder for constructing an instance of this type
 pub struct BodyTemplateBuilder<'a, S: body_template_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Data<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Data<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> BodyTemplate<'a> {
@@ -1061,9 +1064,9 @@ impl<'a> BodyTemplateBuilder<'a, body_template_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BodyTemplateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1078,11 +1081,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> BodyTemplateBuilder<'a, body_template_state::SetNode<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BodyTemplateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1095,7 +1098,7 @@ where
     /// Build the final struct
     pub fn build(self) -> BodyTemplate<'a> {
         BodyTemplate {
-            node: self.__unsafe_private_named.0.unwrap(),
+            node: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1105,7 +1108,7 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> BodyTemplate<'a> {
         BodyTemplate {
-            node: self.__unsafe_private_named.0.unwrap(),
+            node: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1145,8 +1148,8 @@ pub mod component_state {
 
 /// Builder for constructing an instance of this type
 pub struct ComponentBuilder<'a, S: component_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ComponentBody<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -1156,7 +1159,7 @@ pub struct ComponentBuilder<'a, S: component_state::State> {
         Option<ViaValtown<'a>>,
         Option<component::View<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Component<'a> {
@@ -1170,9 +1173,9 @@ impl<'a> ComponentBuilder<'a, component_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ComponentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1180,12 +1183,12 @@ impl<'a> ComponentBuilder<'a, component_state::Empty> {
 impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     /// Set the `body` field (optional)
     pub fn body(mut self, value: impl Into<Option<ComponentBody<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `body` field to an Option value (optional)
     pub fn maybe_body(mut self, value: Option<ComponentBody<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1193,12 +1196,12 @@ impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
 impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1206,12 +1209,12 @@ impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
 impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1219,12 +1222,12 @@ impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
 impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     /// Set the `imports` field (optional)
     pub fn imports(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `imports` field to an Option value (optional)
     pub fn maybe_imports(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1239,11 +1242,11 @@ where
         mut self,
         value: impl Into<Nsid<'a>>,
     ) -> ComponentBuilder<'a, component_state::SetType<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ComponentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1251,12 +1254,12 @@ where
 impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1264,12 +1267,12 @@ impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
 impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     /// Set the `via` field (optional)
     pub fn via(mut self, value: impl Into<Option<ViaValtown<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `via` field to an Option value (optional)
     pub fn maybe_via(mut self, value: Option<ViaValtown<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1277,12 +1280,12 @@ impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
 impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     /// Set the `view` field (optional)
     pub fn view(mut self, value: impl Into<Option<component::View<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `view` field to an Option value (optional)
     pub fn maybe_view(mut self, value: Option<component::View<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -1295,14 +1298,14 @@ where
     /// Build the final struct
     pub fn build(self) -> Component<'a> {
         Component {
-            body: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            description: self.__unsafe_private_named.2,
-            imports: self.__unsafe_private_named.3,
-            r#type: self.__unsafe_private_named.4.unwrap(),
-            updated_at: self.__unsafe_private_named.5,
-            via: self.__unsafe_private_named.6,
-            view: self.__unsafe_private_named.7,
+            body: self._fields.0,
+            created_at: self._fields.1,
+            description: self._fields.2,
+            imports: self._fields.3,
+            r#type: self._fields.4.unwrap(),
+            updated_at: self._fields.5,
+            via: self._fields.6,
+            view: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -1312,14 +1315,14 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Component<'a> {
         Component {
-            body: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            description: self.__unsafe_private_named.2,
-            imports: self.__unsafe_private_named.3,
-            r#type: self.__unsafe_private_named.4.unwrap(),
-            updated_at: self.__unsafe_private_named.5,
-            via: self.__unsafe_private_named.6,
-            view: self.__unsafe_private_named.7,
+            body: self._fields.0,
+            created_at: self._fields.1,
+            description: self._fields.2,
+            imports: self._fields.3,
+            r#type: self._fields.4.unwrap(),
+            updated_at: self._fields.5,
+            via: self._fields.6,
+            view: self._fields.7,
             extra_data: Some(extra_data),
         }
     }
@@ -1371,9 +1374,9 @@ pub mod view_state {
 
 /// Builder for constructing an instance of this type
 pub struct ViewBuilder<'a, S: view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<ViewAcceptsItem<'a>>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<ViewAcceptsItem<'a>>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> View<'a> {
@@ -1387,9 +1390,9 @@ impl<'a> ViewBuilder<'a, view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1404,11 +1407,11 @@ where
         mut self,
         value: impl Into<Vec<ViewAcceptsItem<'a>>>,
     ) -> ViewBuilder<'a, view_state::SetAccepts<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1423,11 +1426,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ViewBuilder<'a, view_state::SetProp<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1441,8 +1444,8 @@ where
     /// Build the final struct
     pub fn build(self) -> View<'a> {
         View {
-            accepts: self.__unsafe_private_named.0.unwrap(),
-            prop: self.__unsafe_private_named.1.unwrap(),
+            accepts: self._fields.0.unwrap(),
+            prop: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1452,8 +1455,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> View<'a> {
         View {
-            accepts: self.__unsafe_private_named.0.unwrap(),
-            prop: self.__unsafe_private_named.1.unwrap(),
+            accepts: self._fields.0.unwrap(),
+            prop: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

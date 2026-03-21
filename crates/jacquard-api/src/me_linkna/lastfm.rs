@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -140,58 +143,58 @@ pub mod lastfm_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type ArtistNames;
         type TrackName;
         type CreatedAt;
-        type ArtistNames;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type ArtistNames = Unset;
         type TrackName = Unset;
         type CreatedAt = Unset;
-        type ArtistNames = Unset;
-    }
-    ///State transition - sets the `track_name` field to Set
-    pub struct SetTrackName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTrackName<S> {}
-    impl<S: State> State for SetTrackName<S> {
-        type TrackName = Set<members::track_name>;
-        type CreatedAt = S::CreatedAt;
-        type ArtistNames = S::ArtistNames;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type TrackName = S::TrackName;
-        type CreatedAt = Set<members::created_at>;
-        type ArtistNames = S::ArtistNames;
     }
     ///State transition - sets the `artist_names` field to Set
     pub struct SetArtistNames<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtistNames<S> {}
     impl<S: State> State for SetArtistNames<S> {
+        type ArtistNames = Set<members::artist_names>;
         type TrackName = S::TrackName;
         type CreatedAt = S::CreatedAt;
-        type ArtistNames = Set<members::artist_names>;
+    }
+    ///State transition - sets the `track_name` field to Set
+    pub struct SetTrackName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTrackName<S> {}
+    impl<S: State> State for SetTrackName<S> {
+        type ArtistNames = S::ArtistNames;
+        type TrackName = Set<members::track_name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type ArtistNames = S::ArtistNames;
+        type TrackName = S::TrackName;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `artist_names` field
+        pub struct artist_names(());
         ///Marker type for the `track_name` field
         pub struct track_name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `artist_names` field
-        pub struct artist_names(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LastfmBuilder<'a, S: lastfm_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
@@ -203,7 +206,7 @@ pub struct LastfmBuilder<'a, S: lastfm_state::State> {
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Lastfm<'a> {
@@ -217,20 +220,9 @@ impl<'a> LastfmBuilder<'a, lastfm_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LastfmBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -238,12 +230,12 @@ impl<'a> LastfmBuilder<'a, lastfm_state::Empty> {
 impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
     /// Set the `artistMbId` field (optional)
     pub fn artist_mb_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `artistMbId` field to an Option value (optional)
     pub fn maybe_artist_mb_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -258,11 +250,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> LastfmBuilder<'a, lastfm_state::SetArtistNames<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LastfmBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -270,12 +262,12 @@ where
 impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
     /// Set the `coverArtUrl` field (optional)
     pub fn cover_art_url(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `coverArtUrl` field to an Option value (optional)
     pub fn maybe_cover_art_url(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -290,11 +282,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LastfmBuilder<'a, lastfm_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         LastfmBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -302,12 +294,12 @@ where
 impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
     /// Set the `originUrl` field (optional)
     pub fn origin_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `originUrl` field to an Option value (optional)
     pub fn maybe_origin_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -315,12 +307,12 @@ impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
 impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
     /// Set the `playedTime` field (optional)
     pub fn played_time(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `playedTime` field to an Option value (optional)
     pub fn maybe_played_time(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -328,12 +320,12 @@ impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
 impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
     /// Set the `releaseMbId` field (optional)
     pub fn release_mb_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `releaseMbId` field to an Option value (optional)
     pub fn maybe_release_mb_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -341,12 +333,12 @@ impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
 impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
     /// Set the `releaseName` field (optional)
     pub fn release_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `releaseName` field to an Option value (optional)
     pub fn maybe_release_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -354,12 +346,12 @@ impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
 impl<'a, S: lastfm_state::State> LastfmBuilder<'a, S> {
     /// Set the `trackMbId` field (optional)
     pub fn track_mb_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `trackMbId` field to an Option value (optional)
     pub fn maybe_track_mb_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -374,11 +366,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LastfmBuilder<'a, lastfm_state::SetTrackName<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         LastfmBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -386,23 +378,23 @@ where
 impl<'a, S> LastfmBuilder<'a, S>
 where
     S: lastfm_state::State,
+    S::ArtistNames: lastfm_state::IsSet,
     S::TrackName: lastfm_state::IsSet,
     S::CreatedAt: lastfm_state::IsSet,
-    S::ArtistNames: lastfm_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lastfm<'a> {
         Lastfm {
-            artist_mb_id: self.__unsafe_private_named.0,
-            artist_names: self.__unsafe_private_named.1.unwrap(),
-            cover_art_url: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            origin_url: self.__unsafe_private_named.4,
-            played_time: self.__unsafe_private_named.5,
-            release_mb_id: self.__unsafe_private_named.6,
-            release_name: self.__unsafe_private_named.7,
-            track_mb_id: self.__unsafe_private_named.8,
-            track_name: self.__unsafe_private_named.9.unwrap(),
+            artist_mb_id: self._fields.0,
+            artist_names: self._fields.1.unwrap(),
+            cover_art_url: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            origin_url: self._fields.4,
+            played_time: self._fields.5,
+            release_mb_id: self._fields.6,
+            release_name: self._fields.7,
+            track_mb_id: self._fields.8,
+            track_name: self._fields.9.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -415,16 +407,16 @@ where
         >,
     ) -> Lastfm<'a> {
         Lastfm {
-            artist_mb_id: self.__unsafe_private_named.0,
-            artist_names: self.__unsafe_private_named.1.unwrap(),
-            cover_art_url: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            origin_url: self.__unsafe_private_named.4,
-            played_time: self.__unsafe_private_named.5,
-            release_mb_id: self.__unsafe_private_named.6,
-            release_name: self.__unsafe_private_named.7,
-            track_mb_id: self.__unsafe_private_named.8,
-            track_name: self.__unsafe_private_named.9.unwrap(),
+            artist_mb_id: self._fields.0,
+            artist_names: self._fields.1.unwrap(),
+            cover_art_url: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            origin_url: self._fields.4,
+            played_time: self._fields.5,
+            release_mb_id: self._fields.6,
+            release_name: self._fields.7,
+            track_mb_id: self._fields.8,
+            track_name: self._fields.9.unwrap(),
             extra_data: Some(extra_data),
         }
     }

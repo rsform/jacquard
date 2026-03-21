@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -210,14 +213,14 @@ pub mod rel_state {
 
 /// Builder for constructing an instance of this type
 pub struct RelBuilder<'a, S: rel_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<Datetime>>,
         Option<Item<'a>>,
         Option<rel::Note<'a>>,
         Option<rel::Rating<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Rel<'a> {
@@ -231,9 +234,9 @@ impl<'a> RelBuilder<'a, rel_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RelBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -241,12 +244,12 @@ impl<'a> RelBuilder<'a, rel_state::Empty> {
 impl<'a, S: rel_state::State> RelBuilder<'a, S> {
     /// Set the `finishedAt` field (optional)
     pub fn finished_at(mut self, value: impl Into<Option<Vec<Datetime>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `finishedAt` field to an Option value (optional)
     pub fn maybe_finished_at(mut self, value: Option<Vec<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -261,11 +264,11 @@ where
         mut self,
         value: impl Into<Item<'a>>,
     ) -> RelBuilder<'a, rel_state::SetItem<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RelBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -273,12 +276,12 @@ where
 impl<'a, S: rel_state::State> RelBuilder<'a, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<rel::Note<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
     pub fn maybe_note(mut self, value: Option<rel::Note<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -286,12 +289,12 @@ impl<'a, S: rel_state::State> RelBuilder<'a, S> {
 impl<'a, S: rel_state::State> RelBuilder<'a, S> {
     /// Set the `rating` field (optional)
     pub fn rating(mut self, value: impl Into<Option<rel::Rating<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `rating` field to an Option value (optional)
     pub fn maybe_rating(mut self, value: Option<rel::Rating<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -304,10 +307,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Rel<'a> {
         Rel {
-            finished_at: self.__unsafe_private_named.0,
-            item: self.__unsafe_private_named.1.unwrap(),
-            note: self.__unsafe_private_named.2,
-            rating: self.__unsafe_private_named.3,
+            finished_at: self._fields.0,
+            item: self._fields.1.unwrap(),
+            note: self._fields.2,
+            rating: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -320,10 +323,10 @@ where
         >,
     ) -> Rel<'a> {
         Rel {
-            finished_at: self.__unsafe_private_named.0,
-            item: self.__unsafe_private_named.1.unwrap(),
-            note: self.__unsafe_private_named.2,
-            rating: self.__unsafe_private_named.3,
+            finished_at: self._fields.0,
+            item: self._fields.1.unwrap(),
+            note: self._fields.2,
+            rating: self._fields.3,
             extra_data: Some(extra_data),
         }
     }
@@ -471,58 +474,58 @@ pub mod note_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type UpdatedAt;
-        type Value;
         type CreatedAt;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type UpdatedAt = Unset;
-        type Value = Unset;
         type CreatedAt = Unset;
+        type Value = Unset;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
         type UpdatedAt = Set<members::updated_at>;
+        type CreatedAt = S::CreatedAt;
         type Value = S::Value;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Value = Set<members::value>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type UpdatedAt = S::UpdatedAt;
-        type Value = S::Value;
         type CreatedAt = Set<members::created_at>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type CreatedAt = S::CreatedAt;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct NoteBuilder<'a, S: note_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<Datetime>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<Datetime>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Note<'a> {
@@ -536,9 +539,9 @@ impl<'a> NoteBuilder<'a, note_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -553,11 +556,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> NoteBuilder<'a, note_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         NoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -572,11 +575,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> NoteBuilder<'a, note_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         NoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -591,11 +594,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> NoteBuilder<'a, note_state::SetValue<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         NoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -604,15 +607,15 @@ impl<'a, S> NoteBuilder<'a, S>
 where
     S: note_state::State,
     S::UpdatedAt: note_state::IsSet,
-    S::Value: note_state::IsSet,
     S::CreatedAt: note_state::IsSet,
+    S::Value: note_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Note<'a> {
         Note {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            updated_at: self.__unsafe_private_named.1.unwrap(),
-            value: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            updated_at: self._fields.1.unwrap(),
+            value: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -625,9 +628,9 @@ where
         >,
     ) -> Note<'a> {
         Note {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            updated_at: self.__unsafe_private_named.1.unwrap(),
-            value: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            updated_at: self._fields.1.unwrap(),
+            value: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -679,9 +682,9 @@ pub mod rating_state {
 
 /// Builder for constructing an instance of this type
 pub struct RatingBuilder<'a, S: rating_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Rating<'a> {
@@ -695,9 +698,9 @@ impl<'a> RatingBuilder<'a, rating_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RatingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -712,11 +715,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> RatingBuilder<'a, rating_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RatingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -731,11 +734,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> RatingBuilder<'a, rating_state::SetValue<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RatingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -749,8 +752,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Rating<'a> {
         Rating {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            value: self.__unsafe_private_named.1.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            value: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -763,8 +766,8 @@ where
         >,
     ) -> Rating<'a> {
         Rating {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            value: self.__unsafe_private_named.1.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            value: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

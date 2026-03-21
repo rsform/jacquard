@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -245,49 +248,49 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type Bug;
+        type Status;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type Bug = Unset;
+        type Status = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type Bug = S::Bug;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `bug` field to Set
     pub struct SetBug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBug<S> {}
     impl<S: State> State for SetBug<S> {
-        type Status = S::Status;
         type Bug = Set<members::bug>;
+        type Status = S::Status;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type Bug = S::Bug;
+        type Status = Set<members::status>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Status = S::Status;
         type Bug = S::Bug;
+        type Status = S::Status;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `bug` field
         pub struct bug(());
+        ///Marker type for the `status` field
+        pub struct status(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -295,15 +298,15 @@ pub mod response_state {
 
 /// Builder for constructing an instance of this type
 pub struct ResponseBuilder<'a, S: response_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AtUri<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<Vec<Facet<'a>>>,
         Option<ResponseStatus<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Response<'a> {
@@ -317,9 +320,9 @@ impl<'a> ResponseBuilder<'a, response_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ResponseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -334,11 +337,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ResponseBuilder<'a, response_state::SetBug<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ResponseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -353,11 +356,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ResponseBuilder<'a, response_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ResponseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -365,12 +368,12 @@ where
 impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
     pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -378,12 +381,12 @@ impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
 impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
     /// Set the `messageFacets` field (optional)
     pub fn message_facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `messageFacets` field to an Option value (optional)
     pub fn maybe_message_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -398,11 +401,11 @@ where
         mut self,
         value: impl Into<ResponseStatus<'a>>,
     ) -> ResponseBuilder<'a, response_state::SetStatus<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ResponseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -410,18 +413,18 @@ where
 impl<'a, S> ResponseBuilder<'a, S>
 where
     S: response_state::State,
-    S::Status: response_state::IsSet,
     S::Bug: response_state::IsSet,
+    S::Status: response_state::IsSet,
     S::CreatedAt: response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Response<'a> {
         Response {
-            bug: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            message: self.__unsafe_private_named.2,
-            message_facets: self.__unsafe_private_named.3,
-            status: self.__unsafe_private_named.4.unwrap(),
+            bug: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            message: self._fields.2,
+            message_facets: self._fields.3,
+            status: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -434,11 +437,11 @@ where
         >,
     ) -> Response<'a> {
         Response {
-            bug: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            message: self.__unsafe_private_named.2,
-            message_facets: self.__unsafe_private_named.3,
-            status: self.__unsafe_private_named.4.unwrap(),
+            bug: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            message: self._fields.2,
+            message_facets: self._fields.3,
+            status: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

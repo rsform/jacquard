@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -128,13 +131,13 @@ pub mod configuration_state {
 
 /// Builder for constructing an instance of this type
 pub struct ConfigurationBuilder<'a, S: configuration_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ContentRights<'a>>,
         Option<ContentWarnings<'a>>,
         Option<DistributionPolicy<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Configuration<'a> {
@@ -148,9 +151,9 @@ impl<'a> ConfigurationBuilder<'a, configuration_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigurationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -161,12 +164,12 @@ impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ContentRights<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `contentRights` field to an Option value (optional)
     pub fn maybe_content_rights(mut self, value: Option<ContentRights<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -177,12 +180,12 @@ impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ContentWarnings<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `contentWarnings` field to an Option value (optional)
     pub fn maybe_content_warnings(mut self, value: Option<ContentWarnings<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -193,7 +196,7 @@ impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<DistributionPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `distributionPolicy` field to an Option value (optional)
@@ -201,7 +204,7 @@ impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
         mut self,
         value: Option<DistributionPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -213,9 +216,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Configuration<'a> {
         Configuration {
-            content_rights: self.__unsafe_private_named.0,
-            content_warnings: self.__unsafe_private_named.1,
-            distribution_policy: self.__unsafe_private_named.2,
+            content_rights: self._fields.0,
+            content_warnings: self._fields.1,
+            distribution_policy: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -228,9 +231,9 @@ where
         >,
     ) -> Configuration<'a> {
         Configuration {
-            content_rights: self.__unsafe_private_named.0,
-            content_warnings: self.__unsafe_private_named.1,
-            distribution_policy: self.__unsafe_private_named.2,
+            content_rights: self._fields.0,
+            content_warnings: self._fields.1,
+            distribution_policy: self._fields.2,
             extra_data: Some(extra_data),
         }
     }

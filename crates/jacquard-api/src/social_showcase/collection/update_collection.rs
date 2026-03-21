@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::blob::BlobRef;
@@ -205,8 +208,8 @@ pub mod update_collection_state {
 
 /// Builder for constructing an instance of this type
 pub struct UpdateCollectionBuilder<'a, S: update_collection_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<BlobRef<'a>>,
         Option<CowStr<'a>>,
         Option<Vec<CollectionItem<'a>>>,
@@ -215,7 +218,7 @@ pub struct UpdateCollectionBuilder<'a, S: update_collection_state::State> {
         Option<AtUri<'a>>,
         Option<UpdateCollectionVisibility<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateCollection<'a> {
@@ -229,9 +232,9 @@ impl<'a> UpdateCollectionBuilder<'a, update_collection_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateCollectionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -239,12 +242,12 @@ impl<'a> UpdateCollectionBuilder<'a, update_collection_state::Empty> {
 impl<'a, S: update_collection_state::State> UpdateCollectionBuilder<'a, S> {
     /// Set the `coverImage` field (optional)
     pub fn cover_image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `coverImage` field to an Option value (optional)
     pub fn maybe_cover_image(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -252,12 +255,12 @@ impl<'a, S: update_collection_state::State> UpdateCollectionBuilder<'a, S> {
 impl<'a, S: update_collection_state::State> UpdateCollectionBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -265,12 +268,12 @@ impl<'a, S: update_collection_state::State> UpdateCollectionBuilder<'a, S> {
 impl<'a, S: update_collection_state::State> UpdateCollectionBuilder<'a, S> {
     /// Set the `items` field (optional)
     pub fn items(mut self, value: impl Into<Option<Vec<CollectionItem<'a>>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `items` field to an Option value (optional)
     pub fn maybe_items(mut self, value: Option<Vec<CollectionItem<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -278,12 +281,12 @@ impl<'a, S: update_collection_state::State> UpdateCollectionBuilder<'a, S> {
 impl<'a, S: update_collection_state::State> UpdateCollectionBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -291,12 +294,12 @@ impl<'a, S: update_collection_state::State> UpdateCollectionBuilder<'a, S> {
 impl<'a, S: update_collection_state::State> UpdateCollectionBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -311,11 +314,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> UpdateCollectionBuilder<'a, update_collection_state::SetUri<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         UpdateCollectionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -326,7 +329,7 @@ impl<'a, S: update_collection_state::State> UpdateCollectionBuilder<'a, S> {
         mut self,
         value: impl Into<Option<UpdateCollectionVisibility<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
@@ -334,7 +337,7 @@ impl<'a, S: update_collection_state::State> UpdateCollectionBuilder<'a, S> {
         mut self,
         value: Option<UpdateCollectionVisibility<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -347,13 +350,13 @@ where
     /// Build the final struct
     pub fn build(self) -> UpdateCollection<'a> {
         UpdateCollection {
-            cover_image: self.__unsafe_private_named.0,
-            description: self.__unsafe_private_named.1,
-            items: self.__unsafe_private_named.2,
-            name: self.__unsafe_private_named.3,
-            tags: self.__unsafe_private_named.4,
-            uri: self.__unsafe_private_named.5.unwrap(),
-            visibility: self.__unsafe_private_named.6,
+            cover_image: self._fields.0,
+            description: self._fields.1,
+            items: self._fields.2,
+            name: self._fields.3,
+            tags: self._fields.4,
+            uri: self._fields.5.unwrap(),
+            visibility: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -366,13 +369,13 @@ where
         >,
     ) -> UpdateCollection<'a> {
         UpdateCollection {
-            cover_image: self.__unsafe_private_named.0,
-            description: self.__unsafe_private_named.1,
-            items: self.__unsafe_private_named.2,
-            name: self.__unsafe_private_named.3,
-            tags: self.__unsafe_private_named.4,
-            uri: self.__unsafe_private_named.5.unwrap(),
-            visibility: self.__unsafe_private_named.6,
+            cover_image: self._fields.0,
+            description: self._fields.1,
+            items: self._fields.2,
+            name: self._fields.3,
+            tags: self._fields.4,
+            uri: self._fields.5.unwrap(),
+            visibility: self._fields.6,
             extra_data: Some(extra_data),
         }
     }

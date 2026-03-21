@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -247,45 +250,45 @@ pub mod lookup_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LookedUpAt;
         type Results;
+        type LookedUpAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LookedUpAt = Unset;
         type Results = Unset;
-    }
-    ///State transition - sets the `looked_up_at` field to Set
-    pub struct SetLookedUpAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLookedUpAt<S> {}
-    impl<S: State> State for SetLookedUpAt<S> {
-        type LookedUpAt = Set<members::looked_up_at>;
-        type Results = S::Results;
+        type LookedUpAt = Unset;
     }
     ///State transition - sets the `results` field to Set
     pub struct SetResults<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetResults<S> {}
     impl<S: State> State for SetResults<S> {
-        type LookedUpAt = S::LookedUpAt;
         type Results = Set<members::results>;
+        type LookedUpAt = S::LookedUpAt;
+    }
+    ///State transition - sets the `looked_up_at` field to Set
+    pub struct SetLookedUpAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLookedUpAt<S> {}
+    impl<S: State> State for SetLookedUpAt<S> {
+        type Results = S::Results;
+        type LookedUpAt = Set<members::looked_up_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `looked_up_at` field
-        pub struct looked_up_at(());
         ///Marker type for the `results` field
         pub struct results(());
+        ///Marker type for the `looked_up_at` field
+        pub struct looked_up_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LookupBuilder<'a, S: lookup_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<Vec<lookup::ProviderResult<'a>>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<Vec<lookup::ProviderResult<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Lookup<'a> {
@@ -299,9 +302,9 @@ impl<'a> LookupBuilder<'a, lookup_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LookupBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -316,11 +319,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LookupBuilder<'a, lookup_state::SetLookedUpAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LookupBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -335,11 +338,11 @@ where
         mut self,
         value: impl Into<Vec<lookup::ProviderResult<'a>>>,
     ) -> LookupBuilder<'a, lookup_state::SetResults<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LookupBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -347,14 +350,14 @@ where
 impl<'a, S> LookupBuilder<'a, S>
 where
     S: lookup_state::State,
-    S::LookedUpAt: lookup_state::IsSet,
     S::Results: lookup_state::IsSet,
+    S::LookedUpAt: lookup_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Lookup<'a> {
         Lookup {
-            looked_up_at: self.__unsafe_private_named.0.unwrap(),
-            results: self.__unsafe_private_named.1.unwrap(),
+            looked_up_at: self._fields.0.unwrap(),
+            results: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -367,8 +370,8 @@ where
         >,
     ) -> Lookup<'a> {
         Lookup {
-            looked_up_at: self.__unsafe_private_named.0.unwrap(),
-            results: self.__unsafe_private_named.1.unwrap(),
+            looked_up_at: self._fields.0.unwrap(),
+            results: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -570,92 +573,92 @@ pub mod provider_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Provider;
         type Artist;
-        type Url;
         type MarketRegion;
+        type Url;
         type Title;
+        type Provider;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Provider = Unset;
         type Artist = Unset;
-        type Url = Unset;
         type MarketRegion = Unset;
+        type Url = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `provider` field to Set
-    pub struct SetProvider<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetProvider<S> {}
-    impl<S: State> State for SetProvider<S> {
-        type Provider = Set<members::provider>;
-        type Artist = S::Artist;
-        type Url = S::Url;
-        type MarketRegion = S::MarketRegion;
-        type Title = S::Title;
+        type Provider = Unset;
     }
     ///State transition - sets the `artist` field to Set
     pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetArtist<S> {}
     impl<S: State> State for SetArtist<S> {
-        type Provider = S::Provider;
         type Artist = Set<members::artist>;
+        type MarketRegion = S::MarketRegion;
         type Url = S::Url;
-        type MarketRegion = S::MarketRegion;
         type Title = S::Title;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
         type Provider = S::Provider;
-        type Artist = S::Artist;
-        type Url = Set<members::url>;
-        type MarketRegion = S::MarketRegion;
-        type Title = S::Title;
     }
     ///State transition - sets the `market_region` field to Set
     pub struct SetMarketRegion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMarketRegion<S> {}
     impl<S: State> State for SetMarketRegion<S> {
-        type Provider = S::Provider;
         type Artist = S::Artist;
-        type Url = S::Url;
         type MarketRegion = Set<members::market_region>;
+        type Url = S::Url;
         type Title = S::Title;
+        type Provider = S::Provider;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Artist = S::Artist;
+        type MarketRegion = S::MarketRegion;
+        type Url = Set<members::url>;
+        type Title = S::Title;
+        type Provider = S::Provider;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Provider = S::Provider;
         type Artist = S::Artist;
-        type Url = S::Url;
         type MarketRegion = S::MarketRegion;
+        type Url = S::Url;
         type Title = Set<members::title>;
+        type Provider = S::Provider;
+    }
+    ///State transition - sets the `provider` field to Set
+    pub struct SetProvider<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetProvider<S> {}
+    impl<S: State> State for SetProvider<S> {
+        type Artist = S::Artist;
+        type MarketRegion = S::MarketRegion;
+        type Url = S::Url;
+        type Title = S::Title;
+        type Provider = Set<members::provider>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `provider` field
-        pub struct provider(());
         ///Marker type for the `artist` field
         pub struct artist(());
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `market_region` field
         pub struct market_region(());
+        ///Marker type for the `url` field
+        pub struct url(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `provider` field
+        pub struct provider(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ProviderResultBuilder<'a, S: provider_result_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<UriValue<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
@@ -665,7 +668,7 @@ pub struct ProviderResultBuilder<'a, S: provider_result_state::State> {
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ProviderResult<'a> {
@@ -679,9 +682,9 @@ impl<'a> ProviderResultBuilder<'a, provider_result_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProviderResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -689,12 +692,12 @@ impl<'a> ProviderResultBuilder<'a, provider_result_state::Empty> {
 impl<'a, S: provider_result_state::State> ProviderResultBuilder<'a, S> {
     /// Set the `artUrl` field (optional)
     pub fn art_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `artUrl` field to an Option value (optional)
     pub fn maybe_art_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -709,11 +712,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ProviderResultBuilder<'a, provider_result_state::SetArtist<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ProviderResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -721,12 +724,12 @@ where
 impl<'a, S: provider_result_state::State> ProviderResultBuilder<'a, S> {
     /// Set the `externalId` field (optional)
     pub fn external_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `externalId` field to an Option value (optional)
     pub fn maybe_external_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -734,12 +737,12 @@ impl<'a, S: provider_result_state::State> ProviderResultBuilder<'a, S> {
 impl<'a, S: provider_result_state::State> ProviderResultBuilder<'a, S> {
     /// Set the `isAlbum` field (optional)
     pub fn is_album(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `isAlbum` field to an Option value (optional)
     pub fn maybe_is_album(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -754,11 +757,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ProviderResultBuilder<'a, provider_result_state::SetMarketRegion<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ProviderResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -773,11 +776,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ProviderResultBuilder<'a, provider_result_state::SetProvider<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ProviderResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -792,11 +795,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ProviderResultBuilder<'a, provider_result_state::SetTitle<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         ProviderResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -811,11 +814,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ProviderResultBuilder<'a, provider_result_state::SetUrl<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         ProviderResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -823,23 +826,23 @@ where
 impl<'a, S> ProviderResultBuilder<'a, S>
 where
     S: provider_result_state::State,
-    S::Provider: provider_result_state::IsSet,
     S::Artist: provider_result_state::IsSet,
-    S::Url: provider_result_state::IsSet,
     S::MarketRegion: provider_result_state::IsSet,
+    S::Url: provider_result_state::IsSet,
     S::Title: provider_result_state::IsSet,
+    S::Provider: provider_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProviderResult<'a> {
         ProviderResult {
-            art_url: self.__unsafe_private_named.0,
-            artist: self.__unsafe_private_named.1.unwrap(),
-            external_id: self.__unsafe_private_named.2,
-            is_album: self.__unsafe_private_named.3,
-            market_region: self.__unsafe_private_named.4.unwrap(),
-            provider: self.__unsafe_private_named.5.unwrap(),
-            title: self.__unsafe_private_named.6.unwrap(),
-            url: self.__unsafe_private_named.7.unwrap(),
+            art_url: self._fields.0,
+            artist: self._fields.1.unwrap(),
+            external_id: self._fields.2,
+            is_album: self._fields.3,
+            market_region: self._fields.4.unwrap(),
+            provider: self._fields.5.unwrap(),
+            title: self._fields.6.unwrap(),
+            url: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -852,14 +855,14 @@ where
         >,
     ) -> ProviderResult<'a> {
         ProviderResult {
-            art_url: self.__unsafe_private_named.0,
-            artist: self.__unsafe_private_named.1.unwrap(),
-            external_id: self.__unsafe_private_named.2,
-            is_album: self.__unsafe_private_named.3,
-            market_region: self.__unsafe_private_named.4.unwrap(),
-            provider: self.__unsafe_private_named.5.unwrap(),
-            title: self.__unsafe_private_named.6.unwrap(),
-            url: self.__unsafe_private_named.7.unwrap(),
+            art_url: self._fields.0,
+            artist: self._fields.1.unwrap(),
+            external_id: self._fields.2,
+            is_album: self._fields.3,
+            market_region: self._fields.4.unwrap(),
+            provider: self._fields.5.unwrap(),
+            title: self._fields.6.unwrap(),
+            url: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }

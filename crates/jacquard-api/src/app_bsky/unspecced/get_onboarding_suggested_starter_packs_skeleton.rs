@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::string::{Did, AtUri};
 use jacquard_derive::{IntoStatic, lexicon};
@@ -87,9 +90,9 @@ pub struct GetOnboardingSuggestedStarterPacksSkeletonBuilder<
     'a,
     S: get_onboarding_suggested_starter_packs_skeleton_state::State,
 > {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<Did<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<Did<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetOnboardingSuggestedStarterPacksSkeleton<'a> {
@@ -111,9 +114,9 @@ impl<
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetOnboardingSuggestedStarterPacksSkeletonBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -124,12 +127,12 @@ impl<
 > GetOnboardingSuggestedStarterPacksSkeletonBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -140,12 +143,12 @@ impl<
 > GetOnboardingSuggestedStarterPacksSkeletonBuilder<'a, S> {
     /// Set the `viewer` field (optional)
     pub fn viewer(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
     pub fn maybe_viewer(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -157,8 +160,8 @@ where
     /// Build the final struct
     pub fn build(self) -> GetOnboardingSuggestedStarterPacksSkeleton<'a> {
         GetOnboardingSuggestedStarterPacksSkeleton {
-            limit: self.__unsafe_private_named.0,
-            viewer: self.__unsafe_private_named.1,
+            limit: self._fields.0,
+            viewer: self._fields.1,
         }
     }
 }

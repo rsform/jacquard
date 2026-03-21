@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -191,8 +194,8 @@ pub mod annotation_state {
 
 /// Builder for constructing an instance of this type
 pub struct AnnotationBuilder<'a, S: annotation_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
@@ -201,7 +204,7 @@ pub struct AnnotationBuilder<'a, S: annotation_state::State> {
         Option<AtUri<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Annotation<'a> {
@@ -215,9 +218,9 @@ impl<'a> AnnotationBuilder<'a, annotation_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AnnotationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -232,11 +235,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> AnnotationBuilder<'a, annotation_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AnnotationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -244,12 +247,12 @@ where
 impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -257,12 +260,12 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
 impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `favicon` field (optional)
     pub fn favicon(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `favicon` field to an Option value (optional)
     pub fn maybe_favicon(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -270,12 +273,12 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
 impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -283,12 +286,12 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
 impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
     pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -303,11 +306,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> AnnotationBuilder<'a, annotation_state::SetSubject<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         AnnotationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -315,12 +318,12 @@ where
 impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -334,13 +337,13 @@ where
     /// Build the final struct
     pub fn build(self) -> Annotation<'a> {
         Annotation {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            favicon: self.__unsafe_private_named.2,
-            image: self.__unsafe_private_named.3,
-            note: self.__unsafe_private_named.4,
-            subject: self.__unsafe_private_named.5.unwrap(),
-            title: self.__unsafe_private_named.6,
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1,
+            favicon: self._fields.2,
+            image: self._fields.3,
+            note: self._fields.4,
+            subject: self._fields.5.unwrap(),
+            title: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -353,13 +356,13 @@ where
         >,
     ) -> Annotation<'a> {
         Annotation {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            favicon: self.__unsafe_private_named.2,
-            image: self.__unsafe_private_named.3,
-            note: self.__unsafe_private_named.4,
-            subject: self.__unsafe_private_named.5.unwrap(),
-            title: self.__unsafe_private_named.6,
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1,
+            favicon: self._fields.2,
+            image: self._fields.3,
+            note: self._fields.4,
+            subject: self._fields.5.unwrap(),
+            title: self._fields.6,
             extra_data: Some(extra_data),
         }
     }

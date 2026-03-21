@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
 use serde::{Serialize, Deserialize};
@@ -130,13 +133,13 @@ pub mod update_subject_status_state {
 
 /// Builder for constructing an instance of this type
 pub struct UpdateSubjectStatusBuilder<'a, S: update_subject_status_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<StatusAttr<'a>>,
         Option<UpdateSubjectStatusSubject<'a>>,
         Option<StatusAttr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateSubjectStatus<'a> {
@@ -150,9 +153,9 @@ impl<'a> UpdateSubjectStatusBuilder<'a, update_subject_status_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateSubjectStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -160,12 +163,12 @@ impl<'a> UpdateSubjectStatusBuilder<'a, update_subject_status_state::Empty> {
 impl<'a, S: update_subject_status_state::State> UpdateSubjectStatusBuilder<'a, S> {
     /// Set the `deactivated` field (optional)
     pub fn deactivated(mut self, value: impl Into<Option<StatusAttr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `deactivated` field to an Option value (optional)
     pub fn maybe_deactivated(mut self, value: Option<StatusAttr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -180,11 +183,11 @@ where
         mut self,
         value: impl Into<UpdateSubjectStatusSubject<'a>>,
     ) -> UpdateSubjectStatusBuilder<'a, update_subject_status_state::SetSubject<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         UpdateSubjectStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -192,12 +195,12 @@ where
 impl<'a, S: update_subject_status_state::State> UpdateSubjectStatusBuilder<'a, S> {
     /// Set the `takedown` field (optional)
     pub fn takedown(mut self, value: impl Into<Option<StatusAttr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `takedown` field to an Option value (optional)
     pub fn maybe_takedown(mut self, value: Option<StatusAttr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -210,9 +213,9 @@ where
     /// Build the final struct
     pub fn build(self) -> UpdateSubjectStatus<'a> {
         UpdateSubjectStatus {
-            deactivated: self.__unsafe_private_named.0,
-            subject: self.__unsafe_private_named.1.unwrap(),
-            takedown: self.__unsafe_private_named.2,
+            deactivated: self._fields.0,
+            subject: self._fields.1.unwrap(),
+            takedown: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -225,9 +228,9 @@ where
         >,
     ) -> UpdateSubjectStatus<'a> {
         UpdateSubjectStatus {
-            deactivated: self.__unsafe_private_named.0,
-            subject: self.__unsafe_private_named.1.unwrap(),
-            takedown: self.__unsafe_private_named.2,
+            deactivated: self._fields.0,
+            subject: self._fields.1.unwrap(),
+            takedown: self._fields.2,
             extra_data: Some(extra_data),
         }
     }

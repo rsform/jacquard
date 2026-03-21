@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -5323,8 +5326,8 @@ pub mod store_state {
 
 /// Builder for constructing an instance of this type
 pub struct StoreBuilder<'a, S: store_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<StoreAcceptedPaymentMethod<'a>>,
         Option<StoreActionableFeedbackPolicy<'a>>,
         Option<StoreAdditionalProperty<'a>>,
@@ -5452,7 +5455,7 @@ pub struct StoreBuilder<'a, S: store_state::State> {
         Option<StoreUrl<'a>>,
         Option<StoreVatId<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Store<'a> {
@@ -5466,8 +5469,8 @@ impl<'a> StoreBuilder<'a, store_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StoreBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -5595,7 +5598,7 @@ impl<'a> StoreBuilder<'a, store_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -5606,7 +5609,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreAcceptedPaymentMethod<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `acceptedPaymentMethod` field to an Option value (optional)
@@ -5614,7 +5617,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreAcceptedPaymentMethod<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -5625,7 +5628,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreActionableFeedbackPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `actionableFeedbackPolicy` field to an Option value (optional)
@@ -5633,7 +5636,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreActionableFeedbackPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -5644,7 +5647,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreAdditionalProperty<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `additionalProperty` field to an Option value (optional)
@@ -5652,7 +5655,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreAdditionalProperty<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -5663,7 +5666,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreAdditionalType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
@@ -5671,7 +5674,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreAdditionalType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -5679,12 +5682,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `address` field (optional)
     pub fn address(mut self, value: impl Into<Option<StoreAddress<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `address` field to an Option value (optional)
     pub fn maybe_address(mut self, value: Option<StoreAddress<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -5695,7 +5698,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreAgentInteractionStatistic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `agentInteractionStatistic` field to an Option value (optional)
@@ -5703,7 +5706,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreAgentInteractionStatistic<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -5714,7 +5717,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreAggregateRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
@@ -5722,7 +5725,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreAggregateRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -5733,7 +5736,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreAlternateName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
@@ -5741,7 +5744,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreAlternateName<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -5749,12 +5752,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `alumni` field (optional)
     pub fn alumni(mut self, value: impl Into<Option<StoreAlumni<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `alumni` field to an Option value (optional)
     pub fn maybe_alumni(mut self, value: Option<StoreAlumni<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -5765,7 +5768,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreAmenityFeature<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `amenityFeature` field to an Option value (optional)
@@ -5773,7 +5776,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreAmenityFeature<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -5781,12 +5784,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `areaServed` field (optional)
     pub fn area_served(mut self, value: impl Into<Option<StoreAreaServed<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `areaServed` field to an Option value (optional)
     pub fn maybe_area_served(mut self, value: Option<StoreAreaServed<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -5794,12 +5797,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<StoreAward<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
     pub fn maybe_award(mut self, value: Option<StoreAward<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -5807,12 +5810,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<StoreAwards<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
     pub fn maybe_awards(mut self, value: Option<StoreAwards<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -5820,12 +5823,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `branchCode` field (optional)
     pub fn branch_code(mut self, value: impl Into<Option<StoreBranchCode<'a>>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `branchCode` field to an Option value (optional)
     pub fn maybe_branch_code(mut self, value: Option<StoreBranchCode<'a>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -5833,12 +5836,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `branchOf` field (optional)
     pub fn branch_of(mut self, value: impl Into<Option<StoreBranchOf<'a>>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `branchOf` field to an Option value (optional)
     pub fn maybe_branch_of(mut self, value: Option<StoreBranchOf<'a>>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -5846,12 +5849,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `brand` field (optional)
     pub fn brand(mut self, value: impl Into<Option<StoreBrand<'a>>>) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `brand` field to an Option value (optional)
     pub fn maybe_brand(mut self, value: Option<StoreBrand<'a>>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -5862,7 +5865,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreCompanyRegistration<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `companyRegistration` field to an Option value (optional)
@@ -5870,7 +5873,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreCompanyRegistration<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -5881,12 +5884,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreContactPoint<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `contactPoint` field to an Option value (optional)
     pub fn maybe_contact_point(mut self, value: Option<StoreContactPoint<'a>>) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -5897,7 +5900,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreContactPoints<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `contactPoints` field to an Option value (optional)
@@ -5905,7 +5908,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreContactPoints<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -5916,12 +5919,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreContainedIn<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `containedIn` field to an Option value (optional)
     pub fn maybe_contained_in(mut self, value: Option<StoreContainedIn<'a>>) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -5932,7 +5935,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreContainedInPlace<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `containedInPlace` field to an Option value (optional)
@@ -5940,7 +5943,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreContainedInPlace<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -5951,7 +5954,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreContainsPlace<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `containsPlace` field to an Option value (optional)
@@ -5959,7 +5962,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreContainsPlace<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -5970,7 +5973,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreCorrectionsPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `correctionsPolicy` field to an Option value (optional)
@@ -5978,7 +5981,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreCorrectionsPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -5989,7 +5992,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreCurrenciesAccepted<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.23 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `currenciesAccepted` field to an Option value (optional)
@@ -5997,7 +6000,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreCurrenciesAccepted<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.23 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -6005,12 +6008,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `department` field (optional)
     pub fn department(mut self, value: impl Into<Option<StoreDepartment<'a>>>) -> Self {
-        self.__unsafe_private_named.24 = value.into();
+        self._fields.24 = value.into();
         self
     }
     /// Set the `department` field to an Option value (optional)
     pub fn maybe_department(mut self, value: Option<StoreDepartment<'a>>) -> Self {
-        self.__unsafe_private_named.24 = value;
+        self._fields.24 = value;
         self
     }
 }
@@ -6021,12 +6024,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.25 = value.into();
+        self._fields.25 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<StoreDescription<'a>>) -> Self {
-        self.__unsafe_private_named.25 = value;
+        self._fields.25 = value;
         self
     }
 }
@@ -6037,7 +6040,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreDisambiguatingDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.26 = value.into();
+        self._fields.26 = value.into();
         self
     }
     /// Set the `disambiguatingDescription` field to an Option value (optional)
@@ -6045,7 +6048,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreDisambiguatingDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.26 = value;
+        self._fields.26 = value;
         self
     }
 }
@@ -6056,7 +6059,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreDissolutionDate<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.27 = value.into();
+        self._fields.27 = value.into();
         self
     }
     /// Set the `dissolutionDate` field to an Option value (optional)
@@ -6064,7 +6067,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreDissolutionDate<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.27 = value;
+        self._fields.27 = value;
         self
     }
 }
@@ -6075,7 +6078,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreDiversityPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.28 = value.into();
+        self._fields.28 = value.into();
         self
     }
     /// Set the `diversityPolicy` field to an Option value (optional)
@@ -6083,7 +6086,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreDiversityPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.28 = value;
+        self._fields.28 = value;
         self
     }
 }
@@ -6094,7 +6097,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreDiversityStaffingReport<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.29 = value.into();
+        self._fields.29 = value.into();
         self
     }
     /// Set the `diversityStaffingReport` field to an Option value (optional)
@@ -6102,7 +6105,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreDiversityStaffingReport<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.29 = value;
+        self._fields.29 = value;
         self
     }
 }
@@ -6110,12 +6113,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `duns` field (optional)
     pub fn duns(mut self, value: impl Into<Option<StoreDuns<'a>>>) -> Self {
-        self.__unsafe_private_named.30 = value.into();
+        self._fields.30 = value.into();
         self
     }
     /// Set the `duns` field to an Option value (optional)
     pub fn maybe_duns(mut self, value: Option<StoreDuns<'a>>) -> Self {
-        self.__unsafe_private_named.30 = value;
+        self._fields.30 = value;
         self
     }
 }
@@ -6123,12 +6126,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `email` field (optional)
     pub fn email(mut self, value: impl Into<Option<StoreEmail<'a>>>) -> Self {
-        self.__unsafe_private_named.31 = value.into();
+        self._fields.31 = value.into();
         self
     }
     /// Set the `email` field to an Option value (optional)
     pub fn maybe_email(mut self, value: Option<StoreEmail<'a>>) -> Self {
-        self.__unsafe_private_named.31 = value;
+        self._fields.31 = value;
         self
     }
 }
@@ -6136,12 +6139,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `employee` field (optional)
     pub fn employee(mut self, value: impl Into<Option<StoreEmployee<'a>>>) -> Self {
-        self.__unsafe_private_named.32 = value.into();
+        self._fields.32 = value.into();
         self
     }
     /// Set the `employee` field to an Option value (optional)
     pub fn maybe_employee(mut self, value: Option<StoreEmployee<'a>>) -> Self {
-        self.__unsafe_private_named.32 = value;
+        self._fields.32 = value;
         self
     }
 }
@@ -6149,12 +6152,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `employees` field (optional)
     pub fn employees(mut self, value: impl Into<Option<StoreEmployees<'a>>>) -> Self {
-        self.__unsafe_private_named.33 = value.into();
+        self._fields.33 = value.into();
         self
     }
     /// Set the `employees` field to an Option value (optional)
     pub fn maybe_employees(mut self, value: Option<StoreEmployees<'a>>) -> Self {
-        self.__unsafe_private_named.33 = value;
+        self._fields.33 = value;
         self
     }
 }
@@ -6165,12 +6168,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreEthicsPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.34 = value.into();
+        self._fields.34 = value.into();
         self
     }
     /// Set the `ethicsPolicy` field to an Option value (optional)
     pub fn maybe_ethics_policy(mut self, value: Option<StoreEthicsPolicy<'a>>) -> Self {
-        self.__unsafe_private_named.34 = value;
+        self._fields.34 = value;
         self
     }
 }
@@ -6178,12 +6181,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `event` field (optional)
     pub fn event(mut self, value: impl Into<Option<StoreEvent<'a>>>) -> Self {
-        self.__unsafe_private_named.35 = value.into();
+        self._fields.35 = value.into();
         self
     }
     /// Set the `event` field to an Option value (optional)
     pub fn maybe_event(mut self, value: Option<StoreEvent<'a>>) -> Self {
-        self.__unsafe_private_named.35 = value;
+        self._fields.35 = value;
         self
     }
 }
@@ -6191,12 +6194,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `events` field (optional)
     pub fn events(mut self, value: impl Into<Option<StoreEvents<'a>>>) -> Self {
-        self.__unsafe_private_named.36 = value.into();
+        self._fields.36 = value.into();
         self
     }
     /// Set the `events` field to an Option value (optional)
     pub fn maybe_events(mut self, value: Option<StoreEvents<'a>>) -> Self {
-        self.__unsafe_private_named.36 = value;
+        self._fields.36 = value;
         self
     }
 }
@@ -6204,12 +6207,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `faxNumber` field (optional)
     pub fn fax_number(mut self, value: impl Into<Option<StoreFaxNumber<'a>>>) -> Self {
-        self.__unsafe_private_named.37 = value.into();
+        self._fields.37 = value.into();
         self
     }
     /// Set the `faxNumber` field to an Option value (optional)
     pub fn maybe_fax_number(mut self, value: Option<StoreFaxNumber<'a>>) -> Self {
-        self.__unsafe_private_named.37 = value;
+        self._fields.37 = value;
         self
     }
 }
@@ -6217,12 +6220,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `founder` field (optional)
     pub fn founder(mut self, value: impl Into<Option<StoreFounder<'a>>>) -> Self {
-        self.__unsafe_private_named.38 = value.into();
+        self._fields.38 = value.into();
         self
     }
     /// Set the `founder` field to an Option value (optional)
     pub fn maybe_founder(mut self, value: Option<StoreFounder<'a>>) -> Self {
-        self.__unsafe_private_named.38 = value;
+        self._fields.38 = value;
         self
     }
 }
@@ -6230,12 +6233,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `founders` field (optional)
     pub fn founders(mut self, value: impl Into<Option<StoreFounders<'a>>>) -> Self {
-        self.__unsafe_private_named.39 = value.into();
+        self._fields.39 = value.into();
         self
     }
     /// Set the `founders` field to an Option value (optional)
     pub fn maybe_founders(mut self, value: Option<StoreFounders<'a>>) -> Self {
-        self.__unsafe_private_named.39 = value;
+        self._fields.39 = value;
         self
     }
 }
@@ -6246,12 +6249,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreFoundingDate<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.40 = value.into();
+        self._fields.40 = value.into();
         self
     }
     /// Set the `foundingDate` field to an Option value (optional)
     pub fn maybe_founding_date(mut self, value: Option<StoreFoundingDate<'a>>) -> Self {
-        self.__unsafe_private_named.40 = value;
+        self._fields.40 = value;
         self
     }
 }
@@ -6262,7 +6265,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreFoundingLocation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.41 = value.into();
+        self._fields.41 = value.into();
         self
     }
     /// Set the `foundingLocation` field to an Option value (optional)
@@ -6270,7 +6273,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreFoundingLocation<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.41 = value;
+        self._fields.41 = value;
         self
     }
 }
@@ -6278,12 +6281,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `funder` field (optional)
     pub fn funder(mut self, value: impl Into<Option<StoreFunder<'a>>>) -> Self {
-        self.__unsafe_private_named.42 = value.into();
+        self._fields.42 = value.into();
         self
     }
     /// Set the `funder` field to an Option value (optional)
     pub fn maybe_funder(mut self, value: Option<StoreFunder<'a>>) -> Self {
-        self.__unsafe_private_named.42 = value;
+        self._fields.42 = value;
         self
     }
 }
@@ -6291,12 +6294,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<StoreFunding<'a>>>) -> Self {
-        self.__unsafe_private_named.43 = value.into();
+        self._fields.43 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
     pub fn maybe_funding(mut self, value: Option<StoreFunding<'a>>) -> Self {
-        self.__unsafe_private_named.43 = value;
+        self._fields.43 = value;
         self
     }
 }
@@ -6304,12 +6307,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `geo` field (optional)
     pub fn geo(mut self, value: impl Into<Option<StoreGeo<'a>>>) -> Self {
-        self.__unsafe_private_named.44 = value.into();
+        self._fields.44 = value.into();
         self
     }
     /// Set the `geo` field to an Option value (optional)
     pub fn maybe_geo(mut self, value: Option<StoreGeo<'a>>) -> Self {
-        self.__unsafe_private_named.44 = value;
+        self._fields.44 = value;
         self
     }
 }
@@ -6320,12 +6323,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreGeoContains<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value.into();
+        self._fields.45 = value.into();
         self
     }
     /// Set the `geoContains` field to an Option value (optional)
     pub fn maybe_geo_contains(mut self, value: Option<StoreGeoContains<'a>>) -> Self {
-        self.__unsafe_private_named.45 = value;
+        self._fields.45 = value;
         self
     }
 }
@@ -6336,12 +6339,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreGeoCoveredBy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.46 = value.into();
+        self._fields.46 = value.into();
         self
     }
     /// Set the `geoCoveredBy` field to an Option value (optional)
     pub fn maybe_geo_covered_by(mut self, value: Option<StoreGeoCoveredBy<'a>>) -> Self {
-        self.__unsafe_private_named.46 = value;
+        self._fields.46 = value;
         self
     }
 }
@@ -6349,12 +6352,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `geoCovers` field (optional)
     pub fn geo_covers(mut self, value: impl Into<Option<StoreGeoCovers<'a>>>) -> Self {
-        self.__unsafe_private_named.47 = value.into();
+        self._fields.47 = value.into();
         self
     }
     /// Set the `geoCovers` field to an Option value (optional)
     pub fn maybe_geo_covers(mut self, value: Option<StoreGeoCovers<'a>>) -> Self {
-        self.__unsafe_private_named.47 = value;
+        self._fields.47 = value;
         self
     }
 }
@@ -6362,12 +6365,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `geoCrosses` field (optional)
     pub fn geo_crosses(mut self, value: impl Into<Option<StoreGeoCrosses<'a>>>) -> Self {
-        self.__unsafe_private_named.48 = value.into();
+        self._fields.48 = value.into();
         self
     }
     /// Set the `geoCrosses` field to an Option value (optional)
     pub fn maybe_geo_crosses(mut self, value: Option<StoreGeoCrosses<'a>>) -> Self {
-        self.__unsafe_private_named.48 = value;
+        self._fields.48 = value;
         self
     }
 }
@@ -6378,12 +6381,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreGeoDisjoint<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.49 = value.into();
+        self._fields.49 = value.into();
         self
     }
     /// Set the `geoDisjoint` field to an Option value (optional)
     pub fn maybe_geo_disjoint(mut self, value: Option<StoreGeoDisjoint<'a>>) -> Self {
-        self.__unsafe_private_named.49 = value;
+        self._fields.49 = value;
         self
     }
 }
@@ -6391,12 +6394,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `geoEquals` field (optional)
     pub fn geo_equals(mut self, value: impl Into<Option<StoreGeoEquals<'a>>>) -> Self {
-        self.__unsafe_private_named.50 = value.into();
+        self._fields.50 = value.into();
         self
     }
     /// Set the `geoEquals` field to an Option value (optional)
     pub fn maybe_geo_equals(mut self, value: Option<StoreGeoEquals<'a>>) -> Self {
-        self.__unsafe_private_named.50 = value;
+        self._fields.50 = value;
         self
     }
 }
@@ -6407,7 +6410,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreGeoIntersects<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.51 = value.into();
+        self._fields.51 = value.into();
         self
     }
     /// Set the `geoIntersects` field to an Option value (optional)
@@ -6415,7 +6418,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreGeoIntersects<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.51 = value;
+        self._fields.51 = value;
         self
     }
 }
@@ -6426,12 +6429,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreGeoOverlaps<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.52 = value.into();
+        self._fields.52 = value.into();
         self
     }
     /// Set the `geoOverlaps` field to an Option value (optional)
     pub fn maybe_geo_overlaps(mut self, value: Option<StoreGeoOverlaps<'a>>) -> Self {
-        self.__unsafe_private_named.52 = value;
+        self._fields.52 = value;
         self
     }
 }
@@ -6439,12 +6442,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `geoTouches` field (optional)
     pub fn geo_touches(mut self, value: impl Into<Option<StoreGeoTouches<'a>>>) -> Self {
-        self.__unsafe_private_named.53 = value.into();
+        self._fields.53 = value.into();
         self
     }
     /// Set the `geoTouches` field to an Option value (optional)
     pub fn maybe_geo_touches(mut self, value: Option<StoreGeoTouches<'a>>) -> Self {
-        self.__unsafe_private_named.53 = value;
+        self._fields.53 = value;
         self
     }
 }
@@ -6452,12 +6455,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `geoWithin` field (optional)
     pub fn geo_within(mut self, value: impl Into<Option<StoreGeoWithin<'a>>>) -> Self {
-        self.__unsafe_private_named.54 = value.into();
+        self._fields.54 = value.into();
         self
     }
     /// Set the `geoWithin` field to an Option value (optional)
     pub fn maybe_geo_within(mut self, value: Option<StoreGeoWithin<'a>>) -> Self {
-        self.__unsafe_private_named.54 = value;
+        self._fields.54 = value;
         self
     }
 }
@@ -6468,7 +6471,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreGlobalLocationNumber<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.55 = value.into();
+        self._fields.55 = value.into();
         self
     }
     /// Set the `globalLocationNumber` field to an Option value (optional)
@@ -6476,7 +6479,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreGlobalLocationNumber<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.55 = value;
+        self._fields.55 = value;
         self
     }
 }
@@ -6487,7 +6490,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreHasCertification<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value.into();
+        self._fields.56 = value.into();
         self
     }
     /// Set the `hasCertification` field to an Option value (optional)
@@ -6495,7 +6498,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreHasCertification<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value;
+        self._fields.56 = value;
         self
     }
 }
@@ -6506,7 +6509,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreHasCredential<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.57 = value.into();
+        self._fields.57 = value.into();
         self
     }
     /// Set the `hasCredential` field to an Option value (optional)
@@ -6514,7 +6517,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreHasCredential<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.57 = value;
+        self._fields.57 = value;
         self
     }
 }
@@ -6525,7 +6528,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreHasDriveThroughService<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.58 = value.into();
+        self._fields.58 = value.into();
         self
     }
     /// Set the `hasDriveThroughService` field to an Option value (optional)
@@ -6533,7 +6536,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreHasDriveThroughService<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.58 = value;
+        self._fields.58 = value;
         self
     }
 }
@@ -6544,7 +6547,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreHasGs1DigitalLink<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.59 = value.into();
+        self._fields.59 = value.into();
         self
     }
     /// Set the `hasGS1DigitalLink` field to an Option value (optional)
@@ -6552,7 +6555,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreHasGs1DigitalLink<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.59 = value;
+        self._fields.59 = value;
         self
     }
 }
@@ -6560,12 +6563,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `hasMap` field (optional)
     pub fn has_map(mut self, value: impl Into<Option<StoreHasMap<'a>>>) -> Self {
-        self.__unsafe_private_named.60 = value.into();
+        self._fields.60 = value.into();
         self
     }
     /// Set the `hasMap` field to an Option value (optional)
     pub fn maybe_has_map(mut self, value: Option<StoreHasMap<'a>>) -> Self {
-        self.__unsafe_private_named.60 = value;
+        self._fields.60 = value;
         self
     }
 }
@@ -6576,7 +6579,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreHasMemberProgram<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.61 = value.into();
+        self._fields.61 = value.into();
         self
     }
     /// Set the `hasMemberProgram` field to an Option value (optional)
@@ -6584,7 +6587,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreHasMemberProgram<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.61 = value;
+        self._fields.61 = value;
         self
     }
 }
@@ -6595,7 +6598,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreHasMerchantReturnPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.62 = value.into();
+        self._fields.62 = value.into();
         self
     }
     /// Set the `hasMerchantReturnPolicy` field to an Option value (optional)
@@ -6603,7 +6606,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreHasMerchantReturnPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.62 = value;
+        self._fields.62 = value;
         self
     }
 }
@@ -6614,7 +6617,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreHasOfferCatalog<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.63 = value.into();
+        self._fields.63 = value.into();
         self
     }
     /// Set the `hasOfferCatalog` field to an Option value (optional)
@@ -6622,7 +6625,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreHasOfferCatalog<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.63 = value;
+        self._fields.63 = value;
         self
     }
 }
@@ -6630,12 +6633,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `hasPOS` field (optional)
     pub fn has_pos(mut self, value: impl Into<Option<StoreHasPos<'a>>>) -> Self {
-        self.__unsafe_private_named.64 = value.into();
+        self._fields.64 = value.into();
         self
     }
     /// Set the `hasPOS` field to an Option value (optional)
     pub fn maybe_has_pos(mut self, value: Option<StoreHasPos<'a>>) -> Self {
-        self.__unsafe_private_named.64 = value;
+        self._fields.64 = value;
         self
     }
 }
@@ -6646,7 +6649,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreHasProductReturnPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.65 = value.into();
+        self._fields.65 = value.into();
         self
     }
     /// Set the `hasProductReturnPolicy` field to an Option value (optional)
@@ -6654,7 +6657,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreHasProductReturnPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.65 = value;
+        self._fields.65 = value;
         self
     }
 }
@@ -6665,7 +6668,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreHasShippingService<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.66 = value.into();
+        self._fields.66 = value.into();
         self
     }
     /// Set the `hasShippingService` field to an Option value (optional)
@@ -6673,7 +6676,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreHasShippingService<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.66 = value;
+        self._fields.66 = value;
         self
     }
 }
@@ -6681,12 +6684,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `identifier` field (optional)
     pub fn identifier(mut self, value: impl Into<Option<StoreIdentifier<'a>>>) -> Self {
-        self.__unsafe_private_named.67 = value.into();
+        self._fields.67 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
     pub fn maybe_identifier(mut self, value: Option<StoreIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.67 = value;
+        self._fields.67 = value;
         self
     }
 }
@@ -6694,12 +6697,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<StoreImage<'a>>>) -> Self {
-        self.__unsafe_private_named.68 = value.into();
+        self._fields.68 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<StoreImage<'a>>) -> Self {
-        self.__unsafe_private_named.68 = value;
+        self._fields.68 = value;
         self
     }
 }
@@ -6710,7 +6713,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreInteractionStatistic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.69 = value.into();
+        self._fields.69 = value.into();
         self
     }
     /// Set the `interactionStatistic` field to an Option value (optional)
@@ -6718,7 +6721,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreInteractionStatistic<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.69 = value;
+        self._fields.69 = value;
         self
     }
 }
@@ -6729,7 +6732,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreIsAccessibleForFree<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.70 = value.into();
+        self._fields.70 = value.into();
         self
     }
     /// Set the `isAccessibleForFree` field to an Option value (optional)
@@ -6737,7 +6740,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreIsAccessibleForFree<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.70 = value;
+        self._fields.70 = value;
         self
     }
 }
@@ -6745,12 +6748,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `isicV4` field (optional)
     pub fn isic_v4(mut self, value: impl Into<Option<StoreIsicV4<'a>>>) -> Self {
-        self.__unsafe_private_named.71 = value.into();
+        self._fields.71 = value.into();
         self
     }
     /// Set the `isicV4` field to an Option value (optional)
     pub fn maybe_isic_v4(mut self, value: Option<StoreIsicV4<'a>>) -> Self {
-        self.__unsafe_private_named.71 = value;
+        self._fields.71 = value;
         self
     }
 }
@@ -6761,12 +6764,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreIso6523Code<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.72 = value.into();
+        self._fields.72 = value.into();
         self
     }
     /// Set the `iso6523Code` field to an Option value (optional)
     pub fn maybe_iso6523_code(mut self, value: Option<StoreIso6523Code<'a>>) -> Self {
-        self.__unsafe_private_named.72 = value;
+        self._fields.72 = value;
         self
     }
 }
@@ -6774,12 +6777,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<StoreKeywords<'a>>>) -> Self {
-        self.__unsafe_private_named.73 = value.into();
+        self._fields.73 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
     pub fn maybe_keywords(mut self, value: Option<StoreKeywords<'a>>) -> Self {
-        self.__unsafe_private_named.73 = value;
+        self._fields.73 = value;
         self
     }
 }
@@ -6787,12 +6790,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `knowsAbout` field (optional)
     pub fn knows_about(mut self, value: impl Into<Option<StoreKnowsAbout<'a>>>) -> Self {
-        self.__unsafe_private_named.74 = value.into();
+        self._fields.74 = value.into();
         self
     }
     /// Set the `knowsAbout` field to an Option value (optional)
     pub fn maybe_knows_about(mut self, value: Option<StoreKnowsAbout<'a>>) -> Self {
-        self.__unsafe_private_named.74 = value;
+        self._fields.74 = value;
         self
     }
 }
@@ -6803,7 +6806,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreKnowsLanguage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.75 = value.into();
+        self._fields.75 = value.into();
         self
     }
     /// Set the `knowsLanguage` field to an Option value (optional)
@@ -6811,7 +6814,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreKnowsLanguage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.75 = value;
+        self._fields.75 = value;
         self
     }
 }
@@ -6819,12 +6822,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `latitude` field (optional)
     pub fn latitude(mut self, value: impl Into<Option<StoreLatitude<'a>>>) -> Self {
-        self.__unsafe_private_named.76 = value.into();
+        self._fields.76 = value.into();
         self
     }
     /// Set the `latitude` field to an Option value (optional)
     pub fn maybe_latitude(mut self, value: Option<StoreLatitude<'a>>) -> Self {
-        self.__unsafe_private_named.76 = value;
+        self._fields.76 = value;
         self
     }
 }
@@ -6835,12 +6838,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreLegalAddress<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.77 = value.into();
+        self._fields.77 = value.into();
         self
     }
     /// Set the `legalAddress` field to an Option value (optional)
     pub fn maybe_legal_address(mut self, value: Option<StoreLegalAddress<'a>>) -> Self {
-        self.__unsafe_private_named.77 = value;
+        self._fields.77 = value;
         self
     }
 }
@@ -6848,12 +6851,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `legalName` field (optional)
     pub fn legal_name(mut self, value: impl Into<Option<StoreLegalName<'a>>>) -> Self {
-        self.__unsafe_private_named.78 = value.into();
+        self._fields.78 = value.into();
         self
     }
     /// Set the `legalName` field to an Option value (optional)
     pub fn maybe_legal_name(mut self, value: Option<StoreLegalName<'a>>) -> Self {
-        self.__unsafe_private_named.78 = value;
+        self._fields.78 = value;
         self
     }
 }
@@ -6864,7 +6867,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreLegalRepresentative<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.79 = value.into();
+        self._fields.79 = value.into();
         self
     }
     /// Set the `legalRepresentative` field to an Option value (optional)
@@ -6872,7 +6875,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreLegalRepresentative<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.79 = value;
+        self._fields.79 = value;
         self
     }
 }
@@ -6880,12 +6883,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `leiCode` field (optional)
     pub fn lei_code(mut self, value: impl Into<Option<StoreLeiCode<'a>>>) -> Self {
-        self.__unsafe_private_named.80 = value.into();
+        self._fields.80 = value.into();
         self
     }
     /// Set the `leiCode` field to an Option value (optional)
     pub fn maybe_lei_code(mut self, value: Option<StoreLeiCode<'a>>) -> Self {
-        self.__unsafe_private_named.80 = value;
+        self._fields.80 = value;
         self
     }
 }
@@ -6893,12 +6896,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<StoreLocation<'a>>>) -> Self {
-        self.__unsafe_private_named.81 = value.into();
+        self._fields.81 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
     pub fn maybe_location(mut self, value: Option<StoreLocation<'a>>) -> Self {
-        self.__unsafe_private_named.81 = value;
+        self._fields.81 = value;
         self
     }
 }
@@ -6906,12 +6909,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `logo` field (optional)
     pub fn logo(mut self, value: impl Into<Option<StoreLogo<'a>>>) -> Self {
-        self.__unsafe_private_named.82 = value.into();
+        self._fields.82 = value.into();
         self
     }
     /// Set the `logo` field to an Option value (optional)
     pub fn maybe_logo(mut self, value: Option<StoreLogo<'a>>) -> Self {
-        self.__unsafe_private_named.82 = value;
+        self._fields.82 = value;
         self
     }
 }
@@ -6919,12 +6922,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `longitude` field (optional)
     pub fn longitude(mut self, value: impl Into<Option<StoreLongitude<'a>>>) -> Self {
-        self.__unsafe_private_named.83 = value.into();
+        self._fields.83 = value.into();
         self
     }
     /// Set the `longitude` field to an Option value (optional)
     pub fn maybe_longitude(mut self, value: Option<StoreLongitude<'a>>) -> Self {
-        self.__unsafe_private_named.83 = value;
+        self._fields.83 = value;
         self
     }
 }
@@ -6935,7 +6938,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreMainEntityOfPage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.84 = value.into();
+        self._fields.84 = value.into();
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
@@ -6943,7 +6946,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreMainEntityOfPage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.84 = value;
+        self._fields.84 = value;
         self
     }
 }
@@ -6951,12 +6954,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `makesOffer` field (optional)
     pub fn makes_offer(mut self, value: impl Into<Option<StoreMakesOffer<'a>>>) -> Self {
-        self.__unsafe_private_named.85 = value.into();
+        self._fields.85 = value.into();
         self
     }
     /// Set the `makesOffer` field to an Option value (optional)
     pub fn maybe_makes_offer(mut self, value: Option<StoreMakesOffer<'a>>) -> Self {
-        self.__unsafe_private_named.85 = value;
+        self._fields.85 = value;
         self
     }
 }
@@ -6964,12 +6967,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `map` field (optional)
     pub fn map(mut self, value: impl Into<Option<StoreMap<'a>>>) -> Self {
-        self.__unsafe_private_named.86 = value.into();
+        self._fields.86 = value.into();
         self
     }
     /// Set the `map` field to an Option value (optional)
     pub fn maybe_map(mut self, value: Option<StoreMap<'a>>) -> Self {
-        self.__unsafe_private_named.86 = value;
+        self._fields.86 = value;
         self
     }
 }
@@ -6977,12 +6980,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `maps` field (optional)
     pub fn maps(mut self, value: impl Into<Option<StoreMaps<'a>>>) -> Self {
-        self.__unsafe_private_named.87 = value.into();
+        self._fields.87 = value.into();
         self
     }
     /// Set the `maps` field to an Option value (optional)
     pub fn maybe_maps(mut self, value: Option<StoreMaps<'a>>) -> Self {
-        self.__unsafe_private_named.87 = value;
+        self._fields.87 = value;
         self
     }
 }
@@ -6993,7 +6996,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreMaximumAttendeeCapacity<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.88 = value.into();
+        self._fields.88 = value.into();
         self
     }
     /// Set the `maximumAttendeeCapacity` field to an Option value (optional)
@@ -7001,7 +7004,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreMaximumAttendeeCapacity<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.88 = value;
+        self._fields.88 = value;
         self
     }
 }
@@ -7009,12 +7012,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `member` field (optional)
     pub fn member(mut self, value: impl Into<Option<StoreMember<'a>>>) -> Self {
-        self.__unsafe_private_named.89 = value.into();
+        self._fields.89 = value.into();
         self
     }
     /// Set the `member` field to an Option value (optional)
     pub fn maybe_member(mut self, value: Option<StoreMember<'a>>) -> Self {
-        self.__unsafe_private_named.89 = value;
+        self._fields.89 = value;
         self
     }
 }
@@ -7022,12 +7025,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `memberOf` field (optional)
     pub fn member_of(mut self, value: impl Into<Option<StoreMemberOf<'a>>>) -> Self {
-        self.__unsafe_private_named.90 = value.into();
+        self._fields.90 = value.into();
         self
     }
     /// Set the `memberOf` field to an Option value (optional)
     pub fn maybe_member_of(mut self, value: Option<StoreMemberOf<'a>>) -> Self {
-        self.__unsafe_private_named.90 = value;
+        self._fields.90 = value;
         self
     }
 }
@@ -7035,12 +7038,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `members` field (optional)
     pub fn members(mut self, value: impl Into<Option<StoreMembers<'a>>>) -> Self {
-        self.__unsafe_private_named.91 = value.into();
+        self._fields.91 = value.into();
         self
     }
     /// Set the `members` field to an Option value (optional)
     pub fn maybe_members(mut self, value: Option<StoreMembers<'a>>) -> Self {
-        self.__unsafe_private_named.91 = value;
+        self._fields.91 = value;
         self
     }
 }
@@ -7048,12 +7051,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `naics` field (optional)
     pub fn naics(mut self, value: impl Into<Option<StoreNaics<'a>>>) -> Self {
-        self.__unsafe_private_named.92 = value.into();
+        self._fields.92 = value.into();
         self
     }
     /// Set the `naics` field to an Option value (optional)
     pub fn maybe_naics(mut self, value: Option<StoreNaics<'a>>) -> Self {
-        self.__unsafe_private_named.92 = value;
+        self._fields.92 = value;
         self
     }
 }
@@ -7061,12 +7064,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<StoreName<'a>>>) -> Self {
-        self.__unsafe_private_named.93 = value.into();
+        self._fields.93 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<StoreName<'a>>) -> Self {
-        self.__unsafe_private_named.93 = value;
+        self._fields.93 = value;
         self
     }
 }
@@ -7077,7 +7080,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreNonprofitStatus<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.94 = value.into();
+        self._fields.94 = value.into();
         self
     }
     /// Set the `nonprofitStatus` field to an Option value (optional)
@@ -7085,7 +7088,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreNonprofitStatus<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.94 = value;
+        self._fields.94 = value;
         self
     }
 }
@@ -7096,7 +7099,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreNumberOfEmployees<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.95 = value.into();
+        self._fields.95 = value.into();
         self
     }
     /// Set the `numberOfEmployees` field to an Option value (optional)
@@ -7104,7 +7107,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreNumberOfEmployees<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.95 = value;
+        self._fields.95 = value;
         self
     }
 }
@@ -7115,12 +7118,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreOpeningHours<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.96 = value.into();
+        self._fields.96 = value.into();
         self
     }
     /// Set the `openingHours` field to an Option value (optional)
     pub fn maybe_opening_hours(mut self, value: Option<StoreOpeningHours<'a>>) -> Self {
-        self.__unsafe_private_named.96 = value;
+        self._fields.96 = value;
         self
     }
 }
@@ -7131,7 +7134,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreOpeningHoursSpecification<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.97 = value.into();
+        self._fields.97 = value.into();
         self
     }
     /// Set the `openingHoursSpecification` field to an Option value (optional)
@@ -7139,7 +7142,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreOpeningHoursSpecification<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.97 = value;
+        self._fields.97 = value;
         self
     }
 }
@@ -7150,7 +7153,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreOwnershipFundingInfo<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.98 = value.into();
+        self._fields.98 = value.into();
         self
     }
     /// Set the `ownershipFundingInfo` field to an Option value (optional)
@@ -7158,7 +7161,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreOwnershipFundingInfo<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.98 = value;
+        self._fields.98 = value;
         self
     }
 }
@@ -7166,12 +7169,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `owns` field (optional)
     pub fn owns(mut self, value: impl Into<Option<StoreOwns<'a>>>) -> Self {
-        self.__unsafe_private_named.99 = value.into();
+        self._fields.99 = value.into();
         self
     }
     /// Set the `owns` field to an Option value (optional)
     pub fn maybe_owns(mut self, value: Option<StoreOwns<'a>>) -> Self {
-        self.__unsafe_private_named.99 = value;
+        self._fields.99 = value;
         self
     }
 }
@@ -7182,7 +7185,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreParentOrganization<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.100 = value.into();
+        self._fields.100 = value.into();
         self
     }
     /// Set the `parentOrganization` field to an Option value (optional)
@@ -7190,7 +7193,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreParentOrganization<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.100 = value;
+        self._fields.100 = value;
         self
     }
 }
@@ -7201,7 +7204,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StorePaymentAccepted<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.101 = value.into();
+        self._fields.101 = value.into();
         self
     }
     /// Set the `paymentAccepted` field to an Option value (optional)
@@ -7209,7 +7212,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StorePaymentAccepted<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.101 = value;
+        self._fields.101 = value;
         self
     }
 }
@@ -7217,12 +7220,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `photo` field (optional)
     pub fn photo(mut self, value: impl Into<Option<StorePhoto<'a>>>) -> Self {
-        self.__unsafe_private_named.102 = value.into();
+        self._fields.102 = value.into();
         self
     }
     /// Set the `photo` field to an Option value (optional)
     pub fn maybe_photo(mut self, value: Option<StorePhoto<'a>>) -> Self {
-        self.__unsafe_private_named.102 = value;
+        self._fields.102 = value;
         self
     }
 }
@@ -7230,12 +7233,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `photos` field (optional)
     pub fn photos(mut self, value: impl Into<Option<StorePhotos<'a>>>) -> Self {
-        self.__unsafe_private_named.103 = value.into();
+        self._fields.103 = value.into();
         self
     }
     /// Set the `photos` field to an Option value (optional)
     pub fn maybe_photos(mut self, value: Option<StorePhotos<'a>>) -> Self {
-        self.__unsafe_private_named.103 = value;
+        self._fields.103 = value;
         self
     }
 }
@@ -7246,7 +7249,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StorePotentialAction<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.104 = value.into();
+        self._fields.104 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
@@ -7254,7 +7257,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StorePotentialAction<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.104 = value;
+        self._fields.104 = value;
         self
     }
 }
@@ -7262,12 +7265,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `priceRange` field (optional)
     pub fn price_range(mut self, value: impl Into<Option<StorePriceRange<'a>>>) -> Self {
-        self.__unsafe_private_named.105 = value.into();
+        self._fields.105 = value.into();
         self
     }
     /// Set the `priceRange` field to an Option value (optional)
     pub fn maybe_price_range(mut self, value: Option<StorePriceRange<'a>>) -> Self {
-        self.__unsafe_private_named.105 = value;
+        self._fields.105 = value;
         self
     }
 }
@@ -7278,12 +7281,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StorePublicAccess<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.106 = value.into();
+        self._fields.106 = value.into();
         self
     }
     /// Set the `publicAccess` field to an Option value (optional)
     pub fn maybe_public_access(mut self, value: Option<StorePublicAccess<'a>>) -> Self {
-        self.__unsafe_private_named.106 = value;
+        self._fields.106 = value;
         self
     }
 }
@@ -7294,7 +7297,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StorePublishingPrinciples<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.107 = value.into();
+        self._fields.107 = value.into();
         self
     }
     /// Set the `publishingPrinciples` field to an Option value (optional)
@@ -7302,7 +7305,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StorePublishingPrinciples<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.107 = value;
+        self._fields.107 = value;
         self
     }
 }
@@ -7310,12 +7313,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<StoreReview<'a>>>) -> Self {
-        self.__unsafe_private_named.108 = value.into();
+        self._fields.108 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
     pub fn maybe_review(mut self, value: Option<StoreReview<'a>>) -> Self {
-        self.__unsafe_private_named.108 = value;
+        self._fields.108 = value;
         self
     }
 }
@@ -7323,12 +7326,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `reviews` field (optional)
     pub fn reviews(mut self, value: impl Into<Option<StoreReviews<'a>>>) -> Self {
-        self.__unsafe_private_named.109 = value.into();
+        self._fields.109 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
     pub fn maybe_reviews(mut self, value: Option<StoreReviews<'a>>) -> Self {
-        self.__unsafe_private_named.109 = value;
+        self._fields.109 = value;
         self
     }
 }
@@ -7336,12 +7339,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<StoreSameAs<'a>>>) -> Self {
-        self.__unsafe_private_named.110 = value.into();
+        self._fields.110 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
     pub fn maybe_same_as(mut self, value: Option<StoreSameAs<'a>>) -> Self {
-        self.__unsafe_private_named.110 = value;
+        self._fields.110 = value;
         self
     }
 }
@@ -7349,12 +7352,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `seeks` field (optional)
     pub fn seeks(mut self, value: impl Into<Option<StoreSeeks<'a>>>) -> Self {
-        self.__unsafe_private_named.111 = value.into();
+        self._fields.111 = value.into();
         self
     }
     /// Set the `seeks` field to an Option value (optional)
     pub fn maybe_seeks(mut self, value: Option<StoreSeeks<'a>>) -> Self {
-        self.__unsafe_private_named.111 = value;
+        self._fields.111 = value;
         self
     }
 }
@@ -7365,12 +7368,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreServiceArea<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.112 = value.into();
+        self._fields.112 = value.into();
         self
     }
     /// Set the `serviceArea` field to an Option value (optional)
     pub fn maybe_service_area(mut self, value: Option<StoreServiceArea<'a>>) -> Self {
-        self.__unsafe_private_named.112 = value;
+        self._fields.112 = value;
         self
     }
 }
@@ -7378,12 +7381,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `skills` field (optional)
     pub fn skills(mut self, value: impl Into<Option<StoreSkills<'a>>>) -> Self {
-        self.__unsafe_private_named.113 = value.into();
+        self._fields.113 = value.into();
         self
     }
     /// Set the `skills` field to an Option value (optional)
     pub fn maybe_skills(mut self, value: Option<StoreSkills<'a>>) -> Self {
-        self.__unsafe_private_named.113 = value;
+        self._fields.113 = value;
         self
     }
 }
@@ -7391,12 +7394,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `slogan` field (optional)
     pub fn slogan(mut self, value: impl Into<Option<StoreSlogan<'a>>>) -> Self {
-        self.__unsafe_private_named.114 = value.into();
+        self._fields.114 = value.into();
         self
     }
     /// Set the `slogan` field to an Option value (optional)
     pub fn maybe_slogan(mut self, value: Option<StoreSlogan<'a>>) -> Self {
-        self.__unsafe_private_named.114 = value;
+        self._fields.114 = value;
         self
     }
 }
@@ -7407,7 +7410,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreSmokingAllowed<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.115 = value.into();
+        self._fields.115 = value.into();
         self
     }
     /// Set the `smokingAllowed` field to an Option value (optional)
@@ -7415,7 +7418,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreSmokingAllowed<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.115 = value;
+        self._fields.115 = value;
         self
     }
 }
@@ -7426,7 +7429,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreSpecialOpeningHoursSpecification<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.116 = value.into();
+        self._fields.116 = value.into();
         self
     }
     /// Set the `specialOpeningHoursSpecification` field to an Option value (optional)
@@ -7434,7 +7437,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreSpecialOpeningHoursSpecification<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.116 = value;
+        self._fields.116 = value;
         self
     }
 }
@@ -7442,12 +7445,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `sponsor` field (optional)
     pub fn sponsor(mut self, value: impl Into<Option<StoreSponsor<'a>>>) -> Self {
-        self.__unsafe_private_named.117 = value.into();
+        self._fields.117 = value.into();
         self
     }
     /// Set the `sponsor` field to an Option value (optional)
     pub fn maybe_sponsor(mut self, value: Option<StoreSponsor<'a>>) -> Self {
-        self.__unsafe_private_named.117 = value;
+        self._fields.117 = value;
         self
     }
 }
@@ -7458,7 +7461,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreSubOrganization<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.118 = value.into();
+        self._fields.118 = value.into();
         self
     }
     /// Set the `subOrganization` field to an Option value (optional)
@@ -7466,7 +7469,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreSubOrganization<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.118 = value;
+        self._fields.118 = value;
         self
     }
 }
@@ -7474,12 +7477,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(mut self, value: impl Into<Option<StoreSubjectOf<'a>>>) -> Self {
-        self.__unsafe_private_named.119 = value.into();
+        self._fields.119 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
     pub fn maybe_subject_of(mut self, value: Option<StoreSubjectOf<'a>>) -> Self {
-        self.__unsafe_private_named.119 = value;
+        self._fields.119 = value;
         self
     }
 }
@@ -7487,12 +7490,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `taxID` field (optional)
     pub fn tax_id(mut self, value: impl Into<Option<StoreTaxId<'a>>>) -> Self {
-        self.__unsafe_private_named.120 = value.into();
+        self._fields.120 = value.into();
         self
     }
     /// Set the `taxID` field to an Option value (optional)
     pub fn maybe_tax_id(mut self, value: Option<StoreTaxId<'a>>) -> Self {
-        self.__unsafe_private_named.120 = value;
+        self._fields.120 = value;
         self
     }
 }
@@ -7500,12 +7503,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `telephone` field (optional)
     pub fn telephone(mut self, value: impl Into<Option<StoreTelephone<'a>>>) -> Self {
-        self.__unsafe_private_named.121 = value.into();
+        self._fields.121 = value.into();
         self
     }
     /// Set the `telephone` field to an Option value (optional)
     pub fn maybe_telephone(mut self, value: Option<StoreTelephone<'a>>) -> Self {
-        self.__unsafe_private_named.121 = value;
+        self._fields.121 = value;
         self
     }
 }
@@ -7516,7 +7519,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreTourBookingPage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.122 = value.into();
+        self._fields.122 = value.into();
         self
     }
     /// Set the `tourBookingPage` field to an Option value (optional)
@@ -7524,7 +7527,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreTourBookingPage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.122 = value;
+        self._fields.122 = value;
         self
     }
 }
@@ -7535,7 +7538,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: impl Into<Option<StoreUnnamedSourcesPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.123 = value.into();
+        self._fields.123 = value.into();
         self
     }
     /// Set the `unnamedSourcesPolicy` field to an Option value (optional)
@@ -7543,7 +7546,7 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
         mut self,
         value: Option<StoreUnnamedSourcesPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.123 = value;
+        self._fields.123 = value;
         self
     }
 }
@@ -7551,12 +7554,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<StoreUrl<'a>>>) -> Self {
-        self.__unsafe_private_named.124 = value.into();
+        self._fields.124 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<StoreUrl<'a>>) -> Self {
-        self.__unsafe_private_named.124 = value;
+        self._fields.124 = value;
         self
     }
 }
@@ -7564,12 +7567,12 @@ impl<'a, S: store_state::State> StoreBuilder<'a, S> {
 impl<'a, S: store_state::State> StoreBuilder<'a, S> {
     /// Set the `vatID` field (optional)
     pub fn vat_id(mut self, value: impl Into<Option<StoreVatId<'a>>>) -> Self {
-        self.__unsafe_private_named.125 = value.into();
+        self._fields.125 = value.into();
         self
     }
     /// Set the `vatID` field to an Option value (optional)
     pub fn maybe_vat_id(mut self, value: Option<StoreVatId<'a>>) -> Self {
-        self.__unsafe_private_named.125 = value;
+        self._fields.125 = value;
         self
     }
 }
@@ -7581,132 +7584,132 @@ where
     /// Build the final struct
     pub fn build(self) -> Store<'a> {
         Store {
-            accepted_payment_method: self.__unsafe_private_named.0,
-            actionable_feedback_policy: self.__unsafe_private_named.1,
-            additional_property: self.__unsafe_private_named.2,
-            additional_type: self.__unsafe_private_named.3,
-            address: self.__unsafe_private_named.4,
-            agent_interaction_statistic: self.__unsafe_private_named.5,
-            aggregate_rating: self.__unsafe_private_named.6,
-            alternate_name: self.__unsafe_private_named.7,
-            alumni: self.__unsafe_private_named.8,
-            amenity_feature: self.__unsafe_private_named.9,
-            area_served: self.__unsafe_private_named.10,
-            award: self.__unsafe_private_named.11,
-            awards: self.__unsafe_private_named.12,
-            branch_code: self.__unsafe_private_named.13,
-            branch_of: self.__unsafe_private_named.14,
-            brand: self.__unsafe_private_named.15,
-            company_registration: self.__unsafe_private_named.16,
-            contact_point: self.__unsafe_private_named.17,
-            contact_points: self.__unsafe_private_named.18,
-            contained_in: self.__unsafe_private_named.19,
-            contained_in_place: self.__unsafe_private_named.20,
-            contains_place: self.__unsafe_private_named.21,
-            corrections_policy: self.__unsafe_private_named.22,
-            currencies_accepted: self.__unsafe_private_named.23,
-            department: self.__unsafe_private_named.24,
-            description: self.__unsafe_private_named.25,
-            disambiguating_description: self.__unsafe_private_named.26,
-            dissolution_date: self.__unsafe_private_named.27,
-            diversity_policy: self.__unsafe_private_named.28,
-            diversity_staffing_report: self.__unsafe_private_named.29,
-            duns: self.__unsafe_private_named.30,
-            email: self.__unsafe_private_named.31,
-            employee: self.__unsafe_private_named.32,
-            employees: self.__unsafe_private_named.33,
-            ethics_policy: self.__unsafe_private_named.34,
-            event: self.__unsafe_private_named.35,
-            events: self.__unsafe_private_named.36,
-            fax_number: self.__unsafe_private_named.37,
-            founder: self.__unsafe_private_named.38,
-            founders: self.__unsafe_private_named.39,
-            founding_date: self.__unsafe_private_named.40,
-            founding_location: self.__unsafe_private_named.41,
-            funder: self.__unsafe_private_named.42,
-            funding: self.__unsafe_private_named.43,
-            geo: self.__unsafe_private_named.44,
-            geo_contains: self.__unsafe_private_named.45,
-            geo_covered_by: self.__unsafe_private_named.46,
-            geo_covers: self.__unsafe_private_named.47,
-            geo_crosses: self.__unsafe_private_named.48,
-            geo_disjoint: self.__unsafe_private_named.49,
-            geo_equals: self.__unsafe_private_named.50,
-            geo_intersects: self.__unsafe_private_named.51,
-            geo_overlaps: self.__unsafe_private_named.52,
-            geo_touches: self.__unsafe_private_named.53,
-            geo_within: self.__unsafe_private_named.54,
-            global_location_number: self.__unsafe_private_named.55,
-            has_certification: self.__unsafe_private_named.56,
-            has_credential: self.__unsafe_private_named.57,
-            has_drive_through_service: self.__unsafe_private_named.58,
-            has_gs1_digital_link: self.__unsafe_private_named.59,
-            has_map: self.__unsafe_private_named.60,
-            has_member_program: self.__unsafe_private_named.61,
-            has_merchant_return_policy: self.__unsafe_private_named.62,
-            has_offer_catalog: self.__unsafe_private_named.63,
-            has_pos: self.__unsafe_private_named.64,
-            has_product_return_policy: self.__unsafe_private_named.65,
-            has_shipping_service: self.__unsafe_private_named.66,
-            identifier: self.__unsafe_private_named.67,
-            image: self.__unsafe_private_named.68,
-            interaction_statistic: self.__unsafe_private_named.69,
-            is_accessible_for_free: self.__unsafe_private_named.70,
-            isic_v4: self.__unsafe_private_named.71,
-            iso6523_code: self.__unsafe_private_named.72,
-            keywords: self.__unsafe_private_named.73,
-            knows_about: self.__unsafe_private_named.74,
-            knows_language: self.__unsafe_private_named.75,
-            latitude: self.__unsafe_private_named.76,
-            legal_address: self.__unsafe_private_named.77,
-            legal_name: self.__unsafe_private_named.78,
-            legal_representative: self.__unsafe_private_named.79,
-            lei_code: self.__unsafe_private_named.80,
-            location: self.__unsafe_private_named.81,
-            logo: self.__unsafe_private_named.82,
-            longitude: self.__unsafe_private_named.83,
-            main_entity_of_page: self.__unsafe_private_named.84,
-            makes_offer: self.__unsafe_private_named.85,
-            map: self.__unsafe_private_named.86,
-            maps: self.__unsafe_private_named.87,
-            maximum_attendee_capacity: self.__unsafe_private_named.88,
-            member: self.__unsafe_private_named.89,
-            member_of: self.__unsafe_private_named.90,
-            members: self.__unsafe_private_named.91,
-            naics: self.__unsafe_private_named.92,
-            name: self.__unsafe_private_named.93,
-            nonprofit_status: self.__unsafe_private_named.94,
-            number_of_employees: self.__unsafe_private_named.95,
-            opening_hours: self.__unsafe_private_named.96,
-            opening_hours_specification: self.__unsafe_private_named.97,
-            ownership_funding_info: self.__unsafe_private_named.98,
-            owns: self.__unsafe_private_named.99,
-            parent_organization: self.__unsafe_private_named.100,
-            payment_accepted: self.__unsafe_private_named.101,
-            photo: self.__unsafe_private_named.102,
-            photos: self.__unsafe_private_named.103,
-            potential_action: self.__unsafe_private_named.104,
-            price_range: self.__unsafe_private_named.105,
-            public_access: self.__unsafe_private_named.106,
-            publishing_principles: self.__unsafe_private_named.107,
-            review: self.__unsafe_private_named.108,
-            reviews: self.__unsafe_private_named.109,
-            same_as: self.__unsafe_private_named.110,
-            seeks: self.__unsafe_private_named.111,
-            service_area: self.__unsafe_private_named.112,
-            skills: self.__unsafe_private_named.113,
-            slogan: self.__unsafe_private_named.114,
-            smoking_allowed: self.__unsafe_private_named.115,
-            special_opening_hours_specification: self.__unsafe_private_named.116,
-            sponsor: self.__unsafe_private_named.117,
-            sub_organization: self.__unsafe_private_named.118,
-            subject_of: self.__unsafe_private_named.119,
-            tax_id: self.__unsafe_private_named.120,
-            telephone: self.__unsafe_private_named.121,
-            tour_booking_page: self.__unsafe_private_named.122,
-            unnamed_sources_policy: self.__unsafe_private_named.123,
-            url: self.__unsafe_private_named.124,
-            vat_id: self.__unsafe_private_named.125,
+            accepted_payment_method: self._fields.0,
+            actionable_feedback_policy: self._fields.1,
+            additional_property: self._fields.2,
+            additional_type: self._fields.3,
+            address: self._fields.4,
+            agent_interaction_statistic: self._fields.5,
+            aggregate_rating: self._fields.6,
+            alternate_name: self._fields.7,
+            alumni: self._fields.8,
+            amenity_feature: self._fields.9,
+            area_served: self._fields.10,
+            award: self._fields.11,
+            awards: self._fields.12,
+            branch_code: self._fields.13,
+            branch_of: self._fields.14,
+            brand: self._fields.15,
+            company_registration: self._fields.16,
+            contact_point: self._fields.17,
+            contact_points: self._fields.18,
+            contained_in: self._fields.19,
+            contained_in_place: self._fields.20,
+            contains_place: self._fields.21,
+            corrections_policy: self._fields.22,
+            currencies_accepted: self._fields.23,
+            department: self._fields.24,
+            description: self._fields.25,
+            disambiguating_description: self._fields.26,
+            dissolution_date: self._fields.27,
+            diversity_policy: self._fields.28,
+            diversity_staffing_report: self._fields.29,
+            duns: self._fields.30,
+            email: self._fields.31,
+            employee: self._fields.32,
+            employees: self._fields.33,
+            ethics_policy: self._fields.34,
+            event: self._fields.35,
+            events: self._fields.36,
+            fax_number: self._fields.37,
+            founder: self._fields.38,
+            founders: self._fields.39,
+            founding_date: self._fields.40,
+            founding_location: self._fields.41,
+            funder: self._fields.42,
+            funding: self._fields.43,
+            geo: self._fields.44,
+            geo_contains: self._fields.45,
+            geo_covered_by: self._fields.46,
+            geo_covers: self._fields.47,
+            geo_crosses: self._fields.48,
+            geo_disjoint: self._fields.49,
+            geo_equals: self._fields.50,
+            geo_intersects: self._fields.51,
+            geo_overlaps: self._fields.52,
+            geo_touches: self._fields.53,
+            geo_within: self._fields.54,
+            global_location_number: self._fields.55,
+            has_certification: self._fields.56,
+            has_credential: self._fields.57,
+            has_drive_through_service: self._fields.58,
+            has_gs1_digital_link: self._fields.59,
+            has_map: self._fields.60,
+            has_member_program: self._fields.61,
+            has_merchant_return_policy: self._fields.62,
+            has_offer_catalog: self._fields.63,
+            has_pos: self._fields.64,
+            has_product_return_policy: self._fields.65,
+            has_shipping_service: self._fields.66,
+            identifier: self._fields.67,
+            image: self._fields.68,
+            interaction_statistic: self._fields.69,
+            is_accessible_for_free: self._fields.70,
+            isic_v4: self._fields.71,
+            iso6523_code: self._fields.72,
+            keywords: self._fields.73,
+            knows_about: self._fields.74,
+            knows_language: self._fields.75,
+            latitude: self._fields.76,
+            legal_address: self._fields.77,
+            legal_name: self._fields.78,
+            legal_representative: self._fields.79,
+            lei_code: self._fields.80,
+            location: self._fields.81,
+            logo: self._fields.82,
+            longitude: self._fields.83,
+            main_entity_of_page: self._fields.84,
+            makes_offer: self._fields.85,
+            map: self._fields.86,
+            maps: self._fields.87,
+            maximum_attendee_capacity: self._fields.88,
+            member: self._fields.89,
+            member_of: self._fields.90,
+            members: self._fields.91,
+            naics: self._fields.92,
+            name: self._fields.93,
+            nonprofit_status: self._fields.94,
+            number_of_employees: self._fields.95,
+            opening_hours: self._fields.96,
+            opening_hours_specification: self._fields.97,
+            ownership_funding_info: self._fields.98,
+            owns: self._fields.99,
+            parent_organization: self._fields.100,
+            payment_accepted: self._fields.101,
+            photo: self._fields.102,
+            photos: self._fields.103,
+            potential_action: self._fields.104,
+            price_range: self._fields.105,
+            public_access: self._fields.106,
+            publishing_principles: self._fields.107,
+            review: self._fields.108,
+            reviews: self._fields.109,
+            same_as: self._fields.110,
+            seeks: self._fields.111,
+            service_area: self._fields.112,
+            skills: self._fields.113,
+            slogan: self._fields.114,
+            smoking_allowed: self._fields.115,
+            special_opening_hours_specification: self._fields.116,
+            sponsor: self._fields.117,
+            sub_organization: self._fields.118,
+            subject_of: self._fields.119,
+            tax_id: self._fields.120,
+            telephone: self._fields.121,
+            tour_booking_page: self._fields.122,
+            unnamed_sources_policy: self._fields.123,
+            url: self._fields.124,
+            vat_id: self._fields.125,
             extra_data: Default::default(),
         }
     }
@@ -7716,132 +7719,132 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Store<'a> {
         Store {
-            accepted_payment_method: self.__unsafe_private_named.0,
-            actionable_feedback_policy: self.__unsafe_private_named.1,
-            additional_property: self.__unsafe_private_named.2,
-            additional_type: self.__unsafe_private_named.3,
-            address: self.__unsafe_private_named.4,
-            agent_interaction_statistic: self.__unsafe_private_named.5,
-            aggregate_rating: self.__unsafe_private_named.6,
-            alternate_name: self.__unsafe_private_named.7,
-            alumni: self.__unsafe_private_named.8,
-            amenity_feature: self.__unsafe_private_named.9,
-            area_served: self.__unsafe_private_named.10,
-            award: self.__unsafe_private_named.11,
-            awards: self.__unsafe_private_named.12,
-            branch_code: self.__unsafe_private_named.13,
-            branch_of: self.__unsafe_private_named.14,
-            brand: self.__unsafe_private_named.15,
-            company_registration: self.__unsafe_private_named.16,
-            contact_point: self.__unsafe_private_named.17,
-            contact_points: self.__unsafe_private_named.18,
-            contained_in: self.__unsafe_private_named.19,
-            contained_in_place: self.__unsafe_private_named.20,
-            contains_place: self.__unsafe_private_named.21,
-            corrections_policy: self.__unsafe_private_named.22,
-            currencies_accepted: self.__unsafe_private_named.23,
-            department: self.__unsafe_private_named.24,
-            description: self.__unsafe_private_named.25,
-            disambiguating_description: self.__unsafe_private_named.26,
-            dissolution_date: self.__unsafe_private_named.27,
-            diversity_policy: self.__unsafe_private_named.28,
-            diversity_staffing_report: self.__unsafe_private_named.29,
-            duns: self.__unsafe_private_named.30,
-            email: self.__unsafe_private_named.31,
-            employee: self.__unsafe_private_named.32,
-            employees: self.__unsafe_private_named.33,
-            ethics_policy: self.__unsafe_private_named.34,
-            event: self.__unsafe_private_named.35,
-            events: self.__unsafe_private_named.36,
-            fax_number: self.__unsafe_private_named.37,
-            founder: self.__unsafe_private_named.38,
-            founders: self.__unsafe_private_named.39,
-            founding_date: self.__unsafe_private_named.40,
-            founding_location: self.__unsafe_private_named.41,
-            funder: self.__unsafe_private_named.42,
-            funding: self.__unsafe_private_named.43,
-            geo: self.__unsafe_private_named.44,
-            geo_contains: self.__unsafe_private_named.45,
-            geo_covered_by: self.__unsafe_private_named.46,
-            geo_covers: self.__unsafe_private_named.47,
-            geo_crosses: self.__unsafe_private_named.48,
-            geo_disjoint: self.__unsafe_private_named.49,
-            geo_equals: self.__unsafe_private_named.50,
-            geo_intersects: self.__unsafe_private_named.51,
-            geo_overlaps: self.__unsafe_private_named.52,
-            geo_touches: self.__unsafe_private_named.53,
-            geo_within: self.__unsafe_private_named.54,
-            global_location_number: self.__unsafe_private_named.55,
-            has_certification: self.__unsafe_private_named.56,
-            has_credential: self.__unsafe_private_named.57,
-            has_drive_through_service: self.__unsafe_private_named.58,
-            has_gs1_digital_link: self.__unsafe_private_named.59,
-            has_map: self.__unsafe_private_named.60,
-            has_member_program: self.__unsafe_private_named.61,
-            has_merchant_return_policy: self.__unsafe_private_named.62,
-            has_offer_catalog: self.__unsafe_private_named.63,
-            has_pos: self.__unsafe_private_named.64,
-            has_product_return_policy: self.__unsafe_private_named.65,
-            has_shipping_service: self.__unsafe_private_named.66,
-            identifier: self.__unsafe_private_named.67,
-            image: self.__unsafe_private_named.68,
-            interaction_statistic: self.__unsafe_private_named.69,
-            is_accessible_for_free: self.__unsafe_private_named.70,
-            isic_v4: self.__unsafe_private_named.71,
-            iso6523_code: self.__unsafe_private_named.72,
-            keywords: self.__unsafe_private_named.73,
-            knows_about: self.__unsafe_private_named.74,
-            knows_language: self.__unsafe_private_named.75,
-            latitude: self.__unsafe_private_named.76,
-            legal_address: self.__unsafe_private_named.77,
-            legal_name: self.__unsafe_private_named.78,
-            legal_representative: self.__unsafe_private_named.79,
-            lei_code: self.__unsafe_private_named.80,
-            location: self.__unsafe_private_named.81,
-            logo: self.__unsafe_private_named.82,
-            longitude: self.__unsafe_private_named.83,
-            main_entity_of_page: self.__unsafe_private_named.84,
-            makes_offer: self.__unsafe_private_named.85,
-            map: self.__unsafe_private_named.86,
-            maps: self.__unsafe_private_named.87,
-            maximum_attendee_capacity: self.__unsafe_private_named.88,
-            member: self.__unsafe_private_named.89,
-            member_of: self.__unsafe_private_named.90,
-            members: self.__unsafe_private_named.91,
-            naics: self.__unsafe_private_named.92,
-            name: self.__unsafe_private_named.93,
-            nonprofit_status: self.__unsafe_private_named.94,
-            number_of_employees: self.__unsafe_private_named.95,
-            opening_hours: self.__unsafe_private_named.96,
-            opening_hours_specification: self.__unsafe_private_named.97,
-            ownership_funding_info: self.__unsafe_private_named.98,
-            owns: self.__unsafe_private_named.99,
-            parent_organization: self.__unsafe_private_named.100,
-            payment_accepted: self.__unsafe_private_named.101,
-            photo: self.__unsafe_private_named.102,
-            photos: self.__unsafe_private_named.103,
-            potential_action: self.__unsafe_private_named.104,
-            price_range: self.__unsafe_private_named.105,
-            public_access: self.__unsafe_private_named.106,
-            publishing_principles: self.__unsafe_private_named.107,
-            review: self.__unsafe_private_named.108,
-            reviews: self.__unsafe_private_named.109,
-            same_as: self.__unsafe_private_named.110,
-            seeks: self.__unsafe_private_named.111,
-            service_area: self.__unsafe_private_named.112,
-            skills: self.__unsafe_private_named.113,
-            slogan: self.__unsafe_private_named.114,
-            smoking_allowed: self.__unsafe_private_named.115,
-            special_opening_hours_specification: self.__unsafe_private_named.116,
-            sponsor: self.__unsafe_private_named.117,
-            sub_organization: self.__unsafe_private_named.118,
-            subject_of: self.__unsafe_private_named.119,
-            tax_id: self.__unsafe_private_named.120,
-            telephone: self.__unsafe_private_named.121,
-            tour_booking_page: self.__unsafe_private_named.122,
-            unnamed_sources_policy: self.__unsafe_private_named.123,
-            url: self.__unsafe_private_named.124,
-            vat_id: self.__unsafe_private_named.125,
+            accepted_payment_method: self._fields.0,
+            actionable_feedback_policy: self._fields.1,
+            additional_property: self._fields.2,
+            additional_type: self._fields.3,
+            address: self._fields.4,
+            agent_interaction_statistic: self._fields.5,
+            aggregate_rating: self._fields.6,
+            alternate_name: self._fields.7,
+            alumni: self._fields.8,
+            amenity_feature: self._fields.9,
+            area_served: self._fields.10,
+            award: self._fields.11,
+            awards: self._fields.12,
+            branch_code: self._fields.13,
+            branch_of: self._fields.14,
+            brand: self._fields.15,
+            company_registration: self._fields.16,
+            contact_point: self._fields.17,
+            contact_points: self._fields.18,
+            contained_in: self._fields.19,
+            contained_in_place: self._fields.20,
+            contains_place: self._fields.21,
+            corrections_policy: self._fields.22,
+            currencies_accepted: self._fields.23,
+            department: self._fields.24,
+            description: self._fields.25,
+            disambiguating_description: self._fields.26,
+            dissolution_date: self._fields.27,
+            diversity_policy: self._fields.28,
+            diversity_staffing_report: self._fields.29,
+            duns: self._fields.30,
+            email: self._fields.31,
+            employee: self._fields.32,
+            employees: self._fields.33,
+            ethics_policy: self._fields.34,
+            event: self._fields.35,
+            events: self._fields.36,
+            fax_number: self._fields.37,
+            founder: self._fields.38,
+            founders: self._fields.39,
+            founding_date: self._fields.40,
+            founding_location: self._fields.41,
+            funder: self._fields.42,
+            funding: self._fields.43,
+            geo: self._fields.44,
+            geo_contains: self._fields.45,
+            geo_covered_by: self._fields.46,
+            geo_covers: self._fields.47,
+            geo_crosses: self._fields.48,
+            geo_disjoint: self._fields.49,
+            geo_equals: self._fields.50,
+            geo_intersects: self._fields.51,
+            geo_overlaps: self._fields.52,
+            geo_touches: self._fields.53,
+            geo_within: self._fields.54,
+            global_location_number: self._fields.55,
+            has_certification: self._fields.56,
+            has_credential: self._fields.57,
+            has_drive_through_service: self._fields.58,
+            has_gs1_digital_link: self._fields.59,
+            has_map: self._fields.60,
+            has_member_program: self._fields.61,
+            has_merchant_return_policy: self._fields.62,
+            has_offer_catalog: self._fields.63,
+            has_pos: self._fields.64,
+            has_product_return_policy: self._fields.65,
+            has_shipping_service: self._fields.66,
+            identifier: self._fields.67,
+            image: self._fields.68,
+            interaction_statistic: self._fields.69,
+            is_accessible_for_free: self._fields.70,
+            isic_v4: self._fields.71,
+            iso6523_code: self._fields.72,
+            keywords: self._fields.73,
+            knows_about: self._fields.74,
+            knows_language: self._fields.75,
+            latitude: self._fields.76,
+            legal_address: self._fields.77,
+            legal_name: self._fields.78,
+            legal_representative: self._fields.79,
+            lei_code: self._fields.80,
+            location: self._fields.81,
+            logo: self._fields.82,
+            longitude: self._fields.83,
+            main_entity_of_page: self._fields.84,
+            makes_offer: self._fields.85,
+            map: self._fields.86,
+            maps: self._fields.87,
+            maximum_attendee_capacity: self._fields.88,
+            member: self._fields.89,
+            member_of: self._fields.90,
+            members: self._fields.91,
+            naics: self._fields.92,
+            name: self._fields.93,
+            nonprofit_status: self._fields.94,
+            number_of_employees: self._fields.95,
+            opening_hours: self._fields.96,
+            opening_hours_specification: self._fields.97,
+            ownership_funding_info: self._fields.98,
+            owns: self._fields.99,
+            parent_organization: self._fields.100,
+            payment_accepted: self._fields.101,
+            photo: self._fields.102,
+            photos: self._fields.103,
+            potential_action: self._fields.104,
+            price_range: self._fields.105,
+            public_access: self._fields.106,
+            publishing_principles: self._fields.107,
+            review: self._fields.108,
+            reviews: self._fields.109,
+            same_as: self._fields.110,
+            seeks: self._fields.111,
+            service_area: self._fields.112,
+            skills: self._fields.113,
+            slogan: self._fields.114,
+            smoking_allowed: self._fields.115,
+            special_opening_hours_specification: self._fields.116,
+            sponsor: self._fields.117,
+            sub_organization: self._fields.118,
+            subject_of: self._fields.119,
+            tax_id: self._fields.120,
+            telephone: self._fields.121,
+            tour_booking_page: self._fields.122,
+            unnamed_sources_policy: self._fields.123,
+            url: self._fields.124,
+            vat_id: self._fields.125,
             extra_data: Some(extra_data),
         }
     }

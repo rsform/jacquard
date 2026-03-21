@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -129,9 +132,9 @@ pub mod search_slugs_state {
 
 /// Builder for constructing an instance of this type
 pub struct SearchSlugsBuilder<'a, S: search_slugs_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SearchSlugs<'a> {
@@ -145,9 +148,9 @@ impl<'a> SearchSlugsBuilder<'a, search_slugs_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SearchSlugsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -155,12 +158,12 @@ impl<'a> SearchSlugsBuilder<'a, search_slugs_state::Empty> {
 impl<'a, S: search_slugs_state::State> SearchSlugsBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -175,11 +178,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SearchSlugsBuilder<'a, search_slugs_state::SetSlug<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SearchSlugsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -192,8 +195,8 @@ where
     /// Build the final struct
     pub fn build(self) -> SearchSlugs<'a> {
         SearchSlugs {
-            limit: self.__unsafe_private_named.0,
-            slug: self.__unsafe_private_named.1.unwrap(),
+            limit: self._fields.0,
+            slug: self._fields.1.unwrap(),
         }
     }
 }
@@ -244,9 +247,9 @@ pub mod slug_result_state {
 
 /// Builder for constructing an instance of this type
 pub struct SlugResultBuilder<'a, S: slug_result_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SlugResult<'a> {
@@ -260,9 +263,9 @@ impl<'a> SlugResultBuilder<'a, slug_result_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SlugResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -277,11 +280,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> SlugResultBuilder<'a, slug_result_state::SetRef<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SlugResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -296,11 +299,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SlugResultBuilder<'a, slug_result_state::SetSlug<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SlugResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -314,8 +317,8 @@ where
     /// Build the final struct
     pub fn build(self) -> SlugResult<'a> {
         SlugResult {
-            r#ref: self.__unsafe_private_named.0.unwrap(),
-            slug: self.__unsafe_private_named.1.unwrap(),
+            r#ref: self._fields.0.unwrap(),
+            slug: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -328,8 +331,8 @@ where
         >,
     ) -> SlugResult<'a> {
         SlugResult {
-            r#ref: self.__unsafe_private_named.0.unwrap(),
-            slug: self.__unsafe_private_named.1.unwrap(),
+            r#ref: self._fields.0.unwrap(),
+            slug: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

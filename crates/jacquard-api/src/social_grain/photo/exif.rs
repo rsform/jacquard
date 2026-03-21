@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -133,44 +136,44 @@ pub mod exif_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Photo;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Photo = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Photo = S::Photo;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `photo` field to Set
     pub struct SetPhoto<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPhoto<S> {}
     impl<S: State> State for SetPhoto<S> {
-        type CreatedAt = S::CreatedAt;
         type Photo = Set<members::photo>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Photo = S::Photo;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `photo` field
         pub struct photo(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ExifBuilder<'a, S: exif_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Datetime>,
         Option<i64>,
@@ -184,7 +187,7 @@ pub struct ExifBuilder<'a, S: exif_state::State> {
         Option<CowStr<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Exif<'a> {
@@ -198,8 +201,8 @@ impl<'a> ExifBuilder<'a, exif_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ExifBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -213,7 +216,7 @@ impl<'a> ExifBuilder<'a, exif_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -228,11 +231,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ExifBuilder<'a, exif_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ExifBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -240,12 +243,12 @@ where
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `dateTimeOriginal` field (optional)
     pub fn date_time_original(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `dateTimeOriginal` field to an Option value (optional)
     pub fn maybe_date_time_original(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -253,12 +256,12 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `exposureTime` field (optional)
     pub fn exposure_time(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `exposureTime` field to an Option value (optional)
     pub fn maybe_exposure_time(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -266,12 +269,12 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `fNumber` field (optional)
     pub fn f_number(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `fNumber` field to an Option value (optional)
     pub fn maybe_f_number(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -279,12 +282,12 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `flash` field (optional)
     pub fn flash(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `flash` field to an Option value (optional)
     pub fn maybe_flash(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -292,12 +295,12 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `focalLengthIn35mmFormat` field (optional)
     pub fn focal_length_in35mm_format(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `focalLengthIn35mmFormat` field to an Option value (optional)
     pub fn maybe_focal_length_in35mm_format(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -305,12 +308,12 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `iSO` field (optional)
     pub fn i_so(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `iSO` field to an Option value (optional)
     pub fn maybe_i_so(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -318,12 +321,12 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `lensMake` field (optional)
     pub fn lens_make(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `lensMake` field to an Option value (optional)
     pub fn maybe_lens_make(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -331,12 +334,12 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `lensModel` field (optional)
     pub fn lens_model(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `lensModel` field to an Option value (optional)
     pub fn maybe_lens_model(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -344,12 +347,12 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `make` field (optional)
     pub fn make(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `make` field to an Option value (optional)
     pub fn maybe_make(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -357,12 +360,12 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
 impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     /// Set the `model` field (optional)
     pub fn model(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `model` field to an Option value (optional)
     pub fn maybe_model(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -377,11 +380,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ExifBuilder<'a, exif_state::SetPhoto<S>> {
-        self.__unsafe_private_named.11 = Option::Some(value.into());
+        self._fields.11 = Option::Some(value.into());
         ExifBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -389,24 +392,24 @@ where
 impl<'a, S> ExifBuilder<'a, S>
 where
     S: exif_state::State,
-    S::CreatedAt: exif_state::IsSet,
     S::Photo: exif_state::IsSet,
+    S::CreatedAt: exif_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Exif<'a> {
         Exif {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            date_time_original: self.__unsafe_private_named.1,
-            exposure_time: self.__unsafe_private_named.2,
-            f_number: self.__unsafe_private_named.3,
-            flash: self.__unsafe_private_named.4,
-            focal_length_in35mm_format: self.__unsafe_private_named.5,
-            i_so: self.__unsafe_private_named.6,
-            lens_make: self.__unsafe_private_named.7,
-            lens_model: self.__unsafe_private_named.8,
-            make: self.__unsafe_private_named.9,
-            model: self.__unsafe_private_named.10,
-            photo: self.__unsafe_private_named.11.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            date_time_original: self._fields.1,
+            exposure_time: self._fields.2,
+            f_number: self._fields.3,
+            flash: self._fields.4,
+            focal_length_in35mm_format: self._fields.5,
+            i_so: self._fields.6,
+            lens_make: self._fields.7,
+            lens_model: self._fields.8,
+            make: self._fields.9,
+            model: self._fields.10,
+            photo: self._fields.11.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -419,18 +422,18 @@ where
         >,
     ) -> Exif<'a> {
         Exif {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            date_time_original: self.__unsafe_private_named.1,
-            exposure_time: self.__unsafe_private_named.2,
-            f_number: self.__unsafe_private_named.3,
-            flash: self.__unsafe_private_named.4,
-            focal_length_in35mm_format: self.__unsafe_private_named.5,
-            i_so: self.__unsafe_private_named.6,
-            lens_make: self.__unsafe_private_named.7,
-            lens_model: self.__unsafe_private_named.8,
-            make: self.__unsafe_private_named.9,
-            model: self.__unsafe_private_named.10,
-            photo: self.__unsafe_private_named.11.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            date_time_original: self._fields.1,
+            exposure_time: self._fields.2,
+            f_number: self._fields.3,
+            flash: self._fields.4,
+            focal_length_in35mm_format: self._fields.5,
+            i_so: self._fields.6,
+            lens_make: self._fields.7,
+            lens_model: self._fields.8,
+            make: self._fields.9,
+            model: self._fields.10,
+            photo: self._fields.11.unwrap(),
             extra_data: Some(extra_data),
         }
     }

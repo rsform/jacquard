@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -133,49 +136,49 @@ pub mod chapter_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Notebook;
         type Authors;
+        type Notebook;
         type EntryList;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Notebook = Unset;
         type Authors = Unset;
+        type Notebook = Unset;
         type EntryList = Unset;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
-        type Notebook = Set<members::notebook>;
-        type Authors = S::Authors;
-        type EntryList = S::EntryList;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthors<S> {}
     impl<S: State> State for SetAuthors<S> {
-        type Notebook = S::Notebook;
         type Authors = Set<members::authors>;
+        type Notebook = S::Notebook;
+        type EntryList = S::EntryList;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotebook<S> {}
+    impl<S: State> State for SetNotebook<S> {
+        type Authors = S::Authors;
+        type Notebook = Set<members::notebook>;
         type EntryList = S::EntryList;
     }
     ///State transition - sets the `entry_list` field to Set
     pub struct SetEntryList<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEntryList<S> {}
     impl<S: State> State for SetEntryList<S> {
-        type Notebook = S::Notebook;
         type Authors = S::Authors;
+        type Notebook = S::Notebook;
         type EntryList = Set<members::entry_list>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `notebook` field
-        pub struct notebook(());
         ///Marker type for the `authors` field
         pub struct authors(());
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
         ///Marker type for the `entry_list` field
         pub struct entry_list(());
     }
@@ -183,8 +186,8 @@ pub mod chapter_state {
 
 /// Builder for constructing an instance of this type
 pub struct ChapterBuilder<'a, S: chapter_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<Author<'a>>>,
         Option<ContentWarnings<'a>>,
         Option<Datetime>,
@@ -194,7 +197,7 @@ pub struct ChapterBuilder<'a, S: chapter_state::State> {
         Option<Tags<'a>>,
         Option<Title<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Chapter<'a> {
@@ -208,9 +211,9 @@ impl<'a> ChapterBuilder<'a, chapter_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ChapterBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -225,11 +228,11 @@ where
         mut self,
         value: impl Into<Vec<Author<'a>>>,
     ) -> ChapterBuilder<'a, chapter_state::SetAuthors<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ChapterBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -240,12 +243,12 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ContentWarnings<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `contentWarnings` field to an Option value (optional)
     pub fn maybe_content_warnings(mut self, value: Option<ContentWarnings<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -253,12 +256,12 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
 impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -273,11 +276,11 @@ where
         mut self,
         value: impl Into<Vec<StrongRef<'a>>>,
     ) -> ChapterBuilder<'a, chapter_state::SetEntryList<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ChapterBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -292,11 +295,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> ChapterBuilder<'a, chapter_state::SetNotebook<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ChapterBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -304,12 +307,12 @@ where
 impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
     /// Set the `rating` field (optional)
     pub fn rating(mut self, value: impl Into<Option<ContentRating<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `rating` field to an Option value (optional)
     pub fn maybe_rating(mut self, value: Option<ContentRating<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -317,12 +320,12 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
 impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Tags<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Tags<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -330,12 +333,12 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
 impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<Title<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<Title<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -343,21 +346,21 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
 impl<'a, S> ChapterBuilder<'a, S>
 where
     S: chapter_state::State,
-    S::Notebook: chapter_state::IsSet,
     S::Authors: chapter_state::IsSet,
+    S::Notebook: chapter_state::IsSet,
     S::EntryList: chapter_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Chapter<'a> {
         Chapter {
-            authors: self.__unsafe_private_named.0.unwrap(),
-            content_warnings: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2,
-            entry_list: self.__unsafe_private_named.3.unwrap(),
-            notebook: self.__unsafe_private_named.4.unwrap(),
-            rating: self.__unsafe_private_named.5,
-            tags: self.__unsafe_private_named.6,
-            title: self.__unsafe_private_named.7,
+            authors: self._fields.0.unwrap(),
+            content_warnings: self._fields.1,
+            created_at: self._fields.2,
+            entry_list: self._fields.3.unwrap(),
+            notebook: self._fields.4.unwrap(),
+            rating: self._fields.5,
+            tags: self._fields.6,
+            title: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -370,14 +373,14 @@ where
         >,
     ) -> Chapter<'a> {
         Chapter {
-            authors: self.__unsafe_private_named.0.unwrap(),
-            content_warnings: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2,
-            entry_list: self.__unsafe_private_named.3.unwrap(),
-            notebook: self.__unsafe_private_named.4.unwrap(),
-            rating: self.__unsafe_private_named.5,
-            tags: self.__unsafe_private_named.6,
-            title: self.__unsafe_private_named.7,
+            authors: self._fields.0.unwrap(),
+            content_warnings: self._fields.1,
+            created_at: self._fields.2,
+            entry_list: self._fields.3.unwrap(),
+            notebook: self._fields.4.unwrap(),
+            rating: self._fields.5,
+            tags: self._fields.6,
+            title: self._fields.7,
             extra_data: Some(extra_data),
         }
     }

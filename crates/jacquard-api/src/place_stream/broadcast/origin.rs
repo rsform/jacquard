@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -135,49 +138,49 @@ pub mod origin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
         type Streamer;
+        type UpdatedAt;
         type Server;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
         type Streamer = Unset;
+        type UpdatedAt = Unset;
         type Server = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Streamer = S::Streamer;
-        type Server = S::Server;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStreamer<S> {}
     impl<S: State> State for SetStreamer<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Streamer = Set<members::streamer>;
+        type UpdatedAt = S::UpdatedAt;
+        type Server = S::Server;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Streamer = S::Streamer;
+        type UpdatedAt = Set<members::updated_at>;
         type Server = S::Server;
     }
     ///State transition - sets the `server` field to Set
     pub struct SetServer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetServer<S> {}
     impl<S: State> State for SetServer<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Streamer = S::Streamer;
+        type UpdatedAt = S::UpdatedAt;
         type Server = Set<members::server>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `streamer` field
         pub struct streamer(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
         ///Marker type for the `server` field
         pub struct server(());
     }
@@ -185,8 +188,8 @@ pub mod origin_state {
 
 /// Builder for constructing an instance of this type
 pub struct OriginBuilder<'a, S: origin_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Did<'a>>,
         Option<CowStr<'a>>,
         Option<Did<'a>>,
@@ -194,7 +197,7 @@ pub struct OriginBuilder<'a, S: origin_state::State> {
         Option<Datetime>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Origin<'a> {
@@ -208,9 +211,9 @@ impl<'a> OriginBuilder<'a, origin_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         OriginBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -218,12 +221,12 @@ impl<'a> OriginBuilder<'a, origin_state::Empty> {
 impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
     /// Set the `broadcaster` field (optional)
     pub fn broadcaster(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `broadcaster` field to an Option value (optional)
     pub fn maybe_broadcaster(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -231,12 +234,12 @@ impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
 impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
     /// Set the `irohTicket` field (optional)
     pub fn iroh_ticket(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `irohTicket` field to an Option value (optional)
     pub fn maybe_iroh_ticket(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -251,11 +254,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> OriginBuilder<'a, origin_state::SetServer<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         OriginBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -270,11 +273,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> OriginBuilder<'a, origin_state::SetStreamer<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         OriginBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -289,11 +292,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> OriginBuilder<'a, origin_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         OriginBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -301,12 +304,12 @@ where
 impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
     /// Set the `websocketURL` field (optional)
     pub fn websocket_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `websocketURL` field to an Option value (optional)
     pub fn maybe_websocket_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -314,19 +317,19 @@ impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
 impl<'a, S> OriginBuilder<'a, S>
 where
     S: origin_state::State,
-    S::UpdatedAt: origin_state::IsSet,
     S::Streamer: origin_state::IsSet,
+    S::UpdatedAt: origin_state::IsSet,
     S::Server: origin_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Origin<'a> {
         Origin {
-            broadcaster: self.__unsafe_private_named.0,
-            iroh_ticket: self.__unsafe_private_named.1,
-            server: self.__unsafe_private_named.2.unwrap(),
-            streamer: self.__unsafe_private_named.3.unwrap(),
-            updated_at: self.__unsafe_private_named.4.unwrap(),
-            websocket_url: self.__unsafe_private_named.5,
+            broadcaster: self._fields.0,
+            iroh_ticket: self._fields.1,
+            server: self._fields.2.unwrap(),
+            streamer: self._fields.3.unwrap(),
+            updated_at: self._fields.4.unwrap(),
+            websocket_url: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -339,12 +342,12 @@ where
         >,
     ) -> Origin<'a> {
         Origin {
-            broadcaster: self.__unsafe_private_named.0,
-            iroh_ticket: self.__unsafe_private_named.1,
-            server: self.__unsafe_private_named.2.unwrap(),
-            streamer: self.__unsafe_private_named.3.unwrap(),
-            updated_at: self.__unsafe_private_named.4.unwrap(),
-            websocket_url: self.__unsafe_private_named.5,
+            broadcaster: self._fields.0,
+            iroh_ticket: self._fields.1,
+            server: self._fields.2.unwrap(),
+            streamer: self._fields.3.unwrap(),
+            updated_at: self._fields.4.unwrap(),
+            websocket_url: self._fields.5,
             extra_data: Some(extra_data),
         }
     }

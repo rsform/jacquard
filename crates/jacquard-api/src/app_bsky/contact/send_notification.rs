@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::string::Did;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -66,45 +69,45 @@ pub mod send_notification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type From;
         type To;
+        type From;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type From = Unset;
         type To = Unset;
-    }
-    ///State transition - sets the `from` field to Set
-    pub struct SetFrom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFrom<S> {}
-    impl<S: State> State for SetFrom<S> {
-        type From = Set<members::from>;
-        type To = S::To;
+        type From = Unset;
     }
     ///State transition - sets the `to` field to Set
     pub struct SetTo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTo<S> {}
     impl<S: State> State for SetTo<S> {
-        type From = S::From;
         type To = Set<members::to>;
+        type From = S::From;
+    }
+    ///State transition - sets the `from` field to Set
+    pub struct SetFrom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFrom<S> {}
+    impl<S: State> State for SetFrom<S> {
+        type To = S::To;
+        type From = Set<members::from>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `from` field
-        pub struct from(());
         ///Marker type for the `to` field
         pub struct to(());
+        ///Marker type for the `from` field
+        pub struct from(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SendNotificationBuilder<'a, S: send_notification_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>, Option<Did<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<Did<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SendNotification<'a> {
@@ -118,9 +121,9 @@ impl<'a> SendNotificationBuilder<'a, send_notification_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SendNotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -135,11 +138,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> SendNotificationBuilder<'a, send_notification_state::SetFrom<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SendNotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -154,11 +157,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> SendNotificationBuilder<'a, send_notification_state::SetTo<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SendNotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -166,14 +169,14 @@ where
 impl<'a, S> SendNotificationBuilder<'a, S>
 where
     S: send_notification_state::State,
-    S::From: send_notification_state::IsSet,
     S::To: send_notification_state::IsSet,
+    S::From: send_notification_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SendNotification<'a> {
         SendNotification {
-            from: self.__unsafe_private_named.0.unwrap(),
-            to: self.__unsafe_private_named.1.unwrap(),
+            from: self._fields.0.unwrap(),
+            to: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -186,8 +189,8 @@ where
         >,
     ) -> SendNotification<'a> {
         SendNotification {
-            from: self.__unsafe_private_named.0.unwrap(),
-            to: self.__unsafe_private_named.1.unwrap(),
+            from: self._fields.0.unwrap(),
+            to: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

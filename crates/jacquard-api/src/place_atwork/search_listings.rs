@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -178,9 +181,9 @@ pub mod listing_record_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListingRecordBuilder<'a, S: listing_record_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Cid<'a>>, Option<AtUri<'a>>, Option<Listing<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Cid<'a>>, Option<AtUri<'a>>, Option<Listing<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ListingRecord<'a> {
@@ -194,9 +197,9 @@ impl<'a> ListingRecordBuilder<'a, listing_record_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListingRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -211,11 +214,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> ListingRecordBuilder<'a, listing_record_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ListingRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -230,11 +233,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ListingRecordBuilder<'a, listing_record_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ListingRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -242,12 +245,12 @@ where
 impl<'a, S: listing_record_state::State> ListingRecordBuilder<'a, S> {
     /// Set the `value` field (optional)
     pub fn value(mut self, value: impl Into<Option<Listing<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `value` field to an Option value (optional)
     pub fn maybe_value(mut self, value: Option<Listing<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -261,9 +264,9 @@ where
     /// Build the final struct
     pub fn build(self) -> ListingRecord<'a> {
         ListingRecord {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
-            value: self.__unsafe_private_named.2,
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
+            value: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -276,9 +279,9 @@ where
         >,
     ) -> ListingRecord<'a> {
         ListingRecord {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
-            value: self.__unsafe_private_named.2,
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
+            value: self._fields.2,
             extra_data: Some(extra_data),
         }
     }
@@ -410,9 +413,9 @@ pub mod search_listings_state {
 
 /// Builder for constructing an instance of this type
 pub struct SearchListingsBuilder<'a, S: search_listings_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SearchListings<'a> {
@@ -426,9 +429,9 @@ impl<'a> SearchListingsBuilder<'a, search_listings_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SearchListingsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -443,11 +446,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SearchListingsBuilder<'a, search_listings_state::SetQuery<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SearchListingsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -460,7 +463,7 @@ where
     /// Build the final struct
     pub fn build(self) -> SearchListings<'a> {
         SearchListings {
-            query: self.__unsafe_private_named.0.unwrap(),
+            query: self._fields.0.unwrap(),
         }
     }
 }

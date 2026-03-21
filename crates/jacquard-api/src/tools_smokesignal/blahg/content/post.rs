@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -287,9 +290,9 @@ pub mod attachment_state {
 
 /// Builder for constructing an instance of this type
 pub struct AttachmentBuilder<'a, S: attachment_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<BlobRef<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<BlobRef<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Attachment<'a> {
@@ -303,9 +306,9 @@ impl<'a> AttachmentBuilder<'a, attachment_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AttachmentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -313,12 +316,12 @@ impl<'a> AttachmentBuilder<'a, attachment_state::Empty> {
 impl<'a, S: attachment_state::State> AttachmentBuilder<'a, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
     pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -333,11 +336,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> AttachmentBuilder<'a, attachment_state::SetContent<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AttachmentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -350,8 +353,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Attachment<'a> {
         Attachment {
-            alt: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
+            alt: self._fields.0,
+            content: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -364,8 +367,8 @@ where
         >,
     ) -> Attachment<'a> {
         Attachment {
-            alt: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
+            alt: self._fields.0,
+            content: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -496,15 +499,15 @@ pub mod post_state {
 
 /// Builder for constructing an instance of this type
 pub struct PostBuilder<'a, S: post_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<post::Attachment<'a>>>,
         Option<BlobRef<'a>>,
         Option<Vec<Language>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Post<'a> {
@@ -518,9 +521,9 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -531,7 +534,7 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<post::Attachment<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `attachments` field to an Option value (optional)
@@ -539,7 +542,7 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
         mut self,
         value: Option<Vec<post::Attachment<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -547,12 +550,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `content` field (optional)
     pub fn content(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `content` field to an Option value (optional)
     pub fn maybe_content(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -560,12 +563,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `langs` field (optional)
     pub fn langs(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `langs` field to an Option value (optional)
     pub fn maybe_langs(mut self, value: Option<Vec<Language>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -573,12 +576,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `publishedAt` field (optional)
     pub fn published_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `publishedAt` field to an Option value (optional)
     pub fn maybe_published_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -586,12 +589,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -603,11 +606,11 @@ where
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
         Post {
-            attachments: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1,
-            langs: self.__unsafe_private_named.2,
-            published_at: self.__unsafe_private_named.3,
-            title: self.__unsafe_private_named.4,
+            attachments: self._fields.0,
+            content: self._fields.1,
+            langs: self._fields.2,
+            published_at: self._fields.3,
+            title: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -620,11 +623,11 @@ where
         >,
     ) -> Post<'a> {
         Post {
-            attachments: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1,
-            langs: self.__unsafe_private_named.2,
-            published_at: self.__unsafe_private_named.3,
-            title: self.__unsafe_private_named.4,
+            attachments: self._fields.0,
+            content: self._fields.1,
+            langs: self._fields.2,
+            published_at: self._fields.3,
+            title: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

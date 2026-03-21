@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -118,58 +121,58 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Issue;
         type Body;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Issue = Unset;
         type Body = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `issue` field to Set
-    pub struct SetIssue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIssue<S> {}
-    impl<S: State> State for SetIssue<S> {
-        type Issue = Set<members::issue>;
-        type Body = S::Body;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `body` field to Set
-    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBody<S> {}
-    impl<S: State> State for SetBody<S> {
-        type Issue = S::Issue;
-        type Body = Set<members::body>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Issue = S::Issue;
         type Body = S::Body;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `issue` field to Set
+    pub struct SetIssue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIssue<S> {}
+    impl<S: State> State for SetIssue<S> {
+        type CreatedAt = S::CreatedAt;
+        type Issue = Set<members::issue>;
+        type Body = S::Body;
+    }
+    ///State transition - sets the `body` field to Set
+    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBody<S> {}
+    impl<S: State> State for SetBody<S> {
+        type CreatedAt = S::CreatedAt;
+        type Issue = S::Issue;
+        type Body = Set<members::body>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `issue` field
         pub struct issue(());
         ///Marker type for the `body` field
         pub struct body(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CommentBuilder<'a, S: comment_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<AtUri<'a>>,
@@ -177,7 +180,7 @@ pub struct CommentBuilder<'a, S: comment_state::State> {
         Option<Vec<AtUri<'a>>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Comment<'a> {
@@ -191,9 +194,9 @@ impl<'a> CommentBuilder<'a, comment_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -208,11 +211,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CommentBuilder<'a, comment_state::SetBody<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -227,11 +230,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CommentBuilder<'a, comment_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -246,11 +249,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> CommentBuilder<'a, comment_state::SetIssue<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -258,12 +261,12 @@ where
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `mentions` field (optional)
     pub fn mentions(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `mentions` field to an Option value (optional)
     pub fn maybe_mentions(mut self, value: Option<Vec<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -271,12 +274,12 @@ impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `references` field (optional)
     pub fn references(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `references` field to an Option value (optional)
     pub fn maybe_references(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -284,12 +287,12 @@ impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `replyTo` field (optional)
     pub fn reply_to(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `replyTo` field to an Option value (optional)
     pub fn maybe_reply_to(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -297,19 +300,19 @@ impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
+    S::CreatedAt: comment_state::IsSet,
     S::Issue: comment_state::IsSet,
     S::Body: comment_state::IsSet,
-    S::CreatedAt: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {
         Comment {
-            body: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            issue: self.__unsafe_private_named.2.unwrap(),
-            mentions: self.__unsafe_private_named.3,
-            references: self.__unsafe_private_named.4,
-            reply_to: self.__unsafe_private_named.5,
+            body: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            issue: self._fields.2.unwrap(),
+            mentions: self._fields.3,
+            references: self._fields.4,
+            reply_to: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -322,12 +325,12 @@ where
         >,
     ) -> Comment<'a> {
         Comment {
-            body: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            issue: self.__unsafe_private_named.2.unwrap(),
-            mentions: self.__unsafe_private_named.3,
-            references: self.__unsafe_private_named.4,
-            reply_to: self.__unsafe_private_named.5,
+            body: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            issue: self._fields.2.unwrap(),
+            mentions: self._fields.3,
+            references: self._fields.4,
+            reply_to: self._fields.5,
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -183,49 +186,49 @@ pub mod definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Options;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Options = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Options = S::Options;
+        type Name = Unset;
     }
     ///State transition - sets the `options` field to Set
     pub struct SetOptions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOptions<S> {}
     impl<S: State> State for SetOptions<S> {
-        type Name = S::Name;
         type Options = Set<members::options>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Options = S::Options;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `options` field
         pub struct options(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DefinitionBuilder<'a, S: definition_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<Vec<definition::DefinitionOption<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Definition<'a> {
@@ -239,9 +242,9 @@ impl<'a> DefinitionBuilder<'a, definition_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DefinitionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -249,12 +252,12 @@ impl<'a> DefinitionBuilder<'a, definition_state::Empty> {
 impl<'a, S: definition_state::State> DefinitionBuilder<'a, S> {
     /// Set the `endDate` field (optional)
     pub fn end_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `endDate` field to an Option value (optional)
     pub fn maybe_end_date(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -269,11 +272,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DefinitionBuilder<'a, definition_state::SetName<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DefinitionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -288,11 +291,11 @@ where
         mut self,
         value: impl Into<Vec<definition::DefinitionOption<'a>>>,
     ) -> DefinitionBuilder<'a, definition_state::SetOptions<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         DefinitionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -300,15 +303,15 @@ where
 impl<'a, S> DefinitionBuilder<'a, S>
 where
     S: definition_state::State,
-    S::Name: definition_state::IsSet,
     S::Options: definition_state::IsSet,
+    S::Name: definition_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Definition<'a> {
         Definition {
-            end_date: self.__unsafe_private_named.0,
-            name: self.__unsafe_private_named.1.unwrap(),
-            options: self.__unsafe_private_named.2.unwrap(),
+            end_date: self._fields.0,
+            name: self._fields.1.unwrap(),
+            options: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -321,9 +324,9 @@ where
         >,
     ) -> Definition<'a> {
         Definition {
-            end_date: self.__unsafe_private_named.0,
-            name: self.__unsafe_private_named.1.unwrap(),
-            options: self.__unsafe_private_named.2.unwrap(),
+            end_date: self._fields.0,
+            name: self._fields.1.unwrap(),
+            options: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

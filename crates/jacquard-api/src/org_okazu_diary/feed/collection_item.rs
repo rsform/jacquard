@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -160,49 +163,49 @@ pub mod collection_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Collection;
+        type CreatedAt;
         type Subjects;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Collection = Unset;
+        type CreatedAt = Unset;
         type Subjects = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Collection = S::Collection;
-        type Subjects = S::Subjects;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
-        type CreatedAt = S::CreatedAt;
         type Collection = Set<members::collection>;
+        type CreatedAt = S::CreatedAt;
+        type Subjects = S::Subjects;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Collection = S::Collection;
+        type CreatedAt = Set<members::created_at>;
         type Subjects = S::Subjects;
     }
     ///State transition - sets the `subjects` field to Set
     pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubjects<S> {}
     impl<S: State> State for SetSubjects<S> {
-        type CreatedAt = S::CreatedAt;
         type Collection = S::Collection;
+        type CreatedAt = S::CreatedAt;
         type Subjects = Set<members::subjects>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `subjects` field
         pub struct subjects(());
     }
@@ -210,8 +213,8 @@ pub mod collection_item_state {
 
 /// Builder for constructing an instance of this type
 pub struct CollectionItemBuilder<'a, S: collection_item_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AtUri<'a>>,
         Option<Datetime>,
         Option<SelfLabels<'a>>,
@@ -219,7 +222,7 @@ pub struct CollectionItemBuilder<'a, S: collection_item_state::State> {
         Option<Vec<Tag<'a>>>,
         Option<StrongRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CollectionItem<'a> {
@@ -233,9 +236,9 @@ impl<'a> CollectionItemBuilder<'a, collection_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CollectionItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -250,11 +253,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> CollectionItemBuilder<'a, collection_item_state::SetCollection<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CollectionItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -269,11 +272,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CollectionItemBuilder<'a, collection_item_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CollectionItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -281,12 +284,12 @@ where
 impl<'a, S: collection_item_state::State> CollectionItemBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -301,11 +304,11 @@ where
         mut self,
         value: impl Into<Vec<Subject<'a>>>,
     ) -> CollectionItemBuilder<'a, collection_item_state::SetSubjects<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         CollectionItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -313,12 +316,12 @@ where
 impl<'a, S: collection_item_state::State> CollectionItemBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<Tag<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<Tag<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -326,12 +329,12 @@ impl<'a, S: collection_item_state::State> CollectionItemBuilder<'a, S> {
 impl<'a, S: collection_item_state::State> CollectionItemBuilder<'a, S> {
     /// Set the `via` field (optional)
     pub fn via(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `via` field to an Option value (optional)
     pub fn maybe_via(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -339,19 +342,19 @@ impl<'a, S: collection_item_state::State> CollectionItemBuilder<'a, S> {
 impl<'a, S> CollectionItemBuilder<'a, S>
 where
     S: collection_item_state::State,
-    S::CreatedAt: collection_item_state::IsSet,
     S::Collection: collection_item_state::IsSet,
+    S::CreatedAt: collection_item_state::IsSet,
     S::Subjects: collection_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionItem<'a> {
         CollectionItem {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            labels: self.__unsafe_private_named.2,
-            subjects: self.__unsafe_private_named.3.unwrap(),
-            tags: self.__unsafe_private_named.4,
-            via: self.__unsafe_private_named.5,
+            collection: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            labels: self._fields.2,
+            subjects: self._fields.3.unwrap(),
+            tags: self._fields.4,
+            via: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -364,12 +367,12 @@ where
         >,
     ) -> CollectionItem<'a> {
         CollectionItem {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            labels: self.__unsafe_private_named.2,
-            subjects: self.__unsafe_private_named.3.unwrap(),
-            tags: self.__unsafe_private_named.4,
-            via: self.__unsafe_private_named.5,
+            collection: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            labels: self._fields.2,
+            subjects: self._fields.3.unwrap(),
+            tags: self._fields.4,
+            via: self._fields.5,
             extra_data: Some(extra_data),
         }
     }

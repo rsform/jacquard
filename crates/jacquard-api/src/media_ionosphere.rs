@@ -10,7 +10,11 @@ pub mod log;
 pub mod programme;
 pub mod service;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -454,15 +458,15 @@ pub mod broadcast_state {
 
 /// Builder for constructing an instance of this type
 pub struct BroadcastBuilder<'a, S: broadcast_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<media_ionosphere::Bearer<'a>>,
         Option<i64>,
         Option<Datetime>,
         Option<i64>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Broadcast<'a> {
@@ -476,9 +480,9 @@ impl<'a> BroadcastBuilder<'a, broadcast_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BroadcastBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -493,11 +497,11 @@ where
         mut self,
         value: impl Into<media_ionosphere::Bearer<'a>>,
     ) -> BroadcastBuilder<'a, broadcast_state::SetBearer<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BroadcastBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -505,12 +509,12 @@ where
 impl<'a, S: broadcast_state::State> BroadcastBuilder<'a, S> {
     /// Set the `cost` field (optional)
     pub fn cost(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `cost` field to an Option value (optional)
     pub fn maybe_cost(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -518,12 +522,12 @@ impl<'a, S: broadcast_state::State> BroadcastBuilder<'a, S> {
 impl<'a, S: broadcast_state::State> BroadcastBuilder<'a, S> {
     /// Set the `from` field (optional)
     pub fn from(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `from` field to an Option value (optional)
     pub fn maybe_from(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -531,12 +535,12 @@ impl<'a, S: broadcast_state::State> BroadcastBuilder<'a, S> {
 impl<'a, S: broadcast_state::State> BroadcastBuilder<'a, S> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `offset` field to an Option value (optional)
     pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -544,12 +548,12 @@ impl<'a, S: broadcast_state::State> BroadcastBuilder<'a, S> {
 impl<'a, S: broadcast_state::State> BroadcastBuilder<'a, S> {
     /// Set the `until` field (optional)
     pub fn until(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `until` field to an Option value (optional)
     pub fn maybe_until(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -562,11 +566,11 @@ where
     /// Build the final struct
     pub fn build(self) -> Broadcast<'a> {
         Broadcast {
-            bearer: self.__unsafe_private_named.0.unwrap(),
-            cost: self.__unsafe_private_named.1.or_else(|| Some(0i64)),
-            from: self.__unsafe_private_named.2,
-            offset: self.__unsafe_private_named.3.or_else(|| Some(0i64)),
-            until: self.__unsafe_private_named.4,
+            bearer: self._fields.0.unwrap(),
+            cost: self._fields.1.or_else(|| Some(0i64)),
+            from: self._fields.2,
+            offset: self._fields.3.or_else(|| Some(0i64)),
+            until: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -579,11 +583,11 @@ where
         >,
     ) -> Broadcast<'a> {
         Broadcast {
-            bearer: self.__unsafe_private_named.0.unwrap(),
-            cost: self.__unsafe_private_named.1.or_else(|| Some(0i64)),
-            from: self.__unsafe_private_named.2,
-            offset: self.__unsafe_private_named.3.or_else(|| Some(0i64)),
-            until: self.__unsafe_private_named.4,
+            bearer: self._fields.0.unwrap(),
+            cost: self._fields.1.or_else(|| Some(0i64)),
+            from: self._fields.2,
+            offset: self._fields.3.or_else(|| Some(0i64)),
+            until: self._fields.4,
             extra_data: Some(extra_data),
         }
     }
@@ -954,12 +958,9 @@ pub mod credit_state {
 
 /// Builder for constructing an instance of this type
 pub struct CreditBuilder<'a, S: credit_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<media_ionosphere::Entity<'a>>,
-        Option<CreditRole<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<media_ionosphere::Entity<'a>>, Option<CreditRole<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Credit<'a> {
@@ -973,9 +974,9 @@ impl<'a> CreditBuilder<'a, credit_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreditBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -990,11 +991,11 @@ where
         mut self,
         value: impl Into<media_ionosphere::Entity<'a>>,
     ) -> CreditBuilder<'a, credit_state::SetEntity<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CreditBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1009,11 +1010,11 @@ where
         mut self,
         value: impl Into<CreditRole<'a>>,
     ) -> CreditBuilder<'a, credit_state::SetRole<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CreditBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1027,8 +1028,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Credit<'a> {
         Credit {
-            entity: self.__unsafe_private_named.0.unwrap(),
-            role: self.__unsafe_private_named.1.unwrap(),
+            entity: self._fields.0.unwrap(),
+            role: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1041,8 +1042,8 @@ where
         >,
     ) -> Credit<'a> {
         Credit {
-            entity: self.__unsafe_private_named.0.unwrap(),
-            role: self.__unsafe_private_named.1.unwrap(),
+            entity: self._fields.0.unwrap(),
+            role: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1082,9 +1083,9 @@ pub mod membership_state {
 
 /// Builder for constructing an instance of this type
 pub struct MembershipBuilder<'a, S: membership_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Membership<'a> {
@@ -1098,9 +1099,9 @@ impl<'a> MembershipBuilder<'a, membership_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MembershipBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1115,11 +1116,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> MembershipBuilder<'a, membership_state::SetGroup<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MembershipBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1127,12 +1128,12 @@ where
 impl<'a, S: membership_state::State> MembershipBuilder<'a, S> {
     /// Set the `index` field (optional)
     pub fn index(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `index` field to an Option value (optional)
     pub fn maybe_index(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1145,8 +1146,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Membership<'a> {
         Membership {
-            group: self.__unsafe_private_named.0.unwrap(),
-            index: self.__unsafe_private_named.1,
+            group: self._fields.0.unwrap(),
+            index: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -1159,8 +1160,8 @@ where
         >,
     ) -> Membership<'a> {
         Membership {
-            group: self.__unsafe_private_named.0.unwrap(),
-            index: self.__unsafe_private_named.1,
+            group: self._fields.0.unwrap(),
+            index: self._fields.1,
             extra_data: Some(extra_data),
         }
     }
@@ -1204,14 +1205,14 @@ pub mod recording_state {
 
 /// Builder for constructing an instance of this type
 pub struct RecordingBuilder<'a, S: recording_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<media_ionosphere::Bearer<'a>>,
         Option<i64>,
         Option<Datetime>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Recording<'a> {
@@ -1225,9 +1226,9 @@ impl<'a> RecordingBuilder<'a, recording_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RecordingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1242,11 +1243,11 @@ where
         mut self,
         value: impl Into<media_ionosphere::Bearer<'a>>,
     ) -> RecordingBuilder<'a, recording_state::SetBearer<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RecordingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1254,12 +1255,12 @@ where
 impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
     /// Set the `cost` field (optional)
     pub fn cost(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `cost` field to an Option value (optional)
     pub fn maybe_cost(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1267,12 +1268,12 @@ impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
 impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
     /// Set the `from` field (optional)
     pub fn from(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `from` field to an Option value (optional)
     pub fn maybe_from(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1280,12 +1281,12 @@ impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
 impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
     /// Set the `until` field (optional)
     pub fn until(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `until` field to an Option value (optional)
     pub fn maybe_until(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1298,10 +1299,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Recording<'a> {
         Recording {
-            bearer: self.__unsafe_private_named.0.unwrap(),
-            cost: self.__unsafe_private_named.1.or_else(|| Some(0i64)),
-            from: self.__unsafe_private_named.2,
-            until: self.__unsafe_private_named.3,
+            bearer: self._fields.0.unwrap(),
+            cost: self._fields.1.or_else(|| Some(0i64)),
+            from: self._fields.2,
+            until: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -1314,10 +1315,10 @@ where
         >,
     ) -> Recording<'a> {
         Recording {
-            bearer: self.__unsafe_private_named.0.unwrap(),
-            cost: self.__unsafe_private_named.1.or_else(|| Some(0i64)),
-            from: self.__unsafe_private_named.2,
-            until: self.__unsafe_private_named.3,
+            bearer: self._fields.0.unwrap(),
+            cost: self._fields.1.or_else(|| Some(0i64)),
+            from: self._fields.2,
+            until: self._fields.3,
             extra_data: Some(extra_data),
         }
     }
@@ -1369,13 +1370,9 @@ pub mod track_state {
 
 /// Builder for constructing an instance of this type
 pub struct TrackBuilder<'a, S: track_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<CowStr<'a>>,
-        Option<Vec<CowStr<'a>>>,
-        Option<CowStr<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Vec<CowStr<'a>>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Track<'a> {
@@ -1389,9 +1386,9 @@ impl<'a> TrackBuilder<'a, track_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TrackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1399,12 +1396,12 @@ impl<'a> TrackBuilder<'a, track_state::Empty> {
 impl<'a, S: track_state::State> TrackBuilder<'a, S> {
     /// Set the `album` field (optional)
     pub fn album(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `album` field to an Option value (optional)
     pub fn maybe_album(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1419,11 +1416,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> TrackBuilder<'a, track_state::SetArtists<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TrackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1438,11 +1435,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TrackBuilder<'a, track_state::SetTitle<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         TrackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1456,9 +1453,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Track<'a> {
         Track {
-            album: self.__unsafe_private_named.0,
-            artists: self.__unsafe_private_named.1.unwrap(),
-            title: self.__unsafe_private_named.2.unwrap(),
+            album: self._fields.0,
+            artists: self._fields.1.unwrap(),
+            title: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1471,9 +1468,9 @@ where
         >,
     ) -> Track<'a> {
         Track {
-            album: self.__unsafe_private_named.0,
-            artists: self.__unsafe_private_named.1.unwrap(),
-            title: self.__unsafe_private_named.2.unwrap(),
+            album: self._fields.0,
+            artists: self._fields.1.unwrap(),
+            title: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

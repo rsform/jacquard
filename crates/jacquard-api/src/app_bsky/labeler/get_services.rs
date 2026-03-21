@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::string::Did;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
@@ -107,9 +110,9 @@ pub mod get_services_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetServicesBuilder<'a, S: get_services_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>, Option<Vec<Did<'a>>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<Vec<Did<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetServices<'a> {
@@ -123,9 +126,9 @@ impl<'a> GetServicesBuilder<'a, get_services_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetServicesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -133,12 +136,12 @@ impl<'a> GetServicesBuilder<'a, get_services_state::Empty> {
 impl<'a, S: get_services_state::State> GetServicesBuilder<'a, S> {
     /// Set the `detailed` field (optional)
     pub fn detailed(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `detailed` field to an Option value (optional)
     pub fn maybe_detailed(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -153,11 +156,11 @@ where
         mut self,
         value: impl Into<Vec<Did<'a>>>,
     ) -> GetServicesBuilder<'a, get_services_state::SetDids<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GetServicesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -170,8 +173,8 @@ where
     /// Build the final struct
     pub fn build(self) -> GetServices<'a> {
         GetServices {
-            detailed: self.__unsafe_private_named.0,
-            dids: self.__unsafe_private_named.1.unwrap(),
+            detailed: self._fields.0,
+            dids: self._fields.1.unwrap(),
         }
     }
 }

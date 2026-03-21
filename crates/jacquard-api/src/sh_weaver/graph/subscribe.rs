@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -109,45 +112,45 @@ pub mod subscribe_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Notebook;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Notebook = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Notebook = S::Notebook;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotebook<S> {}
     impl<S: State> State for SetNotebook<S> {
-        type CreatedAt = S::CreatedAt;
         type Notebook = Set<members::notebook>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Notebook = S::Notebook;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SubscribeBuilder<'a, S: subscribe_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Subscribe<'a> {
@@ -161,9 +164,9 @@ impl<'a> SubscribeBuilder<'a, subscribe_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SubscribeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -178,11 +181,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SubscribeBuilder<'a, subscribe_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SubscribeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -197,11 +200,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> SubscribeBuilder<'a, subscribe_state::SetNotebook<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SubscribeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -209,14 +212,14 @@ where
 impl<'a, S> SubscribeBuilder<'a, S>
 where
     S: subscribe_state::State,
-    S::CreatedAt: subscribe_state::IsSet,
     S::Notebook: subscribe_state::IsSet,
+    S::CreatedAt: subscribe_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Subscribe<'a> {
         Subscribe {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            notebook: self.__unsafe_private_named.1.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            notebook: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -229,8 +232,8 @@ where
         >,
     ) -> Subscribe<'a> {
         Subscribe {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            notebook: self.__unsafe_private_named.1.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            notebook: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

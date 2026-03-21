@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -282,44 +285,44 @@ pub mod folder_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FolderBuilder<'a, S: folder_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -327,7 +330,7 @@ pub struct FolderBuilder<'a, S: folder_state::State> {
         Option<CowStr<'a>>,
         Option<FolderVisibility<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Folder<'a> {
@@ -341,9 +344,9 @@ impl<'a> FolderBuilder<'a, folder_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FolderBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -351,12 +354,12 @@ impl<'a> FolderBuilder<'a, folder_state::Empty> {
 impl<'a, S: folder_state::State> FolderBuilder<'a, S> {
     /// Set the `color` field (optional)
     pub fn color(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `color` field to an Option value (optional)
     pub fn maybe_color(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -371,11 +374,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> FolderBuilder<'a, folder_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         FolderBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -383,12 +386,12 @@ where
 impl<'a, S: folder_state::State> FolderBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -396,12 +399,12 @@ impl<'a, S: folder_state::State> FolderBuilder<'a, S> {
 impl<'a, S: folder_state::State> FolderBuilder<'a, S> {
     /// Set the `icon` field (optional)
     pub fn icon(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `icon` field to an Option value (optional)
     pub fn maybe_icon(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -416,11 +419,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> FolderBuilder<'a, folder_state::SetName<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         FolderBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -428,12 +431,12 @@ where
 impl<'a, S: folder_state::State> FolderBuilder<'a, S> {
     /// Set the `visibility` field (optional)
     pub fn visibility(mut self, value: impl Into<Option<FolderVisibility<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
     pub fn maybe_visibility(mut self, value: Option<FolderVisibility<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -441,18 +444,18 @@ impl<'a, S: folder_state::State> FolderBuilder<'a, S> {
 impl<'a, S> FolderBuilder<'a, S>
 where
     S: folder_state::State,
-    S::CreatedAt: folder_state::IsSet,
     S::Name: folder_state::IsSet,
+    S::CreatedAt: folder_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Folder<'a> {
         Folder {
-            color: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            icon: self.__unsafe_private_named.3,
-            name: self.__unsafe_private_named.4.unwrap(),
-            visibility: self.__unsafe_private_named.5,
+            color: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            icon: self._fields.3,
+            name: self._fields.4.unwrap(),
+            visibility: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -465,12 +468,12 @@ where
         >,
     ) -> Folder<'a> {
         Folder {
-            color: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            icon: self.__unsafe_private_named.3,
-            name: self.__unsafe_private_named.4.unwrap(),
-            visibility: self.__unsafe_private_named.5,
+            color: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            icon: self._fields.3,
+            name: self._fields.4.unwrap(),
+            visibility: self._fields.5,
             extra_data: Some(extra_data),
         }
     }

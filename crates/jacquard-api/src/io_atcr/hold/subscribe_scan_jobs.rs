@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::deps::bytes::Bytes;
@@ -418,8 +421,8 @@ pub mod subscribe_scan_jobs_state {
 
 /// Builder for constructing an instance of this type
 pub struct SubscribeScanJobsBuilder<S: subscribe_scan_jobs_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>,),
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>,),
 }
 
 impl SubscribeScanJobs {
@@ -433,8 +436,8 @@ impl SubscribeScanJobsBuilder<subscribe_scan_jobs_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SubscribeScanJobsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
+            _state: PhantomData,
+            _fields: (None,),
         }
     }
 }
@@ -442,12 +445,12 @@ impl SubscribeScanJobsBuilder<subscribe_scan_jobs_state::Empty> {
 impl<S: subscribe_scan_jobs_state::State> SubscribeScanJobsBuilder<S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -459,7 +462,7 @@ where
     /// Build the final struct
     pub fn build(self) -> SubscribeScanJobs {
         SubscribeScanJobs {
-            cursor: self.__unsafe_private_named.0,
+            cursor: self._fields.0,
         }
     }
 }
@@ -474,134 +477,134 @@ pub mod scan_job_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repository;
-        type UserDid;
-        type HoldDid;
         type HoldEndpoint;
+        type UserDid;
+        type Seq;
+        type Repository;
         type Type;
         type Digest;
-        type Seq;
+        type HoldDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repository = Unset;
-        type UserDid = Unset;
-        type HoldDid = Unset;
         type HoldEndpoint = Unset;
+        type UserDid = Unset;
+        type Seq = Unset;
+        type Repository = Unset;
         type Type = Unset;
         type Digest = Unset;
-        type Seq = Unset;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type Repository = Set<members::repository>;
-        type UserDid = S::UserDid;
-        type HoldDid = S::HoldDid;
-        type HoldEndpoint = S::HoldEndpoint;
-        type Type = S::Type;
-        type Digest = S::Digest;
-        type Seq = S::Seq;
-    }
-    ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserDid<S> {}
-    impl<S: State> State for SetUserDid<S> {
-        type Repository = S::Repository;
-        type UserDid = Set<members::user_did>;
-        type HoldDid = S::HoldDid;
-        type HoldEndpoint = S::HoldEndpoint;
-        type Type = S::Type;
-        type Digest = S::Digest;
-        type Seq = S::Seq;
-    }
-    ///State transition - sets the `hold_did` field to Set
-    pub struct SetHoldDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHoldDid<S> {}
-    impl<S: State> State for SetHoldDid<S> {
-        type Repository = S::Repository;
-        type UserDid = S::UserDid;
-        type HoldDid = Set<members::hold_did>;
-        type HoldEndpoint = S::HoldEndpoint;
-        type Type = S::Type;
-        type Digest = S::Digest;
-        type Seq = S::Seq;
+        type HoldDid = Unset;
     }
     ///State transition - sets the `hold_endpoint` field to Set
     pub struct SetHoldEndpoint<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHoldEndpoint<S> {}
     impl<S: State> State for SetHoldEndpoint<S> {
-        type Repository = S::Repository;
-        type UserDid = S::UserDid;
-        type HoldDid = S::HoldDid;
         type HoldEndpoint = Set<members::hold_endpoint>;
+        type UserDid = S::UserDid;
+        type Seq = S::Seq;
+        type Repository = S::Repository;
         type Type = S::Type;
         type Digest = S::Digest;
-        type Seq = S::Seq;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Repository = S::Repository;
-        type UserDid = S::UserDid;
         type HoldDid = S::HoldDid;
-        type HoldEndpoint = S::HoldEndpoint;
-        type Type = Set<members::r#type>;
-        type Digest = S::Digest;
-        type Seq = S::Seq;
     }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type Repository = S::Repository;
-        type UserDid = S::UserDid;
-        type HoldDid = S::HoldDid;
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUserDid<S> {}
+    impl<S: State> State for SetUserDid<S> {
         type HoldEndpoint = S::HoldEndpoint;
+        type UserDid = Set<members::user_did>;
+        type Seq = S::Seq;
+        type Repository = S::Repository;
         type Type = S::Type;
-        type Digest = Set<members::digest>;
-        type Seq = S::Seq;
+        type Digest = S::Digest;
+        type HoldDid = S::HoldDid;
     }
     ///State transition - sets the `seq` field to Set
     pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSeq<S> {}
     impl<S: State> State for SetSeq<S> {
-        type Repository = S::Repository;
-        type UserDid = S::UserDid;
-        type HoldDid = S::HoldDid;
         type HoldEndpoint = S::HoldEndpoint;
+        type UserDid = S::UserDid;
+        type Seq = Set<members::seq>;
+        type Repository = S::Repository;
         type Type = S::Type;
         type Digest = S::Digest;
-        type Seq = Set<members::seq>;
+        type HoldDid = S::HoldDid;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type HoldEndpoint = S::HoldEndpoint;
+        type UserDid = S::UserDid;
+        type Seq = S::Seq;
+        type Repository = Set<members::repository>;
+        type Type = S::Type;
+        type Digest = S::Digest;
+        type HoldDid = S::HoldDid;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type HoldEndpoint = S::HoldEndpoint;
+        type UserDid = S::UserDid;
+        type Seq = S::Seq;
+        type Repository = S::Repository;
+        type Type = Set<members::r#type>;
+        type Digest = S::Digest;
+        type HoldDid = S::HoldDid;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type HoldEndpoint = S::HoldEndpoint;
+        type UserDid = S::UserDid;
+        type Seq = S::Seq;
+        type Repository = S::Repository;
+        type Type = S::Type;
+        type Digest = Set<members::digest>;
+        type HoldDid = S::HoldDid;
+    }
+    ///State transition - sets the `hold_did` field to Set
+    pub struct SetHoldDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHoldDid<S> {}
+    impl<S: State> State for SetHoldDid<S> {
+        type HoldEndpoint = S::HoldEndpoint;
+        type UserDid = S::UserDid;
+        type Seq = S::Seq;
+        type Repository = S::Repository;
+        type Type = S::Type;
+        type Digest = S::Digest;
+        type HoldDid = Set<members::hold_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repository` field
-        pub struct repository(());
-        ///Marker type for the `user_did` field
-        pub struct user_did(());
-        ///Marker type for the `hold_did` field
-        pub struct hold_did(());
         ///Marker type for the `hold_endpoint` field
         pub struct hold_endpoint(());
+        ///Marker type for the `user_did` field
+        pub struct user_did(());
+        ///Marker type for the `seq` field
+        pub struct seq(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
         ///Marker type for the `type` field
         pub struct r#type(());
         ///Marker type for the `digest` field
         pub struct digest(());
-        ///Marker type for the `seq` field
-        pub struct seq(());
+        ///Marker type for the `hold_did` field
+        pub struct hold_did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ScanJobBuilder<'a, S: scan_job_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Did<'a>>,
         Option<UriValue<'a>>,
@@ -612,7 +615,7 @@ pub struct ScanJobBuilder<'a, S: scan_job_state::State> {
         Option<CowStr<'a>>,
         Option<Did<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ScanJob<'a> {
@@ -626,19 +629,9 @@ impl<'a> ScanJobBuilder<'a, scan_job_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ScanJobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -653,11 +646,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ScanJobBuilder<'a, scan_job_state::SetDigest<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ScanJobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -672,11 +665,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> ScanJobBuilder<'a, scan_job_state::SetHoldDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ScanJobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -691,11 +684,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ScanJobBuilder<'a, scan_job_state::SetHoldEndpoint<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ScanJobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -703,12 +696,12 @@ where
 impl<'a, S: scan_job_state::State> ScanJobBuilder<'a, S> {
     /// Set the `priority` field (optional)
     pub fn priority(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `priority` field to an Option value (optional)
     pub fn maybe_priority(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -723,11 +716,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ScanJobBuilder<'a, scan_job_state::SetRepository<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ScanJobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -742,11 +735,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ScanJobBuilder<'a, scan_job_state::SetSeq<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ScanJobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -754,12 +747,12 @@ where
 impl<'a, S: scan_job_state::State> ScanJobBuilder<'a, S> {
     /// Set the `tag` field (optional)
     pub fn tag(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `tag` field to an Option value (optional)
     pub fn maybe_tag(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -774,11 +767,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ScanJobBuilder<'a, scan_job_state::SetType<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         ScanJobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -793,11 +786,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> ScanJobBuilder<'a, scan_job_state::SetUserDid<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         ScanJobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -805,26 +798,26 @@ where
 impl<'a, S> ScanJobBuilder<'a, S>
 where
     S: scan_job_state::State,
-    S::Repository: scan_job_state::IsSet,
-    S::UserDid: scan_job_state::IsSet,
-    S::HoldDid: scan_job_state::IsSet,
     S::HoldEndpoint: scan_job_state::IsSet,
+    S::UserDid: scan_job_state::IsSet,
+    S::Seq: scan_job_state::IsSet,
+    S::Repository: scan_job_state::IsSet,
     S::Type: scan_job_state::IsSet,
     S::Digest: scan_job_state::IsSet,
-    S::Seq: scan_job_state::IsSet,
+    S::HoldDid: scan_job_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ScanJob<'a> {
         ScanJob {
-            digest: self.__unsafe_private_named.0.unwrap(),
-            hold_did: self.__unsafe_private_named.1.unwrap(),
-            hold_endpoint: self.__unsafe_private_named.2.unwrap(),
-            priority: self.__unsafe_private_named.3,
-            repository: self.__unsafe_private_named.4.unwrap(),
-            seq: self.__unsafe_private_named.5.unwrap(),
-            tag: self.__unsafe_private_named.6,
-            r#type: self.__unsafe_private_named.7.unwrap(),
-            user_did: self.__unsafe_private_named.8.unwrap(),
+            digest: self._fields.0.unwrap(),
+            hold_did: self._fields.1.unwrap(),
+            hold_endpoint: self._fields.2.unwrap(),
+            priority: self._fields.3,
+            repository: self._fields.4.unwrap(),
+            seq: self._fields.5.unwrap(),
+            tag: self._fields.6,
+            r#type: self._fields.7.unwrap(),
+            user_did: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -837,15 +830,15 @@ where
         >,
     ) -> ScanJob<'a> {
         ScanJob {
-            digest: self.__unsafe_private_named.0.unwrap(),
-            hold_did: self.__unsafe_private_named.1.unwrap(),
-            hold_endpoint: self.__unsafe_private_named.2.unwrap(),
-            priority: self.__unsafe_private_named.3,
-            repository: self.__unsafe_private_named.4.unwrap(),
-            seq: self.__unsafe_private_named.5.unwrap(),
-            tag: self.__unsafe_private_named.6,
-            r#type: self.__unsafe_private_named.7.unwrap(),
-            user_did: self.__unsafe_private_named.8.unwrap(),
+            digest: self._fields.0.unwrap(),
+            hold_did: self._fields.1.unwrap(),
+            hold_endpoint: self._fields.2.unwrap(),
+            priority: self._fields.3,
+            repository: self._fields.4.unwrap(),
+            seq: self._fields.5.unwrap(),
+            tag: self._fields.6,
+            r#type: self._fields.7.unwrap(),
+            user_did: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1149,49 +1142,49 @@ pub mod scan_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Digest;
         type Summary;
+        type Digest;
         type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Digest = Unset;
         type Summary = Unset;
+        type Digest = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type Digest = Set<members::digest>;
-        type Summary = S::Summary;
-        type Type = S::Type;
     }
     ///State transition - sets the `summary` field to Set
     pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSummary<S> {}
     impl<S: State> State for SetSummary<S> {
-        type Digest = S::Digest;
         type Summary = Set<members::summary>;
+        type Digest = S::Digest;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type Summary = S::Summary;
+        type Digest = Set<members::digest>;
         type Type = S::Type;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type Digest = S::Digest;
         type Summary = S::Summary;
+        type Digest = S::Digest;
         type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `digest` field
-        pub struct digest(());
         ///Marker type for the `summary` field
         pub struct summary(());
+        ///Marker type for the `digest` field
+        pub struct digest(());
         ///Marker type for the `type` field
         pub struct r#type(());
     }
@@ -1199,8 +1192,8 @@ pub mod scan_result_state {
 
 /// Builder for constructing an instance of this type
 pub struct ScanResultBuilder<'a, S: scan_result_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<Bytes>,
@@ -1209,7 +1202,7 @@ pub struct ScanResultBuilder<'a, S: scan_result_state::State> {
         Option<CowStr<'a>>,
         Option<Bytes>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ScanResult<'a> {
@@ -1223,9 +1216,9 @@ impl<'a> ScanResultBuilder<'a, scan_result_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ScanResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1240,11 +1233,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ScanResultBuilder<'a, scan_result_state::SetDigest<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ScanResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1252,12 +1245,12 @@ where
 impl<'a, S: scan_result_state::State> ScanResultBuilder<'a, S> {
     /// Set the `error` field (optional)
     pub fn error(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `error` field to an Option value (optional)
     pub fn maybe_error(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1265,12 +1258,12 @@ impl<'a, S: scan_result_state::State> ScanResultBuilder<'a, S> {
 impl<'a, S: scan_result_state::State> ScanResultBuilder<'a, S> {
     /// Set the `sbom` field (optional)
     pub fn sbom(mut self, value: impl Into<Option<Bytes>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `sbom` field to an Option value (optional)
     pub fn maybe_sbom(mut self, value: Option<Bytes>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1278,12 +1271,12 @@ impl<'a, S: scan_result_state::State> ScanResultBuilder<'a, S> {
 impl<'a, S: scan_result_state::State> ScanResultBuilder<'a, S> {
     /// Set the `scannerVersion` field (optional)
     pub fn scanner_version(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `scannerVersion` field to an Option value (optional)
     pub fn maybe_scanner_version(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1298,11 +1291,11 @@ where
         mut self,
         value: impl Into<subscribe_scan_jobs::VulnSummary<'a>>,
     ) -> ScanResultBuilder<'a, scan_result_state::SetSummary<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ScanResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1317,11 +1310,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ScanResultBuilder<'a, scan_result_state::SetType<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ScanResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1329,12 +1322,12 @@ where
 impl<'a, S: scan_result_state::State> ScanResultBuilder<'a, S> {
     /// Set the `vulnReport` field (optional)
     pub fn vuln_report(mut self, value: impl Into<Option<Bytes>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `vulnReport` field to an Option value (optional)
     pub fn maybe_vuln_report(mut self, value: Option<Bytes>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1342,20 +1335,20 @@ impl<'a, S: scan_result_state::State> ScanResultBuilder<'a, S> {
 impl<'a, S> ScanResultBuilder<'a, S>
 where
     S: scan_result_state::State,
-    S::Digest: scan_result_state::IsSet,
     S::Summary: scan_result_state::IsSet,
+    S::Digest: scan_result_state::IsSet,
     S::Type: scan_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ScanResult<'a> {
         ScanResult {
-            digest: self.__unsafe_private_named.0.unwrap(),
-            error: self.__unsafe_private_named.1,
-            sbom: self.__unsafe_private_named.2,
-            scanner_version: self.__unsafe_private_named.3,
-            summary: self.__unsafe_private_named.4.unwrap(),
-            r#type: self.__unsafe_private_named.5.unwrap(),
-            vuln_report: self.__unsafe_private_named.6,
+            digest: self._fields.0.unwrap(),
+            error: self._fields.1,
+            sbom: self._fields.2,
+            scanner_version: self._fields.3,
+            summary: self._fields.4.unwrap(),
+            r#type: self._fields.5.unwrap(),
+            vuln_report: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -1368,13 +1361,13 @@ where
         >,
     ) -> ScanResult<'a> {
         ScanResult {
-            digest: self.__unsafe_private_named.0.unwrap(),
-            error: self.__unsafe_private_named.1,
-            sbom: self.__unsafe_private_named.2,
-            scanner_version: self.__unsafe_private_named.3,
-            summary: self.__unsafe_private_named.4.unwrap(),
-            r#type: self.__unsafe_private_named.5.unwrap(),
-            vuln_report: self.__unsafe_private_named.6,
+            digest: self._fields.0.unwrap(),
+            error: self._fields.1,
+            sbom: self._fields.2,
+            scanner_version: self._fields.3,
+            summary: self._fields.4.unwrap(),
+            r#type: self._fields.5.unwrap(),
+            vuln_report: self._fields.6,
             extra_data: Some(extra_data),
         }
     }
@@ -1390,99 +1383,93 @@ pub mod vuln_summary_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Critical;
-        type Medium;
         type High;
-        type Low;
+        type Medium;
         type Total;
+        type Critical;
+        type Low;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Critical = Unset;
-        type Medium = Unset;
         type High = Unset;
-        type Low = Unset;
+        type Medium = Unset;
         type Total = Unset;
-    }
-    ///State transition - sets the `critical` field to Set
-    pub struct SetCritical<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCritical<S> {}
-    impl<S: State> State for SetCritical<S> {
-        type Critical = Set<members::critical>;
-        type Medium = S::Medium;
-        type High = S::High;
-        type Low = S::Low;
-        type Total = S::Total;
-    }
-    ///State transition - sets the `medium` field to Set
-    pub struct SetMedium<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMedium<S> {}
-    impl<S: State> State for SetMedium<S> {
-        type Critical = S::Critical;
-        type Medium = Set<members::medium>;
-        type High = S::High;
-        type Low = S::Low;
-        type Total = S::Total;
+        type Critical = Unset;
+        type Low = Unset;
     }
     ///State transition - sets the `high` field to Set
     pub struct SetHigh<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHigh<S> {}
     impl<S: State> State for SetHigh<S> {
-        type Critical = S::Critical;
-        type Medium = S::Medium;
         type High = Set<members::high>;
-        type Low = S::Low;
-        type Total = S::Total;
-    }
-    ///State transition - sets the `low` field to Set
-    pub struct SetLow<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLow<S> {}
-    impl<S: State> State for SetLow<S> {
-        type Critical = S::Critical;
         type Medium = S::Medium;
-        type High = S::High;
-        type Low = Set<members::low>;
         type Total = S::Total;
+        type Critical = S::Critical;
+        type Low = S::Low;
+    }
+    ///State transition - sets the `medium` field to Set
+    pub struct SetMedium<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMedium<S> {}
+    impl<S: State> State for SetMedium<S> {
+        type High = S::High;
+        type Medium = Set<members::medium>;
+        type Total = S::Total;
+        type Critical = S::Critical;
+        type Low = S::Low;
     }
     ///State transition - sets the `total` field to Set
     pub struct SetTotal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotal<S> {}
     impl<S: State> State for SetTotal<S> {
-        type Critical = S::Critical;
-        type Medium = S::Medium;
         type High = S::High;
-        type Low = S::Low;
+        type Medium = S::Medium;
         type Total = Set<members::total>;
+        type Critical = S::Critical;
+        type Low = S::Low;
+    }
+    ///State transition - sets the `critical` field to Set
+    pub struct SetCritical<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCritical<S> {}
+    impl<S: State> State for SetCritical<S> {
+        type High = S::High;
+        type Medium = S::Medium;
+        type Total = S::Total;
+        type Critical = Set<members::critical>;
+        type Low = S::Low;
+    }
+    ///State transition - sets the `low` field to Set
+    pub struct SetLow<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLow<S> {}
+    impl<S: State> State for SetLow<S> {
+        type High = S::High;
+        type Medium = S::Medium;
+        type Total = S::Total;
+        type Critical = S::Critical;
+        type Low = Set<members::low>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `critical` field
-        pub struct critical(());
-        ///Marker type for the `medium` field
-        pub struct medium(());
         ///Marker type for the `high` field
         pub struct high(());
-        ///Marker type for the `low` field
-        pub struct low(());
+        ///Marker type for the `medium` field
+        pub struct medium(());
         ///Marker type for the `total` field
         pub struct total(());
+        ///Marker type for the `critical` field
+        pub struct critical(());
+        ///Marker type for the `low` field
+        pub struct low(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct VulnSummaryBuilder<'a, S: vuln_summary_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<i64>,
-        Option<i64>,
-        Option<i64>,
-        Option<i64>,
-        Option<i64>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>, Option<i64>, Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> VulnSummary<'a> {
@@ -1496,9 +1483,9 @@ impl<'a> VulnSummaryBuilder<'a, vuln_summary_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         VulnSummaryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1513,11 +1500,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> VulnSummaryBuilder<'a, vuln_summary_state::SetCritical<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         VulnSummaryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1532,11 +1519,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> VulnSummaryBuilder<'a, vuln_summary_state::SetHigh<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         VulnSummaryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1551,11 +1538,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> VulnSummaryBuilder<'a, vuln_summary_state::SetLow<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         VulnSummaryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1570,11 +1557,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> VulnSummaryBuilder<'a, vuln_summary_state::SetMedium<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         VulnSummaryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1589,11 +1576,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> VulnSummaryBuilder<'a, vuln_summary_state::SetTotal<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         VulnSummaryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1601,20 +1588,20 @@ where
 impl<'a, S> VulnSummaryBuilder<'a, S>
 where
     S: vuln_summary_state::State,
-    S::Critical: vuln_summary_state::IsSet,
-    S::Medium: vuln_summary_state::IsSet,
     S::High: vuln_summary_state::IsSet,
-    S::Low: vuln_summary_state::IsSet,
+    S::Medium: vuln_summary_state::IsSet,
     S::Total: vuln_summary_state::IsSet,
+    S::Critical: vuln_summary_state::IsSet,
+    S::Low: vuln_summary_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VulnSummary<'a> {
         VulnSummary {
-            critical: self.__unsafe_private_named.0.unwrap(),
-            high: self.__unsafe_private_named.1.unwrap(),
-            low: self.__unsafe_private_named.2.unwrap(),
-            medium: self.__unsafe_private_named.3.unwrap(),
-            total: self.__unsafe_private_named.4.unwrap(),
+            critical: self._fields.0.unwrap(),
+            high: self._fields.1.unwrap(),
+            low: self._fields.2.unwrap(),
+            medium: self._fields.3.unwrap(),
+            total: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1627,11 +1614,11 @@ where
         >,
     ) -> VulnSummary<'a> {
         VulnSummary {
-            critical: self.__unsafe_private_named.0.unwrap(),
-            high: self.__unsafe_private_named.1.unwrap(),
-            low: self.__unsafe_private_named.2.unwrap(),
-            medium: self.__unsafe_private_named.3.unwrap(),
-            total: self.__unsafe_private_named.4.unwrap(),
+            critical: self._fields.0.unwrap(),
+            high: self._fields.1.unwrap(),
+            low: self._fields.2.unwrap(),
+            medium: self._fields.3.unwrap(),
+            total: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

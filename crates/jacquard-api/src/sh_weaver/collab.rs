@@ -13,7 +13,11 @@ pub mod get_resource_sessions;
 pub mod invite;
 pub mod session;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -1083,8 +1087,8 @@ pub mod collaboration_state_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct CollaborationStateViewBuilder<'a, S: collaboration_state_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AtUri<'a>>,
         Option<Datetime>,
         Option<Datetime>,
@@ -1098,7 +1102,7 @@ pub struct CollaborationStateViewBuilder<'a, S: collaboration_state_view_state::
         Option<StrongRef<'a>>,
         Option<CollaborationStateViewStatus<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CollaborationStateView<'a> {
@@ -1115,8 +1119,8 @@ impl<'a> CollaborationStateViewBuilder<'a, collaboration_state_view_state::Empty
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CollaborationStateViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -1130,7 +1134,7 @@ impl<'a> CollaborationStateViewBuilder<'a, collaboration_state_view_state::Empty
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1138,12 +1142,12 @@ impl<'a> CollaborationStateViewBuilder<'a, collaboration_state_view_state::Empty
 impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder<'a, S> {
     /// Set the `canonicalUri` field (optional)
     pub fn canonical_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `canonicalUri` field to an Option value (optional)
     pub fn maybe_canonical_uri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1151,12 +1155,12 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
 impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1167,12 +1171,12 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
         mut self,
         value: impl Into<Option<Datetime>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `firstCollaboratorAddedAt` field to an Option value (optional)
     pub fn maybe_first_collaborator_added_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1183,7 +1187,7 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
         mut self,
         value: impl Into<Option<Vec<collab::FormerCollaboratorView<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `formerParticipants` field to an Option value (optional)
@@ -1191,7 +1195,7 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
         mut self,
         value: Option<Vec<collab::FormerCollaboratorView<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1199,12 +1203,12 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
 impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder<'a, S> {
     /// Set the `hasDivergence` field (optional)
     pub fn has_divergence(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `hasDivergence` field to an Option value (optional)
     pub fn maybe_has_divergence(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1212,12 +1216,12 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
 impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder<'a, S> {
     /// Set the `hasFormerCollaborators` field (optional)
     pub fn has_former_collaborators(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `hasFormerCollaborators` field to an Option value (optional)
     pub fn maybe_has_former_collaborators(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1225,12 +1229,12 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
 impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder<'a, S> {
     /// Set the `hasOrphanedVersions` field (optional)
     pub fn has_orphaned_versions(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `hasOrphanedVersions` field to an Option value (optional)
     pub fn maybe_has_orphaned_versions(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1238,12 +1242,12 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
 impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder<'a, S> {
     /// Set the `lastSyncedAt` field (optional)
     pub fn last_synced_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `lastSyncedAt` field to an Option value (optional)
     pub fn maybe_last_synced_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -1261,11 +1265,11 @@ where
         'a,
         collaboration_state_view_state::SetParticipants<S>,
     > {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         CollaborationStateViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1276,7 +1280,7 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
         mut self,
         value: impl Into<Option<Vec<PublishedVersionView<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `publishedVersions` field to an Option value (optional)
@@ -1284,7 +1288,7 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
         mut self,
         value: Option<Vec<PublishedVersionView<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -1302,11 +1306,11 @@ where
         'a,
         collaboration_state_view_state::SetResource<S>,
     > {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         CollaborationStateViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1324,11 +1328,11 @@ where
         'a,
         collaboration_state_view_state::SetStatus<S>,
     > {
-        self.__unsafe_private_named.11 = Option::Some(value.into());
+        self._fields.11 = Option::Some(value.into());
         CollaborationStateViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1343,18 +1347,18 @@ where
     /// Build the final struct
     pub fn build(self) -> CollaborationStateView<'a> {
         CollaborationStateView {
-            canonical_uri: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            first_collaborator_added_at: self.__unsafe_private_named.2,
-            former_participants: self.__unsafe_private_named.3,
-            has_divergence: self.__unsafe_private_named.4,
-            has_former_collaborators: self.__unsafe_private_named.5,
-            has_orphaned_versions: self.__unsafe_private_named.6,
-            last_synced_at: self.__unsafe_private_named.7,
-            participants: self.__unsafe_private_named.8.unwrap(),
-            published_versions: self.__unsafe_private_named.9,
-            resource: self.__unsafe_private_named.10.unwrap(),
-            status: self.__unsafe_private_named.11.unwrap(),
+            canonical_uri: self._fields.0,
+            created_at: self._fields.1,
+            first_collaborator_added_at: self._fields.2,
+            former_participants: self._fields.3,
+            has_divergence: self._fields.4,
+            has_former_collaborators: self._fields.5,
+            has_orphaned_versions: self._fields.6,
+            last_synced_at: self._fields.7,
+            participants: self._fields.8.unwrap(),
+            published_versions: self._fields.9,
+            resource: self._fields.10.unwrap(),
+            status: self._fields.11.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1367,18 +1371,18 @@ where
         >,
     ) -> CollaborationStateView<'a> {
         CollaborationStateView {
-            canonical_uri: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            first_collaborator_added_at: self.__unsafe_private_named.2,
-            former_participants: self.__unsafe_private_named.3,
-            has_divergence: self.__unsafe_private_named.4,
-            has_former_collaborators: self.__unsafe_private_named.5,
-            has_orphaned_versions: self.__unsafe_private_named.6,
-            last_synced_at: self.__unsafe_private_named.7,
-            participants: self.__unsafe_private_named.8.unwrap(),
-            published_versions: self.__unsafe_private_named.9,
-            resource: self.__unsafe_private_named.10.unwrap(),
-            status: self.__unsafe_private_named.11.unwrap(),
+            canonical_uri: self._fields.0,
+            created_at: self._fields.1,
+            first_collaborator_added_at: self._fields.2,
+            former_participants: self._fields.3,
+            has_divergence: self._fields.4,
+            has_former_collaborators: self._fields.5,
+            has_orphaned_versions: self._fields.6,
+            last_synced_at: self._fields.7,
+            participants: self._fields.8.unwrap(),
+            published_versions: self._fields.9,
+            resource: self._fields.10.unwrap(),
+            status: self._fields.11.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1919,65 +1923,65 @@ pub mod former_collaborator_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type WasActiveUntil;
-        type User;
         type WasActiveFrom;
+        type User;
+        type WasActiveUntil;
         type EndReason;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type WasActiveUntil = Unset;
-        type User = Unset;
         type WasActiveFrom = Unset;
+        type User = Unset;
+        type WasActiveUntil = Unset;
         type EndReason = Unset;
     }
-    ///State transition - sets the `was_active_until` field to Set
-    pub struct SetWasActiveUntil<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWasActiveUntil<S> {}
-    impl<S: State> State for SetWasActiveUntil<S> {
-        type WasActiveUntil = Set<members::was_active_until>;
+    ///State transition - sets the `was_active_from` field to Set
+    pub struct SetWasActiveFrom<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWasActiveFrom<S> {}
+    impl<S: State> State for SetWasActiveFrom<S> {
+        type WasActiveFrom = Set<members::was_active_from>;
         type User = S::User;
-        type WasActiveFrom = S::WasActiveFrom;
+        type WasActiveUntil = S::WasActiveUntil;
         type EndReason = S::EndReason;
     }
     ///State transition - sets the `user` field to Set
     pub struct SetUser<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUser<S> {}
     impl<S: State> State for SetUser<S> {
-        type WasActiveUntil = S::WasActiveUntil;
-        type User = Set<members::user>;
         type WasActiveFrom = S::WasActiveFrom;
+        type User = Set<members::user>;
+        type WasActiveUntil = S::WasActiveUntil;
         type EndReason = S::EndReason;
     }
-    ///State transition - sets the `was_active_from` field to Set
-    pub struct SetWasActiveFrom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWasActiveFrom<S> {}
-    impl<S: State> State for SetWasActiveFrom<S> {
-        type WasActiveUntil = S::WasActiveUntil;
+    ///State transition - sets the `was_active_until` field to Set
+    pub struct SetWasActiveUntil<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWasActiveUntil<S> {}
+    impl<S: State> State for SetWasActiveUntil<S> {
+        type WasActiveFrom = S::WasActiveFrom;
         type User = S::User;
-        type WasActiveFrom = Set<members::was_active_from>;
+        type WasActiveUntil = Set<members::was_active_until>;
         type EndReason = S::EndReason;
     }
     ///State transition - sets the `end_reason` field to Set
     pub struct SetEndReason<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEndReason<S> {}
     impl<S: State> State for SetEndReason<S> {
-        type WasActiveUntil = S::WasActiveUntil;
-        type User = S::User;
         type WasActiveFrom = S::WasActiveFrom;
+        type User = S::User;
+        type WasActiveUntil = S::WasActiveUntil;
         type EndReason = Set<members::end_reason>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `was_active_until` field
-        pub struct was_active_until(());
-        ///Marker type for the `user` field
-        pub struct user(());
         ///Marker type for the `was_active_from` field
         pub struct was_active_from(());
+        ///Marker type for the `user` field
+        pub struct user(());
+        ///Marker type for the `was_active_until` field
+        pub struct was_active_until(());
         ///Marker type for the `end_reason` field
         pub struct end_reason(());
     }
@@ -1985,8 +1989,8 @@ pub mod former_collaborator_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct FormerCollaboratorViewBuilder<'a, S: former_collaborator_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<i64>,
         Option<FormerCollaboratorViewEndReason<'a>>,
         Option<bool>,
@@ -1995,7 +1999,7 @@ pub struct FormerCollaboratorViewBuilder<'a, S: former_collaborator_view_state::
         Option<Datetime>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> FormerCollaboratorView<'a> {
@@ -2012,9 +2016,9 @@ impl<'a> FormerCollaboratorViewBuilder<'a, former_collaborator_view_state::Empty
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FormerCollaboratorViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2022,12 +2026,12 @@ impl<'a> FormerCollaboratorViewBuilder<'a, former_collaborator_view_state::Empty
 impl<'a, S: former_collaborator_view_state::State> FormerCollaboratorViewBuilder<'a, S> {
     /// Set the `contributionCount` field (optional)
     pub fn contribution_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `contributionCount` field to an Option value (optional)
     pub fn maybe_contribution_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -2045,11 +2049,11 @@ where
         'a,
         former_collaborator_view_state::SetEndReason<S>,
     > {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         FormerCollaboratorViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2057,12 +2061,12 @@ where
 impl<'a, S: former_collaborator_view_state::State> FormerCollaboratorViewBuilder<'a, S> {
     /// Set the `hasPublishedVersion` field (optional)
     pub fn has_published_version(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `hasPublishedVersion` field to an Option value (optional)
     pub fn maybe_has_published_version(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -2070,12 +2074,12 @@ impl<'a, S: former_collaborator_view_state::State> FormerCollaboratorViewBuilder
 impl<'a, S: former_collaborator_view_state::State> FormerCollaboratorViewBuilder<'a, S> {
     /// Set the `publishedVersionUri` field (optional)
     pub fn published_version_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `publishedVersionUri` field to an Option value (optional)
     pub fn maybe_published_version_uri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -2090,11 +2094,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> FormerCollaboratorViewBuilder<'a, former_collaborator_view_state::SetUser<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         FormerCollaboratorViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2112,11 +2116,11 @@ where
         'a,
         former_collaborator_view_state::SetWasActiveFrom<S>,
     > {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         FormerCollaboratorViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2134,11 +2138,11 @@ where
         'a,
         former_collaborator_view_state::SetWasActiveUntil<S>,
     > {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         FormerCollaboratorViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2146,21 +2150,21 @@ where
 impl<'a, S> FormerCollaboratorViewBuilder<'a, S>
 where
     S: former_collaborator_view_state::State,
-    S::WasActiveUntil: former_collaborator_view_state::IsSet,
-    S::User: former_collaborator_view_state::IsSet,
     S::WasActiveFrom: former_collaborator_view_state::IsSet,
+    S::User: former_collaborator_view_state::IsSet,
+    S::WasActiveUntil: former_collaborator_view_state::IsSet,
     S::EndReason: former_collaborator_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> FormerCollaboratorView<'a> {
         FormerCollaboratorView {
-            contribution_count: self.__unsafe_private_named.0,
-            end_reason: self.__unsafe_private_named.1.unwrap(),
-            has_published_version: self.__unsafe_private_named.2,
-            published_version_uri: self.__unsafe_private_named.3,
-            user: self.__unsafe_private_named.4.unwrap(),
-            was_active_from: self.__unsafe_private_named.5.unwrap(),
-            was_active_until: self.__unsafe_private_named.6.unwrap(),
+            contribution_count: self._fields.0,
+            end_reason: self._fields.1.unwrap(),
+            has_published_version: self._fields.2,
+            published_version_uri: self._fields.3,
+            user: self._fields.4.unwrap(),
+            was_active_from: self._fields.5.unwrap(),
+            was_active_until: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2173,13 +2177,13 @@ where
         >,
     ) -> FormerCollaboratorView<'a> {
         FormerCollaboratorView {
-            contribution_count: self.__unsafe_private_named.0,
-            end_reason: self.__unsafe_private_named.1.unwrap(),
-            has_published_version: self.__unsafe_private_named.2,
-            published_version_uri: self.__unsafe_private_named.3,
-            user: self.__unsafe_private_named.4.unwrap(),
-            was_active_from: self.__unsafe_private_named.5.unwrap(),
-            was_active_until: self.__unsafe_private_named.6.unwrap(),
+            contribution_count: self._fields.0,
+            end_reason: self._fields.1.unwrap(),
+            has_published_version: self._fields.2,
+            published_version_uri: self._fields.3,
+            user: self._fields.4.unwrap(),
+            was_active_from: self._fields.5.unwrap(),
+            was_active_until: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2195,134 +2199,134 @@ pub mod invite_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Inviter;
+        type Invitee;
         type Resource;
         type Cid;
-        type Invitee;
+        type Status;
         type Uri;
         type CreatedAt;
-        type Status;
+        type Inviter;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Inviter = Unset;
+        type Invitee = Unset;
         type Resource = Unset;
         type Cid = Unset;
-        type Invitee = Unset;
+        type Status = Unset;
         type Uri = Unset;
         type CreatedAt = Unset;
-        type Status = Unset;
-    }
-    ///State transition - sets the `inviter` field to Set
-    pub struct SetInviter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInviter<S> {}
-    impl<S: State> State for SetInviter<S> {
-        type Inviter = Set<members::inviter>;
-        type Resource = S::Resource;
-        type Cid = S::Cid;
-        type Invitee = S::Invitee;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type Inviter = S::Inviter;
-        type Resource = Set<members::resource>;
-        type Cid = S::Cid;
-        type Invitee = S::Invitee;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Inviter = S::Inviter;
-        type Resource = S::Resource;
-        type Cid = Set<members::cid>;
-        type Invitee = S::Invitee;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
+        type Inviter = Unset;
     }
     ///State transition - sets the `invitee` field to Set
     pub struct SetInvitee<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetInvitee<S> {}
     impl<S: State> State for SetInvitee<S> {
-        type Inviter = S::Inviter;
-        type Resource = S::Resource;
-        type Cid = S::Cid;
         type Invitee = Set<members::invitee>;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Inviter = S::Inviter;
         type Resource = S::Resource;
         type Cid = S::Cid;
-        type Invitee = S::Invitee;
-        type Uri = Set<members::uri>;
-        type CreatedAt = S::CreatedAt;
         type Status = S::Status;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Inviter = S::Inviter;
-        type Resource = S::Resource;
-        type Cid = S::Cid;
-        type Invitee = S::Invitee;
         type Uri = S::Uri;
-        type CreatedAt = Set<members::created_at>;
+        type CreatedAt = S::CreatedAt;
+        type Inviter = S::Inviter;
+    }
+    ///State transition - sets the `resource` field to Set
+    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResource<S> {}
+    impl<S: State> State for SetResource<S> {
+        type Invitee = S::Invitee;
+        type Resource = Set<members::resource>;
+        type Cid = S::Cid;
         type Status = S::Status;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Inviter = S::Inviter;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Invitee = S::Invitee;
+        type Resource = S::Resource;
+        type Cid = Set<members::cid>;
+        type Status = S::Status;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Inviter = S::Inviter;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type Inviter = S::Inviter;
+        type Invitee = S::Invitee;
         type Resource = S::Resource;
         type Cid = S::Cid;
-        type Invitee = S::Invitee;
+        type Status = Set<members::status>;
         type Uri = S::Uri;
         type CreatedAt = S::CreatedAt;
-        type Status = Set<members::status>;
+        type Inviter = S::Inviter;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Invitee = S::Invitee;
+        type Resource = S::Resource;
+        type Cid = S::Cid;
+        type Status = S::Status;
+        type Uri = Set<members::uri>;
+        type CreatedAt = S::CreatedAt;
+        type Inviter = S::Inviter;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Invitee = S::Invitee;
+        type Resource = S::Resource;
+        type Cid = S::Cid;
+        type Status = S::Status;
+        type Uri = S::Uri;
+        type CreatedAt = Set<members::created_at>;
+        type Inviter = S::Inviter;
+    }
+    ///State transition - sets the `inviter` field to Set
+    pub struct SetInviter<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInviter<S> {}
+    impl<S: State> State for SetInviter<S> {
+        type Invitee = S::Invitee;
+        type Resource = S::Resource;
+        type Cid = S::Cid;
+        type Status = S::Status;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Inviter = Set<members::inviter>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `inviter` field
-        pub struct inviter(());
+        ///Marker type for the `invitee` field
+        pub struct invitee(());
         ///Marker type for the `resource` field
         pub struct resource(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `invitee` field
-        pub struct invitee(());
+        ///Marker type for the `status` field
+        pub struct status(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `status` field
-        pub struct status(());
+        ///Marker type for the `inviter` field
+        pub struct inviter(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct InviteViewBuilder<'a, S: invite_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AtUri<'a>>,
         Option<Datetime>,
         Option<Cid<'a>>,
@@ -2337,7 +2341,7 @@ pub struct InviteViewBuilder<'a, S: invite_view_state::State> {
         Option<InviteViewStatus<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> InviteView<'a> {
@@ -2351,8 +2355,8 @@ impl<'a> InviteViewBuilder<'a, invite_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         InviteViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -2367,7 +2371,7 @@ impl<'a> InviteViewBuilder<'a, invite_view_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2375,12 +2379,12 @@ impl<'a> InviteViewBuilder<'a, invite_view_state::Empty> {
 impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     /// Set the `acceptUri` field (optional)
     pub fn accept_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `acceptUri` field to an Option value (optional)
     pub fn maybe_accept_uri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -2388,12 +2392,12 @@ impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
 impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     /// Set the `acceptedAt` field (optional)
     pub fn accepted_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `acceptedAt` field to an Option value (optional)
     pub fn maybe_accepted_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -2408,11 +2412,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetCid<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         InviteViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2427,11 +2431,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         InviteViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2439,12 +2443,12 @@ where
 impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `expiresAt` field to an Option value (optional)
     pub fn maybe_expires_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -2459,11 +2463,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetInvitee<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         InviteViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2478,11 +2482,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetInviter<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         InviteViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2490,12 +2494,12 @@ where
 impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
     pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -2510,11 +2514,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetResource<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         InviteViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2522,12 +2526,12 @@ where
 impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     /// Set the `resourceTitle` field (optional)
     pub fn resource_title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `resourceTitle` field to an Option value (optional)
     pub fn maybe_resource_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -2535,12 +2539,12 @@ impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
 impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     /// Set the `scope` field (optional)
     pub fn scope(mut self, value: impl Into<Option<InviteViewScope<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `scope` field to an Option value (optional)
     pub fn maybe_scope(mut self, value: Option<InviteViewScope<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -2555,11 +2559,11 @@ where
         mut self,
         value: impl Into<InviteViewStatus<'a>>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetStatus<S>> {
-        self.__unsafe_private_named.11 = Option::Some(value.into());
+        self._fields.11 = Option::Some(value.into());
         InviteViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2574,11 +2578,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetUri<S>> {
-        self.__unsafe_private_named.12 = Option::Some(value.into());
+        self._fields.12 = Option::Some(value.into());
         InviteViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2586,30 +2590,30 @@ where
 impl<'a, S> InviteViewBuilder<'a, S>
 where
     S: invite_view_state::State,
-    S::Inviter: invite_view_state::IsSet,
+    S::Invitee: invite_view_state::IsSet,
     S::Resource: invite_view_state::IsSet,
     S::Cid: invite_view_state::IsSet,
-    S::Invitee: invite_view_state::IsSet,
+    S::Status: invite_view_state::IsSet,
     S::Uri: invite_view_state::IsSet,
     S::CreatedAt: invite_view_state::IsSet,
-    S::Status: invite_view_state::IsSet,
+    S::Inviter: invite_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> InviteView<'a> {
         InviteView {
-            accept_uri: self.__unsafe_private_named.0,
-            accepted_at: self.__unsafe_private_named.1,
-            cid: self.__unsafe_private_named.2.unwrap(),
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            expires_at: self.__unsafe_private_named.4,
-            invitee: self.__unsafe_private_named.5.unwrap(),
-            inviter: self.__unsafe_private_named.6.unwrap(),
-            message: self.__unsafe_private_named.7,
-            resource: self.__unsafe_private_named.8.unwrap(),
-            resource_title: self.__unsafe_private_named.9,
-            scope: self.__unsafe_private_named.10,
-            status: self.__unsafe_private_named.11.unwrap(),
-            uri: self.__unsafe_private_named.12.unwrap(),
+            accept_uri: self._fields.0,
+            accepted_at: self._fields.1,
+            cid: self._fields.2.unwrap(),
+            created_at: self._fields.3.unwrap(),
+            expires_at: self._fields.4,
+            invitee: self._fields.5.unwrap(),
+            inviter: self._fields.6.unwrap(),
+            message: self._fields.7,
+            resource: self._fields.8.unwrap(),
+            resource_title: self._fields.9,
+            scope: self._fields.10,
+            status: self._fields.11.unwrap(),
+            uri: self._fields.12.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2622,19 +2626,19 @@ where
         >,
     ) -> InviteView<'a> {
         InviteView {
-            accept_uri: self.__unsafe_private_named.0,
-            accepted_at: self.__unsafe_private_named.1,
-            cid: self.__unsafe_private_named.2.unwrap(),
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            expires_at: self.__unsafe_private_named.4,
-            invitee: self.__unsafe_private_named.5.unwrap(),
-            inviter: self.__unsafe_private_named.6.unwrap(),
-            message: self.__unsafe_private_named.7,
-            resource: self.__unsafe_private_named.8.unwrap(),
-            resource_title: self.__unsafe_private_named.9,
-            scope: self.__unsafe_private_named.10,
-            status: self.__unsafe_private_named.11.unwrap(),
-            uri: self.__unsafe_private_named.12.unwrap(),
+            accept_uri: self._fields.0,
+            accepted_at: self._fields.1,
+            cid: self._fields.2.unwrap(),
+            created_at: self._fields.3.unwrap(),
+            expires_at: self._fields.4,
+            invitee: self._fields.5.unwrap(),
+            inviter: self._fields.6.unwrap(),
+            message: self._fields.7,
+            resource: self._fields.8.unwrap(),
+            resource_title: self._fields.9,
+            scope: self._fields.10,
+            status: self._fields.11.unwrap(),
+            uri: self._fields.12.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2650,58 +2654,58 @@ pub mod participant_state_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Status;
         type Role;
         type User;
-        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Status = Unset;
         type Role = Unset;
         type User = Unset;
-        type Status = Unset;
-    }
-    ///State transition - sets the `role` field to Set
-    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRole<S> {}
-    impl<S: State> State for SetRole<S> {
-        type Role = Set<members::role>;
-        type User = S::User;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `user` field to Set
-    pub struct SetUser<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUser<S> {}
-    impl<S: State> State for SetUser<S> {
-        type Role = S::Role;
-        type User = Set<members::user>;
-        type Status = S::Status;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
+        type Status = Set<members::status>;
         type Role = S::Role;
         type User = S::User;
-        type Status = Set<members::status>;
+    }
+    ///State transition - sets the `role` field to Set
+    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRole<S> {}
+    impl<S: State> State for SetRole<S> {
+        type Status = S::Status;
+        type Role = Set<members::role>;
+        type User = S::User;
+    }
+    ///State transition - sets the `user` field to Set
+    pub struct SetUser<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUser<S> {}
+    impl<S: State> State for SetUser<S> {
+        type Status = S::Status;
+        type Role = S::Role;
+        type User = Set<members::user>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `status` field
+        pub struct status(());
         ///Marker type for the `role` field
         pub struct role(());
         ///Marker type for the `user` field
         pub struct user(());
-        ///Marker type for the `status` field
-        pub struct status(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ParticipantStateViewBuilder<'a, S: participant_state_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AtUri<'a>>,
         Option<ParticipantStateViewEndReason<'a>>,
         Option<Datetime>,
@@ -2714,7 +2718,7 @@ pub struct ParticipantStateViewBuilder<'a, S: participant_state_view_state::Stat
         Option<ProfileViewBasic<'a>>,
         Option<bool>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ParticipantStateView<'a> {
@@ -2731,21 +2735,9 @@ impl<'a> ParticipantStateViewBuilder<'a, participant_state_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ParticipantStateViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2753,12 +2745,12 @@ impl<'a> ParticipantStateViewBuilder<'a, participant_state_view_state::Empty> {
 impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
     /// Set the `acceptUri` field (optional)
     pub fn accept_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `acceptUri` field to an Option value (optional)
     pub fn maybe_accept_uri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -2769,7 +2761,7 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
         mut self,
         value: impl Into<Option<ParticipantStateViewEndReason<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `endReason` field to an Option value (optional)
@@ -2777,7 +2769,7 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
         mut self,
         value: Option<ParticipantStateViewEndReason<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -2785,12 +2777,12 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
 impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
     /// Set the `firstEditAt` field (optional)
     pub fn first_edit_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `firstEditAt` field to an Option value (optional)
     pub fn maybe_first_edit_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -2798,12 +2790,12 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
 impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
     /// Set the `inviteUri` field (optional)
     pub fn invite_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `inviteUri` field to an Option value (optional)
     pub fn maybe_invite_uri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -2811,12 +2803,12 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
 impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
     /// Set the `lastEditAt` field (optional)
     pub fn last_edit_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `lastEditAt` field to an Option value (optional)
     pub fn maybe_last_edit_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -2824,12 +2816,12 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
 impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
     /// Set the `publishedVersion` field (optional)
     pub fn published_version(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `publishedVersion` field to an Option value (optional)
     pub fn maybe_published_version(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -2837,12 +2829,12 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
 impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
     /// Set the `relationshipEndedAt` field (optional)
     pub fn relationship_ended_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `relationshipEndedAt` field to an Option value (optional)
     pub fn maybe_relationship_ended_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -2857,11 +2849,11 @@ where
         mut self,
         value: impl Into<ParticipantStateViewRole<'a>>,
     ) -> ParticipantStateViewBuilder<'a, participant_state_view_state::SetRole<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         ParticipantStateViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2876,11 +2868,11 @@ where
         mut self,
         value: impl Into<ParticipantStateViewStatus<'a>>,
     ) -> ParticipantStateViewBuilder<'a, participant_state_view_state::SetStatus<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         ParticipantStateViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2895,11 +2887,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> ParticipantStateViewBuilder<'a, participant_state_view_state::SetUser<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         ParticipantStateViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2907,12 +2899,12 @@ where
 impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
     /// Set the `wasCollaborator` field (optional)
     pub fn was_collaborator(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `wasCollaborator` field to an Option value (optional)
     pub fn maybe_was_collaborator(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -2920,24 +2912,24 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
 impl<'a, S> ParticipantStateViewBuilder<'a, S>
 where
     S: participant_state_view_state::State,
+    S::Status: participant_state_view_state::IsSet,
     S::Role: participant_state_view_state::IsSet,
     S::User: participant_state_view_state::IsSet,
-    S::Status: participant_state_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ParticipantStateView<'a> {
         ParticipantStateView {
-            accept_uri: self.__unsafe_private_named.0,
-            end_reason: self.__unsafe_private_named.1,
-            first_edit_at: self.__unsafe_private_named.2,
-            invite_uri: self.__unsafe_private_named.3,
-            last_edit_at: self.__unsafe_private_named.4,
-            published_version: self.__unsafe_private_named.5,
-            relationship_ended_at: self.__unsafe_private_named.6,
-            role: self.__unsafe_private_named.7.unwrap(),
-            status: self.__unsafe_private_named.8.unwrap(),
-            user: self.__unsafe_private_named.9.unwrap(),
-            was_collaborator: self.__unsafe_private_named.10,
+            accept_uri: self._fields.0,
+            end_reason: self._fields.1,
+            first_edit_at: self._fields.2,
+            invite_uri: self._fields.3,
+            last_edit_at: self._fields.4,
+            published_version: self._fields.5,
+            relationship_ended_at: self._fields.6,
+            role: self._fields.7.unwrap(),
+            status: self._fields.8.unwrap(),
+            user: self._fields.9.unwrap(),
+            was_collaborator: self._fields.10,
             extra_data: Default::default(),
         }
     }
@@ -2950,17 +2942,17 @@ where
         >,
     ) -> ParticipantStateView<'a> {
         ParticipantStateView {
-            accept_uri: self.__unsafe_private_named.0,
-            end_reason: self.__unsafe_private_named.1,
-            first_edit_at: self.__unsafe_private_named.2,
-            invite_uri: self.__unsafe_private_named.3,
-            last_edit_at: self.__unsafe_private_named.4,
-            published_version: self.__unsafe_private_named.5,
-            relationship_ended_at: self.__unsafe_private_named.6,
-            role: self.__unsafe_private_named.7.unwrap(),
-            status: self.__unsafe_private_named.8.unwrap(),
-            user: self.__unsafe_private_named.9.unwrap(),
-            was_collaborator: self.__unsafe_private_named.10,
+            accept_uri: self._fields.0,
+            end_reason: self._fields.1,
+            first_edit_at: self._fields.2,
+            invite_uri: self._fields.3,
+            last_edit_at: self._fields.4,
+            published_version: self._fields.5,
+            relationship_ended_at: self._fields.6,
+            role: self._fields.7.unwrap(),
+            status: self._fields.8.unwrap(),
+            user: self._fields.9.unwrap(),
+            was_collaborator: self._fields.10,
             extra_data: Some(extra_data),
         }
     }
@@ -2976,92 +2968,92 @@ pub mod session_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type User;
-        type Resource;
         type NodeId;
-        type Uri;
+        type Resource;
+        type User;
         type CreatedAt;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type User = Unset;
-        type Resource = Unset;
         type NodeId = Unset;
-        type Uri = Unset;
+        type Resource = Unset;
+        type User = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `user` field to Set
-    pub struct SetUser<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUser<S> {}
-    impl<S: State> State for SetUser<S> {
-        type User = Set<members::user>;
-        type Resource = S::Resource;
-        type NodeId = S::NodeId;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type User = S::User;
-        type Resource = Set<members::resource>;
-        type NodeId = S::NodeId;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
+        type Uri = Unset;
     }
     ///State transition - sets the `node_id` field to Set
     pub struct SetNodeId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNodeId<S> {}
     impl<S: State> State for SetNodeId<S> {
-        type User = S::User;
-        type Resource = S::Resource;
         type NodeId = Set<members::node_id>;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type User = S::User;
         type Resource = S::Resource;
-        type NodeId = S::NodeId;
-        type Uri = Set<members::uri>;
+        type User = S::User;
         type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `resource` field to Set
+    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResource<S> {}
+    impl<S: State> State for SetResource<S> {
+        type NodeId = S::NodeId;
+        type Resource = Set<members::resource>;
+        type User = S::User;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `user` field to Set
+    pub struct SetUser<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUser<S> {}
+    impl<S: State> State for SetUser<S> {
+        type NodeId = S::NodeId;
+        type Resource = S::Resource;
+        type User = Set<members::user>;
+        type CreatedAt = S::CreatedAt;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type User = S::User;
-        type Resource = S::Resource;
         type NodeId = S::NodeId;
-        type Uri = S::Uri;
+        type Resource = S::Resource;
+        type User = S::User;
         type CreatedAt = Set<members::created_at>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type NodeId = S::NodeId;
+        type Resource = S::Resource;
+        type User = S::User;
+        type CreatedAt = S::CreatedAt;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `user` field
-        pub struct user(());
-        ///Marker type for the `resource` field
-        pub struct resource(());
         ///Marker type for the `node_id` field
         pub struct node_id(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
+        ///Marker type for the `resource` field
+        pub struct resource(());
+        ///Marker type for the `user` field
+        pub struct user(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SessionViewBuilder<'a, S: session_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -3070,7 +3062,7 @@ pub struct SessionViewBuilder<'a, S: session_view_state::State> {
         Option<AtUri<'a>>,
         Option<ProfileViewBasic<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SessionView<'a> {
@@ -3084,9 +3076,9 @@ impl<'a> SessionViewBuilder<'a, session_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SessionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3101,11 +3093,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SessionViewBuilder<'a, session_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SessionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3113,12 +3105,12 @@ where
 impl<'a, S: session_view_state::State> SessionViewBuilder<'a, S> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `expiresAt` field to an Option value (optional)
     pub fn maybe_expires_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -3133,11 +3125,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SessionViewBuilder<'a, session_view_state::SetNodeId<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SessionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3145,12 +3137,12 @@ where
 impl<'a, S: session_view_state::State> SessionViewBuilder<'a, S> {
     /// Set the `relayUrl` field (optional)
     pub fn relay_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `relayUrl` field to an Option value (optional)
     pub fn maybe_relay_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -3165,11 +3157,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> SessionViewBuilder<'a, session_view_state::SetResource<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         SessionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3184,11 +3176,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> SessionViewBuilder<'a, session_view_state::SetUri<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         SessionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3203,11 +3195,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> SessionViewBuilder<'a, session_view_state::SetUser<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         SessionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3215,22 +3207,22 @@ where
 impl<'a, S> SessionViewBuilder<'a, S>
 where
     S: session_view_state::State,
-    S::User: session_view_state::IsSet,
-    S::Resource: session_view_state::IsSet,
     S::NodeId: session_view_state::IsSet,
-    S::Uri: session_view_state::IsSet,
+    S::Resource: session_view_state::IsSet,
+    S::User: session_view_state::IsSet,
     S::CreatedAt: session_view_state::IsSet,
+    S::Uri: session_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SessionView<'a> {
         SessionView {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            expires_at: self.__unsafe_private_named.1,
-            node_id: self.__unsafe_private_named.2.unwrap(),
-            relay_url: self.__unsafe_private_named.3,
-            resource: self.__unsafe_private_named.4.unwrap(),
-            uri: self.__unsafe_private_named.5.unwrap(),
-            user: self.__unsafe_private_named.6.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            expires_at: self._fields.1,
+            node_id: self._fields.2.unwrap(),
+            relay_url: self._fields.3,
+            resource: self._fields.4.unwrap(),
+            uri: self._fields.5.unwrap(),
+            user: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -3243,13 +3235,13 @@ where
         >,
     ) -> SessionView<'a> {
         SessionView {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            expires_at: self.__unsafe_private_named.1,
-            node_id: self.__unsafe_private_named.2.unwrap(),
-            relay_url: self.__unsafe_private_named.3,
-            resource: self.__unsafe_private_named.4.unwrap(),
-            uri: self.__unsafe_private_named.5.unwrap(),
-            user: self.__unsafe_private_named.6.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            expires_at: self._fields.1,
+            node_id: self._fields.2.unwrap(),
+            relay_url: self._fields.3,
+            resource: self._fields.4.unwrap(),
+            uri: self._fields.5.unwrap(),
+            user: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

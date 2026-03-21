@@ -8,7 +8,11 @@
 pub mod episode;
 pub mod favorite;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -286,74 +290,74 @@ pub mod show_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artist;
-        type Title;
         type Schedule;
+        type Artist;
         type CreatedAt;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artist = Unset;
-        type Title = Unset;
         type Schedule = Unset;
+        type Artist = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtist<S> {}
-    impl<S: State> State for SetArtist<S> {
-        type Artist = Set<members::artist>;
-        type Title = S::Title;
-        type Schedule = S::Schedule;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Artist = S::Artist;
-        type Title = Set<members::title>;
-        type Schedule = S::Schedule;
-        type CreatedAt = S::CreatedAt;
+        type Title = Unset;
     }
     ///State transition - sets the `schedule` field to Set
     pub struct SetSchedule<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSchedule<S> {}
     impl<S: State> State for SetSchedule<S> {
-        type Artist = S::Artist;
-        type Title = S::Title;
         type Schedule = Set<members::schedule>;
+        type Artist = S::Artist;
         type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetArtist<S> {}
+    impl<S: State> State for SetArtist<S> {
+        type Schedule = S::Schedule;
+        type Artist = Set<members::artist>;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Artist = S::Artist;
-        type Title = S::Title;
         type Schedule = S::Schedule;
+        type Artist = S::Artist;
         type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Schedule = S::Schedule;
+        type Artist = S::Artist;
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artist` field
-        pub struct artist(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `schedule` field
         pub struct schedule(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ShowBuilder<'a, S: show_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AtUri<'a>>,
         Option<BlobRef<'a>>,
         Option<Datetime>,
@@ -361,7 +365,7 @@ pub struct ShowBuilder<'a, S: show_state::State> {
         Option<ShowSchedule<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Show<'a> {
@@ -375,9 +379,9 @@ impl<'a> ShowBuilder<'a, show_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ShowBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -392,11 +396,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ShowBuilder<'a, show_state::SetArtist<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ShowBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -404,12 +408,12 @@ where
 impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     /// Set the `coverArt` field (optional)
     pub fn cover_art(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `coverArt` field to an Option value (optional)
     pub fn maybe_cover_art(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -424,11 +428,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ShowBuilder<'a, show_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ShowBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -436,12 +440,12 @@ where
 impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -456,11 +460,11 @@ where
         mut self,
         value: impl Into<ShowSchedule<'a>>,
     ) -> ShowBuilder<'a, show_state::SetSchedule<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ShowBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -475,11 +479,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ShowBuilder<'a, show_state::SetTitle<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ShowBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -487,20 +491,20 @@ where
 impl<'a, S> ShowBuilder<'a, S>
 where
     S: show_state::State,
-    S::Artist: show_state::IsSet,
-    S::Title: show_state::IsSet,
     S::Schedule: show_state::IsSet,
+    S::Artist: show_state::IsSet,
     S::CreatedAt: show_state::IsSet,
+    S::Title: show_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Show<'a> {
         Show {
-            artist: self.__unsafe_private_named.0.unwrap(),
-            cover_art: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3,
-            schedule: self.__unsafe_private_named.4.unwrap(),
-            title: self.__unsafe_private_named.5.unwrap(),
+            artist: self._fields.0.unwrap(),
+            cover_art: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3,
+            schedule: self._fields.4.unwrap(),
+            title: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -513,12 +517,12 @@ where
         >,
     ) -> Show<'a> {
         Show {
-            artist: self.__unsafe_private_named.0.unwrap(),
-            cover_art: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3,
-            schedule: self.__unsafe_private_named.4.unwrap(),
-            title: self.__unsafe_private_named.5.unwrap(),
+            artist: self._fields.0.unwrap(),
+            cover_art: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3,
+            schedule: self._fields.4.unwrap(),
+            title: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

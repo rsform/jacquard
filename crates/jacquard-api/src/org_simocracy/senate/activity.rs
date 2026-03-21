@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -409,8 +412,8 @@ pub mod activity_state {
 
 /// Builder for constructing an instance of this type
 pub struct ActivityBuilder<'a, S: activity_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ActivityActivityType<'a>>,
         Option<Vec<StrongRef<'a>>>,
         Option<Datetime>,
@@ -419,7 +422,7 @@ pub struct ActivityBuilder<'a, S: activity_state::State> {
         Option<CowStr<'a>>,
         Option<ActivityStatus<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Activity<'a> {
@@ -433,9 +436,9 @@ impl<'a> ActivityBuilder<'a, activity_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ActivityBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -450,11 +453,11 @@ where
         mut self,
         value: impl Into<ActivityActivityType<'a>>,
     ) -> ActivityBuilder<'a, activity_state::SetActivityType<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ActivityBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -469,11 +472,11 @@ where
         mut self,
         value: impl Into<Vec<StrongRef<'a>>>,
     ) -> ActivityBuilder<'a, activity_state::SetCommitteeSims<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ActivityBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -488,11 +491,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ActivityBuilder<'a, activity_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ActivityBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -500,12 +503,12 @@ where
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `evaluation` field (optional)
     pub fn evaluation(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `evaluation` field to an Option value (optional)
     pub fn maybe_evaluation(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -513,12 +516,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `proposalText` field (optional)
     pub fn proposal_text(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `proposalText` field to an Option value (optional)
     pub fn maybe_proposal_text(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -526,12 +529,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `resultSummary` field (optional)
     pub fn result_summary(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `resultSummary` field to an Option value (optional)
     pub fn maybe_result_summary(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -539,12 +542,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<ActivityStatus<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<ActivityStatus<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -559,13 +562,13 @@ where
     /// Build the final struct
     pub fn build(self) -> Activity<'a> {
         Activity {
-            activity_type: self.__unsafe_private_named.0.unwrap(),
-            committee_sims: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            evaluation: self.__unsafe_private_named.3,
-            proposal_text: self.__unsafe_private_named.4,
-            result_summary: self.__unsafe_private_named.5,
-            status: self.__unsafe_private_named.6,
+            activity_type: self._fields.0.unwrap(),
+            committee_sims: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            evaluation: self._fields.3,
+            proposal_text: self._fields.4,
+            result_summary: self._fields.5,
+            status: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -578,13 +581,13 @@ where
         >,
     ) -> Activity<'a> {
         Activity {
-            activity_type: self.__unsafe_private_named.0.unwrap(),
-            committee_sims: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            evaluation: self.__unsafe_private_named.3,
-            proposal_text: self.__unsafe_private_named.4,
-            result_summary: self.__unsafe_private_named.5,
-            status: self.__unsafe_private_named.6,
+            activity_type: self._fields.0.unwrap(),
+            committee_sims: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            evaluation: self._fields.3,
+            proposal_text: self._fields.4,
+            result_summary: self._fields.5,
+            status: self._fields.6,
             extra_data: Some(extra_data),
         }
     }

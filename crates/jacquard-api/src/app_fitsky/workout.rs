@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -2666,45 +2669,45 @@ pub mod exercise_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Sets;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Sets = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Sets = S::Sets;
+        type Name = Unset;
     }
     ///State transition - sets the `sets` field to Set
     pub struct SetSets<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSets<S> {}
     impl<S: State> State for SetSets<S> {
-        type Name = S::Name;
         type Sets = Set<members::sets>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Sets = S::Sets;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `sets` field
         pub struct sets(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ExerciseBuilder<'a, S: exercise_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<Vec<workout::ExerciseSet<'a>>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Vec<workout::ExerciseSet<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Exercise<'a> {
@@ -2718,9 +2721,9 @@ impl<'a> ExerciseBuilder<'a, exercise_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ExerciseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2735,11 +2738,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ExerciseBuilder<'a, exercise_state::SetName<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ExerciseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2754,11 +2757,11 @@ where
         mut self,
         value: impl Into<Vec<workout::ExerciseSet<'a>>>,
     ) -> ExerciseBuilder<'a, exercise_state::SetSets<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ExerciseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2766,14 +2769,14 @@ where
 impl<'a, S> ExerciseBuilder<'a, S>
 where
     S: exercise_state::State,
-    S::Name: exercise_state::IsSet,
     S::Sets: exercise_state::IsSet,
+    S::Name: exercise_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Exercise<'a> {
         Exercise {
-            name: self.__unsafe_private_named.0.unwrap(),
-            sets: self.__unsafe_private_named.1.unwrap(),
+            name: self._fields.0.unwrap(),
+            sets: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2786,8 +2789,8 @@ where
         >,
     ) -> Exercise<'a> {
         Exercise {
-            name: self.__unsafe_private_named.0.unwrap(),
-            sets: self.__unsafe_private_named.1.unwrap(),
+            name: self._fields.0.unwrap(),
+            sets: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2803,45 +2806,45 @@ pub mod heart_rate_sample_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Bpm;
         type Timestamp;
+        type Bpm;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Bpm = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `bpm` field to Set
-    pub struct SetBpm<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBpm<S> {}
-    impl<S: State> State for SetBpm<S> {
-        type Bpm = Set<members::bpm>;
-        type Timestamp = S::Timestamp;
+        type Bpm = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTimestamp<S> {}
     impl<S: State> State for SetTimestamp<S> {
-        type Bpm = S::Bpm;
         type Timestamp = Set<members::timestamp>;
+        type Bpm = S::Bpm;
+    }
+    ///State transition - sets the `bpm` field to Set
+    pub struct SetBpm<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBpm<S> {}
+    impl<S: State> State for SetBpm<S> {
+        type Timestamp = S::Timestamp;
+        type Bpm = Set<members::bpm>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `bpm` field
-        pub struct bpm(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `bpm` field
+        pub struct bpm(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct HeartRateSampleBuilder<'a, S: heart_rate_sample_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<Datetime>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> HeartRateSample<'a> {
@@ -2855,9 +2858,9 @@ impl<'a> HeartRateSampleBuilder<'a, heart_rate_sample_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         HeartRateSampleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2872,11 +2875,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> HeartRateSampleBuilder<'a, heart_rate_sample_state::SetBpm<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         HeartRateSampleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2891,11 +2894,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> HeartRateSampleBuilder<'a, heart_rate_sample_state::SetTimestamp<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         HeartRateSampleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2903,14 +2906,14 @@ where
 impl<'a, S> HeartRateSampleBuilder<'a, S>
 where
     S: heart_rate_sample_state::State,
-    S::Bpm: heart_rate_sample_state::IsSet,
     S::Timestamp: heart_rate_sample_state::IsSet,
+    S::Bpm: heart_rate_sample_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> HeartRateSample<'a> {
         HeartRateSample {
-            bpm: self.__unsafe_private_named.0.unwrap(),
-            timestamp: self.__unsafe_private_named.1.unwrap(),
+            bpm: self._fields.0.unwrap(),
+            timestamp: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2923,8 +2926,8 @@ where
         >,
     ) -> HeartRateSample<'a> {
         HeartRateSample {
-            bpm: self.__unsafe_private_named.0.unwrap(),
-            timestamp: self.__unsafe_private_named.1.unwrap(),
+            bpm: self._fields.0.unwrap(),
+            timestamp: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2940,92 +2943,92 @@ pub mod workout_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Duration;
+        type StartedAt;
         type Type;
         type Title;
-        type StartedAt;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Duration = Unset;
+        type StartedAt = Unset;
         type Type = Unset;
         type Title = Unset;
-        type StartedAt = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Duration = S::Duration;
-        type Type = S::Type;
-        type Title = S::Title;
-        type StartedAt = S::StartedAt;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `duration` field to Set
     pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDuration<S> {}
     impl<S: State> State for SetDuration<S> {
-        type CreatedAt = S::CreatedAt;
         type Duration = Set<members::duration>;
+        type StartedAt = S::StartedAt;
         type Type = S::Type;
         type Title = S::Title;
-        type StartedAt = S::StartedAt;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
         type CreatedAt = S::CreatedAt;
-        type Duration = S::Duration;
-        type Type = Set<members::r#type>;
-        type Title = S::Title;
-        type StartedAt = S::StartedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type Duration = S::Duration;
-        type Type = S::Type;
-        type Title = Set<members::title>;
-        type StartedAt = S::StartedAt;
     }
     ///State transition - sets the `started_at` field to Set
     pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartedAt<S> {}
     impl<S: State> State for SetStartedAt<S> {
-        type CreatedAt = S::CreatedAt;
         type Duration = S::Duration;
+        type StartedAt = Set<members::started_at>;
         type Type = S::Type;
         type Title = S::Title;
-        type StartedAt = Set<members::started_at>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Duration = S::Duration;
+        type StartedAt = S::StartedAt;
+        type Type = Set<members::r#type>;
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Duration = S::Duration;
+        type StartedAt = S::StartedAt;
+        type Type = S::Type;
+        type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Duration = S::Duration;
+        type StartedAt = S::StartedAt;
+        type Type = S::Type;
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `duration` field
         pub struct duration(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
         ///Marker type for the `type` field
         pub struct r#type(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct WorkoutBuilder<'a, S: workout_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<WorkoutDetails<'a>>,
         Option<i64>,
@@ -3040,7 +3043,7 @@ pub struct WorkoutBuilder<'a, S: workout_state::State> {
         Option<WorkoutType<'a>>,
         Option<workout::VisibilitySettings<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Workout<'a> {
@@ -3054,8 +3057,8 @@ impl<'a> WorkoutBuilder<'a, workout_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         WorkoutBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -3070,7 +3073,7 @@ impl<'a> WorkoutBuilder<'a, workout_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3085,11 +3088,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> WorkoutBuilder<'a, workout_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         WorkoutBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3097,12 +3100,12 @@ where
 impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `details` field (optional)
     pub fn details(mut self, value: impl Into<Option<WorkoutDetails<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `details` field to an Option value (optional)
     pub fn maybe_details(mut self, value: Option<WorkoutDetails<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -3117,11 +3120,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> WorkoutBuilder<'a, workout_state::SetDuration<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         WorkoutBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3129,12 +3132,12 @@ where
 impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `endedAt` field (optional)
     pub fn ended_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `endedAt` field to an Option value (optional)
     pub fn maybe_ended_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -3145,7 +3148,7 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<workout::Milestone<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `milestones` field to an Option value (optional)
@@ -3153,7 +3156,7 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
         mut self,
         value: Option<Vec<workout::Milestone<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -3161,12 +3164,12 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
 impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
     pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -3174,12 +3177,12 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
 impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `ogImage` field (optional)
     pub fn og_image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `ogImage` field to an Option value (optional)
     pub fn maybe_og_image(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -3187,12 +3190,12 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
 impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `planUri` field (optional)
     pub fn plan_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `planUri` field to an Option value (optional)
     pub fn maybe_plan_uri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -3207,11 +3210,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> WorkoutBuilder<'a, workout_state::SetStartedAt<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         WorkoutBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3219,12 +3222,12 @@ where
 impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<WorkoutStatus<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<WorkoutStatus<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -3239,11 +3242,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> WorkoutBuilder<'a, workout_state::SetTitle<S>> {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         WorkoutBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3258,11 +3261,11 @@ where
         mut self,
         value: impl Into<WorkoutType<'a>>,
     ) -> WorkoutBuilder<'a, workout_state::SetType<S>> {
-        self.__unsafe_private_named.11 = Option::Some(value.into());
+        self._fields.11 = Option::Some(value.into());
         WorkoutBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3273,7 +3276,7 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
         mut self,
         value: impl Into<Option<workout::VisibilitySettings<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
@@ -3281,7 +3284,7 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
         mut self,
         value: Option<workout::VisibilitySettings<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -3289,28 +3292,28 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
 impl<'a, S> WorkoutBuilder<'a, S>
 where
     S: workout_state::State,
-    S::CreatedAt: workout_state::IsSet,
     S::Duration: workout_state::IsSet,
+    S::StartedAt: workout_state::IsSet,
     S::Type: workout_state::IsSet,
     S::Title: workout_state::IsSet,
-    S::StartedAt: workout_state::IsSet,
+    S::CreatedAt: workout_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Workout<'a> {
         Workout {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            details: self.__unsafe_private_named.1,
-            duration: self.__unsafe_private_named.2.unwrap(),
-            ended_at: self.__unsafe_private_named.3,
-            milestones: self.__unsafe_private_named.4,
-            notes: self.__unsafe_private_named.5,
-            og_image: self.__unsafe_private_named.6,
-            plan_uri: self.__unsafe_private_named.7,
-            started_at: self.__unsafe_private_named.8.unwrap(),
-            status: self.__unsafe_private_named.9,
-            title: self.__unsafe_private_named.10.unwrap(),
-            r#type: self.__unsafe_private_named.11.unwrap(),
-            visibility: self.__unsafe_private_named.12,
+            created_at: self._fields.0.unwrap(),
+            details: self._fields.1,
+            duration: self._fields.2.unwrap(),
+            ended_at: self._fields.3,
+            milestones: self._fields.4,
+            notes: self._fields.5,
+            og_image: self._fields.6,
+            plan_uri: self._fields.7,
+            started_at: self._fields.8.unwrap(),
+            status: self._fields.9,
+            title: self._fields.10.unwrap(),
+            r#type: self._fields.11.unwrap(),
+            visibility: self._fields.12,
             extra_data: Default::default(),
         }
     }
@@ -3323,19 +3326,19 @@ where
         >,
     ) -> Workout<'a> {
         Workout {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            details: self.__unsafe_private_named.1,
-            duration: self.__unsafe_private_named.2.unwrap(),
-            ended_at: self.__unsafe_private_named.3,
-            milestones: self.__unsafe_private_named.4,
-            notes: self.__unsafe_private_named.5,
-            og_image: self.__unsafe_private_named.6,
-            plan_uri: self.__unsafe_private_named.7,
-            started_at: self.__unsafe_private_named.8.unwrap(),
-            status: self.__unsafe_private_named.9,
-            title: self.__unsafe_private_named.10.unwrap(),
-            r#type: self.__unsafe_private_named.11.unwrap(),
-            visibility: self.__unsafe_private_named.12,
+            created_at: self._fields.0.unwrap(),
+            details: self._fields.1,
+            duration: self._fields.2.unwrap(),
+            ended_at: self._fields.3,
+            milestones: self._fields.4,
+            notes: self._fields.5,
+            og_image: self._fields.6,
+            plan_uri: self._fields.7,
+            started_at: self._fields.8.unwrap(),
+            status: self._fields.9,
+            title: self._fields.10.unwrap(),
+            r#type: self._fields.11.unwrap(),
+            visibility: self._fields.12,
             extra_data: Some(extra_data),
         }
     }
@@ -3387,14 +3390,14 @@ pub mod milestone_state {
 
 /// Builder for constructing an instance of this type
 pub struct MilestoneBuilder<'a, S: milestone_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<MilestoneType<'a>>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Milestone<'a> {
@@ -3408,9 +3411,9 @@ impl<'a> MilestoneBuilder<'a, milestone_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MilestoneBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3418,12 +3421,12 @@ impl<'a> MilestoneBuilder<'a, milestone_state::Empty> {
 impl<'a, S: milestone_state::State> MilestoneBuilder<'a, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
     pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -3438,11 +3441,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> MilestoneBuilder<'a, milestone_state::SetTimestamp<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MilestoneBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3457,11 +3460,11 @@ where
         mut self,
         value: impl Into<MilestoneType<'a>>,
     ) -> MilestoneBuilder<'a, milestone_state::SetType<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         MilestoneBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3469,12 +3472,12 @@ where
 impl<'a, S: milestone_state::State> MilestoneBuilder<'a, S> {
     /// Set the `valueMeters` field (optional)
     pub fn value_meters(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `valueMeters` field to an Option value (optional)
     pub fn maybe_value_meters(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -3488,10 +3491,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Milestone<'a> {
         Milestone {
-            note: self.__unsafe_private_named.0,
-            timestamp: self.__unsafe_private_named.1.unwrap(),
-            r#type: self.__unsafe_private_named.2.unwrap(),
-            value_meters: self.__unsafe_private_named.3,
+            note: self._fields.0,
+            timestamp: self._fields.1.unwrap(),
+            r#type: self._fields.2.unwrap(),
+            value_meters: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -3504,10 +3507,10 @@ where
         >,
     ) -> Milestone<'a> {
         Milestone {
-            note: self.__unsafe_private_named.0,
-            timestamp: self.__unsafe_private_named.1.unwrap(),
-            r#type: self.__unsafe_private_named.2.unwrap(),
-            value_meters: self.__unsafe_private_named.3,
+            note: self._fields.0,
+            timestamp: self._fields.1.unwrap(),
+            r#type: self._fields.2.unwrap(),
+            value_meters: self._fields.3,
             extra_data: Some(extra_data),
         }
     }
@@ -3523,59 +3526,59 @@ pub mod route_point_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Timestamp;
-        type LatE6;
         type LngE6;
+        type LatE6;
+        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Timestamp = Unset;
-        type LatE6 = Unset;
         type LngE6 = Unset;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Timestamp = Set<members::timestamp>;
-        type LatE6 = S::LatE6;
-        type LngE6 = S::LngE6;
-    }
-    ///State transition - sets the `lat_e6` field to Set
-    pub struct SetLatE6<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLatE6<S> {}
-    impl<S: State> State for SetLatE6<S> {
-        type Timestamp = S::Timestamp;
-        type LatE6 = Set<members::lat_e6>;
-        type LngE6 = S::LngE6;
+        type LatE6 = Unset;
+        type Timestamp = Unset;
     }
     ///State transition - sets the `lng_e6` field to Set
     pub struct SetLngE6<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLngE6<S> {}
     impl<S: State> State for SetLngE6<S> {
-        type Timestamp = S::Timestamp;
-        type LatE6 = S::LatE6;
         type LngE6 = Set<members::lng_e6>;
+        type LatE6 = S::LatE6;
+        type Timestamp = S::Timestamp;
+    }
+    ///State transition - sets the `lat_e6` field to Set
+    pub struct SetLatE6<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLatE6<S> {}
+    impl<S: State> State for SetLatE6<S> {
+        type LngE6 = S::LngE6;
+        type LatE6 = Set<members::lat_e6>;
+        type Timestamp = S::Timestamp;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type LngE6 = S::LngE6;
+        type LatE6 = S::LatE6;
+        type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
-        ///Marker type for the `lat_e6` field
-        pub struct lat_e6(());
         ///Marker type for the `lng_e6` field
         pub struct lng_e6(());
+        ///Marker type for the `lat_e6` field
+        pub struct lat_e6(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RoutePointBuilder<'a, S: route_point_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>, Option<Datetime>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RoutePoint<'a> {
@@ -3589,9 +3592,9 @@ impl<'a> RoutePointBuilder<'a, route_point_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RoutePointBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3606,11 +3609,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> RoutePointBuilder<'a, route_point_state::SetLatE6<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RoutePointBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3625,11 +3628,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> RoutePointBuilder<'a, route_point_state::SetLngE6<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RoutePointBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3644,11 +3647,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> RoutePointBuilder<'a, route_point_state::SetTimestamp<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RoutePointBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3656,16 +3659,16 @@ where
 impl<'a, S> RoutePointBuilder<'a, S>
 where
     S: route_point_state::State,
-    S::Timestamp: route_point_state::IsSet,
-    S::LatE6: route_point_state::IsSet,
     S::LngE6: route_point_state::IsSet,
+    S::LatE6: route_point_state::IsSet,
+    S::Timestamp: route_point_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RoutePoint<'a> {
         RoutePoint {
-            lat_e6: self.__unsafe_private_named.0.unwrap(),
-            lng_e6: self.__unsafe_private_named.1.unwrap(),
-            timestamp: self.__unsafe_private_named.2.unwrap(),
+            lat_e6: self._fields.0.unwrap(),
+            lng_e6: self._fields.1.unwrap(),
+            timestamp: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -3678,9 +3681,9 @@ where
         >,
     ) -> RoutePoint<'a> {
         RoutePoint {
-            lat_e6: self.__unsafe_private_named.0.unwrap(),
-            lng_e6: self.__unsafe_private_named.1.unwrap(),
-            timestamp: self.__unsafe_private_named.2.unwrap(),
+            lat_e6: self._fields.0.unwrap(),
+            lng_e6: self._fields.1.unwrap(),
+            timestamp: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

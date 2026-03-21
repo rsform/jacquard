@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::value::Data;
@@ -417,8 +420,8 @@ pub mod stack_state {
 
 /// Builder for constructing an instance of this type
 pub struct StackBuilder<'a, S: stack_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<StackAlign<'a>>,
         Option<Data<'a>>,
         Option<StackGap<'a>>,
@@ -428,7 +431,7 @@ pub struct StackBuilder<'a, S: stack_state::State> {
         Option<bool>,
         Option<bool>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Stack<'a> {
@@ -442,9 +445,9 @@ impl<'a> StackBuilder<'a, stack_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -452,12 +455,12 @@ impl<'a> StackBuilder<'a, stack_state::Empty> {
 impl<'a, S: stack_state::State> StackBuilder<'a, S> {
     /// Set the `align` field (optional)
     pub fn align(mut self, value: impl Into<Option<StackAlign<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `align` field to an Option value (optional)
     pub fn maybe_align(mut self, value: Option<StackAlign<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -472,11 +475,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> StackBuilder<'a, stack_state::SetChildren<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         StackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -484,12 +487,12 @@ where
 impl<'a, S: stack_state::State> StackBuilder<'a, S> {
     /// Set the `gap` field (optional)
     pub fn gap(mut self, value: impl Into<Option<StackGap<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `gap` field to an Option value (optional)
     pub fn maybe_gap(mut self, value: Option<StackGap<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -497,12 +500,12 @@ impl<'a, S: stack_state::State> StackBuilder<'a, S> {
 impl<'a, S: stack_state::State> StackBuilder<'a, S> {
     /// Set the `inset` field (optional)
     pub fn inset(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `inset` field to an Option value (optional)
     pub fn maybe_inset(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -510,12 +513,12 @@ impl<'a, S: stack_state::State> StackBuilder<'a, S> {
 impl<'a, S: stack_state::State> StackBuilder<'a, S> {
     /// Set the `justify` field (optional)
     pub fn justify(mut self, value: impl Into<Option<StackJustify<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `justify` field to an Option value (optional)
     pub fn maybe_justify(mut self, value: Option<StackJustify<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -523,12 +526,12 @@ impl<'a, S: stack_state::State> StackBuilder<'a, S> {
 impl<'a, S: stack_state::State> StackBuilder<'a, S> {
     /// Set the `opaque` field (optional)
     pub fn opaque(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `opaque` field to an Option value (optional)
     pub fn maybe_opaque(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -536,12 +539,12 @@ impl<'a, S: stack_state::State> StackBuilder<'a, S> {
 impl<'a, S: stack_state::State> StackBuilder<'a, S> {
     /// Set the `separator` field (optional)
     pub fn separator(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `separator` field to an Option value (optional)
     pub fn maybe_separator(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -549,12 +552,12 @@ impl<'a, S: stack_state::State> StackBuilder<'a, S> {
 impl<'a, S: stack_state::State> StackBuilder<'a, S> {
     /// Set the `sticky` field (optional)
     pub fn sticky(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `sticky` field to an Option value (optional)
     pub fn maybe_sticky(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -567,14 +570,14 @@ where
     /// Build the final struct
     pub fn build(self) -> Stack<'a> {
         Stack {
-            align: self.__unsafe_private_named.0,
-            children: self.__unsafe_private_named.1.unwrap(),
-            gap: self.__unsafe_private_named.2,
-            inset: self.__unsafe_private_named.3,
-            justify: self.__unsafe_private_named.4,
-            opaque: self.__unsafe_private_named.5,
-            separator: self.__unsafe_private_named.6,
-            sticky: self.__unsafe_private_named.7,
+            align: self._fields.0,
+            children: self._fields.1.unwrap(),
+            gap: self._fields.2,
+            inset: self._fields.3,
+            justify: self._fields.4,
+            opaque: self._fields.5,
+            separator: self._fields.6,
+            sticky: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -584,14 +587,14 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Stack<'a> {
         Stack {
-            align: self.__unsafe_private_named.0,
-            children: self.__unsafe_private_named.1.unwrap(),
-            gap: self.__unsafe_private_named.2,
-            inset: self.__unsafe_private_named.3,
-            justify: self.__unsafe_private_named.4,
-            opaque: self.__unsafe_private_named.5,
-            separator: self.__unsafe_private_named.6,
-            sticky: self.__unsafe_private_named.7,
+            align: self._fields.0,
+            children: self._fields.1.unwrap(),
+            gap: self._fields.2,
+            inset: self._fields.3,
+            justify: self._fields.4,
+            opaque: self._fields.5,
+            separator: self._fields.6,
+            sticky: self._fields.7,
             extra_data: Some(extra_data),
         }
     }

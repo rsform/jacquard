@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::string::AtUri;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -81,9 +84,9 @@ pub mod unmute_actor_list_state {
 
 /// Builder for constructing an instance of this type
 pub struct UnmuteActorListBuilder<'a, S: unmute_actor_list_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> UnmuteActorList<'a> {
@@ -97,9 +100,9 @@ impl<'a> UnmuteActorListBuilder<'a, unmute_actor_list_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UnmuteActorListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -114,11 +117,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> UnmuteActorListBuilder<'a, unmute_actor_list_state::SetList<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         UnmuteActorListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -131,7 +134,7 @@ where
     /// Build the final struct
     pub fn build(self) -> UnmuteActorList<'a> {
         UnmuteActorList {
-            list: self.__unsafe_private_named.0.unwrap(),
+            list: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -144,7 +147,7 @@ where
         >,
     ) -> UnmuteActorList<'a> {
         UnmuteActorList {
-            list: self.__unsafe_private_named.0.unwrap(),
+            list: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

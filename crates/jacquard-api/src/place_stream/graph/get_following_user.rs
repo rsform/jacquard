@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::string::Did;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -101,9 +104,9 @@ pub mod get_following_user_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetFollowingUserBuilder<'a, S: get_following_user_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>, Option<Did<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<Did<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetFollowingUser<'a> {
@@ -117,9 +120,9 @@ impl<'a> GetFollowingUserBuilder<'a, get_following_user_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetFollowingUserBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -134,11 +137,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> GetFollowingUserBuilder<'a, get_following_user_state::SetSubjectDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetFollowingUserBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -153,11 +156,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> GetFollowingUserBuilder<'a, get_following_user_state::SetUserDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GetFollowingUserBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -171,8 +174,8 @@ where
     /// Build the final struct
     pub fn build(self) -> GetFollowingUser<'a> {
         GetFollowingUser {
-            subject_did: self.__unsafe_private_named.0.unwrap(),
-            user_did: self.__unsafe_private_named.1.unwrap(),
+            subject_did: self._fields.0.unwrap(),
+            user_did: self._fields.1.unwrap(),
         }
     }
 }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -817,9 +820,9 @@ pub mod heading_state {
 
 /// Builder for constructing an instance of this type
 pub struct HeadingBuilder<'a, S: heading_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<Facet<'a>>>, Option<i64>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<Facet<'a>>>, Option<i64>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Heading<'a> {
@@ -833,9 +836,9 @@ impl<'a> HeadingBuilder<'a, heading_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         HeadingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -843,12 +846,12 @@ impl<'a> HeadingBuilder<'a, heading_state::Empty> {
 impl<'a, S: heading_state::State> HeadingBuilder<'a, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
     pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -863,11 +866,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> HeadingBuilder<'a, heading_state::SetLevel<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         HeadingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -882,11 +885,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> HeadingBuilder<'a, heading_state::SetText<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         HeadingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -900,9 +903,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Heading<'a> {
         Heading {
-            facets: self.__unsafe_private_named.0,
-            level: self.__unsafe_private_named.1.unwrap(),
-            text: self.__unsafe_private_named.2.unwrap(),
+            facets: self._fields.0,
+            level: self._fields.1.unwrap(),
+            text: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -915,9 +918,9 @@ where
         >,
     ) -> Heading<'a> {
         Heading {
-            facets: self.__unsafe_private_named.0,
-            level: self.__unsafe_private_named.1.unwrap(),
-            text: self.__unsafe_private_named.2.unwrap(),
+            facets: self._fields.0,
+            level: self._fields.1.unwrap(),
+            text: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -957,9 +960,9 @@ pub mod image_embed_state {
 
 /// Builder for constructing an instance of this type
 pub struct ImageEmbedBuilder<'a, S: image_embed_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<BlobRef<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<BlobRef<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ImageEmbed<'a> {
@@ -973,9 +976,9 @@ impl<'a> ImageEmbedBuilder<'a, image_embed_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ImageEmbedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -983,12 +986,12 @@ impl<'a> ImageEmbedBuilder<'a, image_embed_state::Empty> {
 impl<'a, S: image_embed_state::State> ImageEmbedBuilder<'a, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
     pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1003,11 +1006,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> ImageEmbedBuilder<'a, image_embed_state::SetImage<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ImageEmbedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1020,8 +1023,8 @@ where
     /// Build the final struct
     pub fn build(self) -> ImageEmbed<'a> {
         ImageEmbed {
-            alt: self.__unsafe_private_named.0,
-            image: self.__unsafe_private_named.1.unwrap(),
+            alt: self._fields.0,
+            image: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1034,8 +1037,8 @@ where
         >,
     ) -> ImageEmbed<'a> {
         ImageEmbed {
-            alt: self.__unsafe_private_named.0,
-            image: self.__unsafe_private_named.1.unwrap(),
+            alt: self._fields.0,
+            image: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1051,81 +1054,81 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type CreatedAt;
-        type Blocks;
         type Slug;
+        type Blocks;
+        type CreatedAt;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type CreatedAt = Unset;
-        type Blocks = Unset;
         type Slug = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type Blocks = S::Blocks;
-        type Slug = S::Slug;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
-        type Blocks = S::Blocks;
-        type Slug = S::Slug;
-    }
-    ///State transition - sets the `blocks` field to Set
-    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlocks<S> {}
-    impl<S: State> State for SetBlocks<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Blocks = Set<members::blocks>;
-        type Slug = S::Slug;
+        type Blocks = Unset;
+        type CreatedAt = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlug<S> {}
     impl<S: State> State for SetSlug<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Blocks = S::Blocks;
         type Slug = Set<members::slug>;
+        type Blocks = S::Blocks;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `blocks` field to Set
+    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocks<S> {}
+    impl<S: State> State for SetBlocks<S> {
+        type Slug = S::Slug;
+        type Blocks = Set<members::blocks>;
+        type CreatedAt = S::CreatedAt;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Slug = S::Slug;
+        type Blocks = S::Blocks;
+        type CreatedAt = Set<members::created_at>;
+        type Title = S::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Slug = S::Slug;
+        type Blocks = S::Blocks;
+        type CreatedAt = S::CreatedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `blocks` field
-        pub struct blocks(());
         ///Marker type for the `slug` field
         pub struct slug(());
+        ///Marker type for the `blocks` field
+        pub struct blocks(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DocumentBuilder<'a, S: document_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<DocumentBlocksItem<'a>>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Document<'a> {
@@ -1139,9 +1142,9 @@ impl<'a> DocumentBuilder<'a, document_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1156,11 +1159,11 @@ where
         mut self,
         value: impl Into<Vec<DocumentBlocksItem<'a>>>,
     ) -> DocumentBuilder<'a, document_state::SetBlocks<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1175,11 +1178,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> DocumentBuilder<'a, document_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1194,11 +1197,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DocumentBuilder<'a, document_state::SetSlug<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         DocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1213,11 +1216,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DocumentBuilder<'a, document_state::SetTitle<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         DocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1225,12 +1228,12 @@ where
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1238,19 +1241,19 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
-    S::Title: document_state::IsSet,
-    S::CreatedAt: document_state::IsSet,
-    S::Blocks: document_state::IsSet,
     S::Slug: document_state::IsSet,
+    S::Blocks: document_state::IsSet,
+    S::CreatedAt: document_state::IsSet,
+    S::Title: document_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Document<'a> {
         Document {
-            blocks: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            slug: self.__unsafe_private_named.2.unwrap(),
-            title: self.__unsafe_private_named.3.unwrap(),
-            updated_at: self.__unsafe_private_named.4,
+            blocks: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            slug: self._fields.2.unwrap(),
+            title: self._fields.3.unwrap(),
+            updated_at: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -1263,11 +1266,11 @@ where
         >,
     ) -> Document<'a> {
         Document {
-            blocks: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            slug: self.__unsafe_private_named.2.unwrap(),
-            title: self.__unsafe_private_named.3.unwrap(),
-            updated_at: self.__unsafe_private_named.4,
+            blocks: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            slug: self._fields.2.unwrap(),
+            title: self._fields.3.unwrap(),
+            updated_at: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

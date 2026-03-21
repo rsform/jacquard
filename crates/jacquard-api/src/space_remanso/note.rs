@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -712,9 +715,9 @@ pub mod image_state {
 
 /// Builder for constructing an instance of this type
 pub struct ImageBuilder<'a, S: image_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<BlobRef<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<BlobRef<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Image<'a> {
@@ -728,9 +731,9 @@ impl<'a> ImageBuilder<'a, image_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -738,12 +741,12 @@ impl<'a> ImageBuilder<'a, image_state::Empty> {
 impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
     pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -758,11 +761,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> ImageBuilder<'a, image_state::SetImage<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -775,8 +778,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Image<'a> {
         Image {
-            alt: self.__unsafe_private_named.0,
-            image: self.__unsafe_private_named.1.unwrap(),
+            alt: self._fields.0,
+            image: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -789,8 +792,8 @@ where
         >,
     ) -> Image<'a> {
         Image {
-            alt: self.__unsafe_private_named.0,
-            image: self.__unsafe_private_named.1.unwrap(),
+            alt: self._fields.0,
+            image: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1003,8 +1006,8 @@ pub mod note_state {
 
 /// Builder for constructing an instance of this type
 pub struct NoteBuilder<'a, S: note_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<bool>,
@@ -1016,7 +1019,7 @@ pub struct NoteBuilder<'a, S: note_state::State> {
         Option<NoteTheme<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Note<'a> {
@@ -1030,20 +1033,9 @@ impl<'a> NoteBuilder<'a, note_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1058,11 +1050,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> NoteBuilder<'a, note_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         NoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1070,12 +1062,12 @@ where
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1083,12 +1075,12 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `discoverable` field (optional)
     pub fn discoverable(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `discoverable` field to an Option value (optional)
     pub fn maybe_discoverable(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1096,12 +1088,12 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `fontFamily` field (optional)
     pub fn font_family(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `fontFamily` field to an Option value (optional)
     pub fn maybe_font_family(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1109,12 +1101,12 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `fontSize` field (optional)
     pub fn font_size(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `fontSize` field to an Option value (optional)
     pub fn maybe_font_size(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1122,12 +1114,12 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `images` field (optional)
     pub fn images(mut self, value: impl Into<Option<Vec<note::Image<'a>>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `images` field to an Option value (optional)
     pub fn maybe_images(mut self, value: Option<Vec<note::Image<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1135,12 +1127,12 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `language` field (optional)
     pub fn language(mut self, value: impl Into<Option<NoteLanguage<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `language` field to an Option value (optional)
     pub fn maybe_language(mut self, value: Option<NoteLanguage<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1148,12 +1140,12 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `publishedAt` field (optional)
     pub fn published_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `publishedAt` field to an Option value (optional)
     pub fn maybe_published_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -1161,12 +1153,12 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<NoteTheme<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `theme` field to an Option value (optional)
     pub fn maybe_theme(mut self, value: Option<NoteTheme<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -1181,11 +1173,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> NoteBuilder<'a, note_state::SetTitle<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         NoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1199,16 +1191,16 @@ where
     /// Build the final struct
     pub fn build(self) -> Note<'a> {
         Note {
-            content: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1,
-            discoverable: self.__unsafe_private_named.2,
-            font_family: self.__unsafe_private_named.3,
-            font_size: self.__unsafe_private_named.4,
-            images: self.__unsafe_private_named.5,
-            language: self.__unsafe_private_named.6,
-            published_at: self.__unsafe_private_named.7,
-            theme: self.__unsafe_private_named.8,
-            title: self.__unsafe_private_named.9.unwrap(),
+            content: self._fields.0.unwrap(),
+            created_at: self._fields.1,
+            discoverable: self._fields.2,
+            font_family: self._fields.3,
+            font_size: self._fields.4,
+            images: self._fields.5,
+            language: self._fields.6,
+            published_at: self._fields.7,
+            theme: self._fields.8,
+            title: self._fields.9.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1221,16 +1213,16 @@ where
         >,
     ) -> Note<'a> {
         Note {
-            content: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1,
-            discoverable: self.__unsafe_private_named.2,
-            font_family: self.__unsafe_private_named.3,
-            font_size: self.__unsafe_private_named.4,
-            images: self.__unsafe_private_named.5,
-            language: self.__unsafe_private_named.6,
-            published_at: self.__unsafe_private_named.7,
-            theme: self.__unsafe_private_named.8,
-            title: self.__unsafe_private_named.9.unwrap(),
+            content: self._fields.0.unwrap(),
+            created_at: self._fields.1,
+            discoverable: self._fields.2,
+            font_family: self._fields.3,
+            font_size: self._fields.4,
+            images: self._fields.5,
+            language: self._fields.6,
+            published_at: self._fields.7,
+            theme: self._fields.8,
+            title: self._fields.9.unwrap(),
             extra_data: Some(extra_data),
         }
     }

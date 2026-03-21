@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -152,13 +155,9 @@ pub mod app_state {
 
 /// Builder for constructing an instance of this type
 pub struct AppBuilder<'a, S: app_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<CowStr<'a>>,
-        Option<Vec<StrongRef<'a>>>,
-        Option<CowStr<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Vec<StrongRef<'a>>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> App<'a> {
@@ -172,9 +171,9 @@ impl<'a> AppBuilder<'a, app_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AppBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -182,12 +181,12 @@ impl<'a> AppBuilder<'a, app_state::Empty> {
 impl<'a, S: app_state::State> AppBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -202,11 +201,11 @@ where
         mut self,
         value: impl Into<Vec<StrongRef<'a>>>,
     ) -> AppBuilder<'a, app_state::SetDistributions<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AppBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -221,11 +220,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AppBuilder<'a, app_state::SetName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         AppBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -239,9 +238,9 @@ where
     /// Build the final struct
     pub fn build(self) -> App<'a> {
         App {
-            description: self.__unsafe_private_named.0,
-            distributions: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
+            description: self._fields.0,
+            distributions: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -254,9 +253,9 @@ where
         >,
     ) -> App<'a> {
         App {
-            description: self.__unsafe_private_named.0,
-            distributions: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
+            description: self._fields.0,
+            distributions: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -173,9 +176,9 @@ pub mod list_keys_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListKeysBuilder<'a, S: list_keys_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ListKeys<'a> {
@@ -189,9 +192,9 @@ impl<'a> ListKeysBuilder<'a, list_keys_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListKeysBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -199,12 +202,12 @@ impl<'a> ListKeysBuilder<'a, list_keys_state::Empty> {
 impl<'a, S: list_keys_state::State> ListKeysBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -212,12 +215,12 @@ impl<'a, S: list_keys_state::State> ListKeysBuilder<'a, S> {
 impl<'a, S: list_keys_state::State> ListKeysBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -229,8 +232,8 @@ where
     /// Build the final struct
     pub fn build(self) -> ListKeys<'a> {
         ListKeys {
-            cursor: self.__unsafe_private_named.0,
-            limit: self.__unsafe_private_named.1,
+            cursor: self._fields.0,
+            limit: self._fields.1,
         }
     }
 }
@@ -245,59 +248,59 @@ pub mod public_key_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Did;
         type Key;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Did = Unset;
         type Key = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Key = S::Key;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Did = S::Did;
-        type Key = Set<members::key>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
         type Did = S::Did;
         type Key = S::Key;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type CreatedAt = S::CreatedAt;
+        type Did = Set<members::did>;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type CreatedAt = S::CreatedAt;
+        type Did = S::Did;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `key` field
         pub struct key(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PublicKeyBuilder<'a, S: public_key_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<Did<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<Did<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> PublicKey<'a> {
@@ -311,9 +314,9 @@ impl<'a> PublicKeyBuilder<'a, public_key_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PublicKeyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -328,11 +331,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PublicKeyBuilder<'a, public_key_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PublicKeyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -347,11 +350,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> PublicKeyBuilder<'a, public_key_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PublicKeyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -366,11 +369,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PublicKeyBuilder<'a, public_key_state::SetKey<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PublicKeyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -378,16 +381,16 @@ where
 impl<'a, S> PublicKeyBuilder<'a, S>
 where
     S: public_key_state::State,
+    S::CreatedAt: public_key_state::IsSet,
     S::Did: public_key_state::IsSet,
     S::Key: public_key_state::IsSet,
-    S::CreatedAt: public_key_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PublicKey<'a> {
         PublicKey {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            key: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            key: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -400,9 +403,9 @@ where
         >,
     ) -> PublicKey<'a> {
         PublicKey {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            key: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            key: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -229,49 +232,45 @@ pub mod presence_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
         type Status;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Status = S::Status;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Status = Set<members::status>;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Status = S::Status;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PresenceBuilder<'a, S: presence_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<CowStr<'a>>,
-        Option<PresenceStatus<'a>>,
-        Option<Datetime>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<PresenceStatus<'a>>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Presence<'a> {
@@ -285,9 +284,9 @@ impl<'a> PresenceBuilder<'a, presence_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PresenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -295,12 +294,12 @@ impl<'a> PresenceBuilder<'a, presence_state::Empty> {
 impl<'a, S: presence_state::State> PresenceBuilder<'a, S> {
     /// Set the `awayMessage` field (optional)
     pub fn away_message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `awayMessage` field to an Option value (optional)
     pub fn maybe_away_message(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -315,11 +314,11 @@ where
         mut self,
         value: impl Into<PresenceStatus<'a>>,
     ) -> PresenceBuilder<'a, presence_state::SetStatus<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PresenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -334,11 +333,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PresenceBuilder<'a, presence_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PresenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -346,15 +345,15 @@ where
 impl<'a, S> PresenceBuilder<'a, S>
 where
     S: presence_state::State,
-    S::UpdatedAt: presence_state::IsSet,
     S::Status: presence_state::IsSet,
+    S::UpdatedAt: presence_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Presence<'a> {
         Presence {
-            away_message: self.__unsafe_private_named.0,
-            status: self.__unsafe_private_named.1.unwrap(),
-            updated_at: self.__unsafe_private_named.2.unwrap(),
+            away_message: self._fields.0,
+            status: self._fields.1.unwrap(),
+            updated_at: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -367,9 +366,9 @@ where
         >,
     ) -> Presence<'a> {
         Presence {
-            away_message: self.__unsafe_private_named.0,
-            status: self.__unsafe_private_named.1.unwrap(),
-            updated_at: self.__unsafe_private_named.2.unwrap(),
+            away_message: self._fields.0,
+            status: self._fields.1.unwrap(),
+            updated_at: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

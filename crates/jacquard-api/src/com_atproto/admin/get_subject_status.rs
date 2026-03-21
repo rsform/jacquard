@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_derive::{IntoStatic, lexicon, open_union};
@@ -103,9 +106,9 @@ pub mod get_subject_status_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetSubjectStatusBuilder<'a, S: get_subject_status_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Cid<'a>>, Option<Did<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Cid<'a>>, Option<Did<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetSubjectStatus<'a> {
@@ -119,9 +122,9 @@ impl<'a> GetSubjectStatusBuilder<'a, get_subject_status_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSubjectStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -129,12 +132,12 @@ impl<'a> GetSubjectStatusBuilder<'a, get_subject_status_state::Empty> {
 impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
     /// Set the `blob` field (optional)
     pub fn blob(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `blob` field to an Option value (optional)
     pub fn maybe_blob(mut self, value: Option<Cid<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -142,12 +145,12 @@ impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
 impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
     /// Set the `did` field (optional)
     pub fn did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `did` field to an Option value (optional)
     pub fn maybe_did(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -155,12 +158,12 @@ impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
 impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
     /// Set the `uri` field (optional)
     pub fn uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `uri` field to an Option value (optional)
     pub fn maybe_uri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -172,9 +175,9 @@ where
     /// Build the final struct
     pub fn build(self) -> GetSubjectStatus<'a> {
         GetSubjectStatus {
-            blob: self.__unsafe_private_named.0,
-            did: self.__unsafe_private_named.1,
-            uri: self.__unsafe_private_named.2,
+            blob: self._fields.0,
+            did: self._fields.1,
+            uri: self._fields.2,
         }
     }
 }

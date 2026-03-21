@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::deps::bytes::Bytes;
@@ -197,9 +198,9 @@ pub mod get_diff_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetDiffBuilder<'a, S: get_diff_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetDiff<'a> {
@@ -213,9 +214,9 @@ impl<'a> GetDiffBuilder<'a, get_diff_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetDiffBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -230,11 +231,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> GetDiffBuilder<'a, get_diff_state::SetRepo<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetDiffBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -249,11 +250,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GetDiffBuilder<'a, get_diff_state::SetRev1<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GetDiffBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -268,11 +269,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GetDiffBuilder<'a, get_diff_state::SetRev2<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         GetDiffBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -287,9 +288,9 @@ where
     /// Build the final struct
     pub fn build(self) -> GetDiff<'a> {
         GetDiff {
-            repo: self.__unsafe_private_named.0.unwrap(),
-            rev1: self.__unsafe_private_named.1.unwrap(),
-            rev2: self.__unsafe_private_named.2.unwrap(),
+            repo: self._fields.0.unwrap(),
+            rev1: self._fields.1.unwrap(),
+            rev2: self._fields.2.unwrap(),
         }
     }
 }

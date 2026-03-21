@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -112,63 +115,59 @@ pub mod selected_answer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type AnswerRef;
         type CreatedAt;
         type QuestionRef;
-        type AnswerRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type AnswerRef = Unset;
         type CreatedAt = Unset;
         type QuestionRef = Unset;
-        type AnswerRef = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type QuestionRef = S::QuestionRef;
-        type AnswerRef = S::AnswerRef;
-    }
-    ///State transition - sets the `question_ref` field to Set
-    pub struct SetQuestionRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuestionRef<S> {}
-    impl<S: State> State for SetQuestionRef<S> {
-        type CreatedAt = S::CreatedAt;
-        type QuestionRef = Set<members::question_ref>;
-        type AnswerRef = S::AnswerRef;
     }
     ///State transition - sets the `answer_ref` field to Set
     pub struct SetAnswerRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAnswerRef<S> {}
     impl<S: State> State for SetAnswerRef<S> {
+        type AnswerRef = Set<members::answer_ref>;
         type CreatedAt = S::CreatedAt;
         type QuestionRef = S::QuestionRef;
-        type AnswerRef = Set<members::answer_ref>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type AnswerRef = S::AnswerRef;
+        type CreatedAt = Set<members::created_at>;
+        type QuestionRef = S::QuestionRef;
+    }
+    ///State transition - sets the `question_ref` field to Set
+    pub struct SetQuestionRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetQuestionRef<S> {}
+    impl<S: State> State for SetQuestionRef<S> {
+        type AnswerRef = S::AnswerRef;
+        type CreatedAt = S::CreatedAt;
+        type QuestionRef = Set<members::question_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `answer_ref` field
+        pub struct answer_ref(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `question_ref` field
         pub struct question_ref(());
-        ///Marker type for the `answer_ref` field
-        pub struct answer_ref(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SelectedAnswerBuilder<'a, S: selected_answer_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<StrongRef<'a>>,
-        Option<Datetime>,
-        Option<StrongRef<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<StrongRef<'a>>, Option<Datetime>, Option<StrongRef<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SelectedAnswer<'a> {
@@ -182,9 +181,9 @@ impl<'a> SelectedAnswerBuilder<'a, selected_answer_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SelectedAnswerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -199,11 +198,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> SelectedAnswerBuilder<'a, selected_answer_state::SetAnswerRef<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SelectedAnswerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -218,11 +217,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SelectedAnswerBuilder<'a, selected_answer_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SelectedAnswerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -237,11 +236,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> SelectedAnswerBuilder<'a, selected_answer_state::SetQuestionRef<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SelectedAnswerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -249,16 +248,16 @@ where
 impl<'a, S> SelectedAnswerBuilder<'a, S>
 where
     S: selected_answer_state::State,
+    S::AnswerRef: selected_answer_state::IsSet,
     S::CreatedAt: selected_answer_state::IsSet,
     S::QuestionRef: selected_answer_state::IsSet,
-    S::AnswerRef: selected_answer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SelectedAnswer<'a> {
         SelectedAnswer {
-            answer_ref: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            question_ref: self.__unsafe_private_named.2.unwrap(),
+            answer_ref: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            question_ref: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -271,9 +270,9 @@ where
         >,
     ) -> SelectedAnswer<'a> {
         SelectedAnswer {
-            answer_ref: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            question_ref: self.__unsafe_private_named.2.unwrap(),
+            answer_ref: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            question_ref: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

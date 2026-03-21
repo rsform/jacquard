@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::deps::bytes::Bytes;
@@ -277,103 +280,103 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type OccurredAt;
+        type Did;
         type Location;
-        type Book;
         type BookPub;
+        type Book;
         type BookSig;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type OccurredAt = Unset;
+        type Did = Unset;
         type Location = Unset;
-        type Book = Unset;
         type BookPub = Unset;
+        type Book = Unset;
         type BookSig = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type OccurredAt = S::OccurredAt;
-        type Location = S::Location;
-        type Book = S::Book;
-        type BookPub = S::BookPub;
-        type BookSig = S::BookSig;
     }
     ///State transition - sets the `occurred_at` field to Set
     pub struct SetOccurredAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOccurredAt<S> {}
     impl<S: State> State for SetOccurredAt<S> {
-        type Did = S::Did;
         type OccurredAt = Set<members::occurred_at>;
+        type Did = S::Did;
         type Location = S::Location;
-        type Book = S::Book;
         type BookPub = S::BookPub;
+        type Book = S::Book;
+        type BookSig = S::BookSig;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type OccurredAt = S::OccurredAt;
+        type Did = Set<members::did>;
+        type Location = S::Location;
+        type BookPub = S::BookPub;
+        type Book = S::Book;
         type BookSig = S::BookSig;
     }
     ///State transition - sets the `location` field to Set
     pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLocation<S> {}
     impl<S: State> State for SetLocation<S> {
-        type Did = S::Did;
         type OccurredAt = S::OccurredAt;
+        type Did = S::Did;
         type Location = Set<members::location>;
+        type BookPub = S::BookPub;
         type Book = S::Book;
-        type BookPub = S::BookPub;
-        type BookSig = S::BookSig;
-    }
-    ///State transition - sets the `book` field to Set
-    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBook<S> {}
-    impl<S: State> State for SetBook<S> {
-        type Did = S::Did;
-        type OccurredAt = S::OccurredAt;
-        type Location = S::Location;
-        type Book = Set<members::book>;
-        type BookPub = S::BookPub;
         type BookSig = S::BookSig;
     }
     ///State transition - sets the `book_pub` field to Set
     pub struct SetBookPub<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBookPub<S> {}
     impl<S: State> State for SetBookPub<S> {
-        type Did = S::Did;
         type OccurredAt = S::OccurredAt;
+        type Did = S::Did;
         type Location = S::Location;
-        type Book = S::Book;
         type BookPub = Set<members::book_pub>;
+        type Book = S::Book;
+        type BookSig = S::BookSig;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBook<S> {}
+    impl<S: State> State for SetBook<S> {
+        type OccurredAt = S::OccurredAt;
+        type Did = S::Did;
+        type Location = S::Location;
+        type BookPub = S::BookPub;
+        type Book = Set<members::book>;
         type BookSig = S::BookSig;
     }
     ///State transition - sets the `book_sig` field to Set
     pub struct SetBookSig<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBookSig<S> {}
     impl<S: State> State for SetBookSig<S> {
-        type Did = S::Did;
         type OccurredAt = S::OccurredAt;
+        type Did = S::Did;
         type Location = S::Location;
-        type Book = S::Book;
         type BookPub = S::BookPub;
+        type Book = S::Book;
         type BookSig = Set<members::book_sig>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `occurred_at` field
         pub struct occurred_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `location` field
         pub struct location(());
-        ///Marker type for the `book` field
-        pub struct book(());
         ///Marker type for the `book_pub` field
         pub struct book_pub(());
+        ///Marker type for the `book` field
+        pub struct book(());
         ///Marker type for the `book_sig` field
         pub struct book_sig(());
     }
@@ -381,8 +384,8 @@ pub mod event_state {
 
 /// Builder for constructing an instance of this type
 pub struct EventBuilder<'a, S: event_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<StrongRef<'a>>,
         Option<Bytes>,
         Option<Bytes>,
@@ -391,7 +394,7 @@ pub struct EventBuilder<'a, S: event_state::State> {
         Option<EventLocation<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Event<'a> {
@@ -405,9 +408,9 @@ impl<'a> EventBuilder<'a, event_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -422,11 +425,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> EventBuilder<'a, event_state::SetBook<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -441,11 +444,11 @@ where
         mut self,
         value: impl Into<Bytes>,
     ) -> EventBuilder<'a, event_state::SetBookPub<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -460,11 +463,11 @@ where
         mut self,
         value: impl Into<Bytes>,
     ) -> EventBuilder<'a, event_state::SetBookSig<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -479,11 +482,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> EventBuilder<'a, event_state::SetDid<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -491,12 +494,12 @@ where
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `event` field (optional)
     pub fn event(mut self, value: impl Into<Option<EventEvent<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `event` field to an Option value (optional)
     pub fn maybe_event(mut self, value: Option<EventEvent<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -511,11 +514,11 @@ where
         mut self,
         value: impl Into<EventLocation<'a>>,
     ) -> EventBuilder<'a, event_state::SetLocation<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -530,11 +533,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> EventBuilder<'a, event_state::SetOccurredAt<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -542,23 +545,23 @@ where
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
-    S::Did: event_state::IsSet,
     S::OccurredAt: event_state::IsSet,
+    S::Did: event_state::IsSet,
     S::Location: event_state::IsSet,
-    S::Book: event_state::IsSet,
     S::BookPub: event_state::IsSet,
+    S::Book: event_state::IsSet,
     S::BookSig: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
         Event {
-            book: self.__unsafe_private_named.0.unwrap(),
-            book_pub: self.__unsafe_private_named.1.unwrap(),
-            book_sig: self.__unsafe_private_named.2.unwrap(),
-            did: self.__unsafe_private_named.3.unwrap(),
-            event: self.__unsafe_private_named.4,
-            location: self.__unsafe_private_named.5.unwrap(),
-            occurred_at: self.__unsafe_private_named.6.unwrap(),
+            book: self._fields.0.unwrap(),
+            book_pub: self._fields.1.unwrap(),
+            book_sig: self._fields.2.unwrap(),
+            did: self._fields.3.unwrap(),
+            event: self._fields.4,
+            location: self._fields.5.unwrap(),
+            occurred_at: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -571,13 +574,13 @@ where
         >,
     ) -> Event<'a> {
         Event {
-            book: self.__unsafe_private_named.0.unwrap(),
-            book_pub: self.__unsafe_private_named.1.unwrap(),
-            book_sig: self.__unsafe_private_named.2.unwrap(),
-            did: self.__unsafe_private_named.3.unwrap(),
-            event: self.__unsafe_private_named.4,
-            location: self.__unsafe_private_named.5.unwrap(),
-            occurred_at: self.__unsafe_private_named.6.unwrap(),
+            book: self._fields.0.unwrap(),
+            book_pub: self._fields.1.unwrap(),
+            book_sig: self._fields.2.unwrap(),
+            did: self._fields.3.unwrap(),
+            event: self._fields.4,
+            location: self._fields.5.unwrap(),
+            occurred_at: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

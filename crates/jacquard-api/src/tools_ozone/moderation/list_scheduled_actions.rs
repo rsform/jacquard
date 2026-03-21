@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::{Did, Datetime};
@@ -119,8 +122,8 @@ pub mod list_scheduled_actions_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListScheduledActionsBuilder<'a, S: list_scheduled_actions_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<i64>,
@@ -128,7 +131,7 @@ pub struct ListScheduledActionsBuilder<'a, S: list_scheduled_actions_state::Stat
         Option<Vec<CowStr<'a>>>,
         Option<Vec<Did<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ListScheduledActions<'a> {
@@ -145,9 +148,9 @@ impl<'a> ListScheduledActionsBuilder<'a, list_scheduled_actions_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListScheduledActionsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -155,12 +158,12 @@ impl<'a> ListScheduledActionsBuilder<'a, list_scheduled_actions_state::Empty> {
 impl<'a, S: list_scheduled_actions_state::State> ListScheduledActionsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -168,12 +171,12 @@ impl<'a, S: list_scheduled_actions_state::State> ListScheduledActionsBuilder<'a,
 impl<'a, S: list_scheduled_actions_state::State> ListScheduledActionsBuilder<'a, S> {
     /// Set the `endsBefore` field (optional)
     pub fn ends_before(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `endsBefore` field to an Option value (optional)
     pub fn maybe_ends_before(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -181,12 +184,12 @@ impl<'a, S: list_scheduled_actions_state::State> ListScheduledActionsBuilder<'a,
 impl<'a, S: list_scheduled_actions_state::State> ListScheduledActionsBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -194,12 +197,12 @@ impl<'a, S: list_scheduled_actions_state::State> ListScheduledActionsBuilder<'a,
 impl<'a, S: list_scheduled_actions_state::State> ListScheduledActionsBuilder<'a, S> {
     /// Set the `startsAfter` field (optional)
     pub fn starts_after(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `startsAfter` field to an Option value (optional)
     pub fn maybe_starts_after(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -214,11 +217,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> ListScheduledActionsBuilder<'a, list_scheduled_actions_state::SetStatuses<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ListScheduledActionsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -226,12 +229,12 @@ where
 impl<'a, S: list_scheduled_actions_state::State> ListScheduledActionsBuilder<'a, S> {
     /// Set the `subjects` field (optional)
     pub fn subjects(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `subjects` field to an Option value (optional)
     pub fn maybe_subjects(mut self, value: Option<Vec<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -244,12 +247,12 @@ where
     /// Build the final struct
     pub fn build(self) -> ListScheduledActions<'a> {
         ListScheduledActions {
-            cursor: self.__unsafe_private_named.0,
-            ends_before: self.__unsafe_private_named.1,
-            limit: self.__unsafe_private_named.2.or_else(|| Some(50i64)),
-            starts_after: self.__unsafe_private_named.3,
-            statuses: self.__unsafe_private_named.4.unwrap(),
-            subjects: self.__unsafe_private_named.5,
+            cursor: self._fields.0,
+            ends_before: self._fields.1,
+            limit: self._fields.2.or_else(|| Some(50i64)),
+            starts_after: self._fields.3,
+            statuses: self._fields.4.unwrap(),
+            subjects: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -262,12 +265,12 @@ where
         >,
     ) -> ListScheduledActions<'a> {
         ListScheduledActions {
-            cursor: self.__unsafe_private_named.0,
-            ends_before: self.__unsafe_private_named.1,
-            limit: self.__unsafe_private_named.2.or_else(|| Some(50i64)),
-            starts_after: self.__unsafe_private_named.3,
-            statuses: self.__unsafe_private_named.4.unwrap(),
-            subjects: self.__unsafe_private_named.5,
+            cursor: self._fields.0,
+            ends_before: self._fields.1,
+            limit: self._fields.2.or_else(|| Some(50i64)),
+            starts_after: self._fields.3,
+            statuses: self._fields.4.unwrap(),
+            subjects: self._fields.5,
             extra_data: Some(extra_data),
         }
     }

@@ -9,7 +9,11 @@ pub mod actor;
 pub mod badge;
 pub mod location;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -92,9 +96,9 @@ pub mod did_state {
 
 /// Builder for constructing an instance of this type
 pub struct DidBuilder<'a, S: did_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<jacquard_common::types::string::Did<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<jacquard_common::types::string::Did<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Did<'a> {
@@ -108,9 +112,9 @@ impl<'a> DidBuilder<'a, did_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DidBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -125,11 +129,11 @@ where
         mut self,
         value: impl Into<jacquard_common::types::string::Did<'a>>,
     ) -> DidBuilder<'a, did_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DidBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -142,7 +146,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Did<'a> {
         Did {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -155,7 +159,7 @@ where
         >,
     ) -> Did<'a> {
         Did {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

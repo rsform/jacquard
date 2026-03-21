@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -127,45 +130,45 @@ pub mod test_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Geometry;
         type Text;
+        type Geometry;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Geometry = Unset;
         type Text = Unset;
-    }
-    ///State transition - sets the `geometry` field to Set
-    pub struct SetGeometry<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGeometry<S> {}
-    impl<S: State> State for SetGeometry<S> {
-        type Geometry = Set<members::geometry>;
-        type Text = S::Text;
+        type Geometry = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type Geometry = S::Geometry;
         type Text = Set<members::text>;
+        type Geometry = S::Geometry;
+    }
+    ///State transition - sets the `geometry` field to Set
+    pub struct SetGeometry<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGeometry<S> {}
+    impl<S: State> State for SetGeometry<S> {
+        type Text = S::Text;
+        type Geometry = Set<members::geometry>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `geometry` field
-        pub struct geometry(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `geometry` field
+        pub struct geometry(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TestRecordBuilder<'a, S: test_record_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<TestRecordGeometry<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<TestRecordGeometry<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TestRecord<'a> {
@@ -179,9 +182,9 @@ impl<'a> TestRecordBuilder<'a, test_record_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TestRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -196,11 +199,11 @@ where
         mut self,
         value: impl Into<TestRecordGeometry<'a>>,
     ) -> TestRecordBuilder<'a, test_record_state::SetGeometry<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TestRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -215,11 +218,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TestRecordBuilder<'a, test_record_state::SetText<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TestRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -227,14 +230,14 @@ where
 impl<'a, S> TestRecordBuilder<'a, S>
 where
     S: test_record_state::State,
-    S::Geometry: test_record_state::IsSet,
     S::Text: test_record_state::IsSet,
+    S::Geometry: test_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TestRecord<'a> {
         TestRecord {
-            geometry: self.__unsafe_private_named.0.unwrap(),
-            text: self.__unsafe_private_named.1.unwrap(),
+            geometry: self._fields.0.unwrap(),
+            text: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -244,8 +247,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> TestRecord<'a> {
         TestRecord {
-            geometry: self.__unsafe_private_named.0.unwrap(),
-            text: self.__unsafe_private_named.1.unwrap(),
+            geometry: self._fields.0.unwrap(),
+            text: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

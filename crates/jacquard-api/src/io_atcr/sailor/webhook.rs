@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -139,81 +142,81 @@ pub mod webhook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Triggers;
-        type CreatedAt;
-        type PrivateCid;
         type HoldDid;
+        type PrivateCid;
+        type CreatedAt;
+        type Triggers;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Triggers = Unset;
-        type CreatedAt = Unset;
-        type PrivateCid = Unset;
         type HoldDid = Unset;
-    }
-    ///State transition - sets the `triggers` field to Set
-    pub struct SetTriggers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTriggers<S> {}
-    impl<S: State> State for SetTriggers<S> {
-        type Triggers = Set<members::triggers>;
-        type CreatedAt = S::CreatedAt;
-        type PrivateCid = S::PrivateCid;
-        type HoldDid = S::HoldDid;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Triggers = S::Triggers;
-        type CreatedAt = Set<members::created_at>;
-        type PrivateCid = S::PrivateCid;
-        type HoldDid = S::HoldDid;
-    }
-    ///State transition - sets the `private_cid` field to Set
-    pub struct SetPrivateCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPrivateCid<S> {}
-    impl<S: State> State for SetPrivateCid<S> {
-        type Triggers = S::Triggers;
-        type CreatedAt = S::CreatedAt;
-        type PrivateCid = Set<members::private_cid>;
-        type HoldDid = S::HoldDid;
+        type PrivateCid = Unset;
+        type CreatedAt = Unset;
+        type Triggers = Unset;
     }
     ///State transition - sets the `hold_did` field to Set
     pub struct SetHoldDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHoldDid<S> {}
     impl<S: State> State for SetHoldDid<S> {
-        type Triggers = S::Triggers;
-        type CreatedAt = S::CreatedAt;
-        type PrivateCid = S::PrivateCid;
         type HoldDid = Set<members::hold_did>;
+        type PrivateCid = S::PrivateCid;
+        type CreatedAt = S::CreatedAt;
+        type Triggers = S::Triggers;
+    }
+    ///State transition - sets the `private_cid` field to Set
+    pub struct SetPrivateCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPrivateCid<S> {}
+    impl<S: State> State for SetPrivateCid<S> {
+        type HoldDid = S::HoldDid;
+        type PrivateCid = Set<members::private_cid>;
+        type CreatedAt = S::CreatedAt;
+        type Triggers = S::Triggers;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type HoldDid = S::HoldDid;
+        type PrivateCid = S::PrivateCid;
+        type CreatedAt = Set<members::created_at>;
+        type Triggers = S::Triggers;
+    }
+    ///State transition - sets the `triggers` field to Set
+    pub struct SetTriggers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTriggers<S> {}
+    impl<S: State> State for SetTriggers<S> {
+        type HoldDid = S::HoldDid;
+        type PrivateCid = S::PrivateCid;
+        type CreatedAt = S::CreatedAt;
+        type Triggers = Set<members::triggers>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `triggers` field
-        pub struct triggers(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `private_cid` field
-        pub struct private_cid(());
         ///Marker type for the `hold_did` field
         pub struct hold_did(());
+        ///Marker type for the `private_cid` field
+        pub struct private_cid(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `triggers` field
+        pub struct triggers(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct WebhookBuilder<'a, S: webhook_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Did<'a>>,
         Option<CowStr<'a>>,
         Option<i64>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Webhook<'a> {
@@ -227,9 +230,9 @@ impl<'a> WebhookBuilder<'a, webhook_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         WebhookBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -244,11 +247,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> WebhookBuilder<'a, webhook_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         WebhookBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -263,11 +266,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> WebhookBuilder<'a, webhook_state::SetHoldDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         WebhookBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -282,11 +285,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> WebhookBuilder<'a, webhook_state::SetPrivateCid<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         WebhookBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -301,11 +304,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> WebhookBuilder<'a, webhook_state::SetTriggers<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         WebhookBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -313,12 +316,12 @@ where
 impl<'a, S: webhook_state::State> WebhookBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -326,19 +329,19 @@ impl<'a, S: webhook_state::State> WebhookBuilder<'a, S> {
 impl<'a, S> WebhookBuilder<'a, S>
 where
     S: webhook_state::State,
-    S::Triggers: webhook_state::IsSet,
-    S::CreatedAt: webhook_state::IsSet,
-    S::PrivateCid: webhook_state::IsSet,
     S::HoldDid: webhook_state::IsSet,
+    S::PrivateCid: webhook_state::IsSet,
+    S::CreatedAt: webhook_state::IsSet,
+    S::Triggers: webhook_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Webhook<'a> {
         Webhook {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            hold_did: self.__unsafe_private_named.1.unwrap(),
-            private_cid: self.__unsafe_private_named.2.unwrap(),
-            triggers: self.__unsafe_private_named.3.unwrap(),
-            updated_at: self.__unsafe_private_named.4,
+            created_at: self._fields.0.unwrap(),
+            hold_did: self._fields.1.unwrap(),
+            private_cid: self._fields.2.unwrap(),
+            triggers: self._fields.3.unwrap(),
+            updated_at: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -351,11 +354,11 @@ where
         >,
     ) -> Webhook<'a> {
         Webhook {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            hold_did: self.__unsafe_private_named.1.unwrap(),
-            private_cid: self.__unsafe_private_named.2.unwrap(),
-            triggers: self.__unsafe_private_named.3.unwrap(),
-            updated_at: self.__unsafe_private_named.4,
+            created_at: self._fields.0.unwrap(),
+            hold_did: self._fields.1.unwrap(),
+            private_cid: self._fields.2.unwrap(),
+            triggers: self._fields.3.unwrap(),
+            updated_at: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

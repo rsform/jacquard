@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -291,50 +294,50 @@ pub mod work_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type WorkType;
         type Title;
+        type WorkType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type WorkType = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `work_type` field to Set
-    pub struct SetWorkType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWorkType<S> {}
-    impl<S: State> State for SetWorkType<S> {
-        type WorkType = Set<members::work_type>;
-        type Title = S::Title;
+        type WorkType = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type WorkType = S::WorkType;
         type Title = Set<members::title>;
+        type WorkType = S::WorkType;
+    }
+    ///State transition - sets the `work_type` field to Set
+    pub struct SetWorkType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWorkType<S> {}
+    impl<S: State> State for SetWorkType<S> {
+        type Title = S::Title;
+        type WorkType = Set<members::work_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `work_type` field
-        pub struct work_type(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `work_type` field
+        pub struct work_type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct WorkBuilder<'a, S: work_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<WorkWorkType<'a>>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Work<'a> {
@@ -348,9 +351,9 @@ impl<'a> WorkBuilder<'a, work_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         WorkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -358,12 +361,12 @@ impl<'a> WorkBuilder<'a, work_state::Empty> {
 impl<'a, S: work_state::State> WorkBuilder<'a, S> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `id` field to an Option value (optional)
     pub fn maybe_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -378,11 +381,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> WorkBuilder<'a, work_state::SetTitle<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         WorkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -397,11 +400,11 @@ where
         mut self,
         value: impl Into<WorkWorkType<'a>>,
     ) -> WorkBuilder<'a, work_state::SetWorkType<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         WorkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -409,12 +412,12 @@ where
 impl<'a, S: work_state::State> WorkBuilder<'a, S> {
     /// Set the `year` field (optional)
     pub fn year(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `year` field to an Option value (optional)
     pub fn maybe_year(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -422,16 +425,16 @@ impl<'a, S: work_state::State> WorkBuilder<'a, S> {
 impl<'a, S> WorkBuilder<'a, S>
 where
     S: work_state::State,
-    S::WorkType: work_state::IsSet,
     S::Title: work_state::IsSet,
+    S::WorkType: work_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Work<'a> {
         Work {
-            id: self.__unsafe_private_named.0,
-            title: self.__unsafe_private_named.1.unwrap(),
-            work_type: self.__unsafe_private_named.2.unwrap(),
-            year: self.__unsafe_private_named.3,
+            id: self._fields.0,
+            title: self._fields.1.unwrap(),
+            work_type: self._fields.2.unwrap(),
+            year: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -444,10 +447,10 @@ where
         >,
     ) -> Work<'a> {
         Work {
-            id: self.__unsafe_private_named.0,
-            title: self.__unsafe_private_named.1.unwrap(),
-            work_type: self.__unsafe_private_named.2.unwrap(),
-            year: self.__unsafe_private_named.3,
+            id: self._fields.0,
+            title: self._fields.1.unwrap(),
+            work_type: self._fields.2.unwrap(),
+            year: self._fields.3,
             extra_data: Some(extra_data),
         }
     }

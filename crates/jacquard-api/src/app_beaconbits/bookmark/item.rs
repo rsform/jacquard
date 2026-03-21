@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -201,58 +204,58 @@ pub mod item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type VenueName;
         type VenueUri;
+        type VenueName;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type VenueName = Unset;
         type VenueUri = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type VenueName = S::VenueName;
-        type VenueUri = S::VenueUri;
-    }
-    ///State transition - sets the `venue_name` field to Set
-    pub struct SetVenueName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVenueName<S> {}
-    impl<S: State> State for SetVenueName<S> {
-        type CreatedAt = S::CreatedAt;
-        type VenueName = Set<members::venue_name>;
-        type VenueUri = S::VenueUri;
+        type VenueName = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `venue_uri` field to Set
     pub struct SetVenueUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVenueUri<S> {}
     impl<S: State> State for SetVenueUri<S> {
-        type CreatedAt = S::CreatedAt;
-        type VenueName = S::VenueName;
         type VenueUri = Set<members::venue_uri>;
+        type VenueName = S::VenueName;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `venue_name` field to Set
+    pub struct SetVenueName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVenueName<S> {}
+    impl<S: State> State for SetVenueName<S> {
+        type VenueUri = S::VenueUri;
+        type VenueName = Set<members::venue_name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type VenueUri = S::VenueUri;
+        type VenueName = S::VenueName;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `venue_name` field
-        pub struct venue_name(());
         ///Marker type for the `venue_uri` field
         pub struct venue_uri(());
+        ///Marker type for the `venue_name` field
+        pub struct venue_name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ItemBuilder<'a, S: item_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Address<'a>>,
         Option<Datetime>,
         Option<AtUri<'a>>,
@@ -263,7 +266,7 @@ pub struct ItemBuilder<'a, S: item_state::State> {
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Item<'a> {
@@ -277,19 +280,9 @@ impl<'a> ItemBuilder<'a, item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -297,12 +290,12 @@ impl<'a> ItemBuilder<'a, item_state::Empty> {
 impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     /// Set the `addressDetails` field (optional)
     pub fn address_details(mut self, value: impl Into<Option<Address<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `addressDetails` field to an Option value (optional)
     pub fn maybe_address_details(mut self, value: Option<Address<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -317,11 +310,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ItemBuilder<'a, item_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -329,12 +322,12 @@ where
 impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     /// Set the `folderUri` field (optional)
     pub fn folder_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `folderUri` field to an Option value (optional)
     pub fn maybe_folder_uri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -342,12 +335,12 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
 impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<Geo<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
     pub fn maybe_location(mut self, value: Option<Geo<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -355,12 +348,12 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
 impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
     pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -368,12 +361,12 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
 impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     /// Set the `venueAddress` field (optional)
     pub fn venue_address(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `venueAddress` field to an Option value (optional)
     pub fn maybe_venue_address(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -381,12 +374,12 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
 impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     /// Set the `venueCategory` field (optional)
     pub fn venue_category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `venueCategory` field to an Option value (optional)
     pub fn maybe_venue_category(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -401,11 +394,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ItemBuilder<'a, item_state::SetVenueName<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         ItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -420,11 +413,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ItemBuilder<'a, item_state::SetVenueUri<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         ItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -432,22 +425,22 @@ where
 impl<'a, S> ItemBuilder<'a, S>
 where
     S: item_state::State,
-    S::CreatedAt: item_state::IsSet,
-    S::VenueName: item_state::IsSet,
     S::VenueUri: item_state::IsSet,
+    S::VenueName: item_state::IsSet,
+    S::CreatedAt: item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Item<'a> {
         Item {
-            address_details: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            folder_uri: self.__unsafe_private_named.2,
-            location: self.__unsafe_private_named.3,
-            notes: self.__unsafe_private_named.4,
-            venue_address: self.__unsafe_private_named.5,
-            venue_category: self.__unsafe_private_named.6,
-            venue_name: self.__unsafe_private_named.7.unwrap(),
-            venue_uri: self.__unsafe_private_named.8.unwrap(),
+            address_details: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            folder_uri: self._fields.2,
+            location: self._fields.3,
+            notes: self._fields.4,
+            venue_address: self._fields.5,
+            venue_category: self._fields.6,
+            venue_name: self._fields.7.unwrap(),
+            venue_uri: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -460,15 +453,15 @@ where
         >,
     ) -> Item<'a> {
         Item {
-            address_details: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            folder_uri: self.__unsafe_private_named.2,
-            location: self.__unsafe_private_named.3,
-            notes: self.__unsafe_private_named.4,
-            venue_address: self.__unsafe_private_named.5,
-            venue_category: self.__unsafe_private_named.6,
-            venue_name: self.__unsafe_private_named.7.unwrap(),
-            venue_uri: self.__unsafe_private_named.8.unwrap(),
+            address_details: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            folder_uri: self._fields.2,
+            location: self._fields.3,
+            notes: self._fields.4,
+            venue_address: self._fields.5,
+            venue_category: self._fields.6,
+            venue_name: self._fields.7.unwrap(),
+            venue_uri: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }

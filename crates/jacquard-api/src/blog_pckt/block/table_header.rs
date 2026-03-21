@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -101,9 +104,9 @@ pub mod table_header_state {
 
 /// Builder for constructing an instance of this type
 pub struct TableHeaderBuilder<'a, S: table_header_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<Vec<Text<'a>>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<Vec<Text<'a>>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TableHeader<'a> {
@@ -117,9 +120,9 @@ impl<'a> TableHeaderBuilder<'a, table_header_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TableHeaderBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -127,12 +130,12 @@ impl<'a> TableHeaderBuilder<'a, table_header_state::Empty> {
 impl<'a, S: table_header_state::State> TableHeaderBuilder<'a, S> {
     /// Set the `colspan` field (optional)
     pub fn colspan(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `colspan` field to an Option value (optional)
     pub fn maybe_colspan(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -147,11 +150,11 @@ where
         mut self,
         value: impl Into<Vec<Text<'a>>>,
     ) -> TableHeaderBuilder<'a, table_header_state::SetContent<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TableHeaderBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -159,12 +162,12 @@ where
 impl<'a, S: table_header_state::State> TableHeaderBuilder<'a, S> {
     /// Set the `rowspan` field (optional)
     pub fn rowspan(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `rowspan` field to an Option value (optional)
     pub fn maybe_rowspan(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -177,9 +180,9 @@ where
     /// Build the final struct
     pub fn build(self) -> TableHeader<'a> {
         TableHeader {
-            colspan: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
-            rowspan: self.__unsafe_private_named.2,
+            colspan: self._fields.0,
+            content: self._fields.1.unwrap(),
+            rowspan: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -192,9 +195,9 @@ where
         >,
     ) -> TableHeader<'a> {
         TableHeader {
-            colspan: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
-            rowspan: self.__unsafe_private_named.2,
+            colspan: self._fields.0,
+            content: self._fields.1.unwrap(),
+            rowspan: self._fields.2,
             extra_data: Some(extra_data),
         }
     }

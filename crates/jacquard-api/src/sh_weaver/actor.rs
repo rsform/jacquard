@@ -13,7 +13,11 @@ pub mod profile;
 pub mod search_actors;
 pub mod search_actors_typeahead;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::deps::bytes::Bytes;
@@ -689,9 +693,9 @@ pub mod author_state {
 
 /// Builder for constructing an instance of this type
 pub struct AuthorBuilder<'a, S: author_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>, Option<Bytes>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<Bytes>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Author<'a> {
@@ -705,9 +709,9 @@ impl<'a> AuthorBuilder<'a, author_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AuthorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -722,11 +726,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> AuthorBuilder<'a, author_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AuthorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -734,12 +738,12 @@ where
 impl<'a, S: author_state::State> AuthorBuilder<'a, S> {
     /// Set the `signature` field (optional)
     pub fn signature(mut self, value: impl Into<Option<Bytes>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `signature` field to an Option value (optional)
     pub fn maybe_signature(mut self, value: Option<Bytes>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -752,8 +756,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Author<'a> {
         Author {
-            did: self.__unsafe_private_named.0.unwrap(),
-            signature: self.__unsafe_private_named.1,
+            did: self._fields.0.unwrap(),
+            signature: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -766,8 +770,8 @@ where
         >,
     ) -> Author<'a> {
         Author {
-            did: self.__unsafe_private_named.0.unwrap(),
-            signature: self.__unsafe_private_named.1,
+            did: self._fields.0.unwrap(),
+            signature: self._fields.1,
             extra_data: Some(extra_data),
         }
     }
@@ -1482,8 +1486,8 @@ pub mod profile_data_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct ProfileDataViewBuilder<'a, S: profile_data_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<i64>,
         Option<i64>,
         Option<i64>,
@@ -1492,7 +1496,7 @@ pub struct ProfileDataViewBuilder<'a, S: profile_data_view_state::State> {
         Option<i64>,
         Option<actor::ViewerState<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ProfileDataView<'a> {
@@ -1506,9 +1510,9 @@ impl<'a> ProfileDataViewBuilder<'a, profile_data_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileDataViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1516,12 +1520,12 @@ impl<'a> ProfileDataViewBuilder<'a, profile_data_view_state::Empty> {
 impl<'a, S: profile_data_view_state::State> ProfileDataViewBuilder<'a, S> {
     /// Set the `collaborationCount` field (optional)
     pub fn collaboration_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `collaborationCount` field to an Option value (optional)
     pub fn maybe_collaboration_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1529,12 +1533,12 @@ impl<'a, S: profile_data_view_state::State> ProfileDataViewBuilder<'a, S> {
 impl<'a, S: profile_data_view_state::State> ProfileDataViewBuilder<'a, S> {
     /// Set the `entryCount` field (optional)
     pub fn entry_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `entryCount` field to an Option value (optional)
     pub fn maybe_entry_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1542,12 +1546,12 @@ impl<'a, S: profile_data_view_state::State> ProfileDataViewBuilder<'a, S> {
 impl<'a, S: profile_data_view_state::State> ProfileDataViewBuilder<'a, S> {
     /// Set the `followerCount` field (optional)
     pub fn follower_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `followerCount` field to an Option value (optional)
     pub fn maybe_follower_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1555,12 +1559,12 @@ impl<'a, S: profile_data_view_state::State> ProfileDataViewBuilder<'a, S> {
 impl<'a, S: profile_data_view_state::State> ProfileDataViewBuilder<'a, S> {
     /// Set the `followingCount` field (optional)
     pub fn following_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `followingCount` field to an Option value (optional)
     pub fn maybe_following_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1575,11 +1579,11 @@ where
         mut self,
         value: impl Into<ProfileDataViewInner<'a>>,
     ) -> ProfileDataViewBuilder<'a, profile_data_view_state::SetInner<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ProfileDataViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1587,12 +1591,12 @@ where
 impl<'a, S: profile_data_view_state::State> ProfileDataViewBuilder<'a, S> {
     /// Set the `notebookCount` field (optional)
     pub fn notebook_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `notebookCount` field to an Option value (optional)
     pub fn maybe_notebook_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1600,12 +1604,12 @@ impl<'a, S: profile_data_view_state::State> ProfileDataViewBuilder<'a, S> {
 impl<'a, S: profile_data_view_state::State> ProfileDataViewBuilder<'a, S> {
     /// Set the `viewer` field (optional)
     pub fn viewer(mut self, value: impl Into<Option<actor::ViewerState<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
     pub fn maybe_viewer(mut self, value: Option<actor::ViewerState<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1618,13 +1622,13 @@ where
     /// Build the final struct
     pub fn build(self) -> ProfileDataView<'a> {
         ProfileDataView {
-            collaboration_count: self.__unsafe_private_named.0,
-            entry_count: self.__unsafe_private_named.1,
-            follower_count: self.__unsafe_private_named.2,
-            following_count: self.__unsafe_private_named.3,
-            inner: self.__unsafe_private_named.4.unwrap(),
-            notebook_count: self.__unsafe_private_named.5,
-            viewer: self.__unsafe_private_named.6,
+            collaboration_count: self._fields.0,
+            entry_count: self._fields.1,
+            follower_count: self._fields.2,
+            following_count: self._fields.3,
+            inner: self._fields.4.unwrap(),
+            notebook_count: self._fields.5,
+            viewer: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -1637,13 +1641,13 @@ where
         >,
     ) -> ProfileDataView<'a> {
         ProfileDataView {
-            collaboration_count: self.__unsafe_private_named.0,
-            entry_count: self.__unsafe_private_named.1,
-            follower_count: self.__unsafe_private_named.2,
-            following_count: self.__unsafe_private_named.3,
-            inner: self.__unsafe_private_named.4.unwrap(),
-            notebook_count: self.__unsafe_private_named.5,
-            viewer: self.__unsafe_private_named.6,
+            collaboration_count: self._fields.0,
+            entry_count: self._fields.1,
+            follower_count: self._fields.2,
+            following_count: self._fields.3,
+            inner: self._fields.4.unwrap(),
+            notebook_count: self._fields.5,
+            viewer: self._fields.6,
             extra_data: Some(extra_data),
         }
     }
@@ -1683,14 +1687,14 @@ pub mod profile_data_view_basic_state {
 
 /// Builder for constructing an instance of this type
 pub struct ProfileDataViewBasicBuilder<'a, S: profile_data_view_basic_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<i64>,
         Option<i64>,
         Option<ProfileDataViewBasicInner<'a>>,
         Option<actor::ViewerStateBasic<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ProfileDataViewBasic<'a> {
@@ -1707,9 +1711,9 @@ impl<'a> ProfileDataViewBasicBuilder<'a, profile_data_view_basic_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileDataViewBasicBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1717,12 +1721,12 @@ impl<'a> ProfileDataViewBasicBuilder<'a, profile_data_view_basic_state::Empty> {
 impl<'a, S: profile_data_view_basic_state::State> ProfileDataViewBasicBuilder<'a, S> {
     /// Set the `followerCount` field (optional)
     pub fn follower_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `followerCount` field to an Option value (optional)
     pub fn maybe_follower_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1730,12 +1734,12 @@ impl<'a, S: profile_data_view_basic_state::State> ProfileDataViewBasicBuilder<'a
 impl<'a, S: profile_data_view_basic_state::State> ProfileDataViewBasicBuilder<'a, S> {
     /// Set the `followingCount` field (optional)
     pub fn following_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `followingCount` field to an Option value (optional)
     pub fn maybe_following_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1750,11 +1754,11 @@ where
         mut self,
         value: impl Into<ProfileDataViewBasicInner<'a>>,
     ) -> ProfileDataViewBasicBuilder<'a, profile_data_view_basic_state::SetInner<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ProfileDataViewBasicBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1765,12 +1769,12 @@ impl<'a, S: profile_data_view_basic_state::State> ProfileDataViewBasicBuilder<'a
         mut self,
         value: impl Into<Option<actor::ViewerStateBasic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
     pub fn maybe_viewer(mut self, value: Option<actor::ViewerStateBasic<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1783,10 +1787,10 @@ where
     /// Build the final struct
     pub fn build(self) -> ProfileDataViewBasic<'a> {
         ProfileDataViewBasic {
-            follower_count: self.__unsafe_private_named.0,
-            following_count: self.__unsafe_private_named.1,
-            inner: self.__unsafe_private_named.2.unwrap(),
-            viewer: self.__unsafe_private_named.3,
+            follower_count: self._fields.0,
+            following_count: self._fields.1,
+            inner: self._fields.2.unwrap(),
+            viewer: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -1799,10 +1803,10 @@ where
         >,
     ) -> ProfileDataViewBasic<'a> {
         ProfileDataViewBasic {
-            follower_count: self.__unsafe_private_named.0,
-            following_count: self.__unsafe_private_named.1,
-            inner: self.__unsafe_private_named.2.unwrap(),
-            viewer: self.__unsafe_private_named.3,
+            follower_count: self._fields.0,
+            following_count: self._fields.1,
+            inner: self._fields.2.unwrap(),
+            viewer: self._fields.3,
             extra_data: Some(extra_data),
         }
     }
@@ -1818,44 +1822,44 @@ pub mod profile_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Handle;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Handle = S::Handle;
+        type Did = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type Did = S::Did;
         type Handle = Set<members::handle>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Handle = S::Handle;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ProfileViewBuilder<'a, S: profile_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<UriValue<'a>>,
         Option<UriValue<'a>>,
         Option<bool>,
@@ -1875,7 +1879,7 @@ pub struct ProfileViewBuilder<'a, S: profile_view_state::State> {
         Option<i64>,
         Option<bool>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ProfileView<'a> {
@@ -1889,8 +1893,8 @@ impl<'a> ProfileViewBuilder<'a, profile_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -1910,7 +1914,7 @@ impl<'a> ProfileViewBuilder<'a, profile_view_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1918,12 +1922,12 @@ impl<'a> ProfileViewBuilder<'a, profile_view_state::Empty> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
     pub fn maybe_avatar(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1931,12 +1935,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `banner` field (optional)
     pub fn banner(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `banner` field to an Option value (optional)
     pub fn maybe_banner(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1944,12 +1948,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `bluesky` field (optional)
     pub fn bluesky(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `bluesky` field to an Option value (optional)
     pub fn maybe_bluesky(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1957,12 +1961,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1970,12 +1974,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1990,11 +1994,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> ProfileViewBuilder<'a, profile_view_state::SetDid<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ProfileViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2002,12 +2006,12 @@ where
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
     pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -2022,11 +2026,11 @@ where
         mut self,
         value: impl Into<Handle<'a>>,
     ) -> ProfileViewBuilder<'a, profile_view_state::SetHandle<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         ProfileViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2034,12 +2038,12 @@ where
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `indexedAt` field (optional)
     pub fn indexed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `indexedAt` field to an Option value (optional)
     pub fn maybe_indexed_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -2047,12 +2051,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<Label<'a>>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<Vec<Label<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -2060,12 +2064,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `links` field (optional)
     pub fn links(mut self, value: impl Into<Option<Vec<UriValue<'a>>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `links` field to an Option value (optional)
     pub fn maybe_links(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -2073,12 +2077,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
     pub fn maybe_location(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -2086,12 +2090,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `pinned` field (optional)
     pub fn pinned(mut self, value: impl Into<Option<actor::PinnedList<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `pinned` field to an Option value (optional)
     pub fn maybe_pinned(mut self, value: Option<actor::PinnedList<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -2102,12 +2106,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<actor::PronounsList<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `pronouns` field to an Option value (optional)
     pub fn maybe_pronouns(mut self, value: Option<actor::PronounsList<'a>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -2115,12 +2119,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `streamplace` field (optional)
     pub fn streamplace(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `streamplace` field to an Option value (optional)
     pub fn maybe_streamplace(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -2128,12 +2132,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `subscribedCount` field (optional)
     pub fn subscribed_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `subscribedCount` field to an Option value (optional)
     pub fn maybe_subscribed_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -2141,12 +2145,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `subscriberCount` field (optional)
     pub fn subscriber_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `subscriberCount` field to an Option value (optional)
     pub fn maybe_subscriber_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -2154,12 +2158,12 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     /// Set the `tangled` field (optional)
     pub fn tangled(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `tangled` field to an Option value (optional)
     pub fn maybe_tangled(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -2167,30 +2171,30 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
 impl<'a, S> ProfileViewBuilder<'a, S>
 where
     S: profile_view_state::State,
-    S::Did: profile_view_state::IsSet,
     S::Handle: profile_view_state::IsSet,
+    S::Did: profile_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ProfileView<'a> {
         ProfileView {
-            avatar: self.__unsafe_private_named.0,
-            banner: self.__unsafe_private_named.1,
-            bluesky: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3,
-            description: self.__unsafe_private_named.4,
-            did: self.__unsafe_private_named.5.unwrap(),
-            display_name: self.__unsafe_private_named.6,
-            handle: self.__unsafe_private_named.7.unwrap(),
-            indexed_at: self.__unsafe_private_named.8,
-            labels: self.__unsafe_private_named.9,
-            links: self.__unsafe_private_named.10,
-            location: self.__unsafe_private_named.11,
-            pinned: self.__unsafe_private_named.12,
-            pronouns: self.__unsafe_private_named.13,
-            streamplace: self.__unsafe_private_named.14,
-            subscribed_count: self.__unsafe_private_named.15,
-            subscriber_count: self.__unsafe_private_named.16,
-            tangled: self.__unsafe_private_named.17,
+            avatar: self._fields.0,
+            banner: self._fields.1,
+            bluesky: self._fields.2,
+            created_at: self._fields.3,
+            description: self._fields.4,
+            did: self._fields.5.unwrap(),
+            display_name: self._fields.6,
+            handle: self._fields.7.unwrap(),
+            indexed_at: self._fields.8,
+            labels: self._fields.9,
+            links: self._fields.10,
+            location: self._fields.11,
+            pinned: self._fields.12,
+            pronouns: self._fields.13,
+            streamplace: self._fields.14,
+            subscribed_count: self._fields.15,
+            subscriber_count: self._fields.16,
+            tangled: self._fields.17,
             extra_data: Default::default(),
         }
     }
@@ -2203,24 +2207,24 @@ where
         >,
     ) -> ProfileView<'a> {
         ProfileView {
-            avatar: self.__unsafe_private_named.0,
-            banner: self.__unsafe_private_named.1,
-            bluesky: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3,
-            description: self.__unsafe_private_named.4,
-            did: self.__unsafe_private_named.5.unwrap(),
-            display_name: self.__unsafe_private_named.6,
-            handle: self.__unsafe_private_named.7.unwrap(),
-            indexed_at: self.__unsafe_private_named.8,
-            labels: self.__unsafe_private_named.9,
-            links: self.__unsafe_private_named.10,
-            location: self.__unsafe_private_named.11,
-            pinned: self.__unsafe_private_named.12,
-            pronouns: self.__unsafe_private_named.13,
-            streamplace: self.__unsafe_private_named.14,
-            subscribed_count: self.__unsafe_private_named.15,
-            subscriber_count: self.__unsafe_private_named.16,
-            tangled: self.__unsafe_private_named.17,
+            avatar: self._fields.0,
+            banner: self._fields.1,
+            bluesky: self._fields.2,
+            created_at: self._fields.3,
+            description: self._fields.4,
+            did: self._fields.5.unwrap(),
+            display_name: self._fields.6,
+            handle: self._fields.7.unwrap(),
+            indexed_at: self._fields.8,
+            labels: self._fields.9,
+            links: self._fields.10,
+            location: self._fields.11,
+            pinned: self._fields.12,
+            pronouns: self._fields.13,
+            streamplace: self._fields.14,
+            subscribed_count: self._fields.15,
+            subscriber_count: self._fields.16,
+            tangled: self._fields.17,
             extra_data: Some(extra_data),
         }
     }
@@ -2272,8 +2276,8 @@ pub mod profile_view_basic_state {
 
 /// Builder for constructing an instance of this type
 pub struct ProfileViewBasicBuilder<'a, S: profile_view_basic_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<UriValue<'a>>,
         Option<Datetime>,
         Option<Did<'a>>,
@@ -2283,7 +2287,7 @@ pub struct ProfileViewBasicBuilder<'a, S: profile_view_basic_state::State> {
         Option<Vec<Label<'a>>>,
         Option<actor::PronounsList<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ProfileViewBasic<'a> {
@@ -2297,9 +2301,9 @@ impl<'a> ProfileViewBasicBuilder<'a, profile_view_basic_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileViewBasicBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2307,12 +2311,12 @@ impl<'a> ProfileViewBasicBuilder<'a, profile_view_basic_state::Empty> {
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
     pub fn maybe_avatar(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -2320,12 +2324,12 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -2340,11 +2344,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> ProfileViewBasicBuilder<'a, profile_view_basic_state::SetDid<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ProfileViewBasicBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2352,12 +2356,12 @@ where
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
     pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -2372,11 +2376,11 @@ where
         mut self,
         value: impl Into<Handle<'a>>,
     ) -> ProfileViewBasicBuilder<'a, profile_view_basic_state::SetHandle<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ProfileViewBasicBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2384,12 +2388,12 @@ where
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `indexedAt` field (optional)
     pub fn indexed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `indexedAt` field to an Option value (optional)
     pub fn maybe_indexed_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -2397,12 +2401,12 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
 impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<Label<'a>>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<Vec<Label<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -2413,12 +2417,12 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
         mut self,
         value: impl Into<Option<actor::PronounsList<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `pronouns` field to an Option value (optional)
     pub fn maybe_pronouns(mut self, value: Option<actor::PronounsList<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -2432,14 +2436,14 @@ where
     /// Build the final struct
     pub fn build(self) -> ProfileViewBasic<'a> {
         ProfileViewBasic {
-            avatar: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            did: self.__unsafe_private_named.2.unwrap(),
-            display_name: self.__unsafe_private_named.3,
-            handle: self.__unsafe_private_named.4.unwrap(),
-            indexed_at: self.__unsafe_private_named.5,
-            labels: self.__unsafe_private_named.6,
-            pronouns: self.__unsafe_private_named.7,
+            avatar: self._fields.0,
+            created_at: self._fields.1,
+            did: self._fields.2.unwrap(),
+            display_name: self._fields.3,
+            handle: self._fields.4.unwrap(),
+            indexed_at: self._fields.5,
+            labels: self._fields.6,
+            pronouns: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -2452,14 +2456,14 @@ where
         >,
     ) -> ProfileViewBasic<'a> {
         ProfileViewBasic {
-            avatar: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            did: self.__unsafe_private_named.2.unwrap(),
-            display_name: self.__unsafe_private_named.3,
-            handle: self.__unsafe_private_named.4.unwrap(),
-            indexed_at: self.__unsafe_private_named.5,
-            labels: self.__unsafe_private_named.6,
-            pronouns: self.__unsafe_private_named.7,
+            avatar: self._fields.0,
+            created_at: self._fields.1,
+            did: self._fields.2.unwrap(),
+            display_name: self._fields.3,
+            handle: self._fields.4.unwrap(),
+            indexed_at: self._fields.5,
+            labels: self._fields.6,
+            pronouns: self._fields.7,
             extra_data: Some(extra_data),
         }
     }
@@ -2499,9 +2503,9 @@ pub mod subscribed_notebook_state {
 
 /// Builder for constructing an instance of this type
 pub struct SubscribedNotebookBuilder<'a, S: subscribed_notebook_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SubscribedNotebook<'a> {
@@ -2515,9 +2519,9 @@ impl<'a> SubscribedNotebookBuilder<'a, subscribed_notebook_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SubscribedNotebookBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2525,12 +2529,12 @@ impl<'a> SubscribedNotebookBuilder<'a, subscribed_notebook_state::Empty> {
 impl<'a, S: subscribed_notebook_state::State> SubscribedNotebookBuilder<'a, S> {
     /// Set the `path` field (optional)
     pub fn path(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `path` field to an Option value (optional)
     pub fn maybe_path(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -2538,12 +2542,12 @@ impl<'a, S: subscribed_notebook_state::State> SubscribedNotebookBuilder<'a, S> {
 impl<'a, S: subscribed_notebook_state::State> SubscribedNotebookBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -2558,11 +2562,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> SubscribedNotebookBuilder<'a, subscribed_notebook_state::SetUri<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SubscribedNotebookBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2575,9 +2579,9 @@ where
     /// Build the final struct
     pub fn build(self) -> SubscribedNotebook<'a> {
         SubscribedNotebook {
-            path: self.__unsafe_private_named.0,
-            title: self.__unsafe_private_named.1,
-            uri: self.__unsafe_private_named.2.unwrap(),
+            path: self._fields.0,
+            title: self._fields.1,
+            uri: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2590,9 +2594,9 @@ where
         >,
     ) -> SubscribedNotebook<'a> {
         SubscribedNotebook {
-            path: self.__unsafe_private_named.0,
-            title: self.__unsafe_private_named.1,
-            uri: self.__unsafe_private_named.2.unwrap(),
+            path: self._fields.0,
+            title: self._fields.1,
+            uri: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2608,58 +2612,58 @@ pub mod tangled_profile_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Bluesky;
         type Did;
         type Handle;
+        type Bluesky;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Bluesky = Unset;
         type Did = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `bluesky` field to Set
-    pub struct SetBluesky<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBluesky<S> {}
-    impl<S: State> State for SetBluesky<S> {
-        type Bluesky = Set<members::bluesky>;
-        type Did = S::Did;
-        type Handle = S::Handle;
+        type Bluesky = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Bluesky = S::Bluesky;
         type Did = Set<members::did>;
         type Handle = S::Handle;
+        type Bluesky = S::Bluesky;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
-        type Bluesky = S::Bluesky;
         type Did = S::Did;
         type Handle = Set<members::handle>;
+        type Bluesky = S::Bluesky;
+    }
+    ///State transition - sets the `bluesky` field to Set
+    pub struct SetBluesky<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBluesky<S> {}
+    impl<S: State> State for SetBluesky<S> {
+        type Did = S::Did;
+        type Handle = S::Handle;
+        type Bluesky = Set<members::bluesky>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `bluesky` field
-        pub struct bluesky(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `bluesky` field
+        pub struct bluesky(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TangledProfileViewBuilder<'a, S: tangled_profile_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<bool>,
         Option<CowStr<'a>>,
         Option<Did<'a>>,
@@ -2669,7 +2673,7 @@ pub struct TangledProfileViewBuilder<'a, S: tangled_profile_view_state::State> {
         Option<Vec<AtUri<'a>>>,
         Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TangledProfileView<'a> {
@@ -2683,9 +2687,9 @@ impl<'a> TangledProfileViewBuilder<'a, tangled_profile_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TangledProfileViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2700,11 +2704,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> TangledProfileViewBuilder<'a, tangled_profile_view_state::SetBluesky<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TangledProfileViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2712,12 +2716,12 @@ where
 impl<'a, S: tangled_profile_view_state::State> TangledProfileViewBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -2732,11 +2736,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> TangledProfileViewBuilder<'a, tangled_profile_view_state::SetDid<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         TangledProfileViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2751,11 +2755,11 @@ where
         mut self,
         value: impl Into<Handle<'a>>,
     ) -> TangledProfileViewBuilder<'a, tangled_profile_view_state::SetHandle<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         TangledProfileViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2763,12 +2767,12 @@ where
 impl<'a, S: tangled_profile_view_state::State> TangledProfileViewBuilder<'a, S> {
     /// Set the `links` field (optional)
     pub fn links(mut self, value: impl Into<Option<Vec<UriValue<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `links` field to an Option value (optional)
     pub fn maybe_links(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -2776,12 +2780,12 @@ impl<'a, S: tangled_profile_view_state::State> TangledProfileViewBuilder<'a, S> 
 impl<'a, S: tangled_profile_view_state::State> TangledProfileViewBuilder<'a, S> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
     pub fn maybe_location(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -2792,12 +2796,12 @@ impl<'a, S: tangled_profile_view_state::State> TangledProfileViewBuilder<'a, S> 
         mut self,
         value: impl Into<Option<Vec<AtUri<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `pinnedRepositories` field to an Option value (optional)
     pub fn maybe_pinned_repositories(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -2805,12 +2809,12 @@ impl<'a, S: tangled_profile_view_state::State> TangledProfileViewBuilder<'a, S> 
 impl<'a, S: tangled_profile_view_state::State> TangledProfileViewBuilder<'a, S> {
     /// Set the `stats` field (optional)
     pub fn stats(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `stats` field to an Option value (optional)
     pub fn maybe_stats(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -2818,21 +2822,21 @@ impl<'a, S: tangled_profile_view_state::State> TangledProfileViewBuilder<'a, S> 
 impl<'a, S> TangledProfileViewBuilder<'a, S>
 where
     S: tangled_profile_view_state::State,
-    S::Bluesky: tangled_profile_view_state::IsSet,
     S::Did: tangled_profile_view_state::IsSet,
     S::Handle: tangled_profile_view_state::IsSet,
+    S::Bluesky: tangled_profile_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TangledProfileView<'a> {
         TangledProfileView {
-            bluesky: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            did: self.__unsafe_private_named.2.unwrap(),
-            handle: self.__unsafe_private_named.3.unwrap(),
-            links: self.__unsafe_private_named.4,
-            location: self.__unsafe_private_named.5,
-            pinned_repositories: self.__unsafe_private_named.6,
-            stats: self.__unsafe_private_named.7,
+            bluesky: self._fields.0.unwrap(),
+            description: self._fields.1,
+            did: self._fields.2.unwrap(),
+            handle: self._fields.3.unwrap(),
+            links: self._fields.4,
+            location: self._fields.5,
+            pinned_repositories: self._fields.6,
+            stats: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -2845,14 +2849,14 @@ where
         >,
     ) -> TangledProfileView<'a> {
         TangledProfileView {
-            bluesky: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            did: self.__unsafe_private_named.2.unwrap(),
-            handle: self.__unsafe_private_named.3.unwrap(),
-            links: self.__unsafe_private_named.4,
-            location: self.__unsafe_private_named.5,
-            pinned_repositories: self.__unsafe_private_named.6,
-            stats: self.__unsafe_private_named.7,
+            bluesky: self._fields.0.unwrap(),
+            description: self._fields.1,
+            did: self._fields.2.unwrap(),
+            handle: self._fields.3.unwrap(),
+            links: self._fields.4,
+            location: self._fields.5,
+            pinned_repositories: self._fields.6,
+            stats: self._fields.7,
             extra_data: Some(extra_data),
         }
     }

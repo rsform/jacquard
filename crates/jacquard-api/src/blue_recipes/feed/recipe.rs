@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -474,58 +477,58 @@ pub mod recipe_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Title;
         type Steps;
         type Ingredients;
-        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Title = Unset;
         type Steps = Unset;
         type Ingredients = Unset;
-        type Title = Unset;
-    }
-    ///State transition - sets the `steps` field to Set
-    pub struct SetSteps<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSteps<S> {}
-    impl<S: State> State for SetSteps<S> {
-        type Steps = Set<members::steps>;
-        type Ingredients = S::Ingredients;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `ingredients` field to Set
-    pub struct SetIngredients<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIngredients<S> {}
-    impl<S: State> State for SetIngredients<S> {
-        type Steps = S::Steps;
-        type Ingredients = Set<members::ingredients>;
-        type Title = S::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
+        type Title = Set<members::title>;
         type Steps = S::Steps;
         type Ingredients = S::Ingredients;
-        type Title = Set<members::title>;
+    }
+    ///State transition - sets the `steps` field to Set
+    pub struct SetSteps<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSteps<S> {}
+    impl<S: State> State for SetSteps<S> {
+        type Title = S::Title;
+        type Steps = Set<members::steps>;
+        type Ingredients = S::Ingredients;
+    }
+    ///State transition - sets the `ingredients` field to Set
+    pub struct SetIngredients<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIngredients<S> {}
+    impl<S: State> State for SetIngredients<S> {
+        type Title = S::Title;
+        type Steps = S::Steps;
+        type Ingredients = Set<members::ingredients>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `steps` field
         pub struct steps(());
         ///Marker type for the `ingredients` field
         pub struct ingredients(());
-        ///Marker type for the `title` field
-        pub struct title(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RecipeBuilder<'a, S: recipe_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<BlobRef<'a>>,
@@ -535,7 +538,7 @@ pub struct RecipeBuilder<'a, S: recipe_state::State> {
         Option<i64>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Recipe<'a> {
@@ -549,9 +552,9 @@ impl<'a> RecipeBuilder<'a, recipe_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RecipeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -559,12 +562,12 @@ impl<'a> RecipeBuilder<'a, recipe_state::Empty> {
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -572,12 +575,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -585,12 +588,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -605,11 +608,11 @@ where
         mut self,
         value: impl Into<Vec<recipe::Ingredient<'a>>>,
     ) -> RecipeBuilder<'a, recipe_state::SetIngredients<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         RecipeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -617,12 +620,12 @@ where
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `serves` field (optional)
     pub fn serves(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `serves` field to an Option value (optional)
     pub fn maybe_serves(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -637,11 +640,11 @@ where
         mut self,
         value: impl Into<Vec<recipe::Step<'a>>>,
     ) -> RecipeBuilder<'a, recipe_state::SetSteps<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         RecipeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -649,12 +652,12 @@ where
 impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     /// Set the `time` field (optional)
     pub fn time(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `time` field to an Option value (optional)
     pub fn maybe_time(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -669,11 +672,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RecipeBuilder<'a, recipe_state::SetTitle<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         RecipeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -681,21 +684,21 @@ where
 impl<'a, S> RecipeBuilder<'a, S>
 where
     S: recipe_state::State,
+    S::Title: recipe_state::IsSet,
     S::Steps: recipe_state::IsSet,
     S::Ingredients: recipe_state::IsSet,
-    S::Title: recipe_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Recipe<'a> {
         Recipe {
-            created_at: self.__unsafe_private_named.0,
-            description: self.__unsafe_private_named.1,
-            image: self.__unsafe_private_named.2,
-            ingredients: self.__unsafe_private_named.3.unwrap(),
-            serves: self.__unsafe_private_named.4,
-            steps: self.__unsafe_private_named.5.unwrap(),
-            time: self.__unsafe_private_named.6,
-            title: self.__unsafe_private_named.7.unwrap(),
+            created_at: self._fields.0,
+            description: self._fields.1,
+            image: self._fields.2,
+            ingredients: self._fields.3.unwrap(),
+            serves: self._fields.4,
+            steps: self._fields.5.unwrap(),
+            time: self._fields.6,
+            title: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -708,14 +711,14 @@ where
         >,
     ) -> Recipe<'a> {
         Recipe {
-            created_at: self.__unsafe_private_named.0,
-            description: self.__unsafe_private_named.1,
-            image: self.__unsafe_private_named.2,
-            ingredients: self.__unsafe_private_named.3.unwrap(),
-            serves: self.__unsafe_private_named.4,
-            steps: self.__unsafe_private_named.5.unwrap(),
-            time: self.__unsafe_private_named.6,
-            title: self.__unsafe_private_named.7.unwrap(),
+            created_at: self._fields.0,
+            description: self._fields.1,
+            image: self._fields.2,
+            ingredients: self._fields.3.unwrap(),
+            serves: self._fields.4,
+            steps: self._fields.5.unwrap(),
+            time: self._fields.6,
+            title: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }

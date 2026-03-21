@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -216,92 +219,92 @@ pub mod receipt_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Amount;
-        type CreatedAt;
-        type To;
-        type Currency;
         type From;
+        type Amount;
+        type Currency;
+        type To;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Amount = Unset;
-        type CreatedAt = Unset;
-        type To = Unset;
-        type Currency = Unset;
         type From = Unset;
-    }
-    ///State transition - sets the `amount` field to Set
-    pub struct SetAmount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAmount<S> {}
-    impl<S: State> State for SetAmount<S> {
-        type Amount = Set<members::amount>;
-        type CreatedAt = S::CreatedAt;
-        type To = S::To;
-        type Currency = S::Currency;
-        type From = S::From;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Amount = S::Amount;
-        type CreatedAt = Set<members::created_at>;
-        type To = S::To;
-        type Currency = S::Currency;
-        type From = S::From;
-    }
-    ///State transition - sets the `to` field to Set
-    pub struct SetTo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTo<S> {}
-    impl<S: State> State for SetTo<S> {
-        type Amount = S::Amount;
-        type CreatedAt = S::CreatedAt;
-        type To = Set<members::to>;
-        type Currency = S::Currency;
-        type From = S::From;
-    }
-    ///State transition - sets the `currency` field to Set
-    pub struct SetCurrency<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCurrency<S> {}
-    impl<S: State> State for SetCurrency<S> {
-        type Amount = S::Amount;
-        type CreatedAt = S::CreatedAt;
-        type To = S::To;
-        type Currency = Set<members::currency>;
-        type From = S::From;
+        type Amount = Unset;
+        type Currency = Unset;
+        type To = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `from` field to Set
     pub struct SetFrom<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFrom<S> {}
     impl<S: State> State for SetFrom<S> {
-        type Amount = S::Amount;
-        type CreatedAt = S::CreatedAt;
-        type To = S::To;
-        type Currency = S::Currency;
         type From = Set<members::from>;
+        type Amount = S::Amount;
+        type Currency = S::Currency;
+        type To = S::To;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `amount` field to Set
+    pub struct SetAmount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAmount<S> {}
+    impl<S: State> State for SetAmount<S> {
+        type From = S::From;
+        type Amount = Set<members::amount>;
+        type Currency = S::Currency;
+        type To = S::To;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `currency` field to Set
+    pub struct SetCurrency<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCurrency<S> {}
+    impl<S: State> State for SetCurrency<S> {
+        type From = S::From;
+        type Amount = S::Amount;
+        type Currency = Set<members::currency>;
+        type To = S::To;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `to` field to Set
+    pub struct SetTo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTo<S> {}
+    impl<S: State> State for SetTo<S> {
+        type From = S::From;
+        type Amount = S::Amount;
+        type Currency = S::Currency;
+        type To = Set<members::to>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type From = S::From;
+        type Amount = S::Amount;
+        type Currency = S::Currency;
+        type To = S::To;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `amount` field
-        pub struct amount(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `to` field
-        pub struct to(());
-        ///Marker type for the `currency` field
-        pub struct currency(());
         ///Marker type for the `from` field
         pub struct from(());
+        ///Marker type for the `amount` field
+        pub struct amount(());
+        ///Marker type for the `currency` field
+        pub struct currency(());
+        ///Marker type for the `to` field
+        pub struct to(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ReceiptBuilder<'a, S: receipt_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -314,7 +317,7 @@ pub struct ReceiptBuilder<'a, S: receipt_state::State> {
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Receipt<'a> {
@@ -328,21 +331,9 @@ impl<'a> ReceiptBuilder<'a, receipt_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ReceiptBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -357,11 +348,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ReceiptBuilder<'a, receipt_state::SetAmount<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ReceiptBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -376,11 +367,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ReceiptBuilder<'a, receipt_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ReceiptBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -395,11 +386,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ReceiptBuilder<'a, receipt_state::SetCurrency<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ReceiptBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -407,12 +398,12 @@ where
 impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     /// Set the `for` field (optional)
     pub fn r#for(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `for` field to an Option value (optional)
     pub fn maybe_for(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -427,11 +418,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> ReceiptBuilder<'a, receipt_state::SetFrom<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ReceiptBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -439,12 +430,12 @@ where
 impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
     pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -452,12 +443,12 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
 impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     /// Set the `occurredAt` field (optional)
     pub fn occurred_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `occurredAt` field to an Option value (optional)
     pub fn maybe_occurred_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -465,12 +456,12 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
 impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     /// Set the `paymentNetwork` field (optional)
     pub fn payment_network(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `paymentNetwork` field to an Option value (optional)
     pub fn maybe_payment_network(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -478,12 +469,12 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
 impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     /// Set the `paymentRail` field (optional)
     pub fn payment_rail(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `paymentRail` field to an Option value (optional)
     pub fn maybe_payment_rail(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -498,11 +489,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ReceiptBuilder<'a, receipt_state::SetTo<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         ReceiptBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -510,12 +501,12 @@ where
 impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     /// Set the `transactionId` field (optional)
     pub fn transaction_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `transactionId` field to an Option value (optional)
     pub fn maybe_transaction_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -523,26 +514,26 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
 impl<'a, S> ReceiptBuilder<'a, S>
 where
     S: receipt_state::State,
-    S::Amount: receipt_state::IsSet,
-    S::CreatedAt: receipt_state::IsSet,
-    S::To: receipt_state::IsSet,
-    S::Currency: receipt_state::IsSet,
     S::From: receipt_state::IsSet,
+    S::Amount: receipt_state::IsSet,
+    S::Currency: receipt_state::IsSet,
+    S::To: receipt_state::IsSet,
+    S::CreatedAt: receipt_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Receipt<'a> {
         Receipt {
-            amount: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            currency: self.__unsafe_private_named.2.unwrap(),
-            r#for: self.__unsafe_private_named.3,
-            from: self.__unsafe_private_named.4.unwrap(),
-            notes: self.__unsafe_private_named.5,
-            occurred_at: self.__unsafe_private_named.6,
-            payment_network: self.__unsafe_private_named.7,
-            payment_rail: self.__unsafe_private_named.8,
-            to: self.__unsafe_private_named.9.unwrap(),
-            transaction_id: self.__unsafe_private_named.10,
+            amount: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            currency: self._fields.2.unwrap(),
+            r#for: self._fields.3,
+            from: self._fields.4.unwrap(),
+            notes: self._fields.5,
+            occurred_at: self._fields.6,
+            payment_network: self._fields.7,
+            payment_rail: self._fields.8,
+            to: self._fields.9.unwrap(),
+            transaction_id: self._fields.10,
             extra_data: Default::default(),
         }
     }
@@ -555,17 +546,17 @@ where
         >,
     ) -> Receipt<'a> {
         Receipt {
-            amount: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            currency: self.__unsafe_private_named.2.unwrap(),
-            r#for: self.__unsafe_private_named.3,
-            from: self.__unsafe_private_named.4.unwrap(),
-            notes: self.__unsafe_private_named.5,
-            occurred_at: self.__unsafe_private_named.6,
-            payment_network: self.__unsafe_private_named.7,
-            payment_rail: self.__unsafe_private_named.8,
-            to: self.__unsafe_private_named.9.unwrap(),
-            transaction_id: self.__unsafe_private_named.10,
+            amount: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            currency: self._fields.2.unwrap(),
+            r#for: self._fields.3,
+            from: self._fields.4.unwrap(),
+            notes: self._fields.5,
+            occurred_at: self._fields.6,
+            payment_network: self._fields.7,
+            payment_rail: self._fields.8,
+            to: self._fields.9.unwrap(),
+            transaction_id: self._fields.10,
             extra_data: Some(extra_data),
         }
     }

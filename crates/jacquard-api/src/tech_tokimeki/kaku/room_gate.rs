@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -119,45 +122,45 @@ pub mod room_gate_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Room;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Room = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Room = S::Room;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `room` field to Set
     pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoom<S> {}
     impl<S: State> State for SetRoom<S> {
-        type CreatedAt = S::CreatedAt;
         type Room = Set<members::room>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Room = S::Room;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `room` field
         pub struct room(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RoomGateBuilder<'a, S: room_gate_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<bool>, Option<StrongRef<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<bool>, Option<StrongRef<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RoomGate<'a> {
@@ -171,9 +174,9 @@ impl<'a> RoomGateBuilder<'a, room_gate_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RoomGateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -188,11 +191,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> RoomGateBuilder<'a, room_gate_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RoomGateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -200,12 +203,12 @@ where
 impl<'a, S: room_gate_state::State> RoomGateBuilder<'a, S> {
     /// Set the `isClosed` field (optional)
     pub fn is_closed(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `isClosed` field to an Option value (optional)
     pub fn maybe_is_closed(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -220,11 +223,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> RoomGateBuilder<'a, room_gate_state::SetRoom<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RoomGateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -232,15 +235,15 @@ where
 impl<'a, S> RoomGateBuilder<'a, S>
 where
     S: room_gate_state::State,
-    S::CreatedAt: room_gate_state::IsSet,
     S::Room: room_gate_state::IsSet,
+    S::CreatedAt: room_gate_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RoomGate<'a> {
         RoomGate {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            is_closed: self.__unsafe_private_named.1.or_else(|| Some(false)),
-            room: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            is_closed: self._fields.1.or_else(|| Some(false)),
+            room: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -253,9 +256,9 @@ where
         >,
     ) -> RoomGate<'a> {
         RoomGate {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            is_closed: self.__unsafe_private_named.1.or_else(|| Some(false)),
-            room: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            is_closed: self._fields.1.or_else(|| Some(false)),
+            room: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

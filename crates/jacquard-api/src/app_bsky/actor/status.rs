@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -257,14 +260,14 @@ pub mod status_state {
 
 /// Builder for constructing an instance of this type
 pub struct StatusBuilder<'a, S: status_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<i64>,
         Option<ExternalRecord<'a>>,
         Option<StatusStatus<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Status<'a> {
@@ -278,9 +281,9 @@ impl<'a> StatusBuilder<'a, status_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -295,11 +298,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> StatusBuilder<'a, status_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         StatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -307,12 +310,12 @@ where
 impl<'a, S: status_state::State> StatusBuilder<'a, S> {
     /// Set the `durationMinutes` field (optional)
     pub fn duration_minutes(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `durationMinutes` field to an Option value (optional)
     pub fn maybe_duration_minutes(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -320,12 +323,12 @@ impl<'a, S: status_state::State> StatusBuilder<'a, S> {
 impl<'a, S: status_state::State> StatusBuilder<'a, S> {
     /// Set the `embed` field (optional)
     pub fn embed(mut self, value: impl Into<Option<ExternalRecord<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `embed` field to an Option value (optional)
     pub fn maybe_embed(mut self, value: Option<ExternalRecord<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -340,11 +343,11 @@ where
         mut self,
         value: impl Into<StatusStatus<'a>>,
     ) -> StatusBuilder<'a, status_state::SetStatus<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         StatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -358,10 +361,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Status<'a> {
         Status {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            duration_minutes: self.__unsafe_private_named.1,
-            embed: self.__unsafe_private_named.2,
-            status: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            duration_minutes: self._fields.1,
+            embed: self._fields.2,
+            status: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -374,10 +377,10 @@ where
         >,
     ) -> Status<'a> {
         Status {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            duration_minutes: self.__unsafe_private_named.1,
-            embed: self.__unsafe_private_named.2,
-            status: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            duration_minutes: self._fields.1,
+            embed: self._fields.2,
+            status: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

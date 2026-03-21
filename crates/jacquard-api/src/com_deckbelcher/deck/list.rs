@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -579,63 +582,63 @@ pub mod card_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Ref;
-        type Section;
         type Quantity;
+        type Section;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Ref = Unset;
-        type Section = Unset;
         type Quantity = Unset;
+        type Section = Unset;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
         type Ref = Set<members::r#ref>;
+        type Quantity = S::Quantity;
         type Section = S::Section;
-        type Quantity = S::Quantity;
-    }
-    ///State transition - sets the `section` field to Set
-    pub struct SetSection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSection<S> {}
-    impl<S: State> State for SetSection<S> {
-        type Ref = S::Ref;
-        type Section = Set<members::section>;
-        type Quantity = S::Quantity;
     }
     ///State transition - sets the `quantity` field to Set
     pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuantity<S> {}
     impl<S: State> State for SetQuantity<S> {
         type Ref = S::Ref;
-        type Section = S::Section;
         type Quantity = Set<members::quantity>;
+        type Section = S::Section;
+    }
+    ///State transition - sets the `section` field to Set
+    pub struct SetSection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSection<S> {}
+    impl<S: State> State for SetSection<S> {
+        type Ref = S::Ref;
+        type Quantity = S::Quantity;
+        type Section = Set<members::section>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `ref` field
         pub struct r#ref(());
-        ///Marker type for the `section` field
-        pub struct section(());
         ///Marker type for the `quantity` field
         pub struct quantity(());
+        ///Marker type for the `section` field
+        pub struct section(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CardBuilder<'a, S: card_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<i64>,
         Option<CardRef<'a>>,
         Option<list::Section<'a>>,
         Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Card<'a> {
@@ -649,9 +652,9 @@ impl<'a> CardBuilder<'a, card_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CardBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -666,11 +669,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CardBuilder<'a, card_state::SetQuantity<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CardBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -685,11 +688,11 @@ where
         mut self,
         value: impl Into<CardRef<'a>>,
     ) -> CardBuilder<'a, card_state::SetRef<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CardBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -704,11 +707,11 @@ where
         mut self,
         value: impl Into<list::Section<'a>>,
     ) -> CardBuilder<'a, card_state::SetSection<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CardBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -716,12 +719,12 @@ where
 impl<'a, S: card_state::State> CardBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -730,16 +733,16 @@ impl<'a, S> CardBuilder<'a, S>
 where
     S: card_state::State,
     S::Ref: card_state::IsSet,
-    S::Section: card_state::IsSet,
     S::Quantity: card_state::IsSet,
+    S::Section: card_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Card<'a> {
         Card {
-            quantity: self.__unsafe_private_named.0.unwrap(),
-            r#ref: self.__unsafe_private_named.1.unwrap(),
-            section: self.__unsafe_private_named.2.unwrap(),
-            tags: self.__unsafe_private_named.3,
+            quantity: self._fields.0.unwrap(),
+            r#ref: self._fields.1.unwrap(),
+            section: self._fields.2.unwrap(),
+            tags: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -752,10 +755,10 @@ where
         >,
     ) -> Card<'a> {
         Card {
-            quantity: self.__unsafe_private_named.0.unwrap(),
-            r#ref: self.__unsafe_private_named.1.unwrap(),
-            section: self.__unsafe_private_named.2.unwrap(),
-            tags: self.__unsafe_private_named.3,
+            quantity: self._fields.0.unwrap(),
+            r#ref: self._fields.1.unwrap(),
+            section: self._fields.2.unwrap(),
+            tags: self._fields.3,
             extra_data: Some(extra_data),
         }
     }
@@ -1013,57 +1016,57 @@ pub mod list_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Cards;
-        type CreatedAt;
         type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Cards = Unset;
-        type CreatedAt = Unset;
         type Name = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `cards` field to Set
     pub struct SetCards<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCards<S> {}
     impl<S: State> State for SetCards<S> {
         type Cards = Set<members::cards>;
+        type Name = S::Name;
         type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Cards = S::Cards;
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Cards = S::Cards;
-        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Cards = S::Cards;
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `cards` field
         pub struct cards(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ListBuilder<'a, S: list_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<list::Card<'a>>>,
         Option<Datetime>,
         Option<list::Format<'a>>,
@@ -1071,7 +1074,7 @@ pub struct ListBuilder<'a, S: list_state::State> {
         Option<ListPrimer<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> List<'a> {
@@ -1085,9 +1088,9 @@ impl<'a> ListBuilder<'a, list_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1102,11 +1105,11 @@ where
         mut self,
         value: impl Into<Vec<list::Card<'a>>>,
     ) -> ListBuilder<'a, list_state::SetCards<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1121,11 +1124,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ListBuilder<'a, list_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1133,12 +1136,12 @@ where
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `format` field (optional)
     pub fn format(mut self, value: impl Into<Option<list::Format<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `format` field to an Option value (optional)
     pub fn maybe_format(mut self, value: Option<list::Format<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1153,11 +1156,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ListBuilder<'a, list_state::SetName<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1165,12 +1168,12 @@ where
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `primer` field (optional)
     pub fn primer(mut self, value: impl Into<Option<ListPrimer<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `primer` field to an Option value (optional)
     pub fn maybe_primer(mut self, value: Option<ListPrimer<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1178,12 +1181,12 @@ impl<'a, S: list_state::State> ListBuilder<'a, S> {
 impl<'a, S: list_state::State> ListBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1192,18 +1195,18 @@ impl<'a, S> ListBuilder<'a, S>
 where
     S: list_state::State,
     S::Cards: list_state::IsSet,
-    S::CreatedAt: list_state::IsSet,
     S::Name: list_state::IsSet,
+    S::CreatedAt: list_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> List<'a> {
         List {
-            cards: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            format: self.__unsafe_private_named.2,
-            name: self.__unsafe_private_named.3.unwrap(),
-            primer: self.__unsafe_private_named.4,
-            updated_at: self.__unsafe_private_named.5,
+            cards: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            format: self._fields.2,
+            name: self._fields.3.unwrap(),
+            primer: self._fields.4,
+            updated_at: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -1216,12 +1219,12 @@ where
         >,
     ) -> List<'a> {
         List {
-            cards: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            format: self.__unsafe_private_named.2,
-            name: self.__unsafe_private_named.3.unwrap(),
-            primer: self.__unsafe_private_named.4,
-            updated_at: self.__unsafe_private_named.5,
+            cards: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            format: self._fields.2,
+            name: self._fields.3.unwrap(),
+            primer: self._fields.4,
+            updated_at: self._fields.5,
             extra_data: Some(extra_data),
         }
     }
@@ -1261,9 +1264,9 @@ pub mod primer_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct PrimerRefBuilder<'a, S: primer_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<StrongRef<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<StrongRef<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> PrimerRef<'a> {
@@ -1277,9 +1280,9 @@ impl<'a> PrimerRefBuilder<'a, primer_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PrimerRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1294,11 +1297,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> PrimerRefBuilder<'a, primer_ref_state::SetRef<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PrimerRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1311,7 +1314,7 @@ where
     /// Build the final struct
     pub fn build(self) -> PrimerRef<'a> {
         PrimerRef {
-            r#ref: self.__unsafe_private_named.0.unwrap(),
+            r#ref: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1324,7 +1327,7 @@ where
         >,
     ) -> PrimerRef<'a> {
         PrimerRef {
-            r#ref: self.__unsafe_private_named.0.unwrap(),
+            r#ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

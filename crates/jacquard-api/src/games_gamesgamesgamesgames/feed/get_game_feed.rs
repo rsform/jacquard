@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::AtUri;
@@ -137,9 +140,9 @@ pub mod get_game_feed_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetGameFeedBuilder<'a, S: get_game_feed_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<AtUri<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<AtUri<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetGameFeed<'a> {
@@ -153,9 +156,9 @@ impl<'a> GetGameFeedBuilder<'a, get_game_feed_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetGameFeedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -163,12 +166,12 @@ impl<'a> GetGameFeedBuilder<'a, get_game_feed_state::Empty> {
 impl<'a, S: get_game_feed_state::State> GetGameFeedBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -183,11 +186,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> GetGameFeedBuilder<'a, get_game_feed_state::SetFeed<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GetGameFeedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -195,12 +198,12 @@ where
 impl<'a, S: get_game_feed_state::State> GetGameFeedBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -213,9 +216,9 @@ where
     /// Build the final struct
     pub fn build(self) -> GetGameFeed<'a> {
         GetGameFeed {
-            cursor: self.__unsafe_private_named.0,
-            feed: self.__unsafe_private_named.1.unwrap(),
-            limit: self.__unsafe_private_named.2,
+            cursor: self._fields.0,
+            feed: self._fields.1.unwrap(),
+            limit: self._fields.2,
         }
     }
 }

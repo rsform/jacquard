@@ -10,7 +10,11 @@ pub mod get_unread_count;
 pub mod list_notifications;
 pub mod update_seen;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -312,112 +316,112 @@ pub mod notification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Reason;
-        type Author;
-        type Uri;
         type Cid;
-        type IsRead;
+        type Uri;
+        type Author;
+        type Reason;
         type IndexedAt;
+        type IsRead;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Reason = Unset;
-        type Author = Unset;
-        type Uri = Unset;
         type Cid = Unset;
-        type IsRead = Unset;
+        type Uri = Unset;
+        type Author = Unset;
+        type Reason = Unset;
         type IndexedAt = Unset;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
-        type Reason = Set<members::reason>;
-        type Author = S::Author;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type IsRead = S::IsRead;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Reason = S::Reason;
-        type Author = Set<members::author>;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type IsRead = S::IsRead;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Reason = S::Reason;
-        type Author = S::Author;
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type IsRead = S::IsRead;
-        type IndexedAt = S::IndexedAt;
+        type IsRead = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Reason = S::Reason;
-        type Author = S::Author;
-        type Uri = S::Uri;
         type Cid = Set<members::cid>;
-        type IsRead = S::IsRead;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `is_read` field to Set
-    pub struct SetIsRead<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsRead<S> {}
-    impl<S: State> State for SetIsRead<S> {
-        type Reason = S::Reason;
-        type Author = S::Author;
         type Uri = S::Uri;
-        type Cid = S::Cid;
-        type IsRead = Set<members::is_read>;
+        type Author = S::Author;
+        type Reason = S::Reason;
         type IndexedAt = S::IndexedAt;
+        type IsRead = S::IsRead;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Uri = Set<members::uri>;
+        type Author = S::Author;
+        type Reason = S::Reason;
+        type IndexedAt = S::IndexedAt;
+        type IsRead = S::IsRead;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Author = Set<members::author>;
+        type Reason = S::Reason;
+        type IndexedAt = S::IndexedAt;
+        type IsRead = S::IsRead;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetReason<S> {}
+    impl<S: State> State for SetReason<S> {
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Author = S::Author;
+        type Reason = Set<members::reason>;
+        type IndexedAt = S::IndexedAt;
+        type IsRead = S::IsRead;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type Reason = S::Reason;
-        type Author = S::Author;
-        type Uri = S::Uri;
         type Cid = S::Cid;
-        type IsRead = S::IsRead;
+        type Uri = S::Uri;
+        type Author = S::Author;
+        type Reason = S::Reason;
         type IndexedAt = Set<members::indexed_at>;
+        type IsRead = S::IsRead;
+    }
+    ///State transition - sets the `is_read` field to Set
+    pub struct SetIsRead<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIsRead<S> {}
+    impl<S: State> State for SetIsRead<S> {
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Author = S::Author;
+        type Reason = S::Reason;
+        type IndexedAt = S::IndexedAt;
+        type IsRead = Set<members::is_read>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `reason` field
-        pub struct reason(());
-        ///Marker type for the `author` field
-        pub struct author(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `is_read` field
-        pub struct is_read(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `reason` field
+        pub struct reason(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `is_read` field
+        pub struct is_read(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct NotificationBuilder<'a, S: notification_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ProfileViewBasic<'a>>,
         Option<Cid<'a>>,
         Option<Datetime>,
@@ -427,7 +431,7 @@ pub struct NotificationBuilder<'a, S: notification_state::State> {
         Option<Data<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Notification<'a> {
@@ -441,9 +445,9 @@ impl<'a> NotificationBuilder<'a, notification_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -458,11 +462,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> NotificationBuilder<'a, notification_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         NotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -477,11 +481,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> NotificationBuilder<'a, notification_state::SetCid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         NotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -496,11 +500,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> NotificationBuilder<'a, notification_state::SetIndexedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         NotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -515,11 +519,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> NotificationBuilder<'a, notification_state::SetIsRead<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         NotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -534,11 +538,11 @@ where
         mut self,
         value: impl Into<notification::NotificationReason<'a>>,
     ) -> NotificationBuilder<'a, notification_state::SetReason<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         NotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -546,12 +550,12 @@ where
 impl<'a, S: notification_state::State> NotificationBuilder<'a, S> {
     /// Set the `reasonSubject` field (optional)
     pub fn reason_subject(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `reasonSubject` field to an Option value (optional)
     pub fn maybe_reason_subject(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -559,12 +563,12 @@ impl<'a, S: notification_state::State> NotificationBuilder<'a, S> {
 impl<'a, S: notification_state::State> NotificationBuilder<'a, S> {
     /// Set the `record` field (optional)
     pub fn record(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `record` field to an Option value (optional)
     pub fn maybe_record(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -579,11 +583,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> NotificationBuilder<'a, notification_state::SetUri<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         NotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -591,24 +595,24 @@ where
 impl<'a, S> NotificationBuilder<'a, S>
 where
     S: notification_state::State,
-    S::Reason: notification_state::IsSet,
-    S::Author: notification_state::IsSet,
-    S::Uri: notification_state::IsSet,
     S::Cid: notification_state::IsSet,
-    S::IsRead: notification_state::IsSet,
+    S::Uri: notification_state::IsSet,
+    S::Author: notification_state::IsSet,
+    S::Reason: notification_state::IsSet,
     S::IndexedAt: notification_state::IsSet,
+    S::IsRead: notification_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Notification<'a> {
         Notification {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            is_read: self.__unsafe_private_named.3.unwrap(),
-            reason: self.__unsafe_private_named.4.unwrap(),
-            reason_subject: self.__unsafe_private_named.5,
-            record: self.__unsafe_private_named.6,
-            uri: self.__unsafe_private_named.7.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
+            is_read: self._fields.3.unwrap(),
+            reason: self._fields.4.unwrap(),
+            reason_subject: self._fields.5,
+            record: self._fields.6,
+            uri: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -618,14 +622,14 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Notification<'a> {
         Notification {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            is_read: self.__unsafe_private_named.3.unwrap(),
-            reason: self.__unsafe_private_named.4.unwrap(),
-            reason_subject: self.__unsafe_private_named.5,
-            record: self.__unsafe_private_named.6,
-            uri: self.__unsafe_private_named.7.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
+            is_read: self._fields.3.unwrap(),
+            reason: self._fields.4.unwrap(),
+            reason_subject: self._fields.5,
+            record: self._fields.6,
+            uri: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -890,92 +894,92 @@ pub mod notification_group_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Actors;
-        type Count;
-        type Subject;
         type Reason;
         type MostRecentAt;
+        type Count;
+        type Subject;
+        type Actors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Actors = Unset;
-        type Count = Unset;
-        type Subject = Unset;
         type Reason = Unset;
         type MostRecentAt = Unset;
-    }
-    ///State transition - sets the `actors` field to Set
-    pub struct SetActors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActors<S> {}
-    impl<S: State> State for SetActors<S> {
-        type Actors = Set<members::actors>;
-        type Count = S::Count;
-        type Subject = S::Subject;
-        type Reason = S::Reason;
-        type MostRecentAt = S::MostRecentAt;
-    }
-    ///State transition - sets the `count` field to Set
-    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCount<S> {}
-    impl<S: State> State for SetCount<S> {
-        type Actors = S::Actors;
-        type Count = Set<members::count>;
-        type Subject = S::Subject;
-        type Reason = S::Reason;
-        type MostRecentAt = S::MostRecentAt;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Actors = S::Actors;
-        type Count = S::Count;
-        type Subject = Set<members::subject>;
-        type Reason = S::Reason;
-        type MostRecentAt = S::MostRecentAt;
+        type Count = Unset;
+        type Subject = Unset;
+        type Actors = Unset;
     }
     ///State transition - sets the `reason` field to Set
     pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReason<S> {}
     impl<S: State> State for SetReason<S> {
-        type Actors = S::Actors;
-        type Count = S::Count;
-        type Subject = S::Subject;
         type Reason = Set<members::reason>;
         type MostRecentAt = S::MostRecentAt;
+        type Count = S::Count;
+        type Subject = S::Subject;
+        type Actors = S::Actors;
     }
     ///State transition - sets the `most_recent_at` field to Set
     pub struct SetMostRecentAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMostRecentAt<S> {}
     impl<S: State> State for SetMostRecentAt<S> {
-        type Actors = S::Actors;
-        type Count = S::Count;
-        type Subject = S::Subject;
         type Reason = S::Reason;
         type MostRecentAt = Set<members::most_recent_at>;
+        type Count = S::Count;
+        type Subject = S::Subject;
+        type Actors = S::Actors;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCount<S> {}
+    impl<S: State> State for SetCount<S> {
+        type Reason = S::Reason;
+        type MostRecentAt = S::MostRecentAt;
+        type Count = Set<members::count>;
+        type Subject = S::Subject;
+        type Actors = S::Actors;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Reason = S::Reason;
+        type MostRecentAt = S::MostRecentAt;
+        type Count = S::Count;
+        type Subject = Set<members::subject>;
+        type Actors = S::Actors;
+    }
+    ///State transition - sets the `actors` field to Set
+    pub struct SetActors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActors<S> {}
+    impl<S: State> State for SetActors<S> {
+        type Reason = S::Reason;
+        type MostRecentAt = S::MostRecentAt;
+        type Count = S::Count;
+        type Subject = S::Subject;
+        type Actors = Set<members::actors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `actors` field
-        pub struct actors(());
-        ///Marker type for the `count` field
-        pub struct count(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `reason` field
         pub struct reason(());
         ///Marker type for the `most_recent_at` field
         pub struct most_recent_at(());
+        ///Marker type for the `count` field
+        pub struct count(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `actors` field
+        pub struct actors(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct NotificationGroupBuilder<'a, S: notification_group_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<ProfileViewBasic<'a>>>,
         Option<i64>,
         Option<bool>,
@@ -983,7 +987,7 @@ pub struct NotificationGroupBuilder<'a, S: notification_group_state::State> {
         Option<notification::NotificationReason<'a>>,
         Option<NotificationGroupSubject<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> NotificationGroup<'a> {
@@ -997,9 +1001,9 @@ impl<'a> NotificationGroupBuilder<'a, notification_group_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NotificationGroupBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1014,11 +1018,11 @@ where
         mut self,
         value: impl Into<Vec<ProfileViewBasic<'a>>>,
     ) -> NotificationGroupBuilder<'a, notification_group_state::SetActors<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         NotificationGroupBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1033,11 +1037,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> NotificationGroupBuilder<'a, notification_group_state::SetCount<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         NotificationGroupBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1045,12 +1049,12 @@ where
 impl<'a, S: notification_group_state::State> NotificationGroupBuilder<'a, S> {
     /// Set the `isRead` field (optional)
     pub fn is_read(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `isRead` field to an Option value (optional)
     pub fn maybe_is_read(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1065,11 +1069,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> NotificationGroupBuilder<'a, notification_group_state::SetMostRecentAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         NotificationGroupBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1084,11 +1088,11 @@ where
         mut self,
         value: impl Into<notification::NotificationReason<'a>>,
     ) -> NotificationGroupBuilder<'a, notification_group_state::SetReason<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         NotificationGroupBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1103,11 +1107,11 @@ where
         mut self,
         value: impl Into<NotificationGroupSubject<'a>>,
     ) -> NotificationGroupBuilder<'a, notification_group_state::SetSubject<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         NotificationGroupBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1115,21 +1119,21 @@ where
 impl<'a, S> NotificationGroupBuilder<'a, S>
 where
     S: notification_group_state::State,
-    S::Actors: notification_group_state::IsSet,
-    S::Count: notification_group_state::IsSet,
-    S::Subject: notification_group_state::IsSet,
     S::Reason: notification_group_state::IsSet,
     S::MostRecentAt: notification_group_state::IsSet,
+    S::Count: notification_group_state::IsSet,
+    S::Subject: notification_group_state::IsSet,
+    S::Actors: notification_group_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> NotificationGroup<'a> {
         NotificationGroup {
-            actors: self.__unsafe_private_named.0.unwrap(),
-            count: self.__unsafe_private_named.1.unwrap(),
-            is_read: self.__unsafe_private_named.2,
-            most_recent_at: self.__unsafe_private_named.3.unwrap(),
-            reason: self.__unsafe_private_named.4.unwrap(),
-            subject: self.__unsafe_private_named.5.unwrap(),
+            actors: self._fields.0.unwrap(),
+            count: self._fields.1.unwrap(),
+            is_read: self._fields.2,
+            most_recent_at: self._fields.3.unwrap(),
+            reason: self._fields.4.unwrap(),
+            subject: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1139,12 +1143,12 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> NotificationGroup<'a> {
         NotificationGroup {
-            actors: self.__unsafe_private_named.0.unwrap(),
-            count: self.__unsafe_private_named.1.unwrap(),
-            is_read: self.__unsafe_private_named.2,
-            most_recent_at: self.__unsafe_private_named.3.unwrap(),
-            reason: self.__unsafe_private_named.4.unwrap(),
-            subject: self.__unsafe_private_named.5.unwrap(),
+            actors: self._fields.0.unwrap(),
+            count: self._fields.1.unwrap(),
+            is_read: self._fields.2,
+            most_recent_at: self._fields.3.unwrap(),
+            reason: self._fields.4.unwrap(),
+            subject: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1160,49 +1164,49 @@ pub mod subscription_update_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
         type NewEntries;
+        type UpdatedAt;
         type Notebook;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
         type NewEntries = Unset;
+        type UpdatedAt = Unset;
         type Notebook = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type NewEntries = S::NewEntries;
-        type Notebook = S::Notebook;
     }
     ///State transition - sets the `new_entries` field to Set
     pub struct SetNewEntries<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNewEntries<S> {}
     impl<S: State> State for SetNewEntries<S> {
-        type UpdatedAt = S::UpdatedAt;
         type NewEntries = Set<members::new_entries>;
+        type UpdatedAt = S::UpdatedAt;
+        type Notebook = S::Notebook;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type NewEntries = S::NewEntries;
+        type UpdatedAt = Set<members::updated_at>;
         type Notebook = S::Notebook;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotebook<S> {}
     impl<S: State> State for SetNotebook<S> {
-        type UpdatedAt = S::UpdatedAt;
         type NewEntries = S::NewEntries;
+        type UpdatedAt = S::UpdatedAt;
         type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `new_entries` field
         pub struct new_entries(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
     }
@@ -1210,14 +1214,14 @@ pub mod subscription_update_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct SubscriptionUpdateViewBuilder<'a, S: subscription_update_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<EntryView<'a>>>,
         Option<NotebookView<'a>>,
         Option<Datetime>,
         Option<Vec<EntryView<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SubscriptionUpdateView<'a> {
@@ -1234,9 +1238,9 @@ impl<'a> SubscriptionUpdateViewBuilder<'a, subscription_update_view_state::Empty
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SubscriptionUpdateViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1254,11 +1258,11 @@ where
         'a,
         subscription_update_view_state::SetNewEntries<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SubscriptionUpdateViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1276,11 +1280,11 @@ where
         'a,
         subscription_update_view_state::SetNotebook<S>,
     > {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SubscriptionUpdateViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1298,11 +1302,11 @@ where
         'a,
         subscription_update_view_state::SetUpdatedAt<S>,
     > {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SubscriptionUpdateViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1313,12 +1317,12 @@ impl<'a, S: subscription_update_view_state::State> SubscriptionUpdateViewBuilder
         mut self,
         value: impl Into<Option<Vec<EntryView<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `updatedEntries` field to an Option value (optional)
     pub fn maybe_updated_entries(mut self, value: Option<Vec<EntryView<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1326,17 +1330,17 @@ impl<'a, S: subscription_update_view_state::State> SubscriptionUpdateViewBuilder
 impl<'a, S> SubscriptionUpdateViewBuilder<'a, S>
 where
     S: subscription_update_view_state::State,
-    S::UpdatedAt: subscription_update_view_state::IsSet,
     S::NewEntries: subscription_update_view_state::IsSet,
+    S::UpdatedAt: subscription_update_view_state::IsSet,
     S::Notebook: subscription_update_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SubscriptionUpdateView<'a> {
         SubscriptionUpdateView {
-            new_entries: self.__unsafe_private_named.0.unwrap(),
-            notebook: self.__unsafe_private_named.1.unwrap(),
-            updated_at: self.__unsafe_private_named.2.unwrap(),
-            updated_entries: self.__unsafe_private_named.3,
+            new_entries: self._fields.0.unwrap(),
+            notebook: self._fields.1.unwrap(),
+            updated_at: self._fields.2.unwrap(),
+            updated_entries: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -1346,10 +1350,10 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> SubscriptionUpdateView<'a> {
         SubscriptionUpdateView {
-            new_entries: self.__unsafe_private_named.0.unwrap(),
-            notebook: self.__unsafe_private_named.1.unwrap(),
-            updated_at: self.__unsafe_private_named.2.unwrap(),
-            updated_entries: self.__unsafe_private_named.3,
+            new_entries: self._fields.0.unwrap(),
+            notebook: self._fields.1.unwrap(),
+            updated_at: self._fields.2.unwrap(),
+            updated_entries: self._fields.3,
             extra_data: Some(extra_data),
         }
     }

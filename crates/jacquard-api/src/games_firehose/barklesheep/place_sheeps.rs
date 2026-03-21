@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -139,12 +142,9 @@ pub mod place_sheeps_state {
 
 /// Builder for constructing an instance of this type
 pub struct PlaceSheepsBuilder<'a, S: place_sheeps_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<CowStr<'a>>,
-        Option<Vec<place_sheeps::SheepPlacement<'a>>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Vec<place_sheeps::SheepPlacement<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> PlaceSheeps<'a> {
@@ -158,9 +158,9 @@ impl<'a> PlaceSheepsBuilder<'a, place_sheeps_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PlaceSheepsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -175,11 +175,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PlaceSheepsBuilder<'a, place_sheeps_state::SetGameId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PlaceSheepsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -194,11 +194,11 @@ where
         mut self,
         value: impl Into<Vec<place_sheeps::SheepPlacement<'a>>>,
     ) -> PlaceSheepsBuilder<'a, place_sheeps_state::SetSheeps<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PlaceSheepsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -212,8 +212,8 @@ where
     /// Build the final struct
     pub fn build(self) -> PlaceSheeps<'a> {
         PlaceSheeps {
-            game_id: self.__unsafe_private_named.0.unwrap(),
-            sheeps: self.__unsafe_private_named.1.unwrap(),
+            game_id: self._fields.0.unwrap(),
+            sheeps: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -226,8 +226,8 @@ where
         >,
     ) -> PlaceSheeps<'a> {
         PlaceSheeps {
-            game_id: self.__unsafe_private_named.0.unwrap(),
-            sheeps: self.__unsafe_private_named.1.unwrap(),
+            game_id: self._fields.0.unwrap(),
+            sheeps: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -243,59 +243,59 @@ pub mod sheep_placement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
-        type Horizontal;
         type Start;
+        type Horizontal;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
-        type Horizontal = Unset;
         type Start = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Horizontal = S::Horizontal;
-        type Start = S::Start;
-    }
-    ///State transition - sets the `horizontal` field to Set
-    pub struct SetHorizontal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHorizontal<S> {}
-    impl<S: State> State for SetHorizontal<S> {
-        type Type = S::Type;
-        type Horizontal = Set<members::horizontal>;
-        type Start = S::Start;
+        type Horizontal = Unset;
+        type Type = Unset;
     }
     ///State transition - sets the `start` field to Set
     pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStart<S> {}
     impl<S: State> State for SetStart<S> {
-        type Type = S::Type;
-        type Horizontal = S::Horizontal;
         type Start = Set<members::start>;
+        type Horizontal = S::Horizontal;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `horizontal` field to Set
+    pub struct SetHorizontal<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHorizontal<S> {}
+    impl<S: State> State for SetHorizontal<S> {
+        type Start = S::Start;
+        type Horizontal = Set<members::horizontal>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Start = S::Start;
+        type Horizontal = S::Horizontal;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
-        ///Marker type for the `horizontal` field
-        pub struct horizontal(());
         ///Marker type for the `start` field
         pub struct start(());
+        ///Marker type for the `horizontal` field
+        pub struct horizontal(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SheepPlacementBuilder<'a, S: sheep_placement_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>, Option<i64>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<i64>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SheepPlacement<'a> {
@@ -309,9 +309,9 @@ impl<'a> SheepPlacementBuilder<'a, sheep_placement_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SheepPlacementBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -326,11 +326,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> SheepPlacementBuilder<'a, sheep_placement_state::SetHorizontal<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SheepPlacementBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -345,11 +345,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SheepPlacementBuilder<'a, sheep_placement_state::SetStart<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SheepPlacementBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -364,11 +364,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SheepPlacementBuilder<'a, sheep_placement_state::SetType<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SheepPlacementBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -376,16 +376,16 @@ where
 impl<'a, S> SheepPlacementBuilder<'a, S>
 where
     S: sheep_placement_state::State,
-    S::Type: sheep_placement_state::IsSet,
-    S::Horizontal: sheep_placement_state::IsSet,
     S::Start: sheep_placement_state::IsSet,
+    S::Horizontal: sheep_placement_state::IsSet,
+    S::Type: sheep_placement_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SheepPlacement<'a> {
         SheepPlacement {
-            horizontal: self.__unsafe_private_named.0.unwrap(),
-            start: self.__unsafe_private_named.1.unwrap(),
-            r#type: self.__unsafe_private_named.2.unwrap(),
+            horizontal: self._fields.0.unwrap(),
+            start: self._fields.1.unwrap(),
+            r#type: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -398,9 +398,9 @@ where
         >,
     ) -> SheepPlacement<'a> {
         SheepPlacement {
-            horizontal: self.__unsafe_private_named.0.unwrap(),
-            start: self.__unsafe_private_named.1.unwrap(),
-            r#type: self.__unsafe_private_named.2.unwrap(),
+            horizontal: self._fields.0.unwrap(),
+            start: self._fields.1.unwrap(),
+            r#type: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

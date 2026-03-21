@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -145,14 +148,9 @@ pub mod list_records_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListRecordsBuilder<'a, S: list_records_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Nsid<'a>>,
-        Option<CowStr<'a>>,
-        Option<i64>,
-        Option<bool>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Nsid<'a>>, Option<CowStr<'a>>, Option<i64>, Option<bool>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ListRecords<'a> {
@@ -166,9 +164,9 @@ impl<'a> ListRecordsBuilder<'a, list_records_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListRecordsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -183,11 +181,11 @@ where
         mut self,
         value: impl Into<Nsid<'a>>,
     ) -> ListRecordsBuilder<'a, list_records_state::SetCollection<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ListRecordsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -195,12 +193,12 @@ where
 impl<'a, S: list_records_state::State> ListRecordsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -208,12 +206,12 @@ impl<'a, S: list_records_state::State> ListRecordsBuilder<'a, S> {
 impl<'a, S: list_records_state::State> ListRecordsBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -221,12 +219,12 @@ impl<'a, S: list_records_state::State> ListRecordsBuilder<'a, S> {
 impl<'a, S: list_records_state::State> ListRecordsBuilder<'a, S> {
     /// Set the `reverse` field (optional)
     pub fn reverse(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `reverse` field to an Option value (optional)
     pub fn maybe_reverse(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -239,10 +237,10 @@ where
     /// Build the final struct
     pub fn build(self) -> ListRecords<'a> {
         ListRecords {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            cursor: self.__unsafe_private_named.1,
-            limit: self.__unsafe_private_named.2,
-            reverse: self.__unsafe_private_named.3,
+            collection: self._fields.0.unwrap(),
+            cursor: self._fields.1,
+            limit: self._fields.2,
+            reverse: self._fields.3,
         }
     }
 }
@@ -258,58 +256,58 @@ pub mod record_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Uri;
-        type Value;
         type Strategy;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Uri = Unset;
-        type Value = Unset;
         type Strategy = Unset;
+        type Value = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
         type Uri = Set<members::uri>;
+        type Strategy = S::Strategy;
         type Value = S::Value;
-        type Strategy = S::Strategy;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Uri = S::Uri;
-        type Value = Set<members::value>;
-        type Strategy = S::Strategy;
     }
     ///State transition - sets the `strategy` field to Set
     pub struct SetStrategy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStrategy<S> {}
     impl<S: State> State for SetStrategy<S> {
         type Uri = S::Uri;
-        type Value = S::Value;
         type Strategy = Set<members::strategy>;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Uri = S::Uri;
+        type Strategy = S::Strategy;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `strategy` field
         pub struct strategy(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RecordBuilder<'a, S: record_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Strategy<'a>>, Option<AtUri<'a>>, Option<Data<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Strategy<'a>>, Option<AtUri<'a>>, Option<Data<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Record<'a> {
@@ -323,9 +321,9 @@ impl<'a> RecordBuilder<'a, record_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -340,11 +338,11 @@ where
         mut self,
         value: impl Into<Strategy<'a>>,
     ) -> RecordBuilder<'a, record_state::SetStrategy<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -359,11 +357,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> RecordBuilder<'a, record_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -378,11 +376,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> RecordBuilder<'a, record_state::SetValue<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -391,15 +389,15 @@ impl<'a, S> RecordBuilder<'a, S>
 where
     S: record_state::State,
     S::Uri: record_state::IsSet,
-    S::Value: record_state::IsSet,
     S::Strategy: record_state::IsSet,
+    S::Value: record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Record<'a> {
         Record {
-            strategy: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
-            value: self.__unsafe_private_named.2.unwrap(),
+            strategy: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
+            value: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -409,9 +407,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Record<'a> {
         Record {
-            strategy: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
-            value: self.__unsafe_private_named.2.unwrap(),
+            strategy: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
+            value: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

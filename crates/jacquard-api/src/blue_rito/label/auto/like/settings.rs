@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -178,13 +181,13 @@ pub mod settings_state {
 
 /// Builder for constructing an instance of this type
 pub struct SettingsBuilder<'a, S: settings_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<settings::PostRef<'a>>,
         Option<Datetime>,
         Option<settings::PostRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Settings<'a> {
@@ -198,9 +201,9 @@ impl<'a> SettingsBuilder<'a, settings_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SettingsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -215,11 +218,11 @@ where
         mut self,
         value: impl Into<settings::PostRef<'a>>,
     ) -> SettingsBuilder<'a, settings_state::SetApply<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SettingsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -234,11 +237,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SettingsBuilder<'a, settings_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SettingsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -246,12 +249,12 @@ where
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `delete` field (optional)
     pub fn delete(mut self, value: impl Into<Option<settings::PostRef<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `delete` field to an Option value (optional)
     pub fn maybe_delete(mut self, value: Option<settings::PostRef<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -265,9 +268,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Settings<'a> {
         Settings {
-            apply: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            delete: self.__unsafe_private_named.2,
+            apply: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            delete: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -280,9 +283,9 @@ where
         >,
     ) -> Settings<'a> {
         Settings {
-            apply: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            delete: self.__unsafe_private_named.2,
+            apply: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            delete: self._fields.2,
             extra_data: Some(extra_data),
         }
     }
@@ -434,9 +437,9 @@ pub mod post_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct PostRefBuilder<'a, S: post_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<UriValue<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> PostRef<'a> {
@@ -450,9 +453,9 @@ impl<'a> PostRefBuilder<'a, post_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PostRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -467,11 +470,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PostRefBuilder<'a, post_ref_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PostRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -486,11 +489,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> PostRefBuilder<'a, post_ref_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PostRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -504,8 +507,8 @@ where
     /// Build the final struct
     pub fn build(self) -> PostRef<'a> {
         PostRef {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -518,8 +521,8 @@ where
         >,
     ) -> PostRef<'a> {
         PostRef {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

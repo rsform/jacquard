@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -180,9 +183,9 @@ pub mod m_state {
 
 /// Builder for constructing an instance of this type
 pub struct MBuilder<'a, S: m_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<bool>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<bool>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> M<'a> {
@@ -196,9 +199,9 @@ impl<'a> MBuilder<'a, m_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -213,11 +216,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> MBuilder<'a, m_state::SetCommonName<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -225,12 +228,12 @@ where
 impl<'a, S: m_state::State> MBuilder<'a, S> {
     /// Set the `edible` field (optional)
     pub fn edible(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `edible` field to an Option value (optional)
     pub fn maybe_edible(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -238,12 +241,12 @@ impl<'a, S: m_state::State> MBuilder<'a, S> {
 impl<'a, S: m_state::State> MBuilder<'a, S> {
     /// Set the `species` field (optional)
     pub fn species(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `species` field to an Option value (optional)
     pub fn maybe_species(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -256,9 +259,9 @@ where
     /// Build the final struct
     pub fn build(self) -> M<'a> {
         M {
-            common_name: self.__unsafe_private_named.0.unwrap(),
-            edible: self.__unsafe_private_named.1,
-            species: self.__unsafe_private_named.2,
+            common_name: self._fields.0.unwrap(),
+            edible: self._fields.1,
+            species: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -271,9 +274,9 @@ where
         >,
     ) -> M<'a> {
         M {
-            common_name: self.__unsafe_private_named.0.unwrap(),
-            edible: self.__unsafe_private_named.1,
-            species: self.__unsafe_private_named.2,
+            common_name: self._fields.0.unwrap(),
+            edible: self._fields.1,
+            species: self._fields.2,
             extra_data: Some(extra_data),
         }
     }

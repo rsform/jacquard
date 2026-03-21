@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -837,8 +840,8 @@ pub mod brand_state {
 
 /// Builder for constructing an instance of this type
 pub struct BrandBuilder<'a, S: brand_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<BrandAdditionalType<'a>>,
         Option<BrandAggregateRating<'a>>,
         Option<BrandAlternateName<'a>>,
@@ -856,7 +859,7 @@ pub struct BrandBuilder<'a, S: brand_state::State> {
         Option<BrandSubjectOf<'a>>,
         Option<BrandUrl<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Brand<'a> {
@@ -870,8 +873,8 @@ impl<'a> BrandBuilder<'a, brand_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BrandBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -889,7 +892,7 @@ impl<'a> BrandBuilder<'a, brand_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -900,7 +903,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BrandAdditionalType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
@@ -908,7 +911,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
         mut self,
         value: Option<BrandAdditionalType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -919,7 +922,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BrandAggregateRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
@@ -927,7 +930,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
         mut self,
         value: Option<BrandAggregateRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -938,7 +941,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BrandAlternateName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
@@ -946,7 +949,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
         mut self,
         value: Option<BrandAlternateName<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -957,12 +960,12 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BrandDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<BrandDescription<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -973,7 +976,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BrandDisambiguatingDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `disambiguatingDescription` field to an Option value (optional)
@@ -981,7 +984,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
         mut self,
         value: Option<BrandDisambiguatingDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -989,12 +992,12 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
 impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     /// Set the `identifier` field (optional)
     pub fn identifier(mut self, value: impl Into<Option<BrandIdentifier<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
     pub fn maybe_identifier(mut self, value: Option<BrandIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1002,12 +1005,12 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
 impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<BrandImage<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<BrandImage<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1015,12 +1018,12 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
 impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     /// Set the `logo` field (optional)
     pub fn logo(mut self, value: impl Into<Option<BrandLogo<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `logo` field to an Option value (optional)
     pub fn maybe_logo(mut self, value: Option<BrandLogo<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -1031,7 +1034,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BrandMainEntityOfPage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
@@ -1039,7 +1042,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
         mut self,
         value: Option<BrandMainEntityOfPage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -1047,12 +1050,12 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
 impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<BrandName<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<BrandName<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -1063,7 +1066,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BrandPotentialAction<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
@@ -1071,7 +1074,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
         mut self,
         value: Option<BrandPotentialAction<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -1079,12 +1082,12 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
 impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<BrandReview<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
     pub fn maybe_review(mut self, value: Option<BrandReview<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -1092,12 +1095,12 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
 impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<BrandSameAs<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
     pub fn maybe_same_as(mut self, value: Option<BrandSameAs<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -1105,12 +1108,12 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
 impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     /// Set the `slogan` field (optional)
     pub fn slogan(mut self, value: impl Into<Option<BrandSlogan<'a>>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `slogan` field to an Option value (optional)
     pub fn maybe_slogan(mut self, value: Option<BrandSlogan<'a>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -1118,12 +1121,12 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
 impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(mut self, value: impl Into<Option<BrandSubjectOf<'a>>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
     pub fn maybe_subject_of(mut self, value: Option<BrandSubjectOf<'a>>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -1131,12 +1134,12 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
 impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<BrandUrl<'a>>>) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<BrandUrl<'a>>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -1148,22 +1151,22 @@ where
     /// Build the final struct
     pub fn build(self) -> Brand<'a> {
         Brand {
-            additional_type: self.__unsafe_private_named.0,
-            aggregate_rating: self.__unsafe_private_named.1,
-            alternate_name: self.__unsafe_private_named.2,
-            description: self.__unsafe_private_named.3,
-            disambiguating_description: self.__unsafe_private_named.4,
-            identifier: self.__unsafe_private_named.5,
-            image: self.__unsafe_private_named.6,
-            logo: self.__unsafe_private_named.7,
-            main_entity_of_page: self.__unsafe_private_named.8,
-            name: self.__unsafe_private_named.9,
-            potential_action: self.__unsafe_private_named.10,
-            review: self.__unsafe_private_named.11,
-            same_as: self.__unsafe_private_named.12,
-            slogan: self.__unsafe_private_named.13,
-            subject_of: self.__unsafe_private_named.14,
-            url: self.__unsafe_private_named.15,
+            additional_type: self._fields.0,
+            aggregate_rating: self._fields.1,
+            alternate_name: self._fields.2,
+            description: self._fields.3,
+            disambiguating_description: self._fields.4,
+            identifier: self._fields.5,
+            image: self._fields.6,
+            logo: self._fields.7,
+            main_entity_of_page: self._fields.8,
+            name: self._fields.9,
+            potential_action: self._fields.10,
+            review: self._fields.11,
+            same_as: self._fields.12,
+            slogan: self._fields.13,
+            subject_of: self._fields.14,
+            url: self._fields.15,
             extra_data: Default::default(),
         }
     }
@@ -1173,22 +1176,22 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Brand<'a> {
         Brand {
-            additional_type: self.__unsafe_private_named.0,
-            aggregate_rating: self.__unsafe_private_named.1,
-            alternate_name: self.__unsafe_private_named.2,
-            description: self.__unsafe_private_named.3,
-            disambiguating_description: self.__unsafe_private_named.4,
-            identifier: self.__unsafe_private_named.5,
-            image: self.__unsafe_private_named.6,
-            logo: self.__unsafe_private_named.7,
-            main_entity_of_page: self.__unsafe_private_named.8,
-            name: self.__unsafe_private_named.9,
-            potential_action: self.__unsafe_private_named.10,
-            review: self.__unsafe_private_named.11,
-            same_as: self.__unsafe_private_named.12,
-            slogan: self.__unsafe_private_named.13,
-            subject_of: self.__unsafe_private_named.14,
-            url: self.__unsafe_private_named.15,
+            additional_type: self._fields.0,
+            aggregate_rating: self._fields.1,
+            alternate_name: self._fields.2,
+            description: self._fields.3,
+            disambiguating_description: self._fields.4,
+            identifier: self._fields.5,
+            image: self._fields.6,
+            logo: self._fields.7,
+            main_entity_of_page: self._fields.8,
+            name: self._fields.9,
+            potential_action: self._fields.10,
+            review: self._fields.11,
+            same_as: self._fields.12,
+            slogan: self._fields.13,
+            subject_of: self._fields.14,
+            url: self._fields.15,
             extra_data: Some(extra_data),
         }
     }

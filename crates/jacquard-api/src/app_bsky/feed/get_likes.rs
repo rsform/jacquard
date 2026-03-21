@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -116,63 +119,59 @@ pub mod like_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type IndexedAt;
         type Actor;
+        type IndexedAt;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type IndexedAt = Unset;
         type Actor = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type IndexedAt = S::IndexedAt;
-        type Actor = S::Actor;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type CreatedAt = S::CreatedAt;
-        type IndexedAt = Set<members::indexed_at>;
-        type Actor = S::Actor;
+        type IndexedAt = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `actor` field to Set
     pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActor<S> {}
     impl<S: State> State for SetActor<S> {
-        type CreatedAt = S::CreatedAt;
-        type IndexedAt = S::IndexedAt;
         type Actor = Set<members::actor>;
+        type IndexedAt = S::IndexedAt;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Actor = S::Actor;
+        type IndexedAt = Set<members::indexed_at>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Actor = S::Actor;
+        type IndexedAt = S::IndexedAt;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `actor` field
         pub struct actor(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LikeBuilder<'a, S: like_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<ProfileView<'a>>,
-        Option<Datetime>,
-        Option<Datetime>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<ProfileView<'a>>, Option<Datetime>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Like<'a> {
@@ -186,9 +185,9 @@ impl<'a> LikeBuilder<'a, like_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LikeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -203,11 +202,11 @@ where
         mut self,
         value: impl Into<ProfileView<'a>>,
     ) -> LikeBuilder<'a, like_state::SetActor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LikeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -222,11 +221,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LikeBuilder<'a, like_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LikeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -241,11 +240,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LikeBuilder<'a, like_state::SetIndexedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LikeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -253,16 +252,16 @@ where
 impl<'a, S> LikeBuilder<'a, S>
 where
     S: like_state::State,
-    S::CreatedAt: like_state::IsSet,
-    S::IndexedAt: like_state::IsSet,
     S::Actor: like_state::IsSet,
+    S::IndexedAt: like_state::IsSet,
+    S::CreatedAt: like_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Like<'a> {
         Like {
-            actor: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
+            actor: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -275,9 +274,9 @@ where
         >,
     ) -> Like<'a> {
         Like {
-            actor: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
+            actor: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -431,14 +430,9 @@ pub mod get_likes_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetLikesBuilder<'a, S: get_likes_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Cid<'a>>,
-        Option<CowStr<'a>>,
-        Option<i64>,
-        Option<AtUri<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Cid<'a>>, Option<CowStr<'a>>, Option<i64>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetLikes<'a> {
@@ -452,9 +446,9 @@ impl<'a> GetLikesBuilder<'a, get_likes_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetLikesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -462,12 +456,12 @@ impl<'a> GetLikesBuilder<'a, get_likes_state::Empty> {
 impl<'a, S: get_likes_state::State> GetLikesBuilder<'a, S> {
     /// Set the `cid` field (optional)
     pub fn cid(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cid` field to an Option value (optional)
     pub fn maybe_cid(mut self, value: Option<Cid<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -475,12 +469,12 @@ impl<'a, S: get_likes_state::State> GetLikesBuilder<'a, S> {
 impl<'a, S: get_likes_state::State> GetLikesBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -488,12 +482,12 @@ impl<'a, S: get_likes_state::State> GetLikesBuilder<'a, S> {
 impl<'a, S: get_likes_state::State> GetLikesBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -508,11 +502,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> GetLikesBuilder<'a, get_likes_state::SetUri<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         GetLikesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -525,10 +519,10 @@ where
     /// Build the final struct
     pub fn build(self) -> GetLikes<'a> {
         GetLikes {
-            cid: self.__unsafe_private_named.0,
-            cursor: self.__unsafe_private_named.1,
-            limit: self.__unsafe_private_named.2,
-            uri: self.__unsafe_private_named.3.unwrap(),
+            cid: self._fields.0,
+            cursor: self._fields.1,
+            limit: self._fields.2,
+            uri: self._fields.3.unwrap(),
         }
     }
 }

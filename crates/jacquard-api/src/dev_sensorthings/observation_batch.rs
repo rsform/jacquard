@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -255,49 +258,45 @@ pub mod batch_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type T;
         type Result;
+        type T;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type T = Unset;
         type Result = Unset;
-    }
-    ///State transition - sets the `t` field to Set
-    pub struct SetT<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetT<S> {}
-    impl<S: State> State for SetT<S> {
-        type T = Set<members::t>;
-        type Result = S::Result;
+        type T = Unset;
     }
     ///State transition - sets the `result` field to Set
     pub struct SetResult<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetResult<S> {}
     impl<S: State> State for SetResult<S> {
-        type T = S::T;
         type Result = Set<members::result>;
+        type T = S::T;
+    }
+    ///State transition - sets the `t` field to Set
+    pub struct SetT<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetT<S> {}
+    impl<S: State> State for SetT<S> {
+        type Result = S::Result;
+        type T = Set<members::t>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `t` field
-        pub struct t(());
         ///Marker type for the `result` field
         pub struct result(());
+        ///Marker type for the `t` field
+        pub struct t(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BatchEntryBuilder<'a, S: batch_entry_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<BatchEntryQ<'a>>,
-        Option<BatchEntryResult<'a>>,
-        Option<Datetime>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<BatchEntryQ<'a>>, Option<BatchEntryResult<'a>>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> BatchEntry<'a> {
@@ -311,9 +310,9 @@ impl<'a> BatchEntryBuilder<'a, batch_entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BatchEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -321,12 +320,12 @@ impl<'a> BatchEntryBuilder<'a, batch_entry_state::Empty> {
 impl<'a, S: batch_entry_state::State> BatchEntryBuilder<'a, S> {
     /// Set the `q` field (optional)
     pub fn q(mut self, value: impl Into<Option<BatchEntryQ<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `q` field to an Option value (optional)
     pub fn maybe_q(mut self, value: Option<BatchEntryQ<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -341,11 +340,11 @@ where
         mut self,
         value: impl Into<BatchEntryResult<'a>>,
     ) -> BatchEntryBuilder<'a, batch_entry_state::SetResult<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         BatchEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -360,11 +359,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> BatchEntryBuilder<'a, batch_entry_state::SetT<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         BatchEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -372,15 +371,15 @@ where
 impl<'a, S> BatchEntryBuilder<'a, S>
 where
     S: batch_entry_state::State,
-    S::T: batch_entry_state::IsSet,
     S::Result: batch_entry_state::IsSet,
+    S::T: batch_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BatchEntry<'a> {
         BatchEntry {
-            q: self.__unsafe_private_named.0,
-            result: self.__unsafe_private_named.1.unwrap(),
-            t: self.__unsafe_private_named.2.unwrap(),
+            q: self._fields.0,
+            result: self._fields.1.unwrap(),
+            t: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -390,9 +389,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> BatchEntry<'a> {
         BatchEntry {
-            q: self.__unsafe_private_named.0,
-            result: self.__unsafe_private_named.1.unwrap(),
-            t: self.__unsafe_private_named.2.unwrap(),
+            q: self._fields.0,
+            result: self._fields.1.unwrap(),
+            t: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -533,80 +532,80 @@ pub mod observation_batch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Datastream;
         type Observations;
         type WindowStart;
         type WindowEnd;
+        type Datastream;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Datastream = Unset;
         type Observations = Unset;
         type WindowStart = Unset;
         type WindowEnd = Unset;
-    }
-    ///State transition - sets the `datastream` field to Set
-    pub struct SetDatastream<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDatastream<S> {}
-    impl<S: State> State for SetDatastream<S> {
-        type Datastream = Set<members::datastream>;
-        type Observations = S::Observations;
-        type WindowStart = S::WindowStart;
-        type WindowEnd = S::WindowEnd;
+        type Datastream = Unset;
     }
     ///State transition - sets the `observations` field to Set
     pub struct SetObservations<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetObservations<S> {}
     impl<S: State> State for SetObservations<S> {
-        type Datastream = S::Datastream;
         type Observations = Set<members::observations>;
         type WindowStart = S::WindowStart;
         type WindowEnd = S::WindowEnd;
+        type Datastream = S::Datastream;
     }
     ///State transition - sets the `window_start` field to Set
     pub struct SetWindowStart<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWindowStart<S> {}
     impl<S: State> State for SetWindowStart<S> {
-        type Datastream = S::Datastream;
         type Observations = S::Observations;
         type WindowStart = Set<members::window_start>;
         type WindowEnd = S::WindowEnd;
+        type Datastream = S::Datastream;
     }
     ///State transition - sets the `window_end` field to Set
     pub struct SetWindowEnd<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWindowEnd<S> {}
     impl<S: State> State for SetWindowEnd<S> {
-        type Datastream = S::Datastream;
         type Observations = S::Observations;
         type WindowStart = S::WindowStart;
         type WindowEnd = Set<members::window_end>;
+        type Datastream = S::Datastream;
+    }
+    ///State transition - sets the `datastream` field to Set
+    pub struct SetDatastream<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDatastream<S> {}
+    impl<S: State> State for SetDatastream<S> {
+        type Observations = S::Observations;
+        type WindowStart = S::WindowStart;
+        type WindowEnd = S::WindowEnd;
+        type Datastream = Set<members::datastream>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `datastream` field
-        pub struct datastream(());
         ///Marker type for the `observations` field
         pub struct observations(());
         ///Marker type for the `window_start` field
         pub struct window_start(());
         ///Marker type for the `window_end` field
         pub struct window_end(());
+        ///Marker type for the `datastream` field
+        pub struct datastream(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ObservationBatchBuilder<'a, S: observation_batch_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AtUri<'a>>,
         Option<Vec<observation_batch::BatchEntry<'a>>>,
         Option<Datetime>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ObservationBatch<'a> {
@@ -620,9 +619,9 @@ impl<'a> ObservationBatchBuilder<'a, observation_batch_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ObservationBatchBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -637,11 +636,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ObservationBatchBuilder<'a, observation_batch_state::SetDatastream<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ObservationBatchBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -656,11 +655,11 @@ where
         mut self,
         value: impl Into<Vec<observation_batch::BatchEntry<'a>>>,
     ) -> ObservationBatchBuilder<'a, observation_batch_state::SetObservations<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ObservationBatchBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -675,11 +674,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ObservationBatchBuilder<'a, observation_batch_state::SetWindowEnd<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ObservationBatchBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -694,11 +693,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ObservationBatchBuilder<'a, observation_batch_state::SetWindowStart<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ObservationBatchBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -706,18 +705,18 @@ where
 impl<'a, S> ObservationBatchBuilder<'a, S>
 where
     S: observation_batch_state::State,
-    S::Datastream: observation_batch_state::IsSet,
     S::Observations: observation_batch_state::IsSet,
     S::WindowStart: observation_batch_state::IsSet,
     S::WindowEnd: observation_batch_state::IsSet,
+    S::Datastream: observation_batch_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ObservationBatch<'a> {
         ObservationBatch {
-            datastream: self.__unsafe_private_named.0.unwrap(),
-            observations: self.__unsafe_private_named.1.unwrap(),
-            window_end: self.__unsafe_private_named.2.unwrap(),
-            window_start: self.__unsafe_private_named.3.unwrap(),
+            datastream: self._fields.0.unwrap(),
+            observations: self._fields.1.unwrap(),
+            window_end: self._fields.2.unwrap(),
+            window_start: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -727,10 +726,10 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ObservationBatch<'a> {
         ObservationBatch {
-            datastream: self.__unsafe_private_named.0.unwrap(),
-            observations: self.__unsafe_private_named.1.unwrap(),
-            window_end: self.__unsafe_private_named.2.unwrap(),
-            window_start: self.__unsafe_private_named.3.unwrap(),
+            datastream: self._fields.0.unwrap(),
+            observations: self._fields.1.unwrap(),
+            window_end: self._fields.2.unwrap(),
+            window_start: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

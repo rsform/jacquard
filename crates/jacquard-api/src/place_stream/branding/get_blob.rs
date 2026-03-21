@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::deps::bytes::Bytes;
@@ -140,9 +141,9 @@ pub mod get_blob_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetBlobBuilder<'a, S: get_blob_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetBlob<'a> {
@@ -156,9 +157,9 @@ impl<'a> GetBlobBuilder<'a, get_blob_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetBlobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -166,12 +167,12 @@ impl<'a> GetBlobBuilder<'a, get_blob_state::Empty> {
 impl<'a, S: get_blob_state::State> GetBlobBuilder<'a, S> {
     /// Set the `broadcaster` field (optional)
     pub fn broadcaster(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `broadcaster` field to an Option value (optional)
     pub fn maybe_broadcaster(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -186,11 +187,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GetBlobBuilder<'a, get_blob_state::SetKey<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GetBlobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -203,8 +204,8 @@ where
     /// Build the final struct
     pub fn build(self) -> GetBlob<'a> {
         GetBlob {
-            broadcaster: self.__unsafe_private_named.0,
-            key: self.__unsafe_private_named.1.unwrap(),
+            broadcaster: self._fields.0,
+            key: self._fields.1.unwrap(),
         }
     }
 }

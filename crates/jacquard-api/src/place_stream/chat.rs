@@ -9,7 +9,11 @@ pub mod gate;
 pub mod message;
 pub mod profile;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -87,91 +91,91 @@ pub mod message_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Cid;
-        type Author;
-        type IndexedAt;
-        type Record;
         type Uri;
+        type Record;
+        type IndexedAt;
+        type Author;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Cid = Unset;
-        type Author = Unset;
-        type IndexedAt = Unset;
-        type Record = Unset;
         type Uri = Unset;
+        type Record = Unset;
+        type IndexedAt = Unset;
+        type Author = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
         type Cid = Set<members::cid>;
-        type Author = S::Author;
-        type IndexedAt = S::IndexedAt;
+        type Uri = S::Uri;
         type Record = S::Record;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Cid = S::Cid;
-        type Author = Set<members::author>;
         type IndexedAt = S::IndexedAt;
-        type Record = S::Record;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Cid = S::Cid;
         type Author = S::Author;
-        type IndexedAt = Set<members::indexed_at>;
-        type Record = S::Record;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Cid = S::Cid;
-        type Author = S::Author;
-        type IndexedAt = S::IndexedAt;
-        type Record = Set<members::record>;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
         type Cid = S::Cid;
-        type Author = S::Author;
-        type IndexedAt = S::IndexedAt;
-        type Record = S::Record;
         type Uri = Set<members::uri>;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Record = Set<members::record>;
+        type IndexedAt = S::IndexedAt;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Record = S::Record;
+        type IndexedAt = Set<members::indexed_at>;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type Record = S::Record;
+        type IndexedAt = S::IndexedAt;
+        type Author = Set<members::author>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `author` field
-        pub struct author(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `record` field
+        pub struct record(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `author` field
+        pub struct author(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MessageViewBuilder<'a, S: message_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ProfileViewBasic<'a>>,
         Option<Profile<'a>>,
         Option<Cid<'a>>,
@@ -181,7 +185,7 @@ pub struct MessageViewBuilder<'a, S: message_view_state::State> {
         Option<MessageViewReplyTo<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> MessageView<'a> {
@@ -195,9 +199,9 @@ impl<'a> MessageViewBuilder<'a, message_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MessageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -212,11 +216,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> MessageViewBuilder<'a, message_view_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MessageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -224,12 +228,12 @@ where
 impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
     /// Set the `chatProfile` field (optional)
     pub fn chat_profile(mut self, value: impl Into<Option<Profile<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `chatProfile` field to an Option value (optional)
     pub fn maybe_chat_profile(mut self, value: Option<Profile<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -244,11 +248,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> MessageViewBuilder<'a, message_view_state::SetCid<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         MessageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -256,12 +260,12 @@ where
 impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
     /// Set the `deleted` field (optional)
     pub fn deleted(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `deleted` field to an Option value (optional)
     pub fn maybe_deleted(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -276,11 +280,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> MessageViewBuilder<'a, message_view_state::SetIndexedAt<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         MessageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -295,11 +299,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> MessageViewBuilder<'a, message_view_state::SetRecord<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         MessageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -307,12 +311,12 @@ where
 impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
     /// Set the `replyTo` field (optional)
     pub fn reply_to(mut self, value: impl Into<Option<MessageViewReplyTo<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `replyTo` field to an Option value (optional)
     pub fn maybe_reply_to(mut self, value: Option<MessageViewReplyTo<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -327,11 +331,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> MessageViewBuilder<'a, message_view_state::SetUri<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         MessageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -340,22 +344,22 @@ impl<'a, S> MessageViewBuilder<'a, S>
 where
     S: message_view_state::State,
     S::Cid: message_view_state::IsSet,
-    S::Author: message_view_state::IsSet,
-    S::IndexedAt: message_view_state::IsSet,
-    S::Record: message_view_state::IsSet,
     S::Uri: message_view_state::IsSet,
+    S::Record: message_view_state::IsSet,
+    S::IndexedAt: message_view_state::IsSet,
+    S::Author: message_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MessageView<'a> {
         MessageView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            chat_profile: self.__unsafe_private_named.1,
-            cid: self.__unsafe_private_named.2.unwrap(),
-            deleted: self.__unsafe_private_named.3,
-            indexed_at: self.__unsafe_private_named.4.unwrap(),
-            record: self.__unsafe_private_named.5.unwrap(),
-            reply_to: self.__unsafe_private_named.6,
-            uri: self.__unsafe_private_named.7.unwrap(),
+            author: self._fields.0.unwrap(),
+            chat_profile: self._fields.1,
+            cid: self._fields.2.unwrap(),
+            deleted: self._fields.3,
+            indexed_at: self._fields.4.unwrap(),
+            record: self._fields.5.unwrap(),
+            reply_to: self._fields.6,
+            uri: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -365,14 +369,14 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> MessageView<'a> {
         MessageView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            chat_profile: self.__unsafe_private_named.1,
-            cid: self.__unsafe_private_named.2.unwrap(),
-            deleted: self.__unsafe_private_named.3,
-            indexed_at: self.__unsafe_private_named.4.unwrap(),
-            record: self.__unsafe_private_named.5.unwrap(),
-            reply_to: self.__unsafe_private_named.6,
-            uri: self.__unsafe_private_named.7.unwrap(),
+            author: self._fields.0.unwrap(),
+            chat_profile: self._fields.1,
+            cid: self._fields.2.unwrap(),
+            deleted: self._fields.3,
+            indexed_at: self._fields.4.unwrap(),
+            record: self._fields.5.unwrap(),
+            reply_to: self._fields.6,
+            uri: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::string::Did;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -81,9 +84,9 @@ pub mod delete_account_state {
 
 /// Builder for constructing an instance of this type
 pub struct DeleteAccountBuilder<'a, S: delete_account_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DeleteAccount<'a> {
@@ -97,9 +100,9 @@ impl<'a> DeleteAccountBuilder<'a, delete_account_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeleteAccountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -114,11 +117,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> DeleteAccountBuilder<'a, delete_account_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DeleteAccountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -131,7 +134,7 @@ where
     /// Build the final struct
     pub fn build(self) -> DeleteAccount<'a> {
         DeleteAccount {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -144,7 +147,7 @@ where
         >,
     ) -> DeleteAccount<'a> {
         DeleteAccount {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

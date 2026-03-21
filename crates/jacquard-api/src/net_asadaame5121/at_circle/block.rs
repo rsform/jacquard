@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -149,64 +152,64 @@ pub mod block_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Subject;
         type Ring;
         type CreatedAt;
-        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Subject = Unset;
         type Ring = Unset;
         type CreatedAt = Unset;
-        type Subject = Unset;
-    }
-    ///State transition - sets the `ring` field to Set
-    pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRing<S> {}
-    impl<S: State> State for SetRing<S> {
-        type Ring = Set<members::ring>;
-        type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Ring = S::Ring;
-        type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
+        type Subject = Set<members::subject>;
         type Ring = S::Ring;
         type CreatedAt = S::CreatedAt;
-        type Subject = Set<members::subject>;
+    }
+    ///State transition - sets the `ring` field to Set
+    pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRing<S> {}
+    impl<S: State> State for SetRing<S> {
+        type Subject = S::Subject;
+        type Ring = Set<members::ring>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Subject = S::Subject;
+        type Ring = S::Ring;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `ring` field
         pub struct ring(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BlockBuilder<'a, S: block_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<RingRef<'a>>,
         Option<Did<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Block<'a> {
@@ -220,9 +223,9 @@ impl<'a> BlockBuilder<'a, block_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -237,11 +240,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> BlockBuilder<'a, block_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -249,12 +252,12 @@ where
 impl<'a, S: block_state::State> BlockBuilder<'a, S> {
     /// Set the `reason` field (optional)
     pub fn reason(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `reason` field to an Option value (optional)
     pub fn maybe_reason(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -269,11 +272,11 @@ where
         mut self,
         value: impl Into<RingRef<'a>>,
     ) -> BlockBuilder<'a, block_state::SetRing<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         BlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -288,11 +291,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> BlockBuilder<'a, block_state::SetSubject<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         BlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -300,17 +303,17 @@ where
 impl<'a, S> BlockBuilder<'a, S>
 where
     S: block_state::State,
+    S::Subject: block_state::IsSet,
     S::Ring: block_state::IsSet,
     S::CreatedAt: block_state::IsSet,
-    S::Subject: block_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Block<'a> {
         Block {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            reason: self.__unsafe_private_named.1,
-            ring: self.__unsafe_private_named.2.unwrap(),
-            subject: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            reason: self._fields.1,
+            ring: self._fields.2.unwrap(),
+            subject: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -323,10 +326,10 @@ where
         >,
     ) -> Block<'a> {
         Block {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            reason: self.__unsafe_private_named.1,
-            ring: self.__unsafe_private_named.2.unwrap(),
-            subject: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            reason: self._fields.1,
+            ring: self._fields.2.unwrap(),
+            subject: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

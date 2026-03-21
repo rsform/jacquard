@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -903,74 +906,74 @@ pub mod session_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Platform;
         type StartedAt;
         type Status;
         type ClientVersion;
-        type Platform;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Platform = Unset;
         type StartedAt = Unset;
         type Status = Unset;
         type ClientVersion = Unset;
-        type Platform = Unset;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
-        type StartedAt = Set<members::started_at>;
-        type Status = S::Status;
-        type ClientVersion = S::ClientVersion;
-        type Platform = S::Platform;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type StartedAt = S::StartedAt;
-        type Status = Set<members::status>;
-        type ClientVersion = S::ClientVersion;
-        type Platform = S::Platform;
-    }
-    ///State transition - sets the `client_version` field to Set
-    pub struct SetClientVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClientVersion<S> {}
-    impl<S: State> State for SetClientVersion<S> {
-        type StartedAt = S::StartedAt;
-        type Status = S::Status;
-        type ClientVersion = Set<members::client_version>;
-        type Platform = S::Platform;
     }
     ///State transition - sets the `platform` field to Set
     pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlatform<S> {}
     impl<S: State> State for SetPlatform<S> {
+        type Platform = Set<members::platform>;
         type StartedAt = S::StartedAt;
         type Status = S::Status;
         type ClientVersion = S::ClientVersion;
-        type Platform = Set<members::platform>;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
+    impl<S: State> State for SetStartedAt<S> {
+        type Platform = S::Platform;
+        type StartedAt = Set<members::started_at>;
+        type Status = S::Status;
+        type ClientVersion = S::ClientVersion;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type Platform = S::Platform;
+        type StartedAt = S::StartedAt;
+        type Status = Set<members::status>;
+        type ClientVersion = S::ClientVersion;
+    }
+    ///State transition - sets the `client_version` field to Set
+    pub struct SetClientVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetClientVersion<S> {}
+    impl<S: State> State for SetClientVersion<S> {
+        type Platform = S::Platform;
+        type StartedAt = S::StartedAt;
+        type Status = S::Status;
+        type ClientVersion = Set<members::client_version>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `platform` field
+        pub struct platform(());
         ///Marker type for the `started_at` field
         pub struct started_at(());
         ///Marker type for the `status` field
         pub struct status(());
         ///Marker type for the `client_version` field
         pub struct client_version(());
-        ///Marker type for the `platform` field
-        pub struct platform(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SessionBuilder<'a, S: session_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<session::ActivitySummary<'a>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
@@ -989,7 +992,7 @@ pub struct SessionBuilder<'a, S: session_state::State> {
         Option<CowStr<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Session<'a> {
@@ -1003,8 +1006,8 @@ impl<'a> SessionBuilder<'a, session_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SessionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -1023,7 +1026,7 @@ impl<'a> SessionBuilder<'a, session_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1034,7 +1037,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
         mut self,
         value: impl Into<Option<session::ActivitySummary<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `activitySummary` field to an Option value (optional)
@@ -1042,7 +1045,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
         mut self,
         value: Option<session::ActivitySummary<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1057,11 +1060,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SessionBuilder<'a, session_state::SetClientVersion<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SessionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1069,12 +1072,12 @@ where
 impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1082,12 +1085,12 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
 impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `duration` field (optional)
     pub fn duration(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `duration` field to an Option value (optional)
     pub fn maybe_duration(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1095,12 +1098,12 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
 impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `endReason` field (optional)
     pub fn end_reason(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `endReason` field to an Option value (optional)
     pub fn maybe_end_reason(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1108,12 +1111,12 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
 impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `endedAt` field (optional)
     pub fn ended_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `endedAt` field to an Option value (optional)
     pub fn maybe_ended_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1121,12 +1124,12 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
 impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `lastActivityAt` field (optional)
     pub fn last_activity_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `lastActivityAt` field to an Option value (optional)
     pub fn maybe_last_activity_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1134,12 +1137,12 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
 impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<session::Metadata<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
     pub fn maybe_metadata(mut self, value: Option<session::Metadata<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -1147,12 +1150,12 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
 impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `parentSessionUri` field (optional)
     pub fn parent_session_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `parentSessionUri` field to an Option value (optional)
     pub fn maybe_parent_session_uri(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -1167,11 +1170,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SessionBuilder<'a, session_state::SetPlatform<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         SessionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1182,12 +1185,12 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `relatedLogUris` field to an Option value (optional)
     pub fn maybe_related_log_uris(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -1198,7 +1201,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `relatedProgressUris` field to an Option value (optional)
@@ -1206,7 +1209,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
         mut self,
         value: Option<Vec<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -1217,12 +1220,12 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `relatedSessionUris` field to an Option value (optional)
     pub fn maybe_related_session_uris(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -1233,7 +1236,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
         mut self,
         value: impl Into<Option<session::SessionContext<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `sessionContext` field to an Option value (optional)
@@ -1241,7 +1244,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
         mut self,
         value: Option<session::SessionContext<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -1256,11 +1259,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SessionBuilder<'a, session_state::SetStartedAt<S>> {
-        self.__unsafe_private_named.14 = Option::Some(value.into());
+        self._fields.14 = Option::Some(value.into());
         SessionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1275,11 +1278,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SessionBuilder<'a, session_state::SetStatus<S>> {
-        self.__unsafe_private_named.15 = Option::Some(value.into());
+        self._fields.15 = Option::Some(value.into());
         SessionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1287,12 +1290,12 @@ where
 impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -1300,31 +1303,31 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
 impl<'a, S> SessionBuilder<'a, S>
 where
     S: session_state::State,
+    S::Platform: session_state::IsSet,
     S::StartedAt: session_state::IsSet,
     S::Status: session_state::IsSet,
     S::ClientVersion: session_state::IsSet,
-    S::Platform: session_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Session<'a> {
         Session {
-            activity_summary: self.__unsafe_private_named.0,
-            client_version: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2,
-            duration: self.__unsafe_private_named.3,
-            end_reason: self.__unsafe_private_named.4,
-            ended_at: self.__unsafe_private_named.5,
-            last_activity_at: self.__unsafe_private_named.6,
-            metadata: self.__unsafe_private_named.7,
-            parent_session_uri: self.__unsafe_private_named.8,
-            platform: self.__unsafe_private_named.9.unwrap(),
-            related_log_uris: self.__unsafe_private_named.10,
-            related_progress_uris: self.__unsafe_private_named.11,
-            related_session_uris: self.__unsafe_private_named.12,
-            session_context: self.__unsafe_private_named.13,
-            started_at: self.__unsafe_private_named.14.unwrap(),
-            status: self.__unsafe_private_named.15.unwrap(),
-            updated_at: self.__unsafe_private_named.16,
+            activity_summary: self._fields.0,
+            client_version: self._fields.1.unwrap(),
+            created_at: self._fields.2,
+            duration: self._fields.3,
+            end_reason: self._fields.4,
+            ended_at: self._fields.5,
+            last_activity_at: self._fields.6,
+            metadata: self._fields.7,
+            parent_session_uri: self._fields.8,
+            platform: self._fields.9.unwrap(),
+            related_log_uris: self._fields.10,
+            related_progress_uris: self._fields.11,
+            related_session_uris: self._fields.12,
+            session_context: self._fields.13,
+            started_at: self._fields.14.unwrap(),
+            status: self._fields.15.unwrap(),
+            updated_at: self._fields.16,
             extra_data: Default::default(),
         }
     }
@@ -1337,23 +1340,23 @@ where
         >,
     ) -> Session<'a> {
         Session {
-            activity_summary: self.__unsafe_private_named.0,
-            client_version: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2,
-            duration: self.__unsafe_private_named.3,
-            end_reason: self.__unsafe_private_named.4,
-            ended_at: self.__unsafe_private_named.5,
-            last_activity_at: self.__unsafe_private_named.6,
-            metadata: self.__unsafe_private_named.7,
-            parent_session_uri: self.__unsafe_private_named.8,
-            platform: self.__unsafe_private_named.9.unwrap(),
-            related_log_uris: self.__unsafe_private_named.10,
-            related_progress_uris: self.__unsafe_private_named.11,
-            related_session_uris: self.__unsafe_private_named.12,
-            session_context: self.__unsafe_private_named.13,
-            started_at: self.__unsafe_private_named.14.unwrap(),
-            status: self.__unsafe_private_named.15.unwrap(),
-            updated_at: self.__unsafe_private_named.16,
+            activity_summary: self._fields.0,
+            client_version: self._fields.1.unwrap(),
+            created_at: self._fields.2,
+            duration: self._fields.3,
+            end_reason: self._fields.4,
+            ended_at: self._fields.5,
+            last_activity_at: self._fields.6,
+            metadata: self._fields.7,
+            parent_session_uri: self._fields.8,
+            platform: self._fields.9.unwrap(),
+            related_log_uris: self._fields.10,
+            related_progress_uris: self._fields.11,
+            related_session_uris: self._fields.12,
+            session_context: self._fields.13,
+            started_at: self._fields.14.unwrap(),
+            status: self._fields.15.unwrap(),
+            updated_at: self._fields.16,
             extra_data: Some(extra_data),
         }
     }

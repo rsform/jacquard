@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::Did;
@@ -126,8 +129,8 @@ pub mod update_rule_state {
     pub trait State: sealed::Sealed {
         type Pattern;
         type Reason;
-        type Action;
         type Url;
+        type Action;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -135,8 +138,8 @@ pub mod update_rule_state {
     impl State for Empty {
         type Pattern = Unset;
         type Reason = Unset;
-        type Action = Unset;
         type Url = Unset;
+        type Action = Unset;
     }
     ///State transition - sets the `pattern` field to Set
     pub struct SetPattern<S: State = Empty>(PhantomData<fn() -> S>);
@@ -144,8 +147,8 @@ pub mod update_rule_state {
     impl<S: State> State for SetPattern<S> {
         type Pattern = Set<members::pattern>;
         type Reason = S::Reason;
-        type Action = S::Action;
         type Url = S::Url;
+        type Action = S::Action;
     }
     ///State transition - sets the `reason` field to Set
     pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
@@ -153,17 +156,8 @@ pub mod update_rule_state {
     impl<S: State> State for SetReason<S> {
         type Pattern = S::Pattern;
         type Reason = Set<members::reason>;
+        type Url = S::Url;
         type Action = S::Action;
-        type Url = S::Url;
-    }
-    ///State transition - sets the `action` field to Set
-    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAction<S> {}
-    impl<S: State> State for SetAction<S> {
-        type Pattern = S::Pattern;
-        type Reason = S::Reason;
-        type Action = Set<members::action>;
-        type Url = S::Url;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
@@ -171,8 +165,17 @@ pub mod update_rule_state {
     impl<S: State> State for SetUrl<S> {
         type Pattern = S::Pattern;
         type Reason = S::Reason;
-        type Action = S::Action;
         type Url = Set<members::url>;
+        type Action = S::Action;
+    }
+    ///State transition - sets the `action` field to Set
+    pub struct SetAction<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAction<S> {}
+    impl<S: State> State for SetAction<S> {
+        type Pattern = S::Pattern;
+        type Reason = S::Reason;
+        type Url = S::Url;
+        type Action = Set<members::action>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -181,17 +184,17 @@ pub mod update_rule_state {
         pub struct pattern(());
         ///Marker type for the `reason` field
         pub struct reason(());
-        ///Marker type for the `action` field
-        pub struct action(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `action` field
+        pub struct action(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct UpdateRuleBuilder<'a, S: update_rule_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ActionType<'a>>,
         Option<CowStr<'a>>,
         Option<Did<'a>>,
@@ -199,7 +202,7 @@ pub struct UpdateRuleBuilder<'a, S: update_rule_state::State> {
         Option<ReasonType<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateRule<'a> {
@@ -213,9 +216,9 @@ impl<'a> UpdateRuleBuilder<'a, update_rule_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateRuleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -230,11 +233,11 @@ where
         mut self,
         value: impl Into<ActionType<'a>>,
     ) -> UpdateRuleBuilder<'a, update_rule_state::SetAction<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         UpdateRuleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -242,12 +245,12 @@ where
 impl<'a, S: update_rule_state::State> UpdateRuleBuilder<'a, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
     pub fn maybe_comment(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -255,12 +258,12 @@ impl<'a, S: update_rule_state::State> UpdateRuleBuilder<'a, S> {
 impl<'a, S: update_rule_state::State> UpdateRuleBuilder<'a, S> {
     /// Set the `createdBy` field (optional)
     pub fn created_by(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `createdBy` field to an Option value (optional)
     pub fn maybe_created_by(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -275,11 +278,11 @@ where
         mut self,
         value: impl Into<PatternType<'a>>,
     ) -> UpdateRuleBuilder<'a, update_rule_state::SetPattern<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         UpdateRuleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -294,11 +297,11 @@ where
         mut self,
         value: impl Into<ReasonType<'a>>,
     ) -> UpdateRuleBuilder<'a, update_rule_state::SetReason<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         UpdateRuleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -313,11 +316,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> UpdateRuleBuilder<'a, update_rule_state::SetUrl<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         UpdateRuleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -327,18 +330,18 @@ where
     S: update_rule_state::State,
     S::Pattern: update_rule_state::IsSet,
     S::Reason: update_rule_state::IsSet,
-    S::Action: update_rule_state::IsSet,
     S::Url: update_rule_state::IsSet,
+    S::Action: update_rule_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpdateRule<'a> {
         UpdateRule {
-            action: self.__unsafe_private_named.0.unwrap(),
-            comment: self.__unsafe_private_named.1,
-            created_by: self.__unsafe_private_named.2,
-            pattern: self.__unsafe_private_named.3.unwrap(),
-            reason: self.__unsafe_private_named.4.unwrap(),
-            url: self.__unsafe_private_named.5.unwrap(),
+            action: self._fields.0.unwrap(),
+            comment: self._fields.1,
+            created_by: self._fields.2,
+            pattern: self._fields.3.unwrap(),
+            reason: self._fields.4.unwrap(),
+            url: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -351,12 +354,12 @@ where
         >,
     ) -> UpdateRule<'a> {
         UpdateRule {
-            action: self.__unsafe_private_named.0.unwrap(),
-            comment: self.__unsafe_private_named.1,
-            created_by: self.__unsafe_private_named.2,
-            pattern: self.__unsafe_private_named.3.unwrap(),
-            reason: self.__unsafe_private_named.4.unwrap(),
-            url: self.__unsafe_private_named.5.unwrap(),
+            action: self._fields.0.unwrap(),
+            comment: self._fields.1,
+            created_by: self._fields.2,
+            pattern: self._fields.3.unwrap(),
+            reason: self._fields.4.unwrap(),
+            url: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

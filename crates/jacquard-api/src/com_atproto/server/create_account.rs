@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::{Did, Handle};
@@ -222,8 +225,8 @@ pub mod create_account_state {
 
 /// Builder for constructing an instance of this type
 pub struct CreateAccountBuilder<'a, S: create_account_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Did<'a>>,
         Option<CowStr<'a>>,
         Option<Handle<'a>>,
@@ -234,7 +237,7 @@ pub struct CreateAccountBuilder<'a, S: create_account_state::State> {
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CreateAccount<'a> {
@@ -248,19 +251,9 @@ impl<'a> CreateAccountBuilder<'a, create_account_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreateAccountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -268,12 +261,12 @@ impl<'a> CreateAccountBuilder<'a, create_account_state::Empty> {
 impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
     /// Set the `did` field (optional)
     pub fn did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `did` field to an Option value (optional)
     pub fn maybe_did(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -281,12 +274,12 @@ impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
 impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
     /// Set the `email` field (optional)
     pub fn email(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `email` field to an Option value (optional)
     pub fn maybe_email(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -301,11 +294,11 @@ where
         mut self,
         value: impl Into<Handle<'a>>,
     ) -> CreateAccountBuilder<'a, create_account_state::SetHandle<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CreateAccountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -313,12 +306,12 @@ where
 impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
     /// Set the `inviteCode` field (optional)
     pub fn invite_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `inviteCode` field to an Option value (optional)
     pub fn maybe_invite_code(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -326,12 +319,12 @@ impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
 impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
     /// Set the `password` field (optional)
     pub fn password(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `password` field to an Option value (optional)
     pub fn maybe_password(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -339,12 +332,12 @@ impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
 impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
     /// Set the `plcOp` field (optional)
     pub fn plc_op(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `plcOp` field to an Option value (optional)
     pub fn maybe_plc_op(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -352,12 +345,12 @@ impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
 impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
     /// Set the `recoveryKey` field (optional)
     pub fn recovery_key(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `recoveryKey` field to an Option value (optional)
     pub fn maybe_recovery_key(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -365,12 +358,12 @@ impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
 impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
     /// Set the `verificationCode` field (optional)
     pub fn verification_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `verificationCode` field to an Option value (optional)
     pub fn maybe_verification_code(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -378,12 +371,12 @@ impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
 impl<'a, S: create_account_state::State> CreateAccountBuilder<'a, S> {
     /// Set the `verificationPhone` field (optional)
     pub fn verification_phone(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `verificationPhone` field to an Option value (optional)
     pub fn maybe_verification_phone(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -396,15 +389,15 @@ where
     /// Build the final struct
     pub fn build(self) -> CreateAccount<'a> {
         CreateAccount {
-            did: self.__unsafe_private_named.0,
-            email: self.__unsafe_private_named.1,
-            handle: self.__unsafe_private_named.2.unwrap(),
-            invite_code: self.__unsafe_private_named.3,
-            password: self.__unsafe_private_named.4,
-            plc_op: self.__unsafe_private_named.5,
-            recovery_key: self.__unsafe_private_named.6,
-            verification_code: self.__unsafe_private_named.7,
-            verification_phone: self.__unsafe_private_named.8,
+            did: self._fields.0,
+            email: self._fields.1,
+            handle: self._fields.2.unwrap(),
+            invite_code: self._fields.3,
+            password: self._fields.4,
+            plc_op: self._fields.5,
+            recovery_key: self._fields.6,
+            verification_code: self._fields.7,
+            verification_phone: self._fields.8,
             extra_data: Default::default(),
         }
     }
@@ -414,15 +407,15 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> CreateAccount<'a> {
         CreateAccount {
-            did: self.__unsafe_private_named.0,
-            email: self.__unsafe_private_named.1,
-            handle: self.__unsafe_private_named.2.unwrap(),
-            invite_code: self.__unsafe_private_named.3,
-            password: self.__unsafe_private_named.4,
-            plc_op: self.__unsafe_private_named.5,
-            recovery_key: self.__unsafe_private_named.6,
-            verification_code: self.__unsafe_private_named.7,
-            verification_phone: self.__unsafe_private_named.8,
+            did: self._fields.0,
+            email: self._fields.1,
+            handle: self._fields.2.unwrap(),
+            invite_code: self._fields.3,
+            password: self._fields.4,
+            plc_op: self._fields.5,
+            recovery_key: self._fields.6,
+            verification_code: self._fields.7,
+            verification_phone: self._fields.8,
             extra_data: Some(extra_data),
         }
     }

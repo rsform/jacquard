@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Handle;
@@ -87,9 +90,9 @@ pub mod get_handle_from_did_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetHandleFromDidBuilder<'a, S: get_handle_from_did_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtIdentifier<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtIdentifier<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetHandleFromDid<'a> {
@@ -103,9 +106,9 @@ impl<'a> GetHandleFromDidBuilder<'a, get_handle_from_did_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetHandleFromDidBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -120,11 +123,11 @@ where
         mut self,
         value: impl Into<AtIdentifier<'a>>,
     ) -> GetHandleFromDidBuilder<'a, get_handle_from_did_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetHandleFromDidBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -137,7 +140,7 @@ where
     /// Build the final struct
     pub fn build(self) -> GetHandleFromDid<'a> {
         GetHandleFromDid {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
         }
     }
 }

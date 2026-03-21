@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -408,9 +411,9 @@ pub mod livestream_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Record;
         type Uri;
         type Cid;
-        type Record;
         type Author;
         type IndexedAt;
     }
@@ -418,19 +421,29 @@ pub mod livestream_view_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Record = Unset;
         type Uri = Unset;
         type Cid = Unset;
-        type Record = Unset;
         type Author = Unset;
         type IndexedAt = Unset;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Record = Set<members::record>;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
+        type Record = S::Record;
         type Uri = Set<members::uri>;
         type Cid = S::Cid;
-        type Record = S::Record;
         type Author = S::Author;
         type IndexedAt = S::IndexedAt;
     }
@@ -438,19 +451,9 @@ pub mod livestream_view_state {
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
+        type Record = S::Record;
         type Uri = S::Uri;
         type Cid = Set<members::cid>;
-        type Record = S::Record;
-        type Author = S::Author;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Record = Set<members::record>;
         type Author = S::Author;
         type IndexedAt = S::IndexedAt;
     }
@@ -458,9 +461,9 @@ pub mod livestream_view_state {
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
+        type Record = S::Record;
         type Uri = S::Uri;
         type Cid = S::Cid;
-        type Record = S::Record;
         type Author = Set<members::author>;
         type IndexedAt = S::IndexedAt;
     }
@@ -468,21 +471,21 @@ pub mod livestream_view_state {
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
+        type Record = S::Record;
         type Uri = S::Uri;
         type Cid = S::Cid;
-        type Record = S::Record;
         type Author = S::Author;
         type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `record` field
+        pub struct record(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `author` field
         pub struct author(());
         ///Marker type for the `indexed_at` field
@@ -492,8 +495,8 @@ pub mod livestream_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct LivestreamViewBuilder<'a, S: livestream_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ProfileViewBasic<'a>>,
         Option<Cid<'a>>,
         Option<Datetime>,
@@ -501,7 +504,7 @@ pub struct LivestreamViewBuilder<'a, S: livestream_view_state::State> {
         Option<AtUri<'a>>,
         Option<livestream::ViewerCount<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LivestreamView<'a> {
@@ -515,9 +518,9 @@ impl<'a> LivestreamViewBuilder<'a, livestream_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LivestreamViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -532,11 +535,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> LivestreamViewBuilder<'a, livestream_view_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LivestreamViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -551,11 +554,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> LivestreamViewBuilder<'a, livestream_view_state::SetCid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LivestreamViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -570,11 +573,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LivestreamViewBuilder<'a, livestream_view_state::SetIndexedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LivestreamViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -589,11 +592,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> LivestreamViewBuilder<'a, livestream_view_state::SetRecord<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         LivestreamViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -608,11 +611,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> LivestreamViewBuilder<'a, livestream_view_state::SetUri<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         LivestreamViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -623,7 +626,7 @@ impl<'a, S: livestream_view_state::State> LivestreamViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<livestream::ViewerCount<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `viewerCount` field to an Option value (optional)
@@ -631,7 +634,7 @@ impl<'a, S: livestream_view_state::State> LivestreamViewBuilder<'a, S> {
         mut self,
         value: Option<livestream::ViewerCount<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -639,21 +642,21 @@ impl<'a, S: livestream_view_state::State> LivestreamViewBuilder<'a, S> {
 impl<'a, S> LivestreamViewBuilder<'a, S>
 where
     S: livestream_view_state::State,
+    S::Record: livestream_view_state::IsSet,
     S::Uri: livestream_view_state::IsSet,
     S::Cid: livestream_view_state::IsSet,
-    S::Record: livestream_view_state::IsSet,
     S::Author: livestream_view_state::IsSet,
     S::IndexedAt: livestream_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LivestreamView<'a> {
         LivestreamView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            record: self.__unsafe_private_named.3.unwrap(),
-            uri: self.__unsafe_private_named.4.unwrap(),
-            viewer_count: self.__unsafe_private_named.5,
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
+            record: self._fields.3.unwrap(),
+            uri: self._fields.4.unwrap(),
+            viewer_count: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -663,12 +666,12 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> LivestreamView<'a> {
         LivestreamView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            record: self.__unsafe_private_named.3.unwrap(),
-            uri: self.__unsafe_private_named.4.unwrap(),
-            viewer_count: self.__unsafe_private_named.5,
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
+            record: self._fields.3.unwrap(),
+            uri: self._fields.4.unwrap(),
+            viewer_count: self._fields.5,
             extra_data: Some(extra_data),
         }
     }
@@ -1058,44 +1061,44 @@ pub mod livestream_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Title;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LivestreamBuilder<'a, S: livestream_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
         Option<Datetime>,
@@ -1108,7 +1111,7 @@ pub struct LivestreamBuilder<'a, S: livestream_state::State> {
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Livestream<'a> {
@@ -1122,21 +1125,9 @@ impl<'a> LivestreamBuilder<'a, livestream_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LivestreamBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1144,12 +1135,12 @@ impl<'a> LivestreamBuilder<'a, livestream_state::Empty> {
 impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
     /// Set the `agent` field (optional)
     pub fn agent(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `agent` field to an Option value (optional)
     pub fn maybe_agent(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1157,12 +1148,12 @@ impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
 impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
     /// Set the `canonicalUrl` field (optional)
     pub fn canonical_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `canonicalUrl` field to an Option value (optional)
     pub fn maybe_canonical_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1177,11 +1168,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LivestreamBuilder<'a, livestream_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LivestreamBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1189,12 +1180,12 @@ where
 impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
     /// Set the `endedAt` field (optional)
     pub fn ended_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `endedAt` field to an Option value (optional)
     pub fn maybe_ended_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1202,12 +1193,12 @@ impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
 impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
     /// Set the `idleTimeoutSeconds` field (optional)
     pub fn idle_timeout_seconds(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `idleTimeoutSeconds` field to an Option value (optional)
     pub fn maybe_idle_timeout_seconds(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1215,12 +1206,12 @@ impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
 impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
     /// Set the `lastSeenAt` field (optional)
     pub fn last_seen_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `lastSeenAt` field to an Option value (optional)
     pub fn maybe_last_seen_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1231,7 +1222,7 @@ impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
         mut self,
         value: impl Into<Option<livestream::NotificationSettings<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `notificationSettings` field to an Option value (optional)
@@ -1239,7 +1230,7 @@ impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
         mut self,
         value: Option<livestream::NotificationSettings<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1247,12 +1238,12 @@ impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
 impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
     /// Set the `post` field (optional)
     pub fn post(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `post` field to an Option value (optional)
     pub fn maybe_post(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -1260,12 +1251,12 @@ impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
 impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
     /// Set the `thumb` field (optional)
     pub fn thumb(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `thumb` field to an Option value (optional)
     pub fn maybe_thumb(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -1280,11 +1271,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LivestreamBuilder<'a, livestream_state::SetTitle<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         LivestreamBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1292,12 +1283,12 @@ where
 impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -1305,23 +1296,23 @@ impl<'a, S: livestream_state::State> LivestreamBuilder<'a, S> {
 impl<'a, S> LivestreamBuilder<'a, S>
 where
     S: livestream_state::State,
-    S::CreatedAt: livestream_state::IsSet,
     S::Title: livestream_state::IsSet,
+    S::CreatedAt: livestream_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Livestream<'a> {
         Livestream {
-            agent: self.__unsafe_private_named.0,
-            canonical_url: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            ended_at: self.__unsafe_private_named.3,
-            idle_timeout_seconds: self.__unsafe_private_named.4,
-            last_seen_at: self.__unsafe_private_named.5,
-            notification_settings: self.__unsafe_private_named.6,
-            post: self.__unsafe_private_named.7,
-            thumb: self.__unsafe_private_named.8,
-            title: self.__unsafe_private_named.9.unwrap(),
-            url: self.__unsafe_private_named.10,
+            agent: self._fields.0,
+            canonical_url: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            ended_at: self._fields.3,
+            idle_timeout_seconds: self._fields.4,
+            last_seen_at: self._fields.5,
+            notification_settings: self._fields.6,
+            post: self._fields.7,
+            thumb: self._fields.8,
+            title: self._fields.9.unwrap(),
+            url: self._fields.10,
             extra_data: Default::default(),
         }
     }
@@ -1331,17 +1322,17 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Livestream<'a> {
         Livestream {
-            agent: self.__unsafe_private_named.0,
-            canonical_url: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            ended_at: self.__unsafe_private_named.3,
-            idle_timeout_seconds: self.__unsafe_private_named.4,
-            last_seen_at: self.__unsafe_private_named.5,
-            notification_settings: self.__unsafe_private_named.6,
-            post: self.__unsafe_private_named.7,
-            thumb: self.__unsafe_private_named.8,
-            title: self.__unsafe_private_named.9.unwrap(),
-            url: self.__unsafe_private_named.10,
+            agent: self._fields.0,
+            canonical_url: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            ended_at: self._fields.3,
+            idle_timeout_seconds: self._fields.4,
+            last_seen_at: self._fields.5,
+            notification_settings: self._fields.6,
+            post: self._fields.7,
+            thumb: self._fields.8,
+            title: self._fields.9.unwrap(),
+            url: self._fields.10,
             extra_data: Some(extra_data),
         }
     }
@@ -1381,9 +1372,9 @@ pub mod streamplace_anything_state {
 
 /// Builder for constructing an instance of this type
 pub struct StreamplaceAnythingBuilder<'a, S: streamplace_anything_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<StreamplaceAnythingLivestream<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<StreamplaceAnythingLivestream<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> StreamplaceAnything<'a> {
@@ -1397,9 +1388,9 @@ impl<'a> StreamplaceAnythingBuilder<'a, streamplace_anything_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StreamplaceAnythingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1414,11 +1405,11 @@ where
         mut self,
         value: impl Into<StreamplaceAnythingLivestream<'a>>,
     ) -> StreamplaceAnythingBuilder<'a, streamplace_anything_state::SetLivestream<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         StreamplaceAnythingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1431,7 +1422,7 @@ where
     /// Build the final struct
     pub fn build(self) -> StreamplaceAnything<'a> {
         StreamplaceAnything {
-            livestream: self.__unsafe_private_named.0.unwrap(),
+            livestream: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1441,7 +1432,7 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> StreamplaceAnything<'a> {
         StreamplaceAnything {
-            livestream: self.__unsafe_private_named.0.unwrap(),
+            livestream: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1457,81 +1448,81 @@ pub mod teleport_arrival_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type ViewerCount;
         type Source;
         type TeleportUri;
         type StartsAt;
-        type ViewerCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type ViewerCount = Unset;
         type Source = Unset;
         type TeleportUri = Unset;
         type StartsAt = Unset;
-        type ViewerCount = Unset;
-    }
-    ///State transition - sets the `source` field to Set
-    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSource<S> {}
-    impl<S: State> State for SetSource<S> {
-        type Source = Set<members::source>;
-        type TeleportUri = S::TeleportUri;
-        type StartsAt = S::StartsAt;
-        type ViewerCount = S::ViewerCount;
-    }
-    ///State transition - sets the `teleport_uri` field to Set
-    pub struct SetTeleportUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTeleportUri<S> {}
-    impl<S: State> State for SetTeleportUri<S> {
-        type Source = S::Source;
-        type TeleportUri = Set<members::teleport_uri>;
-        type StartsAt = S::StartsAt;
-        type ViewerCount = S::ViewerCount;
-    }
-    ///State transition - sets the `starts_at` field to Set
-    pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartsAt<S> {}
-    impl<S: State> State for SetStartsAt<S> {
-        type Source = S::Source;
-        type TeleportUri = S::TeleportUri;
-        type StartsAt = Set<members::starts_at>;
-        type ViewerCount = S::ViewerCount;
     }
     ///State transition - sets the `viewer_count` field to Set
     pub struct SetViewerCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetViewerCount<S> {}
     impl<S: State> State for SetViewerCount<S> {
+        type ViewerCount = Set<members::viewer_count>;
         type Source = S::Source;
         type TeleportUri = S::TeleportUri;
         type StartsAt = S::StartsAt;
-        type ViewerCount = Set<members::viewer_count>;
+    }
+    ///State transition - sets the `source` field to Set
+    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSource<S> {}
+    impl<S: State> State for SetSource<S> {
+        type ViewerCount = S::ViewerCount;
+        type Source = Set<members::source>;
+        type TeleportUri = S::TeleportUri;
+        type StartsAt = S::StartsAt;
+    }
+    ///State transition - sets the `teleport_uri` field to Set
+    pub struct SetTeleportUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTeleportUri<S> {}
+    impl<S: State> State for SetTeleportUri<S> {
+        type ViewerCount = S::ViewerCount;
+        type Source = S::Source;
+        type TeleportUri = Set<members::teleport_uri>;
+        type StartsAt = S::StartsAt;
+    }
+    ///State transition - sets the `starts_at` field to Set
+    pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartsAt<S> {}
+    impl<S: State> State for SetStartsAt<S> {
+        type ViewerCount = S::ViewerCount;
+        type Source = S::Source;
+        type TeleportUri = S::TeleportUri;
+        type StartsAt = Set<members::starts_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `viewer_count` field
+        pub struct viewer_count(());
         ///Marker type for the `source` field
         pub struct source(());
         ///Marker type for the `teleport_uri` field
         pub struct teleport_uri(());
         ///Marker type for the `starts_at` field
         pub struct starts_at(());
-        ///Marker type for the `viewer_count` field
-        pub struct viewer_count(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TeleportArrivalBuilder<'a, S: teleport_arrival_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Profile<'a>>,
         Option<ProfileViewBasic<'a>>,
         Option<Datetime>,
         Option<AtUri<'a>>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TeleportArrival<'a> {
@@ -1545,9 +1536,9 @@ impl<'a> TeleportArrivalBuilder<'a, teleport_arrival_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TeleportArrivalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1555,12 +1546,12 @@ impl<'a> TeleportArrivalBuilder<'a, teleport_arrival_state::Empty> {
 impl<'a, S: teleport_arrival_state::State> TeleportArrivalBuilder<'a, S> {
     /// Set the `chatProfile` field (optional)
     pub fn chat_profile(mut self, value: impl Into<Option<Profile<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `chatProfile` field to an Option value (optional)
     pub fn maybe_chat_profile(mut self, value: Option<Profile<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1575,11 +1566,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> TeleportArrivalBuilder<'a, teleport_arrival_state::SetSource<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TeleportArrivalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1594,11 +1585,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> TeleportArrivalBuilder<'a, teleport_arrival_state::SetStartsAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         TeleportArrivalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1613,11 +1604,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> TeleportArrivalBuilder<'a, teleport_arrival_state::SetTeleportUri<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         TeleportArrivalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1632,11 +1623,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> TeleportArrivalBuilder<'a, teleport_arrival_state::SetViewerCount<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         TeleportArrivalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1644,19 +1635,19 @@ where
 impl<'a, S> TeleportArrivalBuilder<'a, S>
 where
     S: teleport_arrival_state::State,
+    S::ViewerCount: teleport_arrival_state::IsSet,
     S::Source: teleport_arrival_state::IsSet,
     S::TeleportUri: teleport_arrival_state::IsSet,
     S::StartsAt: teleport_arrival_state::IsSet,
-    S::ViewerCount: teleport_arrival_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TeleportArrival<'a> {
         TeleportArrival {
-            chat_profile: self.__unsafe_private_named.0,
-            source: self.__unsafe_private_named.1.unwrap(),
-            starts_at: self.__unsafe_private_named.2.unwrap(),
-            teleport_uri: self.__unsafe_private_named.3.unwrap(),
-            viewer_count: self.__unsafe_private_named.4.unwrap(),
+            chat_profile: self._fields.0,
+            source: self._fields.1.unwrap(),
+            starts_at: self._fields.2.unwrap(),
+            teleport_uri: self._fields.3.unwrap(),
+            viewer_count: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1666,11 +1657,11 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> TeleportArrival<'a> {
         TeleportArrival {
-            chat_profile: self.__unsafe_private_named.0,
-            source: self.__unsafe_private_named.1.unwrap(),
-            starts_at: self.__unsafe_private_named.2.unwrap(),
-            teleport_uri: self.__unsafe_private_named.3.unwrap(),
-            viewer_count: self.__unsafe_private_named.4.unwrap(),
+            chat_profile: self._fields.0,
+            source: self._fields.1.unwrap(),
+            starts_at: self._fields.2.unwrap(),
+            teleport_uri: self._fields.3.unwrap(),
+            viewer_count: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1722,9 +1713,9 @@ pub mod teleport_canceled_state {
 
 /// Builder for constructing an instance of this type
 pub struct TeleportCanceledBuilder<'a, S: teleport_canceled_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TeleportCanceled<'a> {
@@ -1738,9 +1729,9 @@ impl<'a> TeleportCanceledBuilder<'a, teleport_canceled_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TeleportCanceledBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1755,11 +1746,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TeleportCanceledBuilder<'a, teleport_canceled_state::SetReason<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TeleportCanceledBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1774,11 +1765,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> TeleportCanceledBuilder<'a, teleport_canceled_state::SetTeleportUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TeleportCanceledBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1792,8 +1783,8 @@ where
     /// Build the final struct
     pub fn build(self) -> TeleportCanceled<'a> {
         TeleportCanceled {
-            reason: self.__unsafe_private_named.0.unwrap(),
-            teleport_uri: self.__unsafe_private_named.1.unwrap(),
+            reason: self._fields.0.unwrap(),
+            teleport_uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1803,8 +1794,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> TeleportCanceled<'a> {
         TeleportCanceled {
-            reason: self.__unsafe_private_named.0.unwrap(),
-            teleport_uri: self.__unsafe_private_named.1.unwrap(),
+            reason: self._fields.0.unwrap(),
+            teleport_uri: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1844,9 +1835,9 @@ pub mod viewer_count_state {
 
 /// Builder for constructing an instance of this type
 pub struct ViewerCountBuilder<'a, S: viewer_count_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ViewerCount<'a> {
@@ -1860,9 +1851,9 @@ impl<'a> ViewerCountBuilder<'a, viewer_count_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ViewerCountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1877,11 +1868,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ViewerCountBuilder<'a, viewer_count_state::SetCount<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ViewerCountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1894,7 +1885,7 @@ where
     /// Build the final struct
     pub fn build(self) -> ViewerCount<'a> {
         ViewerCount {
-            count: self.__unsafe_private_named.0.unwrap(),
+            count: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1904,7 +1895,7 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ViewerCount<'a> {
         ViewerCount {
-            count: self.__unsafe_private_named.0.unwrap(),
+            count: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

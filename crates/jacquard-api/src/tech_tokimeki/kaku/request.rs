@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -210,8 +213,8 @@ pub mod request_state {
 
 /// Builder for constructing an instance of this type
 pub struct RequestBuilder<'a, S: request_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<bool>,
         Option<Vec<BlobRef<'a>>>,
@@ -219,7 +222,7 @@ pub struct RequestBuilder<'a, S: request_state::State> {
         Option<Did<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Request<'a> {
@@ -233,9 +236,9 @@ impl<'a> RequestBuilder<'a, request_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RequestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -250,11 +253,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> RequestBuilder<'a, request_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RequestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -262,12 +265,12 @@ where
 impl<'a, S: request_state::State> RequestBuilder<'a, S> {
     /// Set the `isOpen` field (optional)
     pub fn is_open(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `isOpen` field to an Option value (optional)
     pub fn maybe_is_open(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -278,12 +281,12 @@ impl<'a, S: request_state::State> RequestBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<BlobRef<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `referenceImages` field to an Option value (optional)
     pub fn maybe_reference_images(mut self, value: Option<Vec<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -291,12 +294,12 @@ impl<'a, S: request_state::State> RequestBuilder<'a, S> {
 impl<'a, S: request_state::State> RequestBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -304,12 +307,12 @@ impl<'a, S: request_state::State> RequestBuilder<'a, S> {
 impl<'a, S: request_state::State> RequestBuilder<'a, S> {
     /// Set the `targetActor` field (optional)
     pub fn target_actor(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `targetActor` field to an Option value (optional)
     pub fn maybe_target_actor(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -324,11 +327,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RequestBuilder<'a, request_state::SetText<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         RequestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -342,12 +345,12 @@ where
     /// Build the final struct
     pub fn build(self) -> Request<'a> {
         Request {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            is_open: self.__unsafe_private_named.1.or_else(|| Some(true)),
-            reference_images: self.__unsafe_private_named.2,
-            tags: self.__unsafe_private_named.3,
-            target_actor: self.__unsafe_private_named.4,
-            text: self.__unsafe_private_named.5.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            is_open: self._fields.1.or_else(|| Some(true)),
+            reference_images: self._fields.2,
+            tags: self._fields.3,
+            target_actor: self._fields.4,
+            text: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -360,12 +363,12 @@ where
         >,
     ) -> Request<'a> {
         Request {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            is_open: self.__unsafe_private_named.1.or_else(|| Some(true)),
-            reference_images: self.__unsafe_private_named.2,
-            tags: self.__unsafe_private_named.3,
-            target_actor: self.__unsafe_private_named.4,
-            text: self.__unsafe_private_named.5.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            is_open: self._fields.1.or_else(|| Some(true)),
+            reference_images: self._fields.2,
+            tags: self._fields.3,
+            target_actor: self._fields.4,
+            text: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

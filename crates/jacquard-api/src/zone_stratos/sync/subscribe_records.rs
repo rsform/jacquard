@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -484,99 +487,99 @@ pub mod commit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Seq;
-        type Time;
         type Ops;
-        type Did;
+        type Time;
         type Rev;
+        type Did;
+        type Seq;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Seq = Unset;
-        type Time = Unset;
         type Ops = Unset;
-        type Did = Unset;
+        type Time = Unset;
         type Rev = Unset;
-    }
-    ///State transition - sets the `seq` field to Set
-    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeq<S> {}
-    impl<S: State> State for SetSeq<S> {
-        type Seq = Set<members::seq>;
-        type Time = S::Time;
-        type Ops = S::Ops;
-        type Did = S::Did;
-        type Rev = S::Rev;
-    }
-    ///State transition - sets the `time` field to Set
-    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTime<S> {}
-    impl<S: State> State for SetTime<S> {
-        type Seq = S::Seq;
-        type Time = Set<members::time>;
-        type Ops = S::Ops;
-        type Did = S::Did;
-        type Rev = S::Rev;
+        type Did = Unset;
+        type Seq = Unset;
     }
     ///State transition - sets the `ops` field to Set
     pub struct SetOps<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOps<S> {}
     impl<S: State> State for SetOps<S> {
-        type Seq = S::Seq;
-        type Time = S::Time;
         type Ops = Set<members::ops>;
-        type Did = S::Did;
-        type Rev = S::Rev;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Seq = S::Seq;
         type Time = S::Time;
-        type Ops = S::Ops;
-        type Did = Set<members::did>;
         type Rev = S::Rev;
+        type Did = S::Did;
+        type Seq = S::Seq;
+    }
+    ///State transition - sets the `time` field to Set
+    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTime<S> {}
+    impl<S: State> State for SetTime<S> {
+        type Ops = S::Ops;
+        type Time = Set<members::time>;
+        type Rev = S::Rev;
+        type Did = S::Did;
+        type Seq = S::Seq;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
-        type Seq = S::Seq;
-        type Time = S::Time;
         type Ops = S::Ops;
-        type Did = S::Did;
+        type Time = S::Time;
         type Rev = Set<members::rev>;
+        type Did = S::Did;
+        type Seq = S::Seq;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Ops = S::Ops;
+        type Time = S::Time;
+        type Rev = S::Rev;
+        type Did = Set<members::did>;
+        type Seq = S::Seq;
+    }
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeq<S> {}
+    impl<S: State> State for SetSeq<S> {
+        type Ops = S::Ops;
+        type Time = S::Time;
+        type Rev = S::Rev;
+        type Did = S::Did;
+        type Seq = Set<members::seq>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `seq` field
-        pub struct seq(());
-        ///Marker type for the `time` field
-        pub struct time(());
         ///Marker type for the `ops` field
         pub struct ops(());
-        ///Marker type for the `did` field
-        pub struct did(());
+        ///Marker type for the `time` field
+        pub struct time(());
         ///Marker type for the `rev` field
         pub struct rev(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `seq` field
+        pub struct seq(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CommitBuilder<'a, S: commit_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Did<'a>>,
         Option<Vec<subscribe_records::RecordOp<'a>>>,
         Option<Tid>,
         Option<i64>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Commit<'a> {
@@ -590,9 +593,9 @@ impl<'a> CommitBuilder<'a, commit_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CommitBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -607,11 +610,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> CommitBuilder<'a, commit_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CommitBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -626,11 +629,11 @@ where
         mut self,
         value: impl Into<Vec<subscribe_records::RecordOp<'a>>>,
     ) -> CommitBuilder<'a, commit_state::SetOps<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CommitBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -645,11 +648,11 @@ where
         mut self,
         value: impl Into<Tid>,
     ) -> CommitBuilder<'a, commit_state::SetRev<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CommitBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -664,11 +667,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CommitBuilder<'a, commit_state::SetSeq<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         CommitBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -683,11 +686,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CommitBuilder<'a, commit_state::SetTime<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         CommitBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -695,20 +698,20 @@ where
 impl<'a, S> CommitBuilder<'a, S>
 where
     S: commit_state::State,
-    S::Seq: commit_state::IsSet,
-    S::Time: commit_state::IsSet,
     S::Ops: commit_state::IsSet,
-    S::Did: commit_state::IsSet,
+    S::Time: commit_state::IsSet,
     S::Rev: commit_state::IsSet,
+    S::Did: commit_state::IsSet,
+    S::Seq: commit_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Commit<'a> {
         Commit {
-            did: self.__unsafe_private_named.0.unwrap(),
-            ops: self.__unsafe_private_named.1.unwrap(),
-            rev: self.__unsafe_private_named.2.unwrap(),
-            seq: self.__unsafe_private_named.3.unwrap(),
-            time: self.__unsafe_private_named.4.unwrap(),
+            did: self._fields.0.unwrap(),
+            ops: self._fields.1.unwrap(),
+            rev: self._fields.2.unwrap(),
+            seq: self._fields.3.unwrap(),
+            time: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -718,11 +721,11 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Commit<'a> {
         Commit {
-            did: self.__unsafe_private_named.0.unwrap(),
-            ops: self.__unsafe_private_named.1.unwrap(),
-            rev: self.__unsafe_private_named.2.unwrap(),
-            seq: self.__unsafe_private_named.3.unwrap(),
-            time: self.__unsafe_private_named.4.unwrap(),
+            did: self._fields.0.unwrap(),
+            ops: self._fields.1.unwrap(),
+            rev: self._fields.2.unwrap(),
+            seq: self._fields.3.unwrap(),
+            time: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -987,9 +990,9 @@ pub mod subscribe_records_state {
 
 /// Builder for constructing an instance of this type
 pub struct SubscribeRecordsBuilder<'a, S: subscribe_records_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<Did<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<Did<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SubscribeRecords<'a> {
@@ -1003,9 +1006,9 @@ impl<'a> SubscribeRecordsBuilder<'a, subscribe_records_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SubscribeRecordsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1013,12 +1016,12 @@ impl<'a> SubscribeRecordsBuilder<'a, subscribe_records_state::Empty> {
 impl<'a, S: subscribe_records_state::State> SubscribeRecordsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1033,11 +1036,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> SubscribeRecordsBuilder<'a, subscribe_records_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SubscribeRecordsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1045,12 +1048,12 @@ where
 impl<'a, S: subscribe_records_state::State> SubscribeRecordsBuilder<'a, S> {
     /// Set the `domain` field (optional)
     pub fn domain(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `domain` field to an Option value (optional)
     pub fn maybe_domain(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1063,9 +1066,9 @@ where
     /// Build the final struct
     pub fn build(self) -> SubscribeRecords<'a> {
         SubscribeRecords {
-            cursor: self.__unsafe_private_named.0,
-            did: self.__unsafe_private_named.1.unwrap(),
-            domain: self.__unsafe_private_named.2,
+            cursor: self._fields.0,
+            did: self._fields.1.unwrap(),
+            domain: self._fields.2,
         }
     }
 }

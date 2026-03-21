@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -110,59 +113,59 @@ pub mod collaborator_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
-        type Repo;
         type CreatedAt;
+        type Repo;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
-        type Repo = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Repo = S::Repo;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Subject = S::Subject;
-        type Repo = Set<members::repo>;
-        type CreatedAt = S::CreatedAt;
+        type Repo = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
-        type Repo = S::Repo;
         type CreatedAt = Set<members::created_at>;
+        type Repo = S::Repo;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type CreatedAt = S::CreatedAt;
+        type Repo = Set<members::repo>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type CreatedAt = S::CreatedAt;
+        type Repo = S::Repo;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CollaboratorBuilder<'a, S: collaborator_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<AtUri<'a>>, Option<Did<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<AtUri<'a>>, Option<Did<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Collaborator<'a> {
@@ -176,9 +179,9 @@ impl<'a> CollaboratorBuilder<'a, collaborator_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CollaboratorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -193,11 +196,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CollaboratorBuilder<'a, collaborator_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CollaboratorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -212,11 +215,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> CollaboratorBuilder<'a, collaborator_state::SetRepo<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CollaboratorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -231,11 +234,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> CollaboratorBuilder<'a, collaborator_state::SetSubject<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CollaboratorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -243,16 +246,16 @@ where
 impl<'a, S> CollaboratorBuilder<'a, S>
 where
     S: collaborator_state::State,
-    S::Subject: collaborator_state::IsSet,
-    S::Repo: collaborator_state::IsSet,
     S::CreatedAt: collaborator_state::IsSet,
+    S::Repo: collaborator_state::IsSet,
+    S::Subject: collaborator_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Collaborator<'a> {
         Collaborator {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            repo: self.__unsafe_private_named.1.unwrap(),
-            subject: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            repo: self._fields.1.unwrap(),
+            subject: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -265,9 +268,9 @@ where
         >,
     ) -> Collaborator<'a> {
         Collaborator {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            repo: self.__unsafe_private_named.1.unwrap(),
-            subject: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            repo: self._fields.1.unwrap(),
+            subject: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -306,83 +309,83 @@ pub mod submission_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AuthType;
-        type Description;
-        type CreatedAt;
         type Url;
+        type Description;
+        type AuthType;
+        type CreatedAt;
         type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AuthType = Unset;
-        type Description = Unset;
-        type CreatedAt = Unset;
         type Url = Unset;
+        type Description = Unset;
+        type AuthType = Unset;
+        type CreatedAt = Unset;
         type Name = Unset;
     }
-    ///State transition - sets the `auth_type` field to Set
-    pub struct SetAuthType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthType<S> {}
-    impl<S: State> State for SetAuthType<S> {
-        type AuthType = Set<members::auth_type>;
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Url = Set<members::url>;
         type Description = S::Description;
+        type AuthType = S::AuthType;
         type CreatedAt = S::CreatedAt;
-        type Url = S::Url;
         type Name = S::Name;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type AuthType = S::AuthType;
-        type Description = Set<members::description>;
-        type CreatedAt = S::CreatedAt;
         type Url = S::Url;
+        type Description = Set<members::description>;
+        type AuthType = S::AuthType;
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `auth_type` field to Set
+    pub struct SetAuthType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthType<S> {}
+    impl<S: State> State for SetAuthType<S> {
+        type Url = S::Url;
+        type Description = S::Description;
+        type AuthType = Set<members::auth_type>;
+        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type AuthType = S::AuthType;
-        type Description = S::Description;
-        type CreatedAt = Set<members::created_at>;
         type Url = S::Url;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type AuthType = S::AuthType;
         type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-        type Url = Set<members::url>;
+        type AuthType = S::AuthType;
+        type CreatedAt = Set<members::created_at>;
         type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type AuthType = S::AuthType;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
         type Url = S::Url;
+        type Description = S::Description;
+        type AuthType = S::AuthType;
+        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `auth_type` field
-        pub struct auth_type(());
-        ///Marker type for the `description` field
-        pub struct description(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `description` field
+        pub struct description(());
+        ///Marker type for the `auth_type` field
+        pub struct auth_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
     }
@@ -390,8 +393,8 @@ pub mod submission_state {
 
 /// Builder for constructing an instance of this type
 pub struct SubmissionBuilder<'a, S: submission_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<CowStr<'a>>>,
         Option<SubmissionAuthType<'a>>,
         Option<Datetime>,
@@ -403,7 +406,7 @@ pub struct SubmissionBuilder<'a, S: submission_state::State> {
         Option<Vec<CowStr<'a>>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Submission<'a> {
@@ -417,20 +420,9 @@ impl<'a> SubmissionBuilder<'a, submission_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SubmissionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -438,12 +430,12 @@ impl<'a> SubmissionBuilder<'a, submission_state::Empty> {
 impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
     /// Set the `alternativeTo` field (optional)
     pub fn alternative_to(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `alternativeTo` field to an Option value (optional)
     pub fn maybe_alternative_to(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -458,11 +450,11 @@ where
         mut self,
         value: impl Into<SubmissionAuthType<'a>>,
     ) -> SubmissionBuilder<'a, submission_state::SetAuthType<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SubmissionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -477,11 +469,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SubmissionBuilder<'a, submission_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SubmissionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -496,11 +488,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SubmissionBuilder<'a, submission_state::SetDescription<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         SubmissionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -508,12 +500,12 @@ where
 impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
     /// Set the `icon` field (optional)
     pub fn icon(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `icon` field to an Option value (optional)
     pub fn maybe_icon(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -521,12 +513,12 @@ impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
 impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
     /// Set the `isOpenSource` field (optional)
     pub fn is_open_source(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `isOpenSource` field to an Option value (optional)
     pub fn maybe_is_open_source(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -541,11 +533,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SubmissionBuilder<'a, submission_state::SetName<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         SubmissionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -553,12 +545,12 @@ where
 impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
     /// Set the `repositoryUrl` field (optional)
     pub fn repository_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `repositoryUrl` field to an Option value (optional)
     pub fn maybe_repository_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -566,12 +558,12 @@ impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
 impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -586,11 +578,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> SubmissionBuilder<'a, submission_state::SetUrl<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         SubmissionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -598,25 +590,25 @@ where
 impl<'a, S> SubmissionBuilder<'a, S>
 where
     S: submission_state::State,
-    S::AuthType: submission_state::IsSet,
-    S::Description: submission_state::IsSet,
-    S::CreatedAt: submission_state::IsSet,
     S::Url: submission_state::IsSet,
+    S::Description: submission_state::IsSet,
+    S::AuthType: submission_state::IsSet,
+    S::CreatedAt: submission_state::IsSet,
     S::Name: submission_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Submission<'a> {
         Submission {
-            alternative_to: self.__unsafe_private_named.0,
-            auth_type: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3.unwrap(),
-            icon: self.__unsafe_private_named.4,
-            is_open_source: self.__unsafe_private_named.5,
-            name: self.__unsafe_private_named.6.unwrap(),
-            repository_url: self.__unsafe_private_named.7,
-            tags: self.__unsafe_private_named.8,
-            url: self.__unsafe_private_named.9.unwrap(),
+            alternative_to: self._fields.0,
+            auth_type: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3.unwrap(),
+            icon: self._fields.4,
+            is_open_source: self._fields.5,
+            name: self._fields.6.unwrap(),
+            repository_url: self._fields.7,
+            tags: self._fields.8,
+            url: self._fields.9.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -629,16 +621,16 @@ where
         >,
     ) -> Submission<'a> {
         Submission {
-            alternative_to: self.__unsafe_private_named.0,
-            auth_type: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3.unwrap(),
-            icon: self.__unsafe_private_named.4,
-            is_open_source: self.__unsafe_private_named.5,
-            name: self.__unsafe_private_named.6.unwrap(),
-            repository_url: self.__unsafe_private_named.7,
-            tags: self.__unsafe_private_named.8,
-            url: self.__unsafe_private_named.9.unwrap(),
+            alternative_to: self._fields.0,
+            auth_type: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3.unwrap(),
+            icon: self._fields.4,
+            is_open_source: self._fields.5,
+            name: self._fields.6.unwrap(),
+            repository_url: self._fields.7,
+            tags: self._fields.8,
+            url: self._fields.9.unwrap(),
             extra_data: Some(extra_data),
         }
     }

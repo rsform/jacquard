@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -187,9 +190,9 @@ pub mod root_state {
 
 /// Builder for constructing an instance of this type
 pub struct RootBuilder<'a, S: root_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<DocRef<'a>>, Option<BlobRef<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<DocRef<'a>>, Option<BlobRef<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Root<'a> {
@@ -203,9 +206,9 @@ impl<'a> RootBuilder<'a, root_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RootBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -220,11 +223,11 @@ where
         mut self,
         value: impl Into<DocRef<'a>>,
     ) -> RootBuilder<'a, root_state::SetDoc<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RootBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -239,11 +242,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> RootBuilder<'a, root_state::SetSnapshot<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RootBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -257,8 +260,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Root<'a> {
         Root {
-            doc: self.__unsafe_private_named.0.unwrap(),
-            snapshot: self.__unsafe_private_named.1.unwrap(),
+            doc: self._fields.0.unwrap(),
+            snapshot: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -271,8 +274,8 @@ where
         >,
     ) -> Root<'a> {
         Root {
-            doc: self.__unsafe_private_named.0.unwrap(),
-            snapshot: self.__unsafe_private_named.1.unwrap(),
+            doc: self._fields.0.unwrap(),
+            snapshot: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

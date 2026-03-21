@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -183,15 +186,15 @@ pub mod get_post_thread_v2_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetPostThreadV2Builder<'a, S: get_post_thread_v2_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<bool>,
         Option<AtUri<'a>>,
         Option<i64>,
         Option<i64>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetPostThreadV2<'a> {
@@ -205,9 +208,9 @@ impl<'a> GetPostThreadV2Builder<'a, get_post_thread_v2_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetPostThreadV2Builder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -215,12 +218,12 @@ impl<'a> GetPostThreadV2Builder<'a, get_post_thread_v2_state::Empty> {
 impl<'a, S: get_post_thread_v2_state::State> GetPostThreadV2Builder<'a, S> {
     /// Set the `above` field (optional)
     pub fn above(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `above` field to an Option value (optional)
     pub fn maybe_above(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -235,11 +238,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> GetPostThreadV2Builder<'a, get_post_thread_v2_state::SetAnchor<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GetPostThreadV2Builder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -247,12 +250,12 @@ where
 impl<'a, S: get_post_thread_v2_state::State> GetPostThreadV2Builder<'a, S> {
     /// Set the `below` field (optional)
     pub fn below(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `below` field to an Option value (optional)
     pub fn maybe_below(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -260,12 +263,12 @@ impl<'a, S: get_post_thread_v2_state::State> GetPostThreadV2Builder<'a, S> {
 impl<'a, S: get_post_thread_v2_state::State> GetPostThreadV2Builder<'a, S> {
     /// Set the `branchingFactor` field (optional)
     pub fn branching_factor(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `branchingFactor` field to an Option value (optional)
     pub fn maybe_branching_factor(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -273,12 +276,12 @@ impl<'a, S: get_post_thread_v2_state::State> GetPostThreadV2Builder<'a, S> {
 impl<'a, S: get_post_thread_v2_state::State> GetPostThreadV2Builder<'a, S> {
     /// Set the `sort` field (optional)
     pub fn sort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
     pub fn maybe_sort(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -291,11 +294,11 @@ where
     /// Build the final struct
     pub fn build(self) -> GetPostThreadV2<'a> {
         GetPostThreadV2 {
-            above: self.__unsafe_private_named.0,
-            anchor: self.__unsafe_private_named.1.unwrap(),
-            below: self.__unsafe_private_named.2,
-            branching_factor: self.__unsafe_private_named.3,
-            sort: self.__unsafe_private_named.4,
+            above: self._fields.0,
+            anchor: self._fields.1.unwrap(),
+            below: self._fields.2,
+            branching_factor: self._fields.3,
+            sort: self._fields.4,
         }
     }
 }
@@ -310,49 +313,49 @@ pub mod thread_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Depth;
+        type Uri;
         type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Depth = Unset;
+        type Uri = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Depth = S::Depth;
-        type Value = S::Value;
     }
     ///State transition - sets the `depth` field to Set
     pub struct SetDepth<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDepth<S> {}
     impl<S: State> State for SetDepth<S> {
-        type Uri = S::Uri;
         type Depth = Set<members::depth>;
+        type Uri = S::Uri;
+        type Value = S::Value;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Depth = S::Depth;
+        type Uri = Set<members::uri>;
         type Value = S::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Uri = S::Uri;
         type Depth = S::Depth;
+        type Uri = S::Uri;
         type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `depth` field
         pub struct depth(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `value` field
         pub struct value(());
     }
@@ -360,13 +363,9 @@ pub mod thread_item_state {
 
 /// Builder for constructing an instance of this type
 pub struct ThreadItemBuilder<'a, S: thread_item_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<i64>,
-        Option<AtUri<'a>>,
-        Option<ThreadItemValue<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<AtUri<'a>>, Option<ThreadItemValue<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ThreadItem<'a> {
@@ -380,9 +379,9 @@ impl<'a> ThreadItemBuilder<'a, thread_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ThreadItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -397,11 +396,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ThreadItemBuilder<'a, thread_item_state::SetDepth<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ThreadItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -416,11 +415,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ThreadItemBuilder<'a, thread_item_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ThreadItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -435,11 +434,11 @@ where
         mut self,
         value: impl Into<ThreadItemValue<'a>>,
     ) -> ThreadItemBuilder<'a, thread_item_state::SetValue<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ThreadItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -447,16 +446,16 @@ where
 impl<'a, S> ThreadItemBuilder<'a, S>
 where
     S: thread_item_state::State,
-    S::Uri: thread_item_state::IsSet,
     S::Depth: thread_item_state::IsSet,
+    S::Uri: thread_item_state::IsSet,
     S::Value: thread_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ThreadItem<'a> {
         ThreadItem {
-            depth: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
-            value: self.__unsafe_private_named.2.unwrap(),
+            depth: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
+            value: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -469,9 +468,9 @@ where
         >,
     ) -> ThreadItem<'a> {
         ThreadItem {
-            depth: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
-            value: self.__unsafe_private_named.2.unwrap(),
+            depth: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
+            value: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

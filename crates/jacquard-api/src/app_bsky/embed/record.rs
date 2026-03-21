@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -279,9 +282,9 @@ pub mod record_state {
 
 /// Builder for constructing an instance of this type
 pub struct RecordBuilder<'a, S: record_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<StrongRef<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<StrongRef<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Record<'a> {
@@ -295,9 +298,9 @@ impl<'a> RecordBuilder<'a, record_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -312,11 +315,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> RecordBuilder<'a, record_state::SetRecord<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -329,7 +332,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Record<'a> {
         Record {
-            record: self.__unsafe_private_named.0.unwrap(),
+            record: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -339,7 +342,7 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Record<'a> {
         Record {
-            record: self.__unsafe_private_named.0.unwrap(),
+            record: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -639,9 +642,9 @@ pub mod view_state {
 
 /// Builder for constructing an instance of this type
 pub struct ViewBuilder<'a, S: view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<ViewUnionRecord<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<ViewUnionRecord<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> View<'a> {
@@ -655,9 +658,9 @@ impl<'a> ViewBuilder<'a, view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -672,11 +675,11 @@ where
         mut self,
         value: impl Into<ViewUnionRecord<'a>>,
     ) -> ViewBuilder<'a, view_state::SetRecord<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -689,7 +692,7 @@ where
     /// Build the final struct
     pub fn build(self) -> View<'a> {
         View {
-            record: self.__unsafe_private_named.0.unwrap(),
+            record: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -699,7 +702,7 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> View<'a> {
         View {
-            record: self.__unsafe_private_named.0.unwrap(),
+            record: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -716,58 +719,58 @@ pub mod view_blocked_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Blocked;
-        type Uri;
         type Author;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Blocked = Unset;
-        type Uri = Unset;
         type Author = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `blocked` field to Set
     pub struct SetBlocked<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlocked<S> {}
     impl<S: State> State for SetBlocked<S> {
         type Blocked = Set<members::blocked>;
+        type Author = S::Author;
         type Uri = S::Uri;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Blocked = S::Blocked;
-        type Uri = Set<members::uri>;
-        type Author = S::Author;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
         type Blocked = S::Blocked;
-        type Uri = S::Uri;
         type Author = Set<members::author>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Blocked = S::Blocked;
+        type Author = S::Author;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `blocked` field
         pub struct blocked(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ViewBlockedBuilder<'a, S: view_blocked_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<BlockedAuthor<'a>>, Option<bool>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<BlockedAuthor<'a>>, Option<bool>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ViewBlocked<'a> {
@@ -781,9 +784,9 @@ impl<'a> ViewBlockedBuilder<'a, view_blocked_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ViewBlockedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -798,11 +801,11 @@ where
         mut self,
         value: impl Into<BlockedAuthor<'a>>,
     ) -> ViewBlockedBuilder<'a, view_blocked_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ViewBlockedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -817,11 +820,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ViewBlockedBuilder<'a, view_blocked_state::SetBlocked<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ViewBlockedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -836,11 +839,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ViewBlockedBuilder<'a, view_blocked_state::SetUri<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ViewBlockedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -849,15 +852,15 @@ impl<'a, S> ViewBlockedBuilder<'a, S>
 where
     S: view_blocked_state::State,
     S::Blocked: view_blocked_state::IsSet,
-    S::Uri: view_blocked_state::IsSet,
     S::Author: view_blocked_state::IsSet,
+    S::Uri: view_blocked_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ViewBlocked<'a> {
         ViewBlocked {
-            author: self.__unsafe_private_named.0.unwrap(),
-            blocked: self.__unsafe_private_named.1.unwrap(),
-            uri: self.__unsafe_private_named.2.unwrap(),
+            author: self._fields.0.unwrap(),
+            blocked: self._fields.1.unwrap(),
+            uri: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -867,9 +870,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ViewBlocked<'a> {
         ViewBlocked {
-            author: self.__unsafe_private_named.0.unwrap(),
-            blocked: self.__unsafe_private_named.1.unwrap(),
-            uri: self.__unsafe_private_named.2.unwrap(),
+            author: self._fields.0.unwrap(),
+            blocked: self._fields.1.unwrap(),
+            uri: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -921,9 +924,9 @@ pub mod view_detached_state {
 
 /// Builder for constructing an instance of this type
 pub struct ViewDetachedBuilder<'a, S: view_detached_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ViewDetached<'a> {
@@ -937,9 +940,9 @@ impl<'a> ViewDetachedBuilder<'a, view_detached_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ViewDetachedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -954,11 +957,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ViewDetachedBuilder<'a, view_detached_state::SetDetached<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ViewDetachedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -973,11 +976,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ViewDetachedBuilder<'a, view_detached_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ViewDetachedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -991,8 +994,8 @@ where
     /// Build the final struct
     pub fn build(self) -> ViewDetached<'a> {
         ViewDetached {
-            detached: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
+            detached: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1002,8 +1005,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ViewDetached<'a> {
         ViewDetached {
-            detached: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
+            detached: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1019,45 +1022,45 @@ pub mod view_not_found_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type NotFound;
         type Uri;
+        type NotFound;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type NotFound = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `not_found` field to Set
-    pub struct SetNotFound<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotFound<S> {}
-    impl<S: State> State for SetNotFound<S> {
-        type NotFound = Set<members::not_found>;
-        type Uri = S::Uri;
+        type NotFound = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type NotFound = S::NotFound;
         type Uri = Set<members::uri>;
+        type NotFound = S::NotFound;
+    }
+    ///State transition - sets the `not_found` field to Set
+    pub struct SetNotFound<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotFound<S> {}
+    impl<S: State> State for SetNotFound<S> {
+        type Uri = S::Uri;
+        type NotFound = Set<members::not_found>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `not_found` field
-        pub struct not_found(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `not_found` field
+        pub struct not_found(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ViewNotFoundBuilder<'a, S: view_not_found_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ViewNotFound<'a> {
@@ -1071,9 +1074,9 @@ impl<'a> ViewNotFoundBuilder<'a, view_not_found_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ViewNotFoundBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1088,11 +1091,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ViewNotFoundBuilder<'a, view_not_found_state::SetNotFound<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ViewNotFoundBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1107,11 +1110,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ViewNotFoundBuilder<'a, view_not_found_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ViewNotFoundBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1119,14 +1122,14 @@ where
 impl<'a, S> ViewNotFoundBuilder<'a, S>
 where
     S: view_not_found_state::State,
-    S::NotFound: view_not_found_state::IsSet,
     S::Uri: view_not_found_state::IsSet,
+    S::NotFound: view_not_found_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ViewNotFound<'a> {
         ViewNotFound {
-            not_found: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
+            not_found: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1136,8 +1139,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ViewNotFound<'a> {
         ViewNotFound {
-            not_found: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
+            not_found: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1153,92 +1156,92 @@ pub mod view_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
-        type IndexedAt;
-        type Author;
-        type Uri;
         type Cid;
+        type Author;
+        type Value;
+        type Uri;
+        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
-        type IndexedAt = Unset;
-        type Author = Unset;
-        type Uri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type IndexedAt = S::IndexedAt;
-        type Author = S::Author;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Value = S::Value;
-        type IndexedAt = Set<members::indexed_at>;
-        type Author = S::Author;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Value = S::Value;
-        type IndexedAt = S::IndexedAt;
-        type Author = Set<members::author>;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Value = S::Value;
-        type IndexedAt = S::IndexedAt;
-        type Author = S::Author;
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
+        type Author = Unset;
+        type Value = Unset;
+        type Uri = Unset;
+        type IndexedAt = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Value = S::Value;
-        type IndexedAt = S::IndexedAt;
-        type Author = S::Author;
-        type Uri = S::Uri;
         type Cid = Set<members::cid>;
+        type Author = S::Author;
+        type Value = S::Value;
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Cid = S::Cid;
+        type Author = Set<members::author>;
+        type Value = S::Value;
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetValue<S> {}
+    impl<S: State> State for SetValue<S> {
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Value = Set<members::value>;
+        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Value = S::Value;
+        type Uri = Set<members::uri>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type Value = S::Value;
+        type Uri = S::Uri;
+        type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `author` field
-        pub struct author(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ViewRecordBuilder<'a, S: view_record_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ProfileViewBasic<'a>>,
         Option<Cid<'a>>,
         Option<Vec<ViewRecordEmbedsItem<'a>>>,
@@ -1251,7 +1254,7 @@ pub struct ViewRecordBuilder<'a, S: view_record_state::State> {
         Option<AtUri<'a>>,
         Option<Data<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ViewRecord<'a> {
@@ -1265,21 +1268,9 @@ impl<'a> ViewRecordBuilder<'a, view_record_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ViewRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1294,11 +1285,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> ViewRecordBuilder<'a, view_record_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ViewRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1313,11 +1304,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> ViewRecordBuilder<'a, view_record_state::SetCid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ViewRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1328,12 +1319,12 @@ impl<'a, S: view_record_state::State> ViewRecordBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<ViewRecordEmbedsItem<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `embeds` field to an Option value (optional)
     pub fn maybe_embeds(mut self, value: Option<Vec<ViewRecordEmbedsItem<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1348,11 +1339,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ViewRecordBuilder<'a, view_record_state::SetIndexedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ViewRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1360,12 +1351,12 @@ where
 impl<'a, S: view_record_state::State> ViewRecordBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<Label<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<Vec<Label<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1373,12 +1364,12 @@ impl<'a, S: view_record_state::State> ViewRecordBuilder<'a, S> {
 impl<'a, S: view_record_state::State> ViewRecordBuilder<'a, S> {
     /// Set the `likeCount` field (optional)
     pub fn like_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `likeCount` field to an Option value (optional)
     pub fn maybe_like_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1386,12 +1377,12 @@ impl<'a, S: view_record_state::State> ViewRecordBuilder<'a, S> {
 impl<'a, S: view_record_state::State> ViewRecordBuilder<'a, S> {
     /// Set the `quoteCount` field (optional)
     pub fn quote_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `quoteCount` field to an Option value (optional)
     pub fn maybe_quote_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1399,12 +1390,12 @@ impl<'a, S: view_record_state::State> ViewRecordBuilder<'a, S> {
 impl<'a, S: view_record_state::State> ViewRecordBuilder<'a, S> {
     /// Set the `replyCount` field (optional)
     pub fn reply_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `replyCount` field to an Option value (optional)
     pub fn maybe_reply_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -1412,12 +1403,12 @@ impl<'a, S: view_record_state::State> ViewRecordBuilder<'a, S> {
 impl<'a, S: view_record_state::State> ViewRecordBuilder<'a, S> {
     /// Set the `repostCount` field (optional)
     pub fn repost_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `repostCount` field to an Option value (optional)
     pub fn maybe_repost_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -1432,11 +1423,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ViewRecordBuilder<'a, view_record_state::SetUri<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         ViewRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1451,11 +1442,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> ViewRecordBuilder<'a, view_record_state::SetValue<S>> {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         ViewRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1463,26 +1454,26 @@ where
 impl<'a, S> ViewRecordBuilder<'a, S>
 where
     S: view_record_state::State,
-    S::Value: view_record_state::IsSet,
-    S::IndexedAt: view_record_state::IsSet,
-    S::Author: view_record_state::IsSet,
-    S::Uri: view_record_state::IsSet,
     S::Cid: view_record_state::IsSet,
+    S::Author: view_record_state::IsSet,
+    S::Value: view_record_state::IsSet,
+    S::Uri: view_record_state::IsSet,
+    S::IndexedAt: view_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ViewRecord<'a> {
         ViewRecord {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            embeds: self.__unsafe_private_named.2,
-            indexed_at: self.__unsafe_private_named.3.unwrap(),
-            labels: self.__unsafe_private_named.4,
-            like_count: self.__unsafe_private_named.5,
-            quote_count: self.__unsafe_private_named.6,
-            reply_count: self.__unsafe_private_named.7,
-            repost_count: self.__unsafe_private_named.8,
-            uri: self.__unsafe_private_named.9.unwrap(),
-            value: self.__unsafe_private_named.10.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            embeds: self._fields.2,
+            indexed_at: self._fields.3.unwrap(),
+            labels: self._fields.4,
+            like_count: self._fields.5,
+            quote_count: self._fields.6,
+            reply_count: self._fields.7,
+            repost_count: self._fields.8,
+            uri: self._fields.9.unwrap(),
+            value: self._fields.10.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1492,17 +1483,17 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ViewRecord<'a> {
         ViewRecord {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            embeds: self.__unsafe_private_named.2,
-            indexed_at: self.__unsafe_private_named.3.unwrap(),
-            labels: self.__unsafe_private_named.4,
-            like_count: self.__unsafe_private_named.5,
-            quote_count: self.__unsafe_private_named.6,
-            reply_count: self.__unsafe_private_named.7,
-            repost_count: self.__unsafe_private_named.8,
-            uri: self.__unsafe_private_named.9.unwrap(),
-            value: self.__unsafe_private_named.10.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            embeds: self._fields.2,
+            indexed_at: self._fields.3.unwrap(),
+            labels: self._fields.4,
+            like_count: self._fields.5,
+            quote_count: self._fields.6,
+            reply_count: self._fields.7,
+            repost_count: self._fields.8,
+            uri: self._fields.9.unwrap(),
+            value: self._fields.10.unwrap(),
             extra_data: Some(extra_data),
         }
     }

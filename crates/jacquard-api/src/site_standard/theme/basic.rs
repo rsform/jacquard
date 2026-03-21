@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -58,65 +61,65 @@ pub mod basic_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Background;
         type Foreground;
         type Accent;
+        type Background;
         type AccentForeground;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Background = Unset;
         type Foreground = Unset;
         type Accent = Unset;
+        type Background = Unset;
         type AccentForeground = Unset;
-    }
-    ///State transition - sets the `background` field to Set
-    pub struct SetBackground<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBackground<S> {}
-    impl<S: State> State for SetBackground<S> {
-        type Background = Set<members::background>;
-        type Foreground = S::Foreground;
-        type Accent = S::Accent;
-        type AccentForeground = S::AccentForeground;
     }
     ///State transition - sets the `foreground` field to Set
     pub struct SetForeground<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetForeground<S> {}
     impl<S: State> State for SetForeground<S> {
-        type Background = S::Background;
         type Foreground = Set<members::foreground>;
         type Accent = S::Accent;
+        type Background = S::Background;
         type AccentForeground = S::AccentForeground;
     }
     ///State transition - sets the `accent` field to Set
     pub struct SetAccent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAccent<S> {}
     impl<S: State> State for SetAccent<S> {
-        type Background = S::Background;
         type Foreground = S::Foreground;
         type Accent = Set<members::accent>;
+        type Background = S::Background;
+        type AccentForeground = S::AccentForeground;
+    }
+    ///State transition - sets the `background` field to Set
+    pub struct SetBackground<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBackground<S> {}
+    impl<S: State> State for SetBackground<S> {
+        type Foreground = S::Foreground;
+        type Accent = S::Accent;
+        type Background = Set<members::background>;
         type AccentForeground = S::AccentForeground;
     }
     ///State transition - sets the `accent_foreground` field to Set
     pub struct SetAccentForeground<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAccentForeground<S> {}
     impl<S: State> State for SetAccentForeground<S> {
-        type Background = S::Background;
         type Foreground = S::Foreground;
         type Accent = S::Accent;
+        type Background = S::Background;
         type AccentForeground = Set<members::accent_foreground>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `background` field
-        pub struct background(());
         ///Marker type for the `foreground` field
         pub struct foreground(());
         ///Marker type for the `accent` field
         pub struct accent(());
+        ///Marker type for the `background` field
+        pub struct background(());
         ///Marker type for the `accent_foreground` field
         pub struct accent_foreground(());
     }
@@ -124,14 +127,9 @@ pub mod basic_state {
 
 /// Builder for constructing an instance of this type
 pub struct BasicBuilder<'a, S: basic_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Rgb<'a>>,
-        Option<Rgb<'a>>,
-        Option<Rgb<'a>>,
-        Option<Rgb<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Rgb<'a>>, Option<Rgb<'a>>, Option<Rgb<'a>>, Option<Rgb<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Basic<'a> {
@@ -145,9 +143,9 @@ impl<'a> BasicBuilder<'a, basic_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BasicBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -162,11 +160,11 @@ where
         mut self,
         value: impl Into<Rgb<'a>>,
     ) -> BasicBuilder<'a, basic_state::SetAccent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BasicBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -181,11 +179,11 @@ where
         mut self,
         value: impl Into<Rgb<'a>>,
     ) -> BasicBuilder<'a, basic_state::SetAccentForeground<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         BasicBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -200,11 +198,11 @@ where
         mut self,
         value: impl Into<Rgb<'a>>,
     ) -> BasicBuilder<'a, basic_state::SetBackground<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         BasicBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -219,11 +217,11 @@ where
         mut self,
         value: impl Into<Rgb<'a>>,
     ) -> BasicBuilder<'a, basic_state::SetForeground<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         BasicBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -231,18 +229,18 @@ where
 impl<'a, S> BasicBuilder<'a, S>
 where
     S: basic_state::State,
-    S::Background: basic_state::IsSet,
     S::Foreground: basic_state::IsSet,
     S::Accent: basic_state::IsSet,
+    S::Background: basic_state::IsSet,
     S::AccentForeground: basic_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Basic<'a> {
         Basic {
-            accent: self.__unsafe_private_named.0.unwrap(),
-            accent_foreground: self.__unsafe_private_named.1.unwrap(),
-            background: self.__unsafe_private_named.2.unwrap(),
-            foreground: self.__unsafe_private_named.3.unwrap(),
+            accent: self._fields.0.unwrap(),
+            accent_foreground: self._fields.1.unwrap(),
+            background: self._fields.2.unwrap(),
+            foreground: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -255,10 +253,10 @@ where
         >,
     ) -> Basic<'a> {
         Basic {
-            accent: self.__unsafe_private_named.0.unwrap(),
-            accent_foreground: self.__unsafe_private_named.1.unwrap(),
-            background: self.__unsafe_private_named.2.unwrap(),
-            foreground: self.__unsafe_private_named.3.unwrap(),
+            accent: self._fields.0.unwrap(),
+            accent_foreground: self._fields.1.unwrap(),
+            background: self._fields.2.unwrap(),
+            foreground: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

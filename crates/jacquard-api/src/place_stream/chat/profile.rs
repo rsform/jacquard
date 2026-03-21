@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -195,59 +198,59 @@ pub mod color_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Blue;
         type Red;
         type Green;
-        type Blue;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Blue = Unset;
         type Red = Unset;
         type Green = Unset;
-        type Blue = Unset;
-    }
-    ///State transition - sets the `red` field to Set
-    pub struct SetRed<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRed<S> {}
-    impl<S: State> State for SetRed<S> {
-        type Red = Set<members::red>;
-        type Green = S::Green;
-        type Blue = S::Blue;
-    }
-    ///State transition - sets the `green` field to Set
-    pub struct SetGreen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGreen<S> {}
-    impl<S: State> State for SetGreen<S> {
-        type Red = S::Red;
-        type Green = Set<members::green>;
-        type Blue = S::Blue;
     }
     ///State transition - sets the `blue` field to Set
     pub struct SetBlue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlue<S> {}
     impl<S: State> State for SetBlue<S> {
+        type Blue = Set<members::blue>;
         type Red = S::Red;
         type Green = S::Green;
-        type Blue = Set<members::blue>;
+    }
+    ///State transition - sets the `red` field to Set
+    pub struct SetRed<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRed<S> {}
+    impl<S: State> State for SetRed<S> {
+        type Blue = S::Blue;
+        type Red = Set<members::red>;
+        type Green = S::Green;
+    }
+    ///State transition - sets the `green` field to Set
+    pub struct SetGreen<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGreen<S> {}
+    impl<S: State> State for SetGreen<S> {
+        type Blue = S::Blue;
+        type Red = S::Red;
+        type Green = Set<members::green>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `blue` field
+        pub struct blue(());
         ///Marker type for the `red` field
         pub struct red(());
         ///Marker type for the `green` field
         pub struct green(());
-        ///Marker type for the `blue` field
-        pub struct blue(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ColorBuilder<'a, S: color_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Color<'a> {
@@ -261,9 +264,9 @@ impl<'a> ColorBuilder<'a, color_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ColorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -278,11 +281,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ColorBuilder<'a, color_state::SetBlue<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ColorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -297,11 +300,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ColorBuilder<'a, color_state::SetGreen<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ColorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -316,11 +319,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ColorBuilder<'a, color_state::SetRed<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ColorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -328,16 +331,16 @@ where
 impl<'a, S> ColorBuilder<'a, S>
 where
     S: color_state::State,
+    S::Blue: color_state::IsSet,
     S::Red: color_state::IsSet,
     S::Green: color_state::IsSet,
-    S::Blue: color_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Color<'a> {
         Color {
-            blue: self.__unsafe_private_named.0.unwrap(),
-            green: self.__unsafe_private_named.1.unwrap(),
-            red: self.__unsafe_private_named.2.unwrap(),
+            blue: self._fields.0.unwrap(),
+            green: self._fields.1.unwrap(),
+            red: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -350,9 +353,9 @@ where
         >,
     ) -> Color<'a> {
         Color {
-            blue: self.__unsafe_private_named.0.unwrap(),
-            green: self.__unsafe_private_named.1.unwrap(),
-            red: self.__unsafe_private_named.2.unwrap(),
+            blue: self._fields.0.unwrap(),
+            green: self._fields.1.unwrap(),
+            red: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -468,9 +471,9 @@ pub mod profile_state {
 
 /// Builder for constructing an instance of this type
 pub struct ProfileBuilder<'a, S: profile_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<profile::Color<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<profile::Color<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Profile<'a> {
@@ -484,9 +487,9 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -494,12 +497,12 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `color` field (optional)
     pub fn color(mut self, value: impl Into<Option<profile::Color<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `color` field to an Option value (optional)
     pub fn maybe_color(mut self, value: Option<profile::Color<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -511,7 +514,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
         Profile {
-            color: self.__unsafe_private_named.0,
+            color: self._fields.0,
             extra_data: Default::default(),
         }
     }
@@ -524,7 +527,7 @@ where
         >,
     ) -> Profile<'a> {
         Profile {
-            color: self.__unsafe_private_named.0,
+            color: self._fields.0,
             extra_data: Some(extra_data),
         }
     }

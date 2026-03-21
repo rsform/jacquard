@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -137,9 +140,9 @@ pub mod difficulty_state {
 
 /// Builder for constructing an instance of this type
 pub struct DifficultyBuilder<'a, S: difficulty_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<Data<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Data<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Difficulty<'a> {
@@ -153,9 +156,9 @@ impl<'a> DifficultyBuilder<'a, difficulty_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DifficultyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -163,12 +166,12 @@ impl<'a> DifficultyBuilder<'a, difficulty_state::Empty> {
 impl<'a, S: difficulty_state::State> DifficultyBuilder<'a, S> {
     /// Set the `color` field (optional)
     pub fn color(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `color` field to an Option value (optional)
     pub fn maybe_color(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -183,11 +186,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> DifficultyBuilder<'a, difficulty_state::SetName<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DifficultyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -200,8 +203,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Difficulty<'a> {
         Difficulty {
-            color: self.__unsafe_private_named.0,
-            name: self.__unsafe_private_named.1.unwrap(),
+            color: self._fields.0,
+            name: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -211,8 +214,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Difficulty<'a> {
         Difficulty {
-            color: self.__unsafe_private_named.0,
-            name: self.__unsafe_private_named.1.unwrap(),
+            color: self._fields.0,
+            name: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

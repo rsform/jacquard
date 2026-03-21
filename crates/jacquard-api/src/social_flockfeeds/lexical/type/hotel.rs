@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -5603,8 +5606,8 @@ pub mod hotel_state {
 
 /// Builder for constructing an instance of this type
 pub struct HotelBuilder<'a, S: hotel_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<HotelAcceptedPaymentMethod<'a>>,
         Option<HotelActionableFeedbackPolicy<'a>>,
         Option<HotelAdditionalProperty<'a>>,
@@ -5739,7 +5742,7 @@ pub struct HotelBuilder<'a, S: hotel_state::State> {
         Option<HotelUrl<'a>>,
         Option<HotelVatId<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Hotel<'a> {
@@ -5753,8 +5756,8 @@ impl<'a> HotelBuilder<'a, hotel_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         HotelBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -5889,7 +5892,7 @@ impl<'a> HotelBuilder<'a, hotel_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -5900,7 +5903,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelAcceptedPaymentMethod<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `acceptedPaymentMethod` field to an Option value (optional)
@@ -5908,7 +5911,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelAcceptedPaymentMethod<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -5919,7 +5922,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelActionableFeedbackPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `actionableFeedbackPolicy` field to an Option value (optional)
@@ -5927,7 +5930,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelActionableFeedbackPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -5938,7 +5941,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelAdditionalProperty<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `additionalProperty` field to an Option value (optional)
@@ -5946,7 +5949,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelAdditionalProperty<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -5957,7 +5960,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelAdditionalType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
@@ -5965,7 +5968,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelAdditionalType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -5973,12 +5976,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `address` field (optional)
     pub fn address(mut self, value: impl Into<Option<HotelAddress<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `address` field to an Option value (optional)
     pub fn maybe_address(mut self, value: Option<HotelAddress<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -5989,7 +5992,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelAgentInteractionStatistic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `agentInteractionStatistic` field to an Option value (optional)
@@ -5997,7 +6000,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelAgentInteractionStatistic<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -6008,7 +6011,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelAggregateRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
@@ -6016,7 +6019,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelAggregateRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -6027,7 +6030,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelAlternateName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
@@ -6035,7 +6038,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelAlternateName<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -6043,12 +6046,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `alumni` field (optional)
     pub fn alumni(mut self, value: impl Into<Option<HotelAlumni<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `alumni` field to an Option value (optional)
     pub fn maybe_alumni(mut self, value: Option<HotelAlumni<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -6059,7 +6062,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelAmenityFeature<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `amenityFeature` field to an Option value (optional)
@@ -6067,7 +6070,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelAmenityFeature<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -6075,12 +6078,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `areaServed` field (optional)
     pub fn area_served(mut self, value: impl Into<Option<HotelAreaServed<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `areaServed` field to an Option value (optional)
     pub fn maybe_area_served(mut self, value: Option<HotelAreaServed<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -6088,12 +6091,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `audience` field (optional)
     pub fn audience(mut self, value: impl Into<Option<HotelAudience<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `audience` field to an Option value (optional)
     pub fn maybe_audience(mut self, value: Option<HotelAudience<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -6104,7 +6107,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelAvailableLanguage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `availableLanguage` field to an Option value (optional)
@@ -6112,7 +6115,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelAvailableLanguage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -6120,12 +6123,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<HotelAward<'a>>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
     pub fn maybe_award(mut self, value: Option<HotelAward<'a>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -6133,12 +6136,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<HotelAwards<'a>>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
     pub fn maybe_awards(mut self, value: Option<HotelAwards<'a>>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -6146,12 +6149,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `branchCode` field (optional)
     pub fn branch_code(mut self, value: impl Into<Option<HotelBranchCode<'a>>>) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `branchCode` field to an Option value (optional)
     pub fn maybe_branch_code(mut self, value: Option<HotelBranchCode<'a>>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -6159,12 +6162,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `branchOf` field (optional)
     pub fn branch_of(mut self, value: impl Into<Option<HotelBranchOf<'a>>>) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `branchOf` field to an Option value (optional)
     pub fn maybe_branch_of(mut self, value: Option<HotelBranchOf<'a>>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -6172,12 +6175,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `brand` field (optional)
     pub fn brand(mut self, value: impl Into<Option<HotelBrand<'a>>>) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `brand` field to an Option value (optional)
     pub fn maybe_brand(mut self, value: Option<HotelBrand<'a>>) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -6188,12 +6191,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelCheckinTime<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `checkinTime` field to an Option value (optional)
     pub fn maybe_checkin_time(mut self, value: Option<HotelCheckinTime<'a>>) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -6204,12 +6207,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelCheckoutTime<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `checkoutTime` field to an Option value (optional)
     pub fn maybe_checkout_time(mut self, value: Option<HotelCheckoutTime<'a>>) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -6220,7 +6223,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelCompanyRegistration<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `companyRegistration` field to an Option value (optional)
@@ -6228,7 +6231,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelCompanyRegistration<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -6239,12 +6242,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelContactPoint<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `contactPoint` field to an Option value (optional)
     pub fn maybe_contact_point(mut self, value: Option<HotelContactPoint<'a>>) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -6255,7 +6258,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelContactPoints<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `contactPoints` field to an Option value (optional)
@@ -6263,7 +6266,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelContactPoints<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -6274,12 +6277,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelContainedIn<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.23 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `containedIn` field to an Option value (optional)
     pub fn maybe_contained_in(mut self, value: Option<HotelContainedIn<'a>>) -> Self {
-        self.__unsafe_private_named.23 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -6290,7 +6293,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelContainedInPlace<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.24 = value.into();
+        self._fields.24 = value.into();
         self
     }
     /// Set the `containedInPlace` field to an Option value (optional)
@@ -6298,7 +6301,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelContainedInPlace<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.24 = value;
+        self._fields.24 = value;
         self
     }
 }
@@ -6309,7 +6312,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelContainsPlace<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.25 = value.into();
+        self._fields.25 = value.into();
         self
     }
     /// Set the `containsPlace` field to an Option value (optional)
@@ -6317,7 +6320,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelContainsPlace<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.25 = value;
+        self._fields.25 = value;
         self
     }
 }
@@ -6328,7 +6331,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelCorrectionsPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.26 = value.into();
+        self._fields.26 = value.into();
         self
     }
     /// Set the `correctionsPolicy` field to an Option value (optional)
@@ -6336,7 +6339,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelCorrectionsPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.26 = value;
+        self._fields.26 = value;
         self
     }
 }
@@ -6347,7 +6350,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelCurrenciesAccepted<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.27 = value.into();
+        self._fields.27 = value.into();
         self
     }
     /// Set the `currenciesAccepted` field to an Option value (optional)
@@ -6355,7 +6358,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelCurrenciesAccepted<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.27 = value;
+        self._fields.27 = value;
         self
     }
 }
@@ -6363,12 +6366,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `department` field (optional)
     pub fn department(mut self, value: impl Into<Option<HotelDepartment<'a>>>) -> Self {
-        self.__unsafe_private_named.28 = value.into();
+        self._fields.28 = value.into();
         self
     }
     /// Set the `department` field to an Option value (optional)
     pub fn maybe_department(mut self, value: Option<HotelDepartment<'a>>) -> Self {
-        self.__unsafe_private_named.28 = value;
+        self._fields.28 = value;
         self
     }
 }
@@ -6379,12 +6382,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.29 = value.into();
+        self._fields.29 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<HotelDescription<'a>>) -> Self {
-        self.__unsafe_private_named.29 = value;
+        self._fields.29 = value;
         self
     }
 }
@@ -6395,7 +6398,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelDisambiguatingDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.30 = value.into();
+        self._fields.30 = value.into();
         self
     }
     /// Set the `disambiguatingDescription` field to an Option value (optional)
@@ -6403,7 +6406,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelDisambiguatingDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.30 = value;
+        self._fields.30 = value;
         self
     }
 }
@@ -6414,7 +6417,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelDissolutionDate<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value.into();
+        self._fields.31 = value.into();
         self
     }
     /// Set the `dissolutionDate` field to an Option value (optional)
@@ -6422,7 +6425,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelDissolutionDate<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value;
+        self._fields.31 = value;
         self
     }
 }
@@ -6433,7 +6436,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelDiversityPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value.into();
+        self._fields.32 = value.into();
         self
     }
     /// Set the `diversityPolicy` field to an Option value (optional)
@@ -6441,7 +6444,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelDiversityPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value;
+        self._fields.32 = value;
         self
     }
 }
@@ -6452,7 +6455,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelDiversityStaffingReport<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value.into();
+        self._fields.33 = value.into();
         self
     }
     /// Set the `diversityStaffingReport` field to an Option value (optional)
@@ -6460,7 +6463,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelDiversityStaffingReport<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value;
+        self._fields.33 = value;
         self
     }
 }
@@ -6468,12 +6471,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `duns` field (optional)
     pub fn duns(mut self, value: impl Into<Option<HotelDuns<'a>>>) -> Self {
-        self.__unsafe_private_named.34 = value.into();
+        self._fields.34 = value.into();
         self
     }
     /// Set the `duns` field to an Option value (optional)
     pub fn maybe_duns(mut self, value: Option<HotelDuns<'a>>) -> Self {
-        self.__unsafe_private_named.34 = value;
+        self._fields.34 = value;
         self
     }
 }
@@ -6481,12 +6484,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `email` field (optional)
     pub fn email(mut self, value: impl Into<Option<HotelEmail<'a>>>) -> Self {
-        self.__unsafe_private_named.35 = value.into();
+        self._fields.35 = value.into();
         self
     }
     /// Set the `email` field to an Option value (optional)
     pub fn maybe_email(mut self, value: Option<HotelEmail<'a>>) -> Self {
-        self.__unsafe_private_named.35 = value;
+        self._fields.35 = value;
         self
     }
 }
@@ -6494,12 +6497,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `employee` field (optional)
     pub fn employee(mut self, value: impl Into<Option<HotelEmployee<'a>>>) -> Self {
-        self.__unsafe_private_named.36 = value.into();
+        self._fields.36 = value.into();
         self
     }
     /// Set the `employee` field to an Option value (optional)
     pub fn maybe_employee(mut self, value: Option<HotelEmployee<'a>>) -> Self {
-        self.__unsafe_private_named.36 = value;
+        self._fields.36 = value;
         self
     }
 }
@@ -6507,12 +6510,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `employees` field (optional)
     pub fn employees(mut self, value: impl Into<Option<HotelEmployees<'a>>>) -> Self {
-        self.__unsafe_private_named.37 = value.into();
+        self._fields.37 = value.into();
         self
     }
     /// Set the `employees` field to an Option value (optional)
     pub fn maybe_employees(mut self, value: Option<HotelEmployees<'a>>) -> Self {
-        self.__unsafe_private_named.37 = value;
+        self._fields.37 = value;
         self
     }
 }
@@ -6523,12 +6526,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelEthicsPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.38 = value.into();
+        self._fields.38 = value.into();
         self
     }
     /// Set the `ethicsPolicy` field to an Option value (optional)
     pub fn maybe_ethics_policy(mut self, value: Option<HotelEthicsPolicy<'a>>) -> Self {
-        self.__unsafe_private_named.38 = value;
+        self._fields.38 = value;
         self
     }
 }
@@ -6536,12 +6539,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `event` field (optional)
     pub fn event(mut self, value: impl Into<Option<HotelEvent<'a>>>) -> Self {
-        self.__unsafe_private_named.39 = value.into();
+        self._fields.39 = value.into();
         self
     }
     /// Set the `event` field to an Option value (optional)
     pub fn maybe_event(mut self, value: Option<HotelEvent<'a>>) -> Self {
-        self.__unsafe_private_named.39 = value;
+        self._fields.39 = value;
         self
     }
 }
@@ -6549,12 +6552,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `events` field (optional)
     pub fn events(mut self, value: impl Into<Option<HotelEvents<'a>>>) -> Self {
-        self.__unsafe_private_named.40 = value.into();
+        self._fields.40 = value.into();
         self
     }
     /// Set the `events` field to an Option value (optional)
     pub fn maybe_events(mut self, value: Option<HotelEvents<'a>>) -> Self {
-        self.__unsafe_private_named.40 = value;
+        self._fields.40 = value;
         self
     }
 }
@@ -6562,12 +6565,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `faxNumber` field (optional)
     pub fn fax_number(mut self, value: impl Into<Option<HotelFaxNumber<'a>>>) -> Self {
-        self.__unsafe_private_named.41 = value.into();
+        self._fields.41 = value.into();
         self
     }
     /// Set the `faxNumber` field to an Option value (optional)
     pub fn maybe_fax_number(mut self, value: Option<HotelFaxNumber<'a>>) -> Self {
-        self.__unsafe_private_named.41 = value;
+        self._fields.41 = value;
         self
     }
 }
@@ -6575,12 +6578,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `founder` field (optional)
     pub fn founder(mut self, value: impl Into<Option<HotelFounder<'a>>>) -> Self {
-        self.__unsafe_private_named.42 = value.into();
+        self._fields.42 = value.into();
         self
     }
     /// Set the `founder` field to an Option value (optional)
     pub fn maybe_founder(mut self, value: Option<HotelFounder<'a>>) -> Self {
-        self.__unsafe_private_named.42 = value;
+        self._fields.42 = value;
         self
     }
 }
@@ -6588,12 +6591,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `founders` field (optional)
     pub fn founders(mut self, value: impl Into<Option<HotelFounders<'a>>>) -> Self {
-        self.__unsafe_private_named.43 = value.into();
+        self._fields.43 = value.into();
         self
     }
     /// Set the `founders` field to an Option value (optional)
     pub fn maybe_founders(mut self, value: Option<HotelFounders<'a>>) -> Self {
-        self.__unsafe_private_named.43 = value;
+        self._fields.43 = value;
         self
     }
 }
@@ -6604,12 +6607,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelFoundingDate<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.44 = value.into();
+        self._fields.44 = value.into();
         self
     }
     /// Set the `foundingDate` field to an Option value (optional)
     pub fn maybe_founding_date(mut self, value: Option<HotelFoundingDate<'a>>) -> Self {
-        self.__unsafe_private_named.44 = value;
+        self._fields.44 = value;
         self
     }
 }
@@ -6620,7 +6623,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelFoundingLocation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value.into();
+        self._fields.45 = value.into();
         self
     }
     /// Set the `foundingLocation` field to an Option value (optional)
@@ -6628,7 +6631,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelFoundingLocation<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value;
+        self._fields.45 = value;
         self
     }
 }
@@ -6636,12 +6639,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `funder` field (optional)
     pub fn funder(mut self, value: impl Into<Option<HotelFunder<'a>>>) -> Self {
-        self.__unsafe_private_named.46 = value.into();
+        self._fields.46 = value.into();
         self
     }
     /// Set the `funder` field to an Option value (optional)
     pub fn maybe_funder(mut self, value: Option<HotelFunder<'a>>) -> Self {
-        self.__unsafe_private_named.46 = value;
+        self._fields.46 = value;
         self
     }
 }
@@ -6649,12 +6652,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<HotelFunding<'a>>>) -> Self {
-        self.__unsafe_private_named.47 = value.into();
+        self._fields.47 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
     pub fn maybe_funding(mut self, value: Option<HotelFunding<'a>>) -> Self {
-        self.__unsafe_private_named.47 = value;
+        self._fields.47 = value;
         self
     }
 }
@@ -6662,12 +6665,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `geo` field (optional)
     pub fn geo(mut self, value: impl Into<Option<HotelGeo<'a>>>) -> Self {
-        self.__unsafe_private_named.48 = value.into();
+        self._fields.48 = value.into();
         self
     }
     /// Set the `geo` field to an Option value (optional)
     pub fn maybe_geo(mut self, value: Option<HotelGeo<'a>>) -> Self {
-        self.__unsafe_private_named.48 = value;
+        self._fields.48 = value;
         self
     }
 }
@@ -6678,12 +6681,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelGeoContains<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.49 = value.into();
+        self._fields.49 = value.into();
         self
     }
     /// Set the `geoContains` field to an Option value (optional)
     pub fn maybe_geo_contains(mut self, value: Option<HotelGeoContains<'a>>) -> Self {
-        self.__unsafe_private_named.49 = value;
+        self._fields.49 = value;
         self
     }
 }
@@ -6694,12 +6697,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelGeoCoveredBy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.50 = value.into();
+        self._fields.50 = value.into();
         self
     }
     /// Set the `geoCoveredBy` field to an Option value (optional)
     pub fn maybe_geo_covered_by(mut self, value: Option<HotelGeoCoveredBy<'a>>) -> Self {
-        self.__unsafe_private_named.50 = value;
+        self._fields.50 = value;
         self
     }
 }
@@ -6707,12 +6710,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `geoCovers` field (optional)
     pub fn geo_covers(mut self, value: impl Into<Option<HotelGeoCovers<'a>>>) -> Self {
-        self.__unsafe_private_named.51 = value.into();
+        self._fields.51 = value.into();
         self
     }
     /// Set the `geoCovers` field to an Option value (optional)
     pub fn maybe_geo_covers(mut self, value: Option<HotelGeoCovers<'a>>) -> Self {
-        self.__unsafe_private_named.51 = value;
+        self._fields.51 = value;
         self
     }
 }
@@ -6720,12 +6723,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `geoCrosses` field (optional)
     pub fn geo_crosses(mut self, value: impl Into<Option<HotelGeoCrosses<'a>>>) -> Self {
-        self.__unsafe_private_named.52 = value.into();
+        self._fields.52 = value.into();
         self
     }
     /// Set the `geoCrosses` field to an Option value (optional)
     pub fn maybe_geo_crosses(mut self, value: Option<HotelGeoCrosses<'a>>) -> Self {
-        self.__unsafe_private_named.52 = value;
+        self._fields.52 = value;
         self
     }
 }
@@ -6736,12 +6739,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelGeoDisjoint<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.53 = value.into();
+        self._fields.53 = value.into();
         self
     }
     /// Set the `geoDisjoint` field to an Option value (optional)
     pub fn maybe_geo_disjoint(mut self, value: Option<HotelGeoDisjoint<'a>>) -> Self {
-        self.__unsafe_private_named.53 = value;
+        self._fields.53 = value;
         self
     }
 }
@@ -6749,12 +6752,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `geoEquals` field (optional)
     pub fn geo_equals(mut self, value: impl Into<Option<HotelGeoEquals<'a>>>) -> Self {
-        self.__unsafe_private_named.54 = value.into();
+        self._fields.54 = value.into();
         self
     }
     /// Set the `geoEquals` field to an Option value (optional)
     pub fn maybe_geo_equals(mut self, value: Option<HotelGeoEquals<'a>>) -> Self {
-        self.__unsafe_private_named.54 = value;
+        self._fields.54 = value;
         self
     }
 }
@@ -6765,7 +6768,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelGeoIntersects<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.55 = value.into();
+        self._fields.55 = value.into();
         self
     }
     /// Set the `geoIntersects` field to an Option value (optional)
@@ -6773,7 +6776,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelGeoIntersects<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.55 = value;
+        self._fields.55 = value;
         self
     }
 }
@@ -6784,12 +6787,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelGeoOverlaps<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value.into();
+        self._fields.56 = value.into();
         self
     }
     /// Set the `geoOverlaps` field to an Option value (optional)
     pub fn maybe_geo_overlaps(mut self, value: Option<HotelGeoOverlaps<'a>>) -> Self {
-        self.__unsafe_private_named.56 = value;
+        self._fields.56 = value;
         self
     }
 }
@@ -6797,12 +6800,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `geoTouches` field (optional)
     pub fn geo_touches(mut self, value: impl Into<Option<HotelGeoTouches<'a>>>) -> Self {
-        self.__unsafe_private_named.57 = value.into();
+        self._fields.57 = value.into();
         self
     }
     /// Set the `geoTouches` field to an Option value (optional)
     pub fn maybe_geo_touches(mut self, value: Option<HotelGeoTouches<'a>>) -> Self {
-        self.__unsafe_private_named.57 = value;
+        self._fields.57 = value;
         self
     }
 }
@@ -6810,12 +6813,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `geoWithin` field (optional)
     pub fn geo_within(mut self, value: impl Into<Option<HotelGeoWithin<'a>>>) -> Self {
-        self.__unsafe_private_named.58 = value.into();
+        self._fields.58 = value.into();
         self
     }
     /// Set the `geoWithin` field to an Option value (optional)
     pub fn maybe_geo_within(mut self, value: Option<HotelGeoWithin<'a>>) -> Self {
-        self.__unsafe_private_named.58 = value;
+        self._fields.58 = value;
         self
     }
 }
@@ -6826,7 +6829,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelGlobalLocationNumber<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.59 = value.into();
+        self._fields.59 = value.into();
         self
     }
     /// Set the `globalLocationNumber` field to an Option value (optional)
@@ -6834,7 +6837,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelGlobalLocationNumber<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.59 = value;
+        self._fields.59 = value;
         self
     }
 }
@@ -6845,7 +6848,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelHasCertification<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.60 = value.into();
+        self._fields.60 = value.into();
         self
     }
     /// Set the `hasCertification` field to an Option value (optional)
@@ -6853,7 +6856,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelHasCertification<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.60 = value;
+        self._fields.60 = value;
         self
     }
 }
@@ -6864,7 +6867,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelHasCredential<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.61 = value.into();
+        self._fields.61 = value.into();
         self
     }
     /// Set the `hasCredential` field to an Option value (optional)
@@ -6872,7 +6875,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelHasCredential<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.61 = value;
+        self._fields.61 = value;
         self
     }
 }
@@ -6883,7 +6886,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelHasDriveThroughService<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.62 = value.into();
+        self._fields.62 = value.into();
         self
     }
     /// Set the `hasDriveThroughService` field to an Option value (optional)
@@ -6891,7 +6894,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelHasDriveThroughService<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.62 = value;
+        self._fields.62 = value;
         self
     }
 }
@@ -6902,7 +6905,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelHasGs1DigitalLink<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.63 = value.into();
+        self._fields.63 = value.into();
         self
     }
     /// Set the `hasGS1DigitalLink` field to an Option value (optional)
@@ -6910,7 +6913,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelHasGs1DigitalLink<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.63 = value;
+        self._fields.63 = value;
         self
     }
 }
@@ -6918,12 +6921,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasMap` field (optional)
     pub fn has_map(mut self, value: impl Into<Option<HotelHasMap<'a>>>) -> Self {
-        self.__unsafe_private_named.64 = value.into();
+        self._fields.64 = value.into();
         self
     }
     /// Set the `hasMap` field to an Option value (optional)
     pub fn maybe_has_map(mut self, value: Option<HotelHasMap<'a>>) -> Self {
-        self.__unsafe_private_named.64 = value;
+        self._fields.64 = value;
         self
     }
 }
@@ -6934,7 +6937,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelHasMemberProgram<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.65 = value.into();
+        self._fields.65 = value.into();
         self
     }
     /// Set the `hasMemberProgram` field to an Option value (optional)
@@ -6942,7 +6945,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelHasMemberProgram<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.65 = value;
+        self._fields.65 = value;
         self
     }
 }
@@ -6953,7 +6956,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelHasMerchantReturnPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.66 = value.into();
+        self._fields.66 = value.into();
         self
     }
     /// Set the `hasMerchantReturnPolicy` field to an Option value (optional)
@@ -6961,7 +6964,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelHasMerchantReturnPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.66 = value;
+        self._fields.66 = value;
         self
     }
 }
@@ -6972,7 +6975,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelHasOfferCatalog<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.67 = value.into();
+        self._fields.67 = value.into();
         self
     }
     /// Set the `hasOfferCatalog` field to an Option value (optional)
@@ -6980,7 +6983,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelHasOfferCatalog<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.67 = value;
+        self._fields.67 = value;
         self
     }
 }
@@ -6988,12 +6991,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `hasPOS` field (optional)
     pub fn has_pos(mut self, value: impl Into<Option<HotelHasPos<'a>>>) -> Self {
-        self.__unsafe_private_named.68 = value.into();
+        self._fields.68 = value.into();
         self
     }
     /// Set the `hasPOS` field to an Option value (optional)
     pub fn maybe_has_pos(mut self, value: Option<HotelHasPos<'a>>) -> Self {
-        self.__unsafe_private_named.68 = value;
+        self._fields.68 = value;
         self
     }
 }
@@ -7004,7 +7007,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelHasProductReturnPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.69 = value.into();
+        self._fields.69 = value.into();
         self
     }
     /// Set the `hasProductReturnPolicy` field to an Option value (optional)
@@ -7012,7 +7015,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelHasProductReturnPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.69 = value;
+        self._fields.69 = value;
         self
     }
 }
@@ -7023,7 +7026,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelHasShippingService<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.70 = value.into();
+        self._fields.70 = value.into();
         self
     }
     /// Set the `hasShippingService` field to an Option value (optional)
@@ -7031,7 +7034,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelHasShippingService<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.70 = value;
+        self._fields.70 = value;
         self
     }
 }
@@ -7039,12 +7042,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `identifier` field (optional)
     pub fn identifier(mut self, value: impl Into<Option<HotelIdentifier<'a>>>) -> Self {
-        self.__unsafe_private_named.71 = value.into();
+        self._fields.71 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
     pub fn maybe_identifier(mut self, value: Option<HotelIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.71 = value;
+        self._fields.71 = value;
         self
     }
 }
@@ -7052,12 +7055,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<HotelImage<'a>>>) -> Self {
-        self.__unsafe_private_named.72 = value.into();
+        self._fields.72 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<HotelImage<'a>>) -> Self {
-        self.__unsafe_private_named.72 = value;
+        self._fields.72 = value;
         self
     }
 }
@@ -7068,7 +7071,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelInteractionStatistic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.73 = value.into();
+        self._fields.73 = value.into();
         self
     }
     /// Set the `interactionStatistic` field to an Option value (optional)
@@ -7076,7 +7079,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelInteractionStatistic<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.73 = value;
+        self._fields.73 = value;
         self
     }
 }
@@ -7087,7 +7090,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelIsAccessibleForFree<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.74 = value.into();
+        self._fields.74 = value.into();
         self
     }
     /// Set the `isAccessibleForFree` field to an Option value (optional)
@@ -7095,7 +7098,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelIsAccessibleForFree<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.74 = value;
+        self._fields.74 = value;
         self
     }
 }
@@ -7103,12 +7106,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `isicV4` field (optional)
     pub fn isic_v4(mut self, value: impl Into<Option<HotelIsicV4<'a>>>) -> Self {
-        self.__unsafe_private_named.75 = value.into();
+        self._fields.75 = value.into();
         self
     }
     /// Set the `isicV4` field to an Option value (optional)
     pub fn maybe_isic_v4(mut self, value: Option<HotelIsicV4<'a>>) -> Self {
-        self.__unsafe_private_named.75 = value;
+        self._fields.75 = value;
         self
     }
 }
@@ -7119,12 +7122,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelIso6523Code<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.76 = value.into();
+        self._fields.76 = value.into();
         self
     }
     /// Set the `iso6523Code` field to an Option value (optional)
     pub fn maybe_iso6523_code(mut self, value: Option<HotelIso6523Code<'a>>) -> Self {
-        self.__unsafe_private_named.76 = value;
+        self._fields.76 = value;
         self
     }
 }
@@ -7132,12 +7135,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<HotelKeywords<'a>>>) -> Self {
-        self.__unsafe_private_named.77 = value.into();
+        self._fields.77 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
     pub fn maybe_keywords(mut self, value: Option<HotelKeywords<'a>>) -> Self {
-        self.__unsafe_private_named.77 = value;
+        self._fields.77 = value;
         self
     }
 }
@@ -7145,12 +7148,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `knowsAbout` field (optional)
     pub fn knows_about(mut self, value: impl Into<Option<HotelKnowsAbout<'a>>>) -> Self {
-        self.__unsafe_private_named.78 = value.into();
+        self._fields.78 = value.into();
         self
     }
     /// Set the `knowsAbout` field to an Option value (optional)
     pub fn maybe_knows_about(mut self, value: Option<HotelKnowsAbout<'a>>) -> Self {
-        self.__unsafe_private_named.78 = value;
+        self._fields.78 = value;
         self
     }
 }
@@ -7161,7 +7164,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelKnowsLanguage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.79 = value.into();
+        self._fields.79 = value.into();
         self
     }
     /// Set the `knowsLanguage` field to an Option value (optional)
@@ -7169,7 +7172,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelKnowsLanguage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.79 = value;
+        self._fields.79 = value;
         self
     }
 }
@@ -7177,12 +7180,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `latitude` field (optional)
     pub fn latitude(mut self, value: impl Into<Option<HotelLatitude<'a>>>) -> Self {
-        self.__unsafe_private_named.80 = value.into();
+        self._fields.80 = value.into();
         self
     }
     /// Set the `latitude` field to an Option value (optional)
     pub fn maybe_latitude(mut self, value: Option<HotelLatitude<'a>>) -> Self {
-        self.__unsafe_private_named.80 = value;
+        self._fields.80 = value;
         self
     }
 }
@@ -7193,12 +7196,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelLegalAddress<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.81 = value.into();
+        self._fields.81 = value.into();
         self
     }
     /// Set the `legalAddress` field to an Option value (optional)
     pub fn maybe_legal_address(mut self, value: Option<HotelLegalAddress<'a>>) -> Self {
-        self.__unsafe_private_named.81 = value;
+        self._fields.81 = value;
         self
     }
 }
@@ -7206,12 +7209,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `legalName` field (optional)
     pub fn legal_name(mut self, value: impl Into<Option<HotelLegalName<'a>>>) -> Self {
-        self.__unsafe_private_named.82 = value.into();
+        self._fields.82 = value.into();
         self
     }
     /// Set the `legalName` field to an Option value (optional)
     pub fn maybe_legal_name(mut self, value: Option<HotelLegalName<'a>>) -> Self {
-        self.__unsafe_private_named.82 = value;
+        self._fields.82 = value;
         self
     }
 }
@@ -7222,7 +7225,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelLegalRepresentative<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.83 = value.into();
+        self._fields.83 = value.into();
         self
     }
     /// Set the `legalRepresentative` field to an Option value (optional)
@@ -7230,7 +7233,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelLegalRepresentative<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.83 = value;
+        self._fields.83 = value;
         self
     }
 }
@@ -7238,12 +7241,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `leiCode` field (optional)
     pub fn lei_code(mut self, value: impl Into<Option<HotelLeiCode<'a>>>) -> Self {
-        self.__unsafe_private_named.84 = value.into();
+        self._fields.84 = value.into();
         self
     }
     /// Set the `leiCode` field to an Option value (optional)
     pub fn maybe_lei_code(mut self, value: Option<HotelLeiCode<'a>>) -> Self {
-        self.__unsafe_private_named.84 = value;
+        self._fields.84 = value;
         self
     }
 }
@@ -7251,12 +7254,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<HotelLocation<'a>>>) -> Self {
-        self.__unsafe_private_named.85 = value.into();
+        self._fields.85 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
     pub fn maybe_location(mut self, value: Option<HotelLocation<'a>>) -> Self {
-        self.__unsafe_private_named.85 = value;
+        self._fields.85 = value;
         self
     }
 }
@@ -7264,12 +7267,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `logo` field (optional)
     pub fn logo(mut self, value: impl Into<Option<HotelLogo<'a>>>) -> Self {
-        self.__unsafe_private_named.86 = value.into();
+        self._fields.86 = value.into();
         self
     }
     /// Set the `logo` field to an Option value (optional)
     pub fn maybe_logo(mut self, value: Option<HotelLogo<'a>>) -> Self {
-        self.__unsafe_private_named.86 = value;
+        self._fields.86 = value;
         self
     }
 }
@@ -7277,12 +7280,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `longitude` field (optional)
     pub fn longitude(mut self, value: impl Into<Option<HotelLongitude<'a>>>) -> Self {
-        self.__unsafe_private_named.87 = value.into();
+        self._fields.87 = value.into();
         self
     }
     /// Set the `longitude` field to an Option value (optional)
     pub fn maybe_longitude(mut self, value: Option<HotelLongitude<'a>>) -> Self {
-        self.__unsafe_private_named.87 = value;
+        self._fields.87 = value;
         self
     }
 }
@@ -7293,7 +7296,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelMainEntityOfPage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.88 = value.into();
+        self._fields.88 = value.into();
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
@@ -7301,7 +7304,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelMainEntityOfPage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.88 = value;
+        self._fields.88 = value;
         self
     }
 }
@@ -7309,12 +7312,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `makesOffer` field (optional)
     pub fn makes_offer(mut self, value: impl Into<Option<HotelMakesOffer<'a>>>) -> Self {
-        self.__unsafe_private_named.89 = value.into();
+        self._fields.89 = value.into();
         self
     }
     /// Set the `makesOffer` field to an Option value (optional)
     pub fn maybe_makes_offer(mut self, value: Option<HotelMakesOffer<'a>>) -> Self {
-        self.__unsafe_private_named.89 = value;
+        self._fields.89 = value;
         self
     }
 }
@@ -7322,12 +7325,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `map` field (optional)
     pub fn map(mut self, value: impl Into<Option<HotelMap<'a>>>) -> Self {
-        self.__unsafe_private_named.90 = value.into();
+        self._fields.90 = value.into();
         self
     }
     /// Set the `map` field to an Option value (optional)
     pub fn maybe_map(mut self, value: Option<HotelMap<'a>>) -> Self {
-        self.__unsafe_private_named.90 = value;
+        self._fields.90 = value;
         self
     }
 }
@@ -7335,12 +7338,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `maps` field (optional)
     pub fn maps(mut self, value: impl Into<Option<HotelMaps<'a>>>) -> Self {
-        self.__unsafe_private_named.91 = value.into();
+        self._fields.91 = value.into();
         self
     }
     /// Set the `maps` field to an Option value (optional)
     pub fn maybe_maps(mut self, value: Option<HotelMaps<'a>>) -> Self {
-        self.__unsafe_private_named.91 = value;
+        self._fields.91 = value;
         self
     }
 }
@@ -7351,7 +7354,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelMaximumAttendeeCapacity<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.92 = value.into();
+        self._fields.92 = value.into();
         self
     }
     /// Set the `maximumAttendeeCapacity` field to an Option value (optional)
@@ -7359,7 +7362,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelMaximumAttendeeCapacity<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.92 = value;
+        self._fields.92 = value;
         self
     }
 }
@@ -7367,12 +7370,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `member` field (optional)
     pub fn member(mut self, value: impl Into<Option<HotelMember<'a>>>) -> Self {
-        self.__unsafe_private_named.93 = value.into();
+        self._fields.93 = value.into();
         self
     }
     /// Set the `member` field to an Option value (optional)
     pub fn maybe_member(mut self, value: Option<HotelMember<'a>>) -> Self {
-        self.__unsafe_private_named.93 = value;
+        self._fields.93 = value;
         self
     }
 }
@@ -7380,12 +7383,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `memberOf` field (optional)
     pub fn member_of(mut self, value: impl Into<Option<HotelMemberOf<'a>>>) -> Self {
-        self.__unsafe_private_named.94 = value.into();
+        self._fields.94 = value.into();
         self
     }
     /// Set the `memberOf` field to an Option value (optional)
     pub fn maybe_member_of(mut self, value: Option<HotelMemberOf<'a>>) -> Self {
-        self.__unsafe_private_named.94 = value;
+        self._fields.94 = value;
         self
     }
 }
@@ -7393,12 +7396,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `members` field (optional)
     pub fn members(mut self, value: impl Into<Option<HotelMembers<'a>>>) -> Self {
-        self.__unsafe_private_named.95 = value.into();
+        self._fields.95 = value.into();
         self
     }
     /// Set the `members` field to an Option value (optional)
     pub fn maybe_members(mut self, value: Option<HotelMembers<'a>>) -> Self {
-        self.__unsafe_private_named.95 = value;
+        self._fields.95 = value;
         self
     }
 }
@@ -7406,12 +7409,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `naics` field (optional)
     pub fn naics(mut self, value: impl Into<Option<HotelNaics<'a>>>) -> Self {
-        self.__unsafe_private_named.96 = value.into();
+        self._fields.96 = value.into();
         self
     }
     /// Set the `naics` field to an Option value (optional)
     pub fn maybe_naics(mut self, value: Option<HotelNaics<'a>>) -> Self {
-        self.__unsafe_private_named.96 = value;
+        self._fields.96 = value;
         self
     }
 }
@@ -7419,12 +7422,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<HotelName<'a>>>) -> Self {
-        self.__unsafe_private_named.97 = value.into();
+        self._fields.97 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<HotelName<'a>>) -> Self {
-        self.__unsafe_private_named.97 = value;
+        self._fields.97 = value;
         self
     }
 }
@@ -7435,7 +7438,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelNonprofitStatus<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.98 = value.into();
+        self._fields.98 = value.into();
         self
     }
     /// Set the `nonprofitStatus` field to an Option value (optional)
@@ -7443,7 +7446,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelNonprofitStatus<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.98 = value;
+        self._fields.98 = value;
         self
     }
 }
@@ -7454,7 +7457,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelNumberOfEmployees<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.99 = value.into();
+        self._fields.99 = value.into();
         self
     }
     /// Set the `numberOfEmployees` field to an Option value (optional)
@@ -7462,7 +7465,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelNumberOfEmployees<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.99 = value;
+        self._fields.99 = value;
         self
     }
 }
@@ -7473,7 +7476,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelNumberOfRooms<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.100 = value.into();
+        self._fields.100 = value.into();
         self
     }
     /// Set the `numberOfRooms` field to an Option value (optional)
@@ -7481,7 +7484,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelNumberOfRooms<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.100 = value;
+        self._fields.100 = value;
         self
     }
 }
@@ -7492,12 +7495,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelOpeningHours<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.101 = value.into();
+        self._fields.101 = value.into();
         self
     }
     /// Set the `openingHours` field to an Option value (optional)
     pub fn maybe_opening_hours(mut self, value: Option<HotelOpeningHours<'a>>) -> Self {
-        self.__unsafe_private_named.101 = value;
+        self._fields.101 = value;
         self
     }
 }
@@ -7508,7 +7511,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelOpeningHoursSpecification<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.102 = value.into();
+        self._fields.102 = value.into();
         self
     }
     /// Set the `openingHoursSpecification` field to an Option value (optional)
@@ -7516,7 +7519,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelOpeningHoursSpecification<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.102 = value;
+        self._fields.102 = value;
         self
     }
 }
@@ -7527,7 +7530,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelOwnershipFundingInfo<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.103 = value.into();
+        self._fields.103 = value.into();
         self
     }
     /// Set the `ownershipFundingInfo` field to an Option value (optional)
@@ -7535,7 +7538,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelOwnershipFundingInfo<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.103 = value;
+        self._fields.103 = value;
         self
     }
 }
@@ -7543,12 +7546,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `owns` field (optional)
     pub fn owns(mut self, value: impl Into<Option<HotelOwns<'a>>>) -> Self {
-        self.__unsafe_private_named.104 = value.into();
+        self._fields.104 = value.into();
         self
     }
     /// Set the `owns` field to an Option value (optional)
     pub fn maybe_owns(mut self, value: Option<HotelOwns<'a>>) -> Self {
-        self.__unsafe_private_named.104 = value;
+        self._fields.104 = value;
         self
     }
 }
@@ -7559,7 +7562,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelParentOrganization<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.105 = value.into();
+        self._fields.105 = value.into();
         self
     }
     /// Set the `parentOrganization` field to an Option value (optional)
@@ -7567,7 +7570,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelParentOrganization<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.105 = value;
+        self._fields.105 = value;
         self
     }
 }
@@ -7578,7 +7581,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelPaymentAccepted<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.106 = value.into();
+        self._fields.106 = value.into();
         self
     }
     /// Set the `paymentAccepted` field to an Option value (optional)
@@ -7586,7 +7589,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelPaymentAccepted<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.106 = value;
+        self._fields.106 = value;
         self
     }
 }
@@ -7597,12 +7600,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelPetsAllowed<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.107 = value.into();
+        self._fields.107 = value.into();
         self
     }
     /// Set the `petsAllowed` field to an Option value (optional)
     pub fn maybe_pets_allowed(mut self, value: Option<HotelPetsAllowed<'a>>) -> Self {
-        self.__unsafe_private_named.107 = value;
+        self._fields.107 = value;
         self
     }
 }
@@ -7610,12 +7613,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `photo` field (optional)
     pub fn photo(mut self, value: impl Into<Option<HotelPhoto<'a>>>) -> Self {
-        self.__unsafe_private_named.108 = value.into();
+        self._fields.108 = value.into();
         self
     }
     /// Set the `photo` field to an Option value (optional)
     pub fn maybe_photo(mut self, value: Option<HotelPhoto<'a>>) -> Self {
-        self.__unsafe_private_named.108 = value;
+        self._fields.108 = value;
         self
     }
 }
@@ -7623,12 +7626,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `photos` field (optional)
     pub fn photos(mut self, value: impl Into<Option<HotelPhotos<'a>>>) -> Self {
-        self.__unsafe_private_named.109 = value.into();
+        self._fields.109 = value.into();
         self
     }
     /// Set the `photos` field to an Option value (optional)
     pub fn maybe_photos(mut self, value: Option<HotelPhotos<'a>>) -> Self {
-        self.__unsafe_private_named.109 = value;
+        self._fields.109 = value;
         self
     }
 }
@@ -7639,7 +7642,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelPotentialAction<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.110 = value.into();
+        self._fields.110 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
@@ -7647,7 +7650,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelPotentialAction<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.110 = value;
+        self._fields.110 = value;
         self
     }
 }
@@ -7655,12 +7658,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `priceRange` field (optional)
     pub fn price_range(mut self, value: impl Into<Option<HotelPriceRange<'a>>>) -> Self {
-        self.__unsafe_private_named.111 = value.into();
+        self._fields.111 = value.into();
         self
     }
     /// Set the `priceRange` field to an Option value (optional)
     pub fn maybe_price_range(mut self, value: Option<HotelPriceRange<'a>>) -> Self {
-        self.__unsafe_private_named.111 = value;
+        self._fields.111 = value;
         self
     }
 }
@@ -7671,12 +7674,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelPublicAccess<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.112 = value.into();
+        self._fields.112 = value.into();
         self
     }
     /// Set the `publicAccess` field to an Option value (optional)
     pub fn maybe_public_access(mut self, value: Option<HotelPublicAccess<'a>>) -> Self {
-        self.__unsafe_private_named.112 = value;
+        self._fields.112 = value;
         self
     }
 }
@@ -7687,7 +7690,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelPublishingPrinciples<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.113 = value.into();
+        self._fields.113 = value.into();
         self
     }
     /// Set the `publishingPrinciples` field to an Option value (optional)
@@ -7695,7 +7698,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelPublishingPrinciples<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.113 = value;
+        self._fields.113 = value;
         self
     }
 }
@@ -7703,12 +7706,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<HotelReview<'a>>>) -> Self {
-        self.__unsafe_private_named.114 = value.into();
+        self._fields.114 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
     pub fn maybe_review(mut self, value: Option<HotelReview<'a>>) -> Self {
-        self.__unsafe_private_named.114 = value;
+        self._fields.114 = value;
         self
     }
 }
@@ -7716,12 +7719,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `reviews` field (optional)
     pub fn reviews(mut self, value: impl Into<Option<HotelReviews<'a>>>) -> Self {
-        self.__unsafe_private_named.115 = value.into();
+        self._fields.115 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
     pub fn maybe_reviews(mut self, value: Option<HotelReviews<'a>>) -> Self {
-        self.__unsafe_private_named.115 = value;
+        self._fields.115 = value;
         self
     }
 }
@@ -7729,12 +7732,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<HotelSameAs<'a>>>) -> Self {
-        self.__unsafe_private_named.116 = value.into();
+        self._fields.116 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
     pub fn maybe_same_as(mut self, value: Option<HotelSameAs<'a>>) -> Self {
-        self.__unsafe_private_named.116 = value;
+        self._fields.116 = value;
         self
     }
 }
@@ -7742,12 +7745,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `seeks` field (optional)
     pub fn seeks(mut self, value: impl Into<Option<HotelSeeks<'a>>>) -> Self {
-        self.__unsafe_private_named.117 = value.into();
+        self._fields.117 = value.into();
         self
     }
     /// Set the `seeks` field to an Option value (optional)
     pub fn maybe_seeks(mut self, value: Option<HotelSeeks<'a>>) -> Self {
-        self.__unsafe_private_named.117 = value;
+        self._fields.117 = value;
         self
     }
 }
@@ -7758,12 +7761,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelServiceArea<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.118 = value.into();
+        self._fields.118 = value.into();
         self
     }
     /// Set the `serviceArea` field to an Option value (optional)
     pub fn maybe_service_area(mut self, value: Option<HotelServiceArea<'a>>) -> Self {
-        self.__unsafe_private_named.118 = value;
+        self._fields.118 = value;
         self
     }
 }
@@ -7771,12 +7774,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `skills` field (optional)
     pub fn skills(mut self, value: impl Into<Option<HotelSkills<'a>>>) -> Self {
-        self.__unsafe_private_named.119 = value.into();
+        self._fields.119 = value.into();
         self
     }
     /// Set the `skills` field to an Option value (optional)
     pub fn maybe_skills(mut self, value: Option<HotelSkills<'a>>) -> Self {
-        self.__unsafe_private_named.119 = value;
+        self._fields.119 = value;
         self
     }
 }
@@ -7784,12 +7787,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `slogan` field (optional)
     pub fn slogan(mut self, value: impl Into<Option<HotelSlogan<'a>>>) -> Self {
-        self.__unsafe_private_named.120 = value.into();
+        self._fields.120 = value.into();
         self
     }
     /// Set the `slogan` field to an Option value (optional)
     pub fn maybe_slogan(mut self, value: Option<HotelSlogan<'a>>) -> Self {
-        self.__unsafe_private_named.120 = value;
+        self._fields.120 = value;
         self
     }
 }
@@ -7800,7 +7803,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelSmokingAllowed<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.121 = value.into();
+        self._fields.121 = value.into();
         self
     }
     /// Set the `smokingAllowed` field to an Option value (optional)
@@ -7808,7 +7811,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelSmokingAllowed<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.121 = value;
+        self._fields.121 = value;
         self
     }
 }
@@ -7819,7 +7822,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelSpecialOpeningHoursSpecification<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.122 = value.into();
+        self._fields.122 = value.into();
         self
     }
     /// Set the `specialOpeningHoursSpecification` field to an Option value (optional)
@@ -7827,7 +7830,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelSpecialOpeningHoursSpecification<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.122 = value;
+        self._fields.122 = value;
         self
     }
 }
@@ -7835,12 +7838,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `sponsor` field (optional)
     pub fn sponsor(mut self, value: impl Into<Option<HotelSponsor<'a>>>) -> Self {
-        self.__unsafe_private_named.123 = value.into();
+        self._fields.123 = value.into();
         self
     }
     /// Set the `sponsor` field to an Option value (optional)
     pub fn maybe_sponsor(mut self, value: Option<HotelSponsor<'a>>) -> Self {
-        self.__unsafe_private_named.123 = value;
+        self._fields.123 = value;
         self
     }
 }
@@ -7848,12 +7851,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `starRating` field (optional)
     pub fn star_rating(mut self, value: impl Into<Option<HotelStarRating<'a>>>) -> Self {
-        self.__unsafe_private_named.124 = value.into();
+        self._fields.124 = value.into();
         self
     }
     /// Set the `starRating` field to an Option value (optional)
     pub fn maybe_star_rating(mut self, value: Option<HotelStarRating<'a>>) -> Self {
-        self.__unsafe_private_named.124 = value;
+        self._fields.124 = value;
         self
     }
 }
@@ -7864,7 +7867,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelSubOrganization<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.125 = value.into();
+        self._fields.125 = value.into();
         self
     }
     /// Set the `subOrganization` field to an Option value (optional)
@@ -7872,7 +7875,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelSubOrganization<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.125 = value;
+        self._fields.125 = value;
         self
     }
 }
@@ -7880,12 +7883,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(mut self, value: impl Into<Option<HotelSubjectOf<'a>>>) -> Self {
-        self.__unsafe_private_named.126 = value.into();
+        self._fields.126 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
     pub fn maybe_subject_of(mut self, value: Option<HotelSubjectOf<'a>>) -> Self {
-        self.__unsafe_private_named.126 = value;
+        self._fields.126 = value;
         self
     }
 }
@@ -7893,12 +7896,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `taxID` field (optional)
     pub fn tax_id(mut self, value: impl Into<Option<HotelTaxId<'a>>>) -> Self {
-        self.__unsafe_private_named.127 = value.into();
+        self._fields.127 = value.into();
         self
     }
     /// Set the `taxID` field to an Option value (optional)
     pub fn maybe_tax_id(mut self, value: Option<HotelTaxId<'a>>) -> Self {
-        self.__unsafe_private_named.127 = value;
+        self._fields.127 = value;
         self
     }
 }
@@ -7906,12 +7909,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `telephone` field (optional)
     pub fn telephone(mut self, value: impl Into<Option<HotelTelephone<'a>>>) -> Self {
-        self.__unsafe_private_named.128 = value.into();
+        self._fields.128 = value.into();
         self
     }
     /// Set the `telephone` field to an Option value (optional)
     pub fn maybe_telephone(mut self, value: Option<HotelTelephone<'a>>) -> Self {
-        self.__unsafe_private_named.128 = value;
+        self._fields.128 = value;
         self
     }
 }
@@ -7922,7 +7925,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelTourBookingPage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.129 = value.into();
+        self._fields.129 = value.into();
         self
     }
     /// Set the `tourBookingPage` field to an Option value (optional)
@@ -7930,7 +7933,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelTourBookingPage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.129 = value;
+        self._fields.129 = value;
         self
     }
 }
@@ -7941,7 +7944,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: impl Into<Option<HotelUnnamedSourcesPolicy<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.130 = value.into();
+        self._fields.130 = value.into();
         self
     }
     /// Set the `unnamedSourcesPolicy` field to an Option value (optional)
@@ -7949,7 +7952,7 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
         mut self,
         value: Option<HotelUnnamedSourcesPolicy<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.130 = value;
+        self._fields.130 = value;
         self
     }
 }
@@ -7957,12 +7960,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<HotelUrl<'a>>>) -> Self {
-        self.__unsafe_private_named.131 = value.into();
+        self._fields.131 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<HotelUrl<'a>>) -> Self {
-        self.__unsafe_private_named.131 = value;
+        self._fields.131 = value;
         self
     }
 }
@@ -7970,12 +7973,12 @@ impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
 impl<'a, S: hotel_state::State> HotelBuilder<'a, S> {
     /// Set the `vatID` field (optional)
     pub fn vat_id(mut self, value: impl Into<Option<HotelVatId<'a>>>) -> Self {
-        self.__unsafe_private_named.132 = value.into();
+        self._fields.132 = value.into();
         self
     }
     /// Set the `vatID` field to an Option value (optional)
     pub fn maybe_vat_id(mut self, value: Option<HotelVatId<'a>>) -> Self {
-        self.__unsafe_private_named.132 = value;
+        self._fields.132 = value;
         self
     }
 }
@@ -7987,139 +7990,139 @@ where
     /// Build the final struct
     pub fn build(self) -> Hotel<'a> {
         Hotel {
-            accepted_payment_method: self.__unsafe_private_named.0,
-            actionable_feedback_policy: self.__unsafe_private_named.1,
-            additional_property: self.__unsafe_private_named.2,
-            additional_type: self.__unsafe_private_named.3,
-            address: self.__unsafe_private_named.4,
-            agent_interaction_statistic: self.__unsafe_private_named.5,
-            aggregate_rating: self.__unsafe_private_named.6,
-            alternate_name: self.__unsafe_private_named.7,
-            alumni: self.__unsafe_private_named.8,
-            amenity_feature: self.__unsafe_private_named.9,
-            area_served: self.__unsafe_private_named.10,
-            audience: self.__unsafe_private_named.11,
-            available_language: self.__unsafe_private_named.12,
-            award: self.__unsafe_private_named.13,
-            awards: self.__unsafe_private_named.14,
-            branch_code: self.__unsafe_private_named.15,
-            branch_of: self.__unsafe_private_named.16,
-            brand: self.__unsafe_private_named.17,
-            checkin_time: self.__unsafe_private_named.18,
-            checkout_time: self.__unsafe_private_named.19,
-            company_registration: self.__unsafe_private_named.20,
-            contact_point: self.__unsafe_private_named.21,
-            contact_points: self.__unsafe_private_named.22,
-            contained_in: self.__unsafe_private_named.23,
-            contained_in_place: self.__unsafe_private_named.24,
-            contains_place: self.__unsafe_private_named.25,
-            corrections_policy: self.__unsafe_private_named.26,
-            currencies_accepted: self.__unsafe_private_named.27,
-            department: self.__unsafe_private_named.28,
-            description: self.__unsafe_private_named.29,
-            disambiguating_description: self.__unsafe_private_named.30,
-            dissolution_date: self.__unsafe_private_named.31,
-            diversity_policy: self.__unsafe_private_named.32,
-            diversity_staffing_report: self.__unsafe_private_named.33,
-            duns: self.__unsafe_private_named.34,
-            email: self.__unsafe_private_named.35,
-            employee: self.__unsafe_private_named.36,
-            employees: self.__unsafe_private_named.37,
-            ethics_policy: self.__unsafe_private_named.38,
-            event: self.__unsafe_private_named.39,
-            events: self.__unsafe_private_named.40,
-            fax_number: self.__unsafe_private_named.41,
-            founder: self.__unsafe_private_named.42,
-            founders: self.__unsafe_private_named.43,
-            founding_date: self.__unsafe_private_named.44,
-            founding_location: self.__unsafe_private_named.45,
-            funder: self.__unsafe_private_named.46,
-            funding: self.__unsafe_private_named.47,
-            geo: self.__unsafe_private_named.48,
-            geo_contains: self.__unsafe_private_named.49,
-            geo_covered_by: self.__unsafe_private_named.50,
-            geo_covers: self.__unsafe_private_named.51,
-            geo_crosses: self.__unsafe_private_named.52,
-            geo_disjoint: self.__unsafe_private_named.53,
-            geo_equals: self.__unsafe_private_named.54,
-            geo_intersects: self.__unsafe_private_named.55,
-            geo_overlaps: self.__unsafe_private_named.56,
-            geo_touches: self.__unsafe_private_named.57,
-            geo_within: self.__unsafe_private_named.58,
-            global_location_number: self.__unsafe_private_named.59,
-            has_certification: self.__unsafe_private_named.60,
-            has_credential: self.__unsafe_private_named.61,
-            has_drive_through_service: self.__unsafe_private_named.62,
-            has_gs1_digital_link: self.__unsafe_private_named.63,
-            has_map: self.__unsafe_private_named.64,
-            has_member_program: self.__unsafe_private_named.65,
-            has_merchant_return_policy: self.__unsafe_private_named.66,
-            has_offer_catalog: self.__unsafe_private_named.67,
-            has_pos: self.__unsafe_private_named.68,
-            has_product_return_policy: self.__unsafe_private_named.69,
-            has_shipping_service: self.__unsafe_private_named.70,
-            identifier: self.__unsafe_private_named.71,
-            image: self.__unsafe_private_named.72,
-            interaction_statistic: self.__unsafe_private_named.73,
-            is_accessible_for_free: self.__unsafe_private_named.74,
-            isic_v4: self.__unsafe_private_named.75,
-            iso6523_code: self.__unsafe_private_named.76,
-            keywords: self.__unsafe_private_named.77,
-            knows_about: self.__unsafe_private_named.78,
-            knows_language: self.__unsafe_private_named.79,
-            latitude: self.__unsafe_private_named.80,
-            legal_address: self.__unsafe_private_named.81,
-            legal_name: self.__unsafe_private_named.82,
-            legal_representative: self.__unsafe_private_named.83,
-            lei_code: self.__unsafe_private_named.84,
-            location: self.__unsafe_private_named.85,
-            logo: self.__unsafe_private_named.86,
-            longitude: self.__unsafe_private_named.87,
-            main_entity_of_page: self.__unsafe_private_named.88,
-            makes_offer: self.__unsafe_private_named.89,
-            map: self.__unsafe_private_named.90,
-            maps: self.__unsafe_private_named.91,
-            maximum_attendee_capacity: self.__unsafe_private_named.92,
-            member: self.__unsafe_private_named.93,
-            member_of: self.__unsafe_private_named.94,
-            members: self.__unsafe_private_named.95,
-            naics: self.__unsafe_private_named.96,
-            name: self.__unsafe_private_named.97,
-            nonprofit_status: self.__unsafe_private_named.98,
-            number_of_employees: self.__unsafe_private_named.99,
-            number_of_rooms: self.__unsafe_private_named.100,
-            opening_hours: self.__unsafe_private_named.101,
-            opening_hours_specification: self.__unsafe_private_named.102,
-            ownership_funding_info: self.__unsafe_private_named.103,
-            owns: self.__unsafe_private_named.104,
-            parent_organization: self.__unsafe_private_named.105,
-            payment_accepted: self.__unsafe_private_named.106,
-            pets_allowed: self.__unsafe_private_named.107,
-            photo: self.__unsafe_private_named.108,
-            photos: self.__unsafe_private_named.109,
-            potential_action: self.__unsafe_private_named.110,
-            price_range: self.__unsafe_private_named.111,
-            public_access: self.__unsafe_private_named.112,
-            publishing_principles: self.__unsafe_private_named.113,
-            review: self.__unsafe_private_named.114,
-            reviews: self.__unsafe_private_named.115,
-            same_as: self.__unsafe_private_named.116,
-            seeks: self.__unsafe_private_named.117,
-            service_area: self.__unsafe_private_named.118,
-            skills: self.__unsafe_private_named.119,
-            slogan: self.__unsafe_private_named.120,
-            smoking_allowed: self.__unsafe_private_named.121,
-            special_opening_hours_specification: self.__unsafe_private_named.122,
-            sponsor: self.__unsafe_private_named.123,
-            star_rating: self.__unsafe_private_named.124,
-            sub_organization: self.__unsafe_private_named.125,
-            subject_of: self.__unsafe_private_named.126,
-            tax_id: self.__unsafe_private_named.127,
-            telephone: self.__unsafe_private_named.128,
-            tour_booking_page: self.__unsafe_private_named.129,
-            unnamed_sources_policy: self.__unsafe_private_named.130,
-            url: self.__unsafe_private_named.131,
-            vat_id: self.__unsafe_private_named.132,
+            accepted_payment_method: self._fields.0,
+            actionable_feedback_policy: self._fields.1,
+            additional_property: self._fields.2,
+            additional_type: self._fields.3,
+            address: self._fields.4,
+            agent_interaction_statistic: self._fields.5,
+            aggregate_rating: self._fields.6,
+            alternate_name: self._fields.7,
+            alumni: self._fields.8,
+            amenity_feature: self._fields.9,
+            area_served: self._fields.10,
+            audience: self._fields.11,
+            available_language: self._fields.12,
+            award: self._fields.13,
+            awards: self._fields.14,
+            branch_code: self._fields.15,
+            branch_of: self._fields.16,
+            brand: self._fields.17,
+            checkin_time: self._fields.18,
+            checkout_time: self._fields.19,
+            company_registration: self._fields.20,
+            contact_point: self._fields.21,
+            contact_points: self._fields.22,
+            contained_in: self._fields.23,
+            contained_in_place: self._fields.24,
+            contains_place: self._fields.25,
+            corrections_policy: self._fields.26,
+            currencies_accepted: self._fields.27,
+            department: self._fields.28,
+            description: self._fields.29,
+            disambiguating_description: self._fields.30,
+            dissolution_date: self._fields.31,
+            diversity_policy: self._fields.32,
+            diversity_staffing_report: self._fields.33,
+            duns: self._fields.34,
+            email: self._fields.35,
+            employee: self._fields.36,
+            employees: self._fields.37,
+            ethics_policy: self._fields.38,
+            event: self._fields.39,
+            events: self._fields.40,
+            fax_number: self._fields.41,
+            founder: self._fields.42,
+            founders: self._fields.43,
+            founding_date: self._fields.44,
+            founding_location: self._fields.45,
+            funder: self._fields.46,
+            funding: self._fields.47,
+            geo: self._fields.48,
+            geo_contains: self._fields.49,
+            geo_covered_by: self._fields.50,
+            geo_covers: self._fields.51,
+            geo_crosses: self._fields.52,
+            geo_disjoint: self._fields.53,
+            geo_equals: self._fields.54,
+            geo_intersects: self._fields.55,
+            geo_overlaps: self._fields.56,
+            geo_touches: self._fields.57,
+            geo_within: self._fields.58,
+            global_location_number: self._fields.59,
+            has_certification: self._fields.60,
+            has_credential: self._fields.61,
+            has_drive_through_service: self._fields.62,
+            has_gs1_digital_link: self._fields.63,
+            has_map: self._fields.64,
+            has_member_program: self._fields.65,
+            has_merchant_return_policy: self._fields.66,
+            has_offer_catalog: self._fields.67,
+            has_pos: self._fields.68,
+            has_product_return_policy: self._fields.69,
+            has_shipping_service: self._fields.70,
+            identifier: self._fields.71,
+            image: self._fields.72,
+            interaction_statistic: self._fields.73,
+            is_accessible_for_free: self._fields.74,
+            isic_v4: self._fields.75,
+            iso6523_code: self._fields.76,
+            keywords: self._fields.77,
+            knows_about: self._fields.78,
+            knows_language: self._fields.79,
+            latitude: self._fields.80,
+            legal_address: self._fields.81,
+            legal_name: self._fields.82,
+            legal_representative: self._fields.83,
+            lei_code: self._fields.84,
+            location: self._fields.85,
+            logo: self._fields.86,
+            longitude: self._fields.87,
+            main_entity_of_page: self._fields.88,
+            makes_offer: self._fields.89,
+            map: self._fields.90,
+            maps: self._fields.91,
+            maximum_attendee_capacity: self._fields.92,
+            member: self._fields.93,
+            member_of: self._fields.94,
+            members: self._fields.95,
+            naics: self._fields.96,
+            name: self._fields.97,
+            nonprofit_status: self._fields.98,
+            number_of_employees: self._fields.99,
+            number_of_rooms: self._fields.100,
+            opening_hours: self._fields.101,
+            opening_hours_specification: self._fields.102,
+            ownership_funding_info: self._fields.103,
+            owns: self._fields.104,
+            parent_organization: self._fields.105,
+            payment_accepted: self._fields.106,
+            pets_allowed: self._fields.107,
+            photo: self._fields.108,
+            photos: self._fields.109,
+            potential_action: self._fields.110,
+            price_range: self._fields.111,
+            public_access: self._fields.112,
+            publishing_principles: self._fields.113,
+            review: self._fields.114,
+            reviews: self._fields.115,
+            same_as: self._fields.116,
+            seeks: self._fields.117,
+            service_area: self._fields.118,
+            skills: self._fields.119,
+            slogan: self._fields.120,
+            smoking_allowed: self._fields.121,
+            special_opening_hours_specification: self._fields.122,
+            sponsor: self._fields.123,
+            star_rating: self._fields.124,
+            sub_organization: self._fields.125,
+            subject_of: self._fields.126,
+            tax_id: self._fields.127,
+            telephone: self._fields.128,
+            tour_booking_page: self._fields.129,
+            unnamed_sources_policy: self._fields.130,
+            url: self._fields.131,
+            vat_id: self._fields.132,
             extra_data: Default::default(),
         }
     }
@@ -8129,139 +8132,139 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Hotel<'a> {
         Hotel {
-            accepted_payment_method: self.__unsafe_private_named.0,
-            actionable_feedback_policy: self.__unsafe_private_named.1,
-            additional_property: self.__unsafe_private_named.2,
-            additional_type: self.__unsafe_private_named.3,
-            address: self.__unsafe_private_named.4,
-            agent_interaction_statistic: self.__unsafe_private_named.5,
-            aggregate_rating: self.__unsafe_private_named.6,
-            alternate_name: self.__unsafe_private_named.7,
-            alumni: self.__unsafe_private_named.8,
-            amenity_feature: self.__unsafe_private_named.9,
-            area_served: self.__unsafe_private_named.10,
-            audience: self.__unsafe_private_named.11,
-            available_language: self.__unsafe_private_named.12,
-            award: self.__unsafe_private_named.13,
-            awards: self.__unsafe_private_named.14,
-            branch_code: self.__unsafe_private_named.15,
-            branch_of: self.__unsafe_private_named.16,
-            brand: self.__unsafe_private_named.17,
-            checkin_time: self.__unsafe_private_named.18,
-            checkout_time: self.__unsafe_private_named.19,
-            company_registration: self.__unsafe_private_named.20,
-            contact_point: self.__unsafe_private_named.21,
-            contact_points: self.__unsafe_private_named.22,
-            contained_in: self.__unsafe_private_named.23,
-            contained_in_place: self.__unsafe_private_named.24,
-            contains_place: self.__unsafe_private_named.25,
-            corrections_policy: self.__unsafe_private_named.26,
-            currencies_accepted: self.__unsafe_private_named.27,
-            department: self.__unsafe_private_named.28,
-            description: self.__unsafe_private_named.29,
-            disambiguating_description: self.__unsafe_private_named.30,
-            dissolution_date: self.__unsafe_private_named.31,
-            diversity_policy: self.__unsafe_private_named.32,
-            diversity_staffing_report: self.__unsafe_private_named.33,
-            duns: self.__unsafe_private_named.34,
-            email: self.__unsafe_private_named.35,
-            employee: self.__unsafe_private_named.36,
-            employees: self.__unsafe_private_named.37,
-            ethics_policy: self.__unsafe_private_named.38,
-            event: self.__unsafe_private_named.39,
-            events: self.__unsafe_private_named.40,
-            fax_number: self.__unsafe_private_named.41,
-            founder: self.__unsafe_private_named.42,
-            founders: self.__unsafe_private_named.43,
-            founding_date: self.__unsafe_private_named.44,
-            founding_location: self.__unsafe_private_named.45,
-            funder: self.__unsafe_private_named.46,
-            funding: self.__unsafe_private_named.47,
-            geo: self.__unsafe_private_named.48,
-            geo_contains: self.__unsafe_private_named.49,
-            geo_covered_by: self.__unsafe_private_named.50,
-            geo_covers: self.__unsafe_private_named.51,
-            geo_crosses: self.__unsafe_private_named.52,
-            geo_disjoint: self.__unsafe_private_named.53,
-            geo_equals: self.__unsafe_private_named.54,
-            geo_intersects: self.__unsafe_private_named.55,
-            geo_overlaps: self.__unsafe_private_named.56,
-            geo_touches: self.__unsafe_private_named.57,
-            geo_within: self.__unsafe_private_named.58,
-            global_location_number: self.__unsafe_private_named.59,
-            has_certification: self.__unsafe_private_named.60,
-            has_credential: self.__unsafe_private_named.61,
-            has_drive_through_service: self.__unsafe_private_named.62,
-            has_gs1_digital_link: self.__unsafe_private_named.63,
-            has_map: self.__unsafe_private_named.64,
-            has_member_program: self.__unsafe_private_named.65,
-            has_merchant_return_policy: self.__unsafe_private_named.66,
-            has_offer_catalog: self.__unsafe_private_named.67,
-            has_pos: self.__unsafe_private_named.68,
-            has_product_return_policy: self.__unsafe_private_named.69,
-            has_shipping_service: self.__unsafe_private_named.70,
-            identifier: self.__unsafe_private_named.71,
-            image: self.__unsafe_private_named.72,
-            interaction_statistic: self.__unsafe_private_named.73,
-            is_accessible_for_free: self.__unsafe_private_named.74,
-            isic_v4: self.__unsafe_private_named.75,
-            iso6523_code: self.__unsafe_private_named.76,
-            keywords: self.__unsafe_private_named.77,
-            knows_about: self.__unsafe_private_named.78,
-            knows_language: self.__unsafe_private_named.79,
-            latitude: self.__unsafe_private_named.80,
-            legal_address: self.__unsafe_private_named.81,
-            legal_name: self.__unsafe_private_named.82,
-            legal_representative: self.__unsafe_private_named.83,
-            lei_code: self.__unsafe_private_named.84,
-            location: self.__unsafe_private_named.85,
-            logo: self.__unsafe_private_named.86,
-            longitude: self.__unsafe_private_named.87,
-            main_entity_of_page: self.__unsafe_private_named.88,
-            makes_offer: self.__unsafe_private_named.89,
-            map: self.__unsafe_private_named.90,
-            maps: self.__unsafe_private_named.91,
-            maximum_attendee_capacity: self.__unsafe_private_named.92,
-            member: self.__unsafe_private_named.93,
-            member_of: self.__unsafe_private_named.94,
-            members: self.__unsafe_private_named.95,
-            naics: self.__unsafe_private_named.96,
-            name: self.__unsafe_private_named.97,
-            nonprofit_status: self.__unsafe_private_named.98,
-            number_of_employees: self.__unsafe_private_named.99,
-            number_of_rooms: self.__unsafe_private_named.100,
-            opening_hours: self.__unsafe_private_named.101,
-            opening_hours_specification: self.__unsafe_private_named.102,
-            ownership_funding_info: self.__unsafe_private_named.103,
-            owns: self.__unsafe_private_named.104,
-            parent_organization: self.__unsafe_private_named.105,
-            payment_accepted: self.__unsafe_private_named.106,
-            pets_allowed: self.__unsafe_private_named.107,
-            photo: self.__unsafe_private_named.108,
-            photos: self.__unsafe_private_named.109,
-            potential_action: self.__unsafe_private_named.110,
-            price_range: self.__unsafe_private_named.111,
-            public_access: self.__unsafe_private_named.112,
-            publishing_principles: self.__unsafe_private_named.113,
-            review: self.__unsafe_private_named.114,
-            reviews: self.__unsafe_private_named.115,
-            same_as: self.__unsafe_private_named.116,
-            seeks: self.__unsafe_private_named.117,
-            service_area: self.__unsafe_private_named.118,
-            skills: self.__unsafe_private_named.119,
-            slogan: self.__unsafe_private_named.120,
-            smoking_allowed: self.__unsafe_private_named.121,
-            special_opening_hours_specification: self.__unsafe_private_named.122,
-            sponsor: self.__unsafe_private_named.123,
-            star_rating: self.__unsafe_private_named.124,
-            sub_organization: self.__unsafe_private_named.125,
-            subject_of: self.__unsafe_private_named.126,
-            tax_id: self.__unsafe_private_named.127,
-            telephone: self.__unsafe_private_named.128,
-            tour_booking_page: self.__unsafe_private_named.129,
-            unnamed_sources_policy: self.__unsafe_private_named.130,
-            url: self.__unsafe_private_named.131,
-            vat_id: self.__unsafe_private_named.132,
+            accepted_payment_method: self._fields.0,
+            actionable_feedback_policy: self._fields.1,
+            additional_property: self._fields.2,
+            additional_type: self._fields.3,
+            address: self._fields.4,
+            agent_interaction_statistic: self._fields.5,
+            aggregate_rating: self._fields.6,
+            alternate_name: self._fields.7,
+            alumni: self._fields.8,
+            amenity_feature: self._fields.9,
+            area_served: self._fields.10,
+            audience: self._fields.11,
+            available_language: self._fields.12,
+            award: self._fields.13,
+            awards: self._fields.14,
+            branch_code: self._fields.15,
+            branch_of: self._fields.16,
+            brand: self._fields.17,
+            checkin_time: self._fields.18,
+            checkout_time: self._fields.19,
+            company_registration: self._fields.20,
+            contact_point: self._fields.21,
+            contact_points: self._fields.22,
+            contained_in: self._fields.23,
+            contained_in_place: self._fields.24,
+            contains_place: self._fields.25,
+            corrections_policy: self._fields.26,
+            currencies_accepted: self._fields.27,
+            department: self._fields.28,
+            description: self._fields.29,
+            disambiguating_description: self._fields.30,
+            dissolution_date: self._fields.31,
+            diversity_policy: self._fields.32,
+            diversity_staffing_report: self._fields.33,
+            duns: self._fields.34,
+            email: self._fields.35,
+            employee: self._fields.36,
+            employees: self._fields.37,
+            ethics_policy: self._fields.38,
+            event: self._fields.39,
+            events: self._fields.40,
+            fax_number: self._fields.41,
+            founder: self._fields.42,
+            founders: self._fields.43,
+            founding_date: self._fields.44,
+            founding_location: self._fields.45,
+            funder: self._fields.46,
+            funding: self._fields.47,
+            geo: self._fields.48,
+            geo_contains: self._fields.49,
+            geo_covered_by: self._fields.50,
+            geo_covers: self._fields.51,
+            geo_crosses: self._fields.52,
+            geo_disjoint: self._fields.53,
+            geo_equals: self._fields.54,
+            geo_intersects: self._fields.55,
+            geo_overlaps: self._fields.56,
+            geo_touches: self._fields.57,
+            geo_within: self._fields.58,
+            global_location_number: self._fields.59,
+            has_certification: self._fields.60,
+            has_credential: self._fields.61,
+            has_drive_through_service: self._fields.62,
+            has_gs1_digital_link: self._fields.63,
+            has_map: self._fields.64,
+            has_member_program: self._fields.65,
+            has_merchant_return_policy: self._fields.66,
+            has_offer_catalog: self._fields.67,
+            has_pos: self._fields.68,
+            has_product_return_policy: self._fields.69,
+            has_shipping_service: self._fields.70,
+            identifier: self._fields.71,
+            image: self._fields.72,
+            interaction_statistic: self._fields.73,
+            is_accessible_for_free: self._fields.74,
+            isic_v4: self._fields.75,
+            iso6523_code: self._fields.76,
+            keywords: self._fields.77,
+            knows_about: self._fields.78,
+            knows_language: self._fields.79,
+            latitude: self._fields.80,
+            legal_address: self._fields.81,
+            legal_name: self._fields.82,
+            legal_representative: self._fields.83,
+            lei_code: self._fields.84,
+            location: self._fields.85,
+            logo: self._fields.86,
+            longitude: self._fields.87,
+            main_entity_of_page: self._fields.88,
+            makes_offer: self._fields.89,
+            map: self._fields.90,
+            maps: self._fields.91,
+            maximum_attendee_capacity: self._fields.92,
+            member: self._fields.93,
+            member_of: self._fields.94,
+            members: self._fields.95,
+            naics: self._fields.96,
+            name: self._fields.97,
+            nonprofit_status: self._fields.98,
+            number_of_employees: self._fields.99,
+            number_of_rooms: self._fields.100,
+            opening_hours: self._fields.101,
+            opening_hours_specification: self._fields.102,
+            ownership_funding_info: self._fields.103,
+            owns: self._fields.104,
+            parent_organization: self._fields.105,
+            payment_accepted: self._fields.106,
+            pets_allowed: self._fields.107,
+            photo: self._fields.108,
+            photos: self._fields.109,
+            potential_action: self._fields.110,
+            price_range: self._fields.111,
+            public_access: self._fields.112,
+            publishing_principles: self._fields.113,
+            review: self._fields.114,
+            reviews: self._fields.115,
+            same_as: self._fields.116,
+            seeks: self._fields.117,
+            service_area: self._fields.118,
+            skills: self._fields.119,
+            slogan: self._fields.120,
+            smoking_allowed: self._fields.121,
+            special_opening_hours_specification: self._fields.122,
+            sponsor: self._fields.123,
+            star_rating: self._fields.124,
+            sub_organization: self._fields.125,
+            subject_of: self._fields.126,
+            tax_id: self._fields.127,
+            telephone: self._fields.128,
+            tour_booking_page: self._fields.129,
+            unnamed_sources_policy: self._fields.130,
+            url: self._fields.131,
+            vat_id: self._fields.132,
             extra_data: Some(extra_data),
         }
     }

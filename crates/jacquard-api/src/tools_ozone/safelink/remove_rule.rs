@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::Did;
@@ -118,50 +121,50 @@ pub mod remove_rule_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type Pattern;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type Pattern = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Pattern = S::Pattern;
+        type Url = Unset;
     }
     ///State transition - sets the `pattern` field to Set
     pub struct SetPattern<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPattern<S> {}
     impl<S: State> State for SetPattern<S> {
-        type Url = S::Url;
         type Pattern = Set<members::pattern>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Pattern = S::Pattern;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `pattern` field
         pub struct pattern(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RemoveRuleBuilder<'a, S: remove_rule_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Did<'a>>,
         Option<PatternType<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RemoveRule<'a> {
@@ -175,9 +178,9 @@ impl<'a> RemoveRuleBuilder<'a, remove_rule_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RemoveRuleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -185,12 +188,12 @@ impl<'a> RemoveRuleBuilder<'a, remove_rule_state::Empty> {
 impl<'a, S: remove_rule_state::State> RemoveRuleBuilder<'a, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
     pub fn maybe_comment(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -198,12 +201,12 @@ impl<'a, S: remove_rule_state::State> RemoveRuleBuilder<'a, S> {
 impl<'a, S: remove_rule_state::State> RemoveRuleBuilder<'a, S> {
     /// Set the `createdBy` field (optional)
     pub fn created_by(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `createdBy` field to an Option value (optional)
     pub fn maybe_created_by(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -218,11 +221,11 @@ where
         mut self,
         value: impl Into<PatternType<'a>>,
     ) -> RemoveRuleBuilder<'a, remove_rule_state::SetPattern<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RemoveRuleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -237,11 +240,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RemoveRuleBuilder<'a, remove_rule_state::SetUrl<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         RemoveRuleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -249,16 +252,16 @@ where
 impl<'a, S> RemoveRuleBuilder<'a, S>
 where
     S: remove_rule_state::State,
-    S::Url: remove_rule_state::IsSet,
     S::Pattern: remove_rule_state::IsSet,
+    S::Url: remove_rule_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RemoveRule<'a> {
         RemoveRule {
-            comment: self.__unsafe_private_named.0,
-            created_by: self.__unsafe_private_named.1,
-            pattern: self.__unsafe_private_named.2.unwrap(),
-            url: self.__unsafe_private_named.3.unwrap(),
+            comment: self._fields.0,
+            created_by: self._fields.1,
+            pattern: self._fields.2.unwrap(),
+            url: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -271,10 +274,10 @@ where
         >,
     ) -> RemoveRule<'a> {
         RemoveRule {
-            comment: self.__unsafe_private_named.0,
-            created_by: self.__unsafe_private_named.1,
-            pattern: self.__unsafe_private_named.2.unwrap(),
-            url: self.__unsafe_private_named.3.unwrap(),
+            comment: self._fields.0,
+            created_by: self._fields.1,
+            pattern: self._fields.2.unwrap(),
+            url: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

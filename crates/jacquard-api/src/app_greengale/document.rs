@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -271,9 +274,9 @@ pub mod content_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct ContentRefBuilder<'a, S: content_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ContentRef<'a> {
@@ -287,9 +290,9 @@ impl<'a> ContentRefBuilder<'a, content_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ContentRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -304,11 +307,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ContentRefBuilder<'a, content_ref_state::SetUri<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ContentRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -321,7 +324,7 @@ where
     /// Build the final struct
     pub fn build(self) -> ContentRef<'a> {
         ContentRef {
-            uri: self.__unsafe_private_named.0.unwrap(),
+            uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -334,7 +337,7 @@ where
         >,
     ) -> ContentRef<'a> {
         ContentRef {
-            uri: self.__unsafe_private_named.0.unwrap(),
+            uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -549,92 +552,92 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Url;
         type Title;
+        type Path;
         type Content;
         type PublishedAt;
-        type Path;
-        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Url = Unset;
         type Title = Unset;
+        type Path = Unset;
         type Content = Unset;
         type PublishedAt = Unset;
-        type Path = Unset;
-        type Url = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Content = S::Content;
-        type PublishedAt = S::PublishedAt;
-        type Path = S::Path;
-        type Url = S::Url;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Title = S::Title;
-        type Content = Set<members::content>;
-        type PublishedAt = S::PublishedAt;
-        type Path = S::Path;
-        type Url = S::Url;
-    }
-    ///State transition - sets the `published_at` field to Set
-    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
-    impl<S: State> State for SetPublishedAt<S> {
-        type Title = S::Title;
-        type Content = S::Content;
-        type PublishedAt = Set<members::published_at>;
-        type Path = S::Path;
-        type Url = S::Url;
-    }
-    ///State transition - sets the `path` field to Set
-    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPath<S> {}
-    impl<S: State> State for SetPath<S> {
-        type Title = S::Title;
-        type Content = S::Content;
-        type PublishedAt = S::PublishedAt;
-        type Path = Set<members::path>;
-        type Url = S::Url;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
+        type Url = Set<members::url>;
         type Title = S::Title;
+        type Path = S::Path;
         type Content = S::Content;
         type PublishedAt = S::PublishedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type Url = S::Url;
+        type Title = Set<members::title>;
         type Path = S::Path;
-        type Url = Set<members::url>;
+        type Content = S::Content;
+        type PublishedAt = S::PublishedAt;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPath<S> {}
+    impl<S: State> State for SetPath<S> {
+        type Url = S::Url;
+        type Title = S::Title;
+        type Path = Set<members::path>;
+        type Content = S::Content;
+        type PublishedAt = S::PublishedAt;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Url = S::Url;
+        type Title = S::Title;
+        type Path = S::Path;
+        type Content = Set<members::content>;
+        type PublishedAt = S::PublishedAt;
+    }
+    ///State transition - sets the `published_at` field to Set
+    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
+    impl<S: State> State for SetPublishedAt<S> {
+        type Url = S::Url;
+        type Title = S::Title;
+        type Path = S::Path;
+        type Content = S::Content;
+        type PublishedAt = Set<members::published_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `url` field
+        pub struct url(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `path` field
+        pub struct path(());
         ///Marker type for the `content` field
         pub struct content(());
         ///Marker type for the `published_at` field
         pub struct published_at(());
-        ///Marker type for the `path` field
-        pub struct path(());
-        ///Marker type for the `url` field
-        pub struct url(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DocumentBuilder<'a, S: document_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<BlobMetadata<'a>>>,
         Option<CowStr<'a>>,
         Option<bool>,
@@ -648,7 +651,7 @@ pub struct DocumentBuilder<'a, S: document_state::State> {
         Option<UriValue<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Document<'a> {
@@ -662,8 +665,8 @@ impl<'a> DocumentBuilder<'a, document_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -677,7 +680,7 @@ impl<'a> DocumentBuilder<'a, document_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -685,12 +688,12 @@ impl<'a> DocumentBuilder<'a, document_state::Empty> {
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `blobs` field (optional)
     pub fn blobs(mut self, value: impl Into<Option<Vec<BlobMetadata<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `blobs` field to an Option value (optional)
     pub fn maybe_blobs(mut self, value: Option<Vec<BlobMetadata<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -705,11 +708,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DocumentBuilder<'a, document_state::SetContent<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -717,12 +720,12 @@ where
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `latex` field (optional)
     pub fn latex(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `latex` field to an Option value (optional)
     pub fn maybe_latex(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -730,12 +733,12 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `ogp` field (optional)
     pub fn ogp(mut self, value: impl Into<Option<Ogp<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `ogp` field to an Option value (optional)
     pub fn maybe_ogp(mut self, value: Option<Ogp<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -750,11 +753,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DocumentBuilder<'a, document_state::SetPath<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         DocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -769,11 +772,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> DocumentBuilder<'a, document_state::SetPublishedAt<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         DocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -781,12 +784,12 @@ where
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `subtitle` field (optional)
     pub fn subtitle(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `subtitle` field to an Option value (optional)
     pub fn maybe_subtitle(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -794,12 +797,12 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -807,12 +810,12 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<Theme<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `theme` field to an Option value (optional)
     pub fn maybe_theme(mut self, value: Option<Theme<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -827,11 +830,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DocumentBuilder<'a, document_state::SetTitle<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         DocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -846,11 +849,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> DocumentBuilder<'a, document_state::SetUrl<S>> {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         DocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -858,12 +861,12 @@ where
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `visibility` field (optional)
     pub fn visibility(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
     pub fn maybe_visibility(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -871,30 +874,27 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
+    S::Url: document_state::IsSet,
     S::Title: document_state::IsSet,
+    S::Path: document_state::IsSet,
     S::Content: document_state::IsSet,
     S::PublishedAt: document_state::IsSet,
-    S::Path: document_state::IsSet,
-    S::Url: document_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Document<'a> {
         Document {
-            blobs: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
-            latex: self.__unsafe_private_named.2.or_else(|| Some(false)),
-            ogp: self.__unsafe_private_named.3,
-            path: self.__unsafe_private_named.4.unwrap(),
-            published_at: self.__unsafe_private_named.5.unwrap(),
-            subtitle: self.__unsafe_private_named.6,
-            tags: self.__unsafe_private_named.7,
-            theme: self.__unsafe_private_named.8,
-            title: self.__unsafe_private_named.9.unwrap(),
-            url: self.__unsafe_private_named.10.unwrap(),
-            visibility: self
-                .__unsafe_private_named
-                .11
-                .or_else(|| Some(CowStr::from("public"))),
+            blobs: self._fields.0,
+            content: self._fields.1.unwrap(),
+            latex: self._fields.2.or_else(|| Some(false)),
+            ogp: self._fields.3,
+            path: self._fields.4.unwrap(),
+            published_at: self._fields.5.unwrap(),
+            subtitle: self._fields.6,
+            tags: self._fields.7,
+            theme: self._fields.8,
+            title: self._fields.9.unwrap(),
+            url: self._fields.10.unwrap(),
+            visibility: self._fields.11.or_else(|| Some(CowStr::from("public"))),
             extra_data: Default::default(),
         }
     }
@@ -907,21 +907,18 @@ where
         >,
     ) -> Document<'a> {
         Document {
-            blobs: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
-            latex: self.__unsafe_private_named.2.or_else(|| Some(false)),
-            ogp: self.__unsafe_private_named.3,
-            path: self.__unsafe_private_named.4.unwrap(),
-            published_at: self.__unsafe_private_named.5.unwrap(),
-            subtitle: self.__unsafe_private_named.6,
-            tags: self.__unsafe_private_named.7,
-            theme: self.__unsafe_private_named.8,
-            title: self.__unsafe_private_named.9.unwrap(),
-            url: self.__unsafe_private_named.10.unwrap(),
-            visibility: self
-                .__unsafe_private_named
-                .11
-                .or_else(|| Some(CowStr::from("public"))),
+            blobs: self._fields.0,
+            content: self._fields.1.unwrap(),
+            latex: self._fields.2.or_else(|| Some(false)),
+            ogp: self._fields.3,
+            path: self._fields.4.unwrap(),
+            published_at: self._fields.5.unwrap(),
+            subtitle: self._fields.6,
+            tags: self._fields.7,
+            theme: self._fields.8,
+            title: self._fields.9.unwrap(),
+            url: self._fields.10.unwrap(),
+            visibility: self._fields.11.or_else(|| Some(CowStr::from("public"))),
             extra_data: Some(extra_data),
         }
     }

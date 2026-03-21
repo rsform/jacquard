@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
@@ -144,45 +147,45 @@ pub mod import_contacts_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Contacts;
         type Token;
+        type Contacts;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Contacts = Unset;
         type Token = Unset;
-    }
-    ///State transition - sets the `contacts` field to Set
-    pub struct SetContacts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContacts<S> {}
-    impl<S: State> State for SetContacts<S> {
-        type Contacts = Set<members::contacts>;
-        type Token = S::Token;
+        type Contacts = Unset;
     }
     ///State transition - sets the `token` field to Set
     pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetToken<S> {}
     impl<S: State> State for SetToken<S> {
-        type Contacts = S::Contacts;
         type Token = Set<members::token>;
+        type Contacts = S::Contacts;
+    }
+    ///State transition - sets the `contacts` field to Set
+    pub struct SetContacts<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContacts<S> {}
+    impl<S: State> State for SetContacts<S> {
+        type Token = S::Token;
+        type Contacts = Set<members::contacts>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `contacts` field
-        pub struct contacts(());
         ///Marker type for the `token` field
         pub struct token(());
+        ///Marker type for the `contacts` field
+        pub struct contacts(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ImportContactsBuilder<'a, S: import_contacts_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<CowStr<'a>>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<CowStr<'a>>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ImportContacts<'a> {
@@ -196,9 +199,9 @@ impl<'a> ImportContactsBuilder<'a, import_contacts_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ImportContactsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -213,11 +216,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> ImportContactsBuilder<'a, import_contacts_state::SetContacts<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ImportContactsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -232,11 +235,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ImportContactsBuilder<'a, import_contacts_state::SetToken<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ImportContactsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -244,14 +247,14 @@ where
 impl<'a, S> ImportContactsBuilder<'a, S>
 where
     S: import_contacts_state::State,
-    S::Contacts: import_contacts_state::IsSet,
     S::Token: import_contacts_state::IsSet,
+    S::Contacts: import_contacts_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ImportContacts<'a> {
         ImportContacts {
-            contacts: self.__unsafe_private_named.0.unwrap(),
-            token: self.__unsafe_private_named.1.unwrap(),
+            contacts: self._fields.0.unwrap(),
+            token: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -264,8 +267,8 @@ where
         >,
     ) -> ImportContacts<'a> {
         ImportContacts {
-            contacts: self.__unsafe_private_named.0.unwrap(),
-            token: self.__unsafe_private_named.1.unwrap(),
+            contacts: self._fields.0.unwrap(),
+            token: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

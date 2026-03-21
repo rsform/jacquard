@@ -8,7 +8,11 @@
 pub mod get_services;
 pub mod service;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -222,12 +226,9 @@ pub mod labeler_policies_state {
 
 /// Builder for constructing an instance of this type
 pub struct LabelerPoliciesBuilder<'a, S: labeler_policies_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Vec<LabelValueDefinition<'a>>>,
-        Option<Vec<LabelValue<'a>>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<LabelValueDefinition<'a>>>, Option<Vec<LabelValue<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LabelerPolicies<'a> {
@@ -241,9 +242,9 @@ impl<'a> LabelerPoliciesBuilder<'a, labeler_policies_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LabelerPoliciesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -254,7 +255,7 @@ impl<'a, S: labeler_policies_state::State> LabelerPoliciesBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<LabelValueDefinition<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `labelValueDefinitions` field to an Option value (optional)
@@ -262,7 +263,7 @@ impl<'a, S: labeler_policies_state::State> LabelerPoliciesBuilder<'a, S> {
         mut self,
         value: Option<Vec<LabelValueDefinition<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -277,11 +278,11 @@ where
         mut self,
         value: impl Into<Vec<LabelValue<'a>>>,
     ) -> LabelerPoliciesBuilder<'a, labeler_policies_state::SetLabelValues<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LabelerPoliciesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -294,8 +295,8 @@ where
     /// Build the final struct
     pub fn build(self) -> LabelerPolicies<'a> {
         LabelerPolicies {
-            label_value_definitions: self.__unsafe_private_named.0,
-            label_values: self.__unsafe_private_named.1.unwrap(),
+            label_value_definitions: self._fields.0,
+            label_values: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -308,8 +309,8 @@ where
         >,
     ) -> LabelerPolicies<'a> {
         LabelerPolicies {
-            label_value_definitions: self.__unsafe_private_named.0,
-            label_values: self.__unsafe_private_named.1.unwrap(),
+            label_value_definitions: self._fields.0,
+            label_values: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -610,8 +611,8 @@ pub mod labeler_view_state {
     pub trait State: sealed::Sealed {
         type Uri;
         type Cid;
-        type Creator;
         type IndexedAt;
+        type Creator;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -619,8 +620,8 @@ pub mod labeler_view_state {
     impl State for Empty {
         type Uri = Unset;
         type Cid = Unset;
-        type Creator = Unset;
         type IndexedAt = Unset;
+        type Creator = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
@@ -628,8 +629,8 @@ pub mod labeler_view_state {
     impl<S: State> State for SetUri<S> {
         type Uri = Set<members::uri>;
         type Cid = S::Cid;
-        type Creator = S::Creator;
         type IndexedAt = S::IndexedAt;
+        type Creator = S::Creator;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
@@ -637,17 +638,8 @@ pub mod labeler_view_state {
     impl<S: State> State for SetCid<S> {
         type Uri = S::Uri;
         type Cid = Set<members::cid>;
+        type IndexedAt = S::IndexedAt;
         type Creator = S::Creator;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `creator` field to Set
-    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreator<S> {}
-    impl<S: State> State for SetCreator<S> {
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Creator = Set<members::creator>;
-        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -655,8 +647,17 @@ pub mod labeler_view_state {
     impl<S: State> State for SetIndexedAt<S> {
         type Uri = S::Uri;
         type Cid = S::Cid;
-        type Creator = S::Creator;
         type IndexedAt = Set<members::indexed_at>;
+        type Creator = S::Creator;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreator<S> {}
+    impl<S: State> State for SetCreator<S> {
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
+        type Creator = Set<members::creator>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -665,17 +666,17 @@ pub mod labeler_view_state {
         pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `creator` field
-        pub struct creator(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LabelerViewBuilder<'a, S: labeler_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Cid<'a>>,
         Option<ProfileView<'a>>,
         Option<Datetime>,
@@ -684,7 +685,7 @@ pub struct LabelerViewBuilder<'a, S: labeler_view_state::State> {
         Option<AtUri<'a>>,
         Option<labeler::LabelerViewerState<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LabelerView<'a> {
@@ -698,9 +699,9 @@ impl<'a> LabelerViewBuilder<'a, labeler_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LabelerViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -715,11 +716,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> LabelerViewBuilder<'a, labeler_view_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LabelerViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -734,11 +735,11 @@ where
         mut self,
         value: impl Into<ProfileView<'a>>,
     ) -> LabelerViewBuilder<'a, labeler_view_state::SetCreator<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LabelerViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -753,11 +754,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LabelerViewBuilder<'a, labeler_view_state::SetIndexedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LabelerViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -765,12 +766,12 @@ where
 impl<'a, S: labeler_view_state::State> LabelerViewBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<Label<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<Vec<Label<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -778,12 +779,12 @@ impl<'a, S: labeler_view_state::State> LabelerViewBuilder<'a, S> {
 impl<'a, S: labeler_view_state::State> LabelerViewBuilder<'a, S> {
     /// Set the `likeCount` field (optional)
     pub fn like_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `likeCount` field to an Option value (optional)
     pub fn maybe_like_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -798,11 +799,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> LabelerViewBuilder<'a, labeler_view_state::SetUri<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         LabelerViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -813,7 +814,7 @@ impl<'a, S: labeler_view_state::State> LabelerViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<labeler::LabelerViewerState<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
@@ -821,7 +822,7 @@ impl<'a, S: labeler_view_state::State> LabelerViewBuilder<'a, S> {
         mut self,
         value: Option<labeler::LabelerViewerState<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -831,19 +832,19 @@ where
     S: labeler_view_state::State,
     S::Uri: labeler_view_state::IsSet,
     S::Cid: labeler_view_state::IsSet,
-    S::Creator: labeler_view_state::IsSet,
     S::IndexedAt: labeler_view_state::IsSet,
+    S::Creator: labeler_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LabelerView<'a> {
         LabelerView {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            creator: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            labels: self.__unsafe_private_named.3,
-            like_count: self.__unsafe_private_named.4,
-            uri: self.__unsafe_private_named.5.unwrap(),
-            viewer: self.__unsafe_private_named.6,
+            cid: self._fields.0.unwrap(),
+            creator: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
+            labels: self._fields.3,
+            like_count: self._fields.4,
+            uri: self._fields.5.unwrap(),
+            viewer: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -856,13 +857,13 @@ where
         >,
     ) -> LabelerView<'a> {
         LabelerView {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            creator: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            labels: self.__unsafe_private_named.3,
-            like_count: self.__unsafe_private_named.4,
-            uri: self.__unsafe_private_named.5.unwrap(),
-            viewer: self.__unsafe_private_named.6,
+            cid: self._fields.0.unwrap(),
+            creator: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
+            labels: self._fields.3,
+            like_count: self._fields.4,
+            uri: self._fields.5.unwrap(),
+            viewer: self._fields.6,
             extra_data: Some(extra_data),
         }
     }
@@ -879,91 +880,91 @@ pub mod labeler_view_detailed_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Uri;
-        type IndexedAt;
-        type Cid;
         type Creator;
         type Policies;
+        type Cid;
+        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Uri = Unset;
-        type IndexedAt = Unset;
-        type Cid = Unset;
         type Creator = Unset;
         type Policies = Unset;
+        type Cid = Unset;
+        type IndexedAt = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
         type Uri = Set<members::uri>;
-        type IndexedAt = S::IndexedAt;
+        type Creator = S::Creator;
+        type Policies = S::Policies;
         type Cid = S::Cid;
-        type Creator = S::Creator;
-        type Policies = S::Policies;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Uri = S::Uri;
-        type IndexedAt = Set<members::indexed_at>;
-        type Cid = S::Cid;
-        type Creator = S::Creator;
-        type Policies = S::Policies;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
         type IndexedAt = S::IndexedAt;
-        type Cid = Set<members::cid>;
-        type Creator = S::Creator;
-        type Policies = S::Policies;
     }
     ///State transition - sets the `creator` field to Set
     pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreator<S> {}
     impl<S: State> State for SetCreator<S> {
         type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Creator = Set<members::creator>;
         type Policies = S::Policies;
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `policies` field to Set
     pub struct SetPolicies<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPolicies<S> {}
     impl<S: State> State for SetPolicies<S> {
         type Uri = S::Uri;
-        type IndexedAt = S::IndexedAt;
-        type Cid = S::Cid;
         type Creator = S::Creator;
         type Policies = Set<members::policies>;
+        type Cid = S::Cid;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Creator = S::Creator;
+        type Policies = S::Policies;
+        type Cid = Set<members::cid>;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type Uri = S::Uri;
+        type Creator = S::Creator;
+        type Policies = S::Policies;
+        type Cid = S::Cid;
+        type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `creator` field
         pub struct creator(());
         ///Marker type for the `policies` field
         pub struct policies(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LabelerViewDetailedBuilder<'a, S: labeler_view_detailed_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Cid<'a>>,
         Option<ProfileView<'a>>,
         Option<Datetime>,
@@ -976,7 +977,7 @@ pub struct LabelerViewDetailedBuilder<'a, S: labeler_view_detailed_state::State>
         Option<AtUri<'a>>,
         Option<labeler::LabelerViewerState<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LabelerViewDetailed<'a> {
@@ -990,21 +991,9 @@ impl<'a> LabelerViewDetailedBuilder<'a, labeler_view_detailed_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LabelerViewDetailedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1019,11 +1008,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> LabelerViewDetailedBuilder<'a, labeler_view_detailed_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LabelerViewDetailedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1038,11 +1027,11 @@ where
         mut self,
         value: impl Into<ProfileView<'a>>,
     ) -> LabelerViewDetailedBuilder<'a, labeler_view_detailed_state::SetCreator<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LabelerViewDetailedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1057,11 +1046,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LabelerViewDetailedBuilder<'a, labeler_view_detailed_state::SetIndexedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LabelerViewDetailedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1069,12 +1058,12 @@ where
 impl<'a, S: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<Label<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<Vec<Label<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1082,12 +1071,12 @@ impl<'a, S: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<'a, S
 impl<'a, S: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<'a, S> {
     /// Set the `likeCount` field (optional)
     pub fn like_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `likeCount` field to an Option value (optional)
     pub fn maybe_like_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1102,11 +1091,11 @@ where
         mut self,
         value: impl Into<labeler::LabelerPolicies<'a>>,
     ) -> LabelerViewDetailedBuilder<'a, labeler_view_detailed_state::SetPolicies<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         LabelerViewDetailedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1117,12 +1106,12 @@ impl<'a, S: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<'a, S
         mut self,
         value: impl Into<Option<Vec<ReasonType<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `reasonTypes` field to an Option value (optional)
     pub fn maybe_reason_types(mut self, value: Option<Vec<ReasonType<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1133,12 +1122,12 @@ impl<'a, S: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<'a, S
         mut self,
         value: impl Into<Option<Vec<Nsid<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `subjectCollections` field to an Option value (optional)
     pub fn maybe_subject_collections(mut self, value: Option<Vec<Nsid<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -1149,12 +1138,12 @@ impl<'a, S: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<'a, S
         mut self,
         value: impl Into<Option<Vec<SubjectType<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `subjectTypes` field to an Option value (optional)
     pub fn maybe_subject_types(mut self, value: Option<Vec<SubjectType<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -1169,11 +1158,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> LabelerViewDetailedBuilder<'a, labeler_view_detailed_state::SetUri<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         LabelerViewDetailedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1184,7 +1173,7 @@ impl<'a, S: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<'a, S
         mut self,
         value: impl Into<Option<labeler::LabelerViewerState<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
@@ -1192,7 +1181,7 @@ impl<'a, S: labeler_view_detailed_state::State> LabelerViewDetailedBuilder<'a, S
         mut self,
         value: Option<labeler::LabelerViewerState<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -1201,25 +1190,25 @@ impl<'a, S> LabelerViewDetailedBuilder<'a, S>
 where
     S: labeler_view_detailed_state::State,
     S::Uri: labeler_view_detailed_state::IsSet,
-    S::IndexedAt: labeler_view_detailed_state::IsSet,
-    S::Cid: labeler_view_detailed_state::IsSet,
     S::Creator: labeler_view_detailed_state::IsSet,
     S::Policies: labeler_view_detailed_state::IsSet,
+    S::Cid: labeler_view_detailed_state::IsSet,
+    S::IndexedAt: labeler_view_detailed_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LabelerViewDetailed<'a> {
         LabelerViewDetailed {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            creator: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            labels: self.__unsafe_private_named.3,
-            like_count: self.__unsafe_private_named.4,
-            policies: self.__unsafe_private_named.5.unwrap(),
-            reason_types: self.__unsafe_private_named.6,
-            subject_collections: self.__unsafe_private_named.7,
-            subject_types: self.__unsafe_private_named.8,
-            uri: self.__unsafe_private_named.9.unwrap(),
-            viewer: self.__unsafe_private_named.10,
+            cid: self._fields.0.unwrap(),
+            creator: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
+            labels: self._fields.3,
+            like_count: self._fields.4,
+            policies: self._fields.5.unwrap(),
+            reason_types: self._fields.6,
+            subject_collections: self._fields.7,
+            subject_types: self._fields.8,
+            uri: self._fields.9.unwrap(),
+            viewer: self._fields.10,
             extra_data: Default::default(),
         }
     }
@@ -1232,17 +1221,17 @@ where
         >,
     ) -> LabelerViewDetailed<'a> {
         LabelerViewDetailed {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            creator: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            labels: self.__unsafe_private_named.3,
-            like_count: self.__unsafe_private_named.4,
-            policies: self.__unsafe_private_named.5.unwrap(),
-            reason_types: self.__unsafe_private_named.6,
-            subject_collections: self.__unsafe_private_named.7,
-            subject_types: self.__unsafe_private_named.8,
-            uri: self.__unsafe_private_named.9.unwrap(),
-            viewer: self.__unsafe_private_named.10,
+            cid: self._fields.0.unwrap(),
+            creator: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
+            labels: self._fields.3,
+            like_count: self._fields.4,
+            policies: self._fields.5.unwrap(),
+            reason_types: self._fields.6,
+            subject_collections: self._fields.7,
+            subject_types: self._fields.8,
+            uri: self._fields.9.unwrap(),
+            viewer: self._fields.10,
             extra_data: Some(extra_data),
         }
     }

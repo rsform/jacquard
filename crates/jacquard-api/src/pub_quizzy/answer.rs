@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -241,80 +244,80 @@ pub mod answer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
-        type Timestamp;
         type Question;
         type Certainty;
+        type Text;
+        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
-        type Timestamp = Unset;
         type Question = Unset;
         type Certainty = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Text = Set<members::text>;
-        type Timestamp = S::Timestamp;
-        type Question = S::Question;
-        type Certainty = S::Certainty;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Text = S::Text;
-        type Timestamp = Set<members::timestamp>;
-        type Question = S::Question;
-        type Certainty = S::Certainty;
+        type Text = Unset;
+        type Timestamp = Unset;
     }
     ///State transition - sets the `question` field to Set
     pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuestion<S> {}
     impl<S: State> State for SetQuestion<S> {
-        type Text = S::Text;
-        type Timestamp = S::Timestamp;
         type Question = Set<members::question>;
         type Certainty = S::Certainty;
+        type Text = S::Text;
+        type Timestamp = S::Timestamp;
     }
     ///State transition - sets the `certainty` field to Set
     pub struct SetCertainty<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCertainty<S> {}
     impl<S: State> State for SetCertainty<S> {
-        type Text = S::Text;
-        type Timestamp = S::Timestamp;
         type Question = S::Question;
         type Certainty = Set<members::certainty>;
+        type Text = S::Text;
+        type Timestamp = S::Timestamp;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Question = S::Question;
+        type Certainty = S::Certainty;
+        type Text = Set<members::text>;
+        type Timestamp = S::Timestamp;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type Question = S::Question;
+        type Certainty = S::Certainty;
+        type Text = S::Text;
+        type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
         ///Marker type for the `question` field
         pub struct question(());
         ///Marker type for the `certainty` field
         pub struct certainty(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AnswerBuilder<'a, S: answer_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AnswerCertainty<'a>>,
         Option<StrongRef<'a>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Answer<'a> {
@@ -328,9 +331,9 @@ impl<'a> AnswerBuilder<'a, answer_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AnswerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -345,11 +348,11 @@ where
         mut self,
         value: impl Into<AnswerCertainty<'a>>,
     ) -> AnswerBuilder<'a, answer_state::SetCertainty<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AnswerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -364,11 +367,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> AnswerBuilder<'a, answer_state::SetQuestion<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AnswerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -383,11 +386,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AnswerBuilder<'a, answer_state::SetText<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         AnswerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -402,11 +405,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> AnswerBuilder<'a, answer_state::SetTimestamp<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         AnswerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -414,18 +417,18 @@ where
 impl<'a, S> AnswerBuilder<'a, S>
 where
     S: answer_state::State,
-    S::Text: answer_state::IsSet,
-    S::Timestamp: answer_state::IsSet,
     S::Question: answer_state::IsSet,
     S::Certainty: answer_state::IsSet,
+    S::Text: answer_state::IsSet,
+    S::Timestamp: answer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Answer<'a> {
         Answer {
-            certainty: self.__unsafe_private_named.0.unwrap(),
-            question: self.__unsafe_private_named.1.unwrap(),
-            text: self.__unsafe_private_named.2.unwrap(),
-            timestamp: self.__unsafe_private_named.3.unwrap(),
+            certainty: self._fields.0.unwrap(),
+            question: self._fields.1.unwrap(),
+            text: self._fields.2.unwrap(),
+            timestamp: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -438,10 +441,10 @@ where
         >,
     ) -> Answer<'a> {
         Answer {
-            certainty: self.__unsafe_private_named.0.unwrap(),
-            question: self.__unsafe_private_named.1.unwrap(),
-            text: self.__unsafe_private_named.2.unwrap(),
-            timestamp: self.__unsafe_private_named.3.unwrap(),
+            certainty: self._fields.0.unwrap(),
+            question: self._fields.1.unwrap(),
+            text: self._fields.2.unwrap(),
+            timestamp: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

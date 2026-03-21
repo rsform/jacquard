@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -166,14 +169,14 @@ pub mod credit_state {
 
 /// Builder for constructing an instance of this type
 pub struct CreditBuilder<'a, S: credit_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<StrongRef<'a>>,
         Option<Vec<CreditEntry<'a>>>,
         Option<CowStr<'a>>,
         Option<StrongRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Credit<'a> {
@@ -187,9 +190,9 @@ impl<'a> CreditBuilder<'a, credit_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreditBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -197,12 +200,12 @@ impl<'a> CreditBuilder<'a, credit_state::Empty> {
 impl<'a, S: credit_state::State> CreditBuilder<'a, S> {
     /// Set the `actor` field (optional)
     pub fn actor(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `actor` field to an Option value (optional)
     pub fn maybe_actor(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -217,11 +220,11 @@ where
         mut self,
         value: impl Into<Vec<CreditEntry<'a>>>,
     ) -> CreditBuilder<'a, credit_state::SetCredits<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CreditBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -229,12 +232,12 @@ where
 impl<'a, S: credit_state::State> CreditBuilder<'a, S> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `displayName` field to an Option value (optional)
     pub fn maybe_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -249,11 +252,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> CreditBuilder<'a, credit_state::SetGame<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         CreditBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -267,10 +270,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Credit<'a> {
         Credit {
-            actor: self.__unsafe_private_named.0,
-            credits: self.__unsafe_private_named.1.unwrap(),
-            display_name: self.__unsafe_private_named.2,
-            game: self.__unsafe_private_named.3.unwrap(),
+            actor: self._fields.0,
+            credits: self._fields.1.unwrap(),
+            display_name: self._fields.2,
+            game: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -283,10 +286,10 @@ where
         >,
     ) -> Credit<'a> {
         Credit {
-            actor: self.__unsafe_private_named.0,
-            credits: self.__unsafe_private_named.1.unwrap(),
-            display_name: self.__unsafe_private_named.2,
-            game: self.__unsafe_private_named.3.unwrap(),
+            actor: self._fields.0,
+            credits: self._fields.1.unwrap(),
+            display_name: self._fields.2,
+            game: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

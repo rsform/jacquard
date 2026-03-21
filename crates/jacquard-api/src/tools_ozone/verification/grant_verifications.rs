@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -143,45 +146,45 @@ pub mod grant_error_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type Error;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type Error = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Error = S::Error;
+        type Subject = Unset;
     }
     ///State transition - sets the `error` field to Set
     pub struct SetError<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetError<S> {}
     impl<S: State> State for SetError<S> {
-        type Subject = S::Subject;
         type Error = Set<members::error>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Error = S::Error;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `error` field
         pub struct error(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GrantErrorBuilder<'a, S: grant_error_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<Did<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Did<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GrantError<'a> {
@@ -195,9 +198,9 @@ impl<'a> GrantErrorBuilder<'a, grant_error_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GrantErrorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -212,11 +215,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GrantErrorBuilder<'a, grant_error_state::SetError<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GrantErrorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -231,11 +234,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> GrantErrorBuilder<'a, grant_error_state::SetSubject<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GrantErrorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -243,14 +246,14 @@ where
 impl<'a, S> GrantErrorBuilder<'a, S>
 where
     S: grant_error_state::State,
-    S::Subject: grant_error_state::IsSet,
     S::Error: grant_error_state::IsSet,
+    S::Subject: grant_error_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GrantError<'a> {
         GrantError {
-            error: self.__unsafe_private_named.0.unwrap(),
-            subject: self.__unsafe_private_named.1.unwrap(),
+            error: self._fields.0.unwrap(),
+            subject: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -263,8 +266,8 @@ where
         >,
     ) -> GrantError<'a> {
         GrantError {
-            error: self.__unsafe_private_named.0.unwrap(),
-            subject: self.__unsafe_private_named.1.unwrap(),
+            error: self._fields.0.unwrap(),
+            subject: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -460,9 +463,9 @@ pub mod grant_verifications_state {
 
 /// Builder for constructing an instance of this type
 pub struct GrantVerificationsBuilder<'a, S: grant_verifications_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<grant_verifications::VerificationInput<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<grant_verifications::VerificationInput<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GrantVerifications<'a> {
@@ -476,9 +479,9 @@ impl<'a> GrantVerificationsBuilder<'a, grant_verifications_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GrantVerificationsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -493,11 +496,11 @@ where
         mut self,
         value: impl Into<Vec<grant_verifications::VerificationInput<'a>>>,
     ) -> GrantVerificationsBuilder<'a, grant_verifications_state::SetVerifications<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GrantVerificationsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -510,7 +513,7 @@ where
     /// Build the final struct
     pub fn build(self) -> GrantVerifications<'a> {
         GrantVerifications {
-            verifications: self.__unsafe_private_named.0.unwrap(),
+            verifications: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -523,7 +526,7 @@ where
         >,
     ) -> GrantVerifications<'a> {
         GrantVerifications {
-            verifications: self.__unsafe_private_named.0.unwrap(),
+            verifications: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -539,64 +542,59 @@ pub mod verification_input_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
-        type Subject;
         type DisplayName;
+        type Subject;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
-        type Subject = Unset;
         type DisplayName = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type Subject = S::Subject;
-        type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Handle = S::Handle;
-        type Subject = Set<members::subject>;
-        type DisplayName = S::DisplayName;
+        type Subject = Unset;
+        type Handle = Unset;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisplayName<S> {}
     impl<S: State> State for SetDisplayName<S> {
-        type Handle = S::Handle;
-        type Subject = S::Subject;
         type DisplayName = Set<members::display_name>;
+        type Subject = S::Subject;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type DisplayName = S::DisplayName;
+        type Subject = Set<members::subject>;
+        type Handle = S::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type DisplayName = S::DisplayName;
+        type Subject = S::Subject;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct VerificationInputBuilder<'a, S: verification_input_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<Handle<'a>>,
-        Option<Did<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<CowStr<'a>>, Option<Handle<'a>>, Option<Did<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> VerificationInput<'a> {
@@ -610,9 +608,9 @@ impl<'a> VerificationInputBuilder<'a, verification_input_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         VerificationInputBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -620,12 +618,12 @@ impl<'a> VerificationInputBuilder<'a, verification_input_state::Empty> {
 impl<'a, S: verification_input_state::State> VerificationInputBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -640,11 +638,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> VerificationInputBuilder<'a, verification_input_state::SetDisplayName<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         VerificationInputBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -659,11 +657,11 @@ where
         mut self,
         value: impl Into<Handle<'a>>,
     ) -> VerificationInputBuilder<'a, verification_input_state::SetHandle<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         VerificationInputBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -678,11 +676,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> VerificationInputBuilder<'a, verification_input_state::SetSubject<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         VerificationInputBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -690,17 +688,17 @@ where
 impl<'a, S> VerificationInputBuilder<'a, S>
 where
     S: verification_input_state::State,
-    S::Handle: verification_input_state::IsSet,
-    S::Subject: verification_input_state::IsSet,
     S::DisplayName: verification_input_state::IsSet,
+    S::Subject: verification_input_state::IsSet,
+    S::Handle: verification_input_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VerificationInput<'a> {
         VerificationInput {
-            created_at: self.__unsafe_private_named.0,
-            display_name: self.__unsafe_private_named.1.unwrap(),
-            handle: self.__unsafe_private_named.2.unwrap(),
-            subject: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0,
+            display_name: self._fields.1.unwrap(),
+            handle: self._fields.2.unwrap(),
+            subject: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -713,10 +711,10 @@ where
         >,
     ) -> VerificationInput<'a> {
         VerificationInput {
-            created_at: self.__unsafe_private_named.0,
-            display_name: self.__unsafe_private_named.1.unwrap(),
-            handle: self.__unsafe_private_named.2.unwrap(),
-            subject: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0,
+            display_name: self._fields.1.unwrap(),
+            handle: self._fields.2.unwrap(),
+            subject: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

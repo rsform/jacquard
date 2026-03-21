@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::{AtUri, UriValue};
@@ -155,14 +158,9 @@ pub mod configure_state {
 
 /// Builder for constructing an instance of this type
 pub struct ConfigureBuilder<'a, S: configure_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<bool>,
-        Option<AtUri<'a>>,
-        Option<bool>,
-        Option<UriValue<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<AtUri<'a>>, Option<bool>, Option<UriValue<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Configure<'a> {
@@ -176,9 +174,9 @@ impl<'a> ConfigureBuilder<'a, configure_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigureBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -186,12 +184,12 @@ impl<'a> ConfigureBuilder<'a, configure_state::Empty> {
 impl<'a, S: configure_state::State> ConfigureBuilder<'a, S> {
     /// Set the `disableDirectRsvp` field (optional)
     pub fn disable_direct_rsvp(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `disableDirectRsvp` field to an Option value (optional)
     pub fn maybe_disable_direct_rsvp(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -206,11 +204,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ConfigureBuilder<'a, configure_state::SetEvent<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ConfigureBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -218,12 +216,12 @@ where
 impl<'a, S: configure_state::State> ConfigureBuilder<'a, S> {
     /// Set the `requireConfirmedEmail` field (optional)
     pub fn require_confirmed_email(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `requireConfirmedEmail` field to an Option value (optional)
     pub fn maybe_require_confirmed_email(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -231,12 +229,12 @@ impl<'a, S: configure_state::State> ConfigureBuilder<'a, S> {
 impl<'a, S: configure_state::State> ConfigureBuilder<'a, S> {
     /// Set the `rsvpRedirectUrl` field (optional)
     pub fn rsvp_redirect_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `rsvpRedirectUrl` field to an Option value (optional)
     pub fn maybe_rsvp_redirect_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -249,10 +247,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Configure<'a> {
         Configure {
-            disable_direct_rsvp: self.__unsafe_private_named.0,
-            event: self.__unsafe_private_named.1.unwrap(),
-            require_confirmed_email: self.__unsafe_private_named.2,
-            rsvp_redirect_url: self.__unsafe_private_named.3,
+            disable_direct_rsvp: self._fields.0,
+            event: self._fields.1.unwrap(),
+            require_confirmed_email: self._fields.2,
+            rsvp_redirect_url: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -265,10 +263,10 @@ where
         >,
     ) -> Configure<'a> {
         Configure {
-            disable_direct_rsvp: self.__unsafe_private_named.0,
-            event: self.__unsafe_private_named.1.unwrap(),
-            require_confirmed_email: self.__unsafe_private_named.2,
-            rsvp_redirect_url: self.__unsafe_private_named.3,
+            disable_direct_rsvp: self._fields.0,
+            event: self._fields.1.unwrap(),
+            require_confirmed_email: self._fields.2,
+            rsvp_redirect_url: self._fields.3,
             extra_data: Some(extra_data),
         }
     }

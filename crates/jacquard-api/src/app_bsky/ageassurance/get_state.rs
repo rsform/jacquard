@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -92,9 +95,9 @@ pub mod get_state_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetStateBuilder<'a, S: get_state_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetState<'a> {
@@ -108,9 +111,9 @@ impl<'a> GetStateBuilder<'a, get_state_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetStateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -125,11 +128,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GetStateBuilder<'a, get_state_state::SetCountryCode<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetStateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -137,12 +140,12 @@ where
 impl<'a, S: get_state_state::State> GetStateBuilder<'a, S> {
     /// Set the `regionCode` field (optional)
     pub fn region_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `regionCode` field to an Option value (optional)
     pub fn maybe_region_code(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -155,8 +158,8 @@ where
     /// Build the final struct
     pub fn build(self) -> GetState<'a> {
         GetState {
-            country_code: self.__unsafe_private_named.0.unwrap(),
-            region_code: self.__unsafe_private_named.1,
+            country_code: self._fields.0.unwrap(),
+            region_code: self._fields.1,
         }
     }
 }

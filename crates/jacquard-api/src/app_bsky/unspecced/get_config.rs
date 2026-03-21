@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -96,45 +99,45 @@ pub mod live_now_config_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Domains;
         type Did;
+        type Domains;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Domains = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `domains` field to Set
-    pub struct SetDomains<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDomains<S> {}
-    impl<S: State> State for SetDomains<S> {
-        type Domains = Set<members::domains>;
-        type Did = S::Did;
+        type Domains = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Domains = S::Domains;
         type Did = Set<members::did>;
+        type Domains = S::Domains;
+    }
+    ///State transition - sets the `domains` field to Set
+    pub struct SetDomains<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDomains<S> {}
+    impl<S: State> State for SetDomains<S> {
+        type Did = S::Did;
+        type Domains = Set<members::domains>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `domains` field
-        pub struct domains(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `domains` field
+        pub struct domains(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LiveNowConfigBuilder<'a, S: live_now_config_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>, Option<Vec<CowStr<'a>>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<Vec<CowStr<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LiveNowConfig<'a> {
@@ -148,9 +151,9 @@ impl<'a> LiveNowConfigBuilder<'a, live_now_config_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LiveNowConfigBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -165,11 +168,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> LiveNowConfigBuilder<'a, live_now_config_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LiveNowConfigBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -184,11 +187,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> LiveNowConfigBuilder<'a, live_now_config_state::SetDomains<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LiveNowConfigBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -196,14 +199,14 @@ where
 impl<'a, S> LiveNowConfigBuilder<'a, S>
 where
     S: live_now_config_state::State,
-    S::Domains: live_now_config_state::IsSet,
     S::Did: live_now_config_state::IsSet,
+    S::Domains: live_now_config_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LiveNowConfig<'a> {
         LiveNowConfig {
-            did: self.__unsafe_private_named.0.unwrap(),
-            domains: self.__unsafe_private_named.1.unwrap(),
+            did: self._fields.0.unwrap(),
+            domains: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -216,8 +219,8 @@ where
         >,
     ) -> LiveNowConfig<'a> {
         LiveNowConfig {
-            did: self.__unsafe_private_named.0.unwrap(),
-            domains: self.__unsafe_private_named.1.unwrap(),
+            did: self._fields.0.unwrap(),
+            domains: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -10,7 +10,11 @@ pub mod delete_member;
 pub mod list_members;
 pub mod update_member;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -212,44 +216,44 @@ pub mod member_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Role;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Role = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Role = S::Role;
+        type Did = Unset;
     }
     ///State transition - sets the `role` field to Set
     pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRole<S> {}
     impl<S: State> State for SetRole<S> {
-        type Did = S::Did;
         type Role = Set<members::role>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Role = S::Role;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `role` field
         pub struct role(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MemberBuilder<'a, S: member_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Did<'a>>,
         Option<bool>,
@@ -258,7 +262,7 @@ pub struct MemberBuilder<'a, S: member_state::State> {
         Option<MemberRole<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Member<'a> {
@@ -272,9 +276,9 @@ impl<'a> MemberBuilder<'a, member_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MemberBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -282,12 +286,12 @@ impl<'a> MemberBuilder<'a, member_state::Empty> {
 impl<'a, S: member_state::State> MemberBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -302,11 +306,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> MemberBuilder<'a, member_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MemberBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -314,12 +318,12 @@ where
 impl<'a, S: member_state::State> MemberBuilder<'a, S> {
     /// Set the `disabled` field (optional)
     pub fn disabled(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `disabled` field to an Option value (optional)
     pub fn maybe_disabled(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -327,12 +331,12 @@ impl<'a, S: member_state::State> MemberBuilder<'a, S> {
 impl<'a, S: member_state::State> MemberBuilder<'a, S> {
     /// Set the `lastUpdatedBy` field (optional)
     pub fn last_updated_by(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `lastUpdatedBy` field to an Option value (optional)
     pub fn maybe_last_updated_by(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -340,12 +344,12 @@ impl<'a, S: member_state::State> MemberBuilder<'a, S> {
 impl<'a, S: member_state::State> MemberBuilder<'a, S> {
     /// Set the `profile` field (optional)
     pub fn profile(mut self, value: impl Into<Option<ProfileViewDetailed<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `profile` field to an Option value (optional)
     pub fn maybe_profile(mut self, value: Option<ProfileViewDetailed<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -360,11 +364,11 @@ where
         mut self,
         value: impl Into<MemberRole<'a>>,
     ) -> MemberBuilder<'a, member_state::SetRole<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         MemberBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -372,12 +376,12 @@ where
 impl<'a, S: member_state::State> MemberBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -385,19 +389,19 @@ impl<'a, S: member_state::State> MemberBuilder<'a, S> {
 impl<'a, S> MemberBuilder<'a, S>
 where
     S: member_state::State,
-    S::Did: member_state::IsSet,
     S::Role: member_state::IsSet,
+    S::Did: member_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Member<'a> {
         Member {
-            created_at: self.__unsafe_private_named.0,
-            did: self.__unsafe_private_named.1.unwrap(),
-            disabled: self.__unsafe_private_named.2,
-            last_updated_by: self.__unsafe_private_named.3,
-            profile: self.__unsafe_private_named.4,
-            role: self.__unsafe_private_named.5.unwrap(),
-            updated_at: self.__unsafe_private_named.6,
+            created_at: self._fields.0,
+            did: self._fields.1.unwrap(),
+            disabled: self._fields.2,
+            last_updated_by: self._fields.3,
+            profile: self._fields.4,
+            role: self._fields.5.unwrap(),
+            updated_at: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -410,13 +414,13 @@ where
         >,
     ) -> Member<'a> {
         Member {
-            created_at: self.__unsafe_private_named.0,
-            did: self.__unsafe_private_named.1.unwrap(),
-            disabled: self.__unsafe_private_named.2,
-            last_updated_by: self.__unsafe_private_named.3,
-            profile: self.__unsafe_private_named.4,
-            role: self.__unsafe_private_named.5.unwrap(),
-            updated_at: self.__unsafe_private_named.6,
+            created_at: self._fields.0,
+            did: self._fields.1.unwrap(),
+            disabled: self._fields.2,
+            last_updated_by: self._fields.3,
+            profile: self._fields.4,
+            role: self._fields.5.unwrap(),
+            updated_at: self._fields.6,
             extra_data: Some(extra_data),
         }
     }

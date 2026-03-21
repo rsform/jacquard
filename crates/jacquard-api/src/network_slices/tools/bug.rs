@@ -9,7 +9,11 @@ pub mod comment;
 pub mod issue;
 pub mod response;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -317,112 +321,112 @@ pub mod bug_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Severity;
-        type Description;
         type StepsToReproduce;
-        type Namespace;
         type CreatedAt;
+        type Severity;
+        type Namespace;
         type Title;
+        type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Severity = Unset;
-        type Description = Unset;
         type StepsToReproduce = Unset;
-        type Namespace = Unset;
         type CreatedAt = Unset;
+        type Severity = Unset;
+        type Namespace = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `severity` field to Set
-    pub struct SetSeverity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeverity<S> {}
-    impl<S: State> State for SetSeverity<S> {
-        type Severity = Set<members::severity>;
-        type Description = S::Description;
-        type StepsToReproduce = S::StepsToReproduce;
-        type Namespace = S::Namespace;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Severity = S::Severity;
-        type Description = Set<members::description>;
-        type StepsToReproduce = S::StepsToReproduce;
-        type Namespace = S::Namespace;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
+        type Description = Unset;
     }
     ///State transition - sets the `steps_to_reproduce` field to Set
     pub struct SetStepsToReproduce<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStepsToReproduce<S> {}
     impl<S: State> State for SetStepsToReproduce<S> {
-        type Severity = S::Severity;
-        type Description = S::Description;
         type StepsToReproduce = Set<members::steps_to_reproduce>;
-        type Namespace = S::Namespace;
         type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `namespace` field to Set
-    pub struct SetNamespace<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNamespace<S> {}
-    impl<S: State> State for SetNamespace<S> {
         type Severity = S::Severity;
-        type Description = S::Description;
-        type StepsToReproduce = S::StepsToReproduce;
-        type Namespace = Set<members::namespace>;
-        type CreatedAt = S::CreatedAt;
+        type Namespace = S::Namespace;
         type Title = S::Title;
+        type Description = S::Description;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Severity = S::Severity;
-        type Description = S::Description;
         type StepsToReproduce = S::StepsToReproduce;
-        type Namespace = S::Namespace;
         type CreatedAt = Set<members::created_at>;
+        type Severity = S::Severity;
+        type Namespace = S::Namespace;
         type Title = S::Title;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `severity` field to Set
+    pub struct SetSeverity<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeverity<S> {}
+    impl<S: State> State for SetSeverity<S> {
+        type StepsToReproduce = S::StepsToReproduce;
+        type CreatedAt = S::CreatedAt;
+        type Severity = Set<members::severity>;
+        type Namespace = S::Namespace;
+        type Title = S::Title;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `namespace` field to Set
+    pub struct SetNamespace<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNamespace<S> {}
+    impl<S: State> State for SetNamespace<S> {
+        type StepsToReproduce = S::StepsToReproduce;
+        type CreatedAt = S::CreatedAt;
+        type Severity = S::Severity;
+        type Namespace = Set<members::namespace>;
+        type Title = S::Title;
+        type Description = S::Description;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Severity = S::Severity;
-        type Description = S::Description;
         type StepsToReproduce = S::StepsToReproduce;
-        type Namespace = S::Namespace;
         type CreatedAt = S::CreatedAt;
+        type Severity = S::Severity;
+        type Namespace = S::Namespace;
         type Title = Set<members::title>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type StepsToReproduce = S::StepsToReproduce;
+        type CreatedAt = S::CreatedAt;
+        type Severity = S::Severity;
+        type Namespace = S::Namespace;
+        type Title = S::Title;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `severity` field
-        pub struct severity(());
-        ///Marker type for the `description` field
-        pub struct description(());
         ///Marker type for the `steps_to_reproduce` field
         pub struct steps_to_reproduce(());
-        ///Marker type for the `namespace` field
-        pub struct namespace(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `severity` field
+        pub struct severity(());
+        ///Marker type for the `namespace` field
+        pub struct namespace(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `description` field
+        pub struct description(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BugBuilder<'a, S: bug_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Images<'a>>,
         Option<Datetime>,
@@ -434,7 +438,7 @@ pub struct BugBuilder<'a, S: bug_state::State> {
         Option<Vec<Facet<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Bug<'a> {
@@ -448,20 +452,9 @@ impl<'a> BugBuilder<'a, bug_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BugBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -469,12 +462,12 @@ impl<'a> BugBuilder<'a, bug_state::Empty> {
 impl<'a, S: bug_state::State> BugBuilder<'a, S> {
     /// Set the `appUsed` field (optional)
     pub fn app_used(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `appUsed` field to an Option value (optional)
     pub fn maybe_app_used(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -482,12 +475,12 @@ impl<'a, S: bug_state::State> BugBuilder<'a, S> {
 impl<'a, S: bug_state::State> BugBuilder<'a, S> {
     /// Set the `attachments` field (optional)
     pub fn attachments(mut self, value: impl Into<Option<Images<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `attachments` field to an Option value (optional)
     pub fn maybe_attachments(mut self, value: Option<Images<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -502,11 +495,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> BugBuilder<'a, bug_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         BugBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -521,11 +514,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BugBuilder<'a, bug_state::SetDescription<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         BugBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -536,12 +529,12 @@ impl<'a, S: bug_state::State> BugBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<Facet<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `descriptionFacets` field to an Option value (optional)
     pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -556,11 +549,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BugBuilder<'a, bug_state::SetNamespace<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         BugBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -575,11 +568,11 @@ where
         mut self,
         value: impl Into<BugSeverity<'a>>,
     ) -> BugBuilder<'a, bug_state::SetSeverity<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         BugBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -594,11 +587,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BugBuilder<'a, bug_state::SetStepsToReproduce<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         BugBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -609,7 +602,7 @@ impl<'a, S: bug_state::State> BugBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<Facet<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `stepsToReproduceFacets` field to an Option value (optional)
@@ -617,7 +610,7 @@ impl<'a, S: bug_state::State> BugBuilder<'a, S> {
         mut self,
         value: Option<Vec<Facet<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -632,11 +625,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BugBuilder<'a, bug_state::SetTitle<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         BugBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -644,26 +637,26 @@ where
 impl<'a, S> BugBuilder<'a, S>
 where
     S: bug_state::State,
-    S::Severity: bug_state::IsSet,
-    S::Description: bug_state::IsSet,
     S::StepsToReproduce: bug_state::IsSet,
-    S::Namespace: bug_state::IsSet,
     S::CreatedAt: bug_state::IsSet,
+    S::Severity: bug_state::IsSet,
+    S::Namespace: bug_state::IsSet,
     S::Title: bug_state::IsSet,
+    S::Description: bug_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Bug<'a> {
         Bug {
-            app_used: self.__unsafe_private_named.0,
-            attachments: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3.unwrap(),
-            description_facets: self.__unsafe_private_named.4,
-            namespace: self.__unsafe_private_named.5.unwrap(),
-            severity: self.__unsafe_private_named.6.unwrap(),
-            steps_to_reproduce: self.__unsafe_private_named.7.unwrap(),
-            steps_to_reproduce_facets: self.__unsafe_private_named.8,
-            title: self.__unsafe_private_named.9.unwrap(),
+            app_used: self._fields.0,
+            attachments: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3.unwrap(),
+            description_facets: self._fields.4,
+            namespace: self._fields.5.unwrap(),
+            severity: self._fields.6.unwrap(),
+            steps_to_reproduce: self._fields.7.unwrap(),
+            steps_to_reproduce_facets: self._fields.8,
+            title: self._fields.9.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -676,16 +669,16 @@ where
         >,
     ) -> Bug<'a> {
         Bug {
-            app_used: self.__unsafe_private_named.0,
-            attachments: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3.unwrap(),
-            description_facets: self.__unsafe_private_named.4,
-            namespace: self.__unsafe_private_named.5.unwrap(),
-            severity: self.__unsafe_private_named.6.unwrap(),
-            steps_to_reproduce: self.__unsafe_private_named.7.unwrap(),
-            steps_to_reproduce_facets: self.__unsafe_private_named.8,
-            title: self.__unsafe_private_named.9.unwrap(),
+            app_used: self._fields.0,
+            attachments: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3.unwrap(),
+            description_facets: self._fields.4,
+            namespace: self._fields.5.unwrap(),
+            severity: self._fields.6.unwrap(),
+            steps_to_reproduce: self._fields.7.unwrap(),
+            steps_to_reproduce_facets: self._fields.8,
+            title: self._fields.9.unwrap(),
             extra_data: Some(extra_data),
         }
     }

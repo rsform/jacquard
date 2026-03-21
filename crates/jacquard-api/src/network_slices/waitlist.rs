@@ -8,7 +8,11 @@
 pub mod invite;
 pub mod request;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -107,57 +111,57 @@ pub mod invite_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Slice;
-        type CreatedAt;
         type Did;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Slice = Unset;
-        type CreatedAt = Unset;
         type Did = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `slice` field to Set
     pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlice<S> {}
     impl<S: State> State for SetSlice<S> {
         type Slice = Set<members::slice>;
+        type Did = S::Did;
         type CreatedAt = S::CreatedAt;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Slice = S::Slice;
-        type CreatedAt = Set<members::created_at>;
-        type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
         type Slice = S::Slice;
-        type CreatedAt = S::CreatedAt;
         type Did = Set<members::did>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Slice = S::Slice;
+        type Did = S::Did;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `slice` field
         pub struct slice(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct InviteViewBuilder<'a, S: invite_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Did<'a>>,
         Option<Datetime>,
@@ -165,7 +169,7 @@ pub struct InviteViewBuilder<'a, S: invite_view_state::State> {
         Option<AtUri<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> InviteView<'a> {
@@ -179,9 +183,9 @@ impl<'a> InviteViewBuilder<'a, invite_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         InviteViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -196,11 +200,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         InviteViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -215,11 +219,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         InviteViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -227,12 +231,12 @@ where
 impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `expiresAt` field to an Option value (optional)
     pub fn maybe_expires_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -240,12 +244,12 @@ impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
 impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     /// Set the `profile` field (optional)
     pub fn profile(mut self, value: impl Into<Option<ProfileViewBasic<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `profile` field to an Option value (optional)
     pub fn maybe_profile(mut self, value: Option<ProfileViewBasic<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -260,11 +264,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> InviteViewBuilder<'a, invite_view_state::SetSlice<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         InviteViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -272,12 +276,12 @@ where
 impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     /// Set the `uri` field (optional)
     pub fn uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `uri` field to an Option value (optional)
     pub fn maybe_uri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -286,18 +290,18 @@ impl<'a, S> InviteViewBuilder<'a, S>
 where
     S: invite_view_state::State,
     S::Slice: invite_view_state::IsSet,
-    S::CreatedAt: invite_view_state::IsSet,
     S::Did: invite_view_state::IsSet,
+    S::CreatedAt: invite_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> InviteView<'a> {
         InviteView {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            expires_at: self.__unsafe_private_named.2,
-            profile: self.__unsafe_private_named.3,
-            slice: self.__unsafe_private_named.4.unwrap(),
-            uri: self.__unsafe_private_named.5,
+            created_at: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            expires_at: self._fields.2,
+            profile: self._fields.3,
+            slice: self._fields.4.unwrap(),
+            uri: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -310,12 +314,12 @@ where
         >,
     ) -> InviteView<'a> {
         InviteView {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            expires_at: self.__unsafe_private_named.2,
-            profile: self.__unsafe_private_named.3,
-            slice: self.__unsafe_private_named.4.unwrap(),
-            uri: self.__unsafe_private_named.5,
+            created_at: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            expires_at: self._fields.2,
+            profile: self._fields.3,
+            slice: self._fields.4.unwrap(),
+            uri: self._fields.5,
             extra_data: Some(extra_data),
         }
     }
@@ -521,13 +525,9 @@ pub mod request_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct RequestViewBuilder<'a, S: request_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Datetime>,
-        Option<ProfileViewBasic<'a>>,
-        Option<AtUri<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<ProfileViewBasic<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RequestView<'a> {
@@ -541,9 +541,9 @@ impl<'a> RequestViewBuilder<'a, request_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RequestViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -558,11 +558,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> RequestViewBuilder<'a, request_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RequestViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -570,12 +570,12 @@ where
 impl<'a, S: request_view_state::State> RequestViewBuilder<'a, S> {
     /// Set the `profile` field (optional)
     pub fn profile(mut self, value: impl Into<Option<ProfileViewBasic<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `profile` field to an Option value (optional)
     pub fn maybe_profile(mut self, value: Option<ProfileViewBasic<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -590,11 +590,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> RequestViewBuilder<'a, request_view_state::SetSlice<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RequestViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -608,9 +608,9 @@ where
     /// Build the final struct
     pub fn build(self) -> RequestView<'a> {
         RequestView {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            profile: self.__unsafe_private_named.1,
-            slice: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            profile: self._fields.1,
+            slice: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -623,9 +623,9 @@ where
         >,
     ) -> RequestView<'a> {
         RequestView {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            profile: self.__unsafe_private_named.1,
-            slice: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            profile: self._fields.1,
+            slice: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

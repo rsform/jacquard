@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -120,9 +123,9 @@ pub mod list_missing_blobs_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListMissingBlobsBuilder<'a, S: list_missing_blobs_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ListMissingBlobs<'a> {
@@ -136,9 +139,9 @@ impl<'a> ListMissingBlobsBuilder<'a, list_missing_blobs_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListMissingBlobsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -146,12 +149,12 @@ impl<'a> ListMissingBlobsBuilder<'a, list_missing_blobs_state::Empty> {
 impl<'a, S: list_missing_blobs_state::State> ListMissingBlobsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -159,12 +162,12 @@ impl<'a, S: list_missing_blobs_state::State> ListMissingBlobsBuilder<'a, S> {
 impl<'a, S: list_missing_blobs_state::State> ListMissingBlobsBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -176,8 +179,8 @@ where
     /// Build the final struct
     pub fn build(self) -> ListMissingBlobs<'a> {
         ListMissingBlobs {
-            cursor: self.__unsafe_private_named.0,
-            limit: self.__unsafe_private_named.1,
+            cursor: self._fields.0,
+            limit: self._fields.1,
         }
     }
 }
@@ -192,45 +195,45 @@ pub mod record_blob_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RecordUri;
         type Cid;
+        type RecordUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RecordUri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `record_uri` field to Set
-    pub struct SetRecordUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecordUri<S> {}
-    impl<S: State> State for SetRecordUri<S> {
-        type RecordUri = Set<members::record_uri>;
-        type Cid = S::Cid;
+        type RecordUri = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type RecordUri = S::RecordUri;
         type Cid = Set<members::cid>;
+        type RecordUri = S::RecordUri;
+    }
+    ///State transition - sets the `record_uri` field to Set
+    pub struct SetRecordUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecordUri<S> {}
+    impl<S: State> State for SetRecordUri<S> {
+        type Cid = S::Cid;
+        type RecordUri = Set<members::record_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record_uri` field
-        pub struct record_uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `record_uri` field
+        pub struct record_uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RecordBlobBuilder<'a, S: record_blob_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Cid<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Cid<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RecordBlob<'a> {
@@ -244,9 +247,9 @@ impl<'a> RecordBlobBuilder<'a, record_blob_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RecordBlobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -261,11 +264,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> RecordBlobBuilder<'a, record_blob_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RecordBlobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -280,11 +283,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> RecordBlobBuilder<'a, record_blob_state::SetRecordUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RecordBlobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -292,14 +295,14 @@ where
 impl<'a, S> RecordBlobBuilder<'a, S>
 where
     S: record_blob_state::State,
-    S::RecordUri: record_blob_state::IsSet,
     S::Cid: record_blob_state::IsSet,
+    S::RecordUri: record_blob_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RecordBlob<'a> {
         RecordBlob {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            record_uri: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0.unwrap(),
+            record_uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -312,8 +315,8 @@ where
         >,
     ) -> RecordBlob<'a> {
         RecordBlob {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            record_uri: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0.unwrap(),
+            record_uri: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

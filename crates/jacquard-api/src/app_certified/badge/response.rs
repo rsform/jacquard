@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -218,64 +221,64 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BadgeAward;
-        type Response;
         type CreatedAt;
+        type Response;
+        type BadgeAward;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BadgeAward = Unset;
-        type Response = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `badge_award` field to Set
-    pub struct SetBadgeAward<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBadgeAward<S> {}
-    impl<S: State> State for SetBadgeAward<S> {
-        type BadgeAward = Set<members::badge_award>;
-        type Response = S::Response;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `response` field to Set
-    pub struct SetResponse<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResponse<S> {}
-    impl<S: State> State for SetResponse<S> {
-        type BadgeAward = S::BadgeAward;
-        type Response = Set<members::response>;
-        type CreatedAt = S::CreatedAt;
+        type Response = Unset;
+        type BadgeAward = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type BadgeAward = S::BadgeAward;
-        type Response = S::Response;
         type CreatedAt = Set<members::created_at>;
+        type Response = S::Response;
+        type BadgeAward = S::BadgeAward;
+    }
+    ///State transition - sets the `response` field to Set
+    pub struct SetResponse<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResponse<S> {}
+    impl<S: State> State for SetResponse<S> {
+        type CreatedAt = S::CreatedAt;
+        type Response = Set<members::response>;
+        type BadgeAward = S::BadgeAward;
+    }
+    ///State transition - sets the `badge_award` field to Set
+    pub struct SetBadgeAward<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBadgeAward<S> {}
+    impl<S: State> State for SetBadgeAward<S> {
+        type CreatedAt = S::CreatedAt;
+        type Response = S::Response;
+        type BadgeAward = Set<members::badge_award>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `badge_award` field
-        pub struct badge_award(());
-        ///Marker type for the `response` field
-        pub struct response(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `response` field
+        pub struct response(());
+        ///Marker type for the `badge_award` field
+        pub struct badge_award(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ResponseBuilder<'a, S: response_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Award<'a>>,
         Option<Datetime>,
         Option<ResponseResponse<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Response<'a> {
@@ -289,9 +292,9 @@ impl<'a> ResponseBuilder<'a, response_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ResponseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -306,11 +309,11 @@ where
         mut self,
         value: impl Into<Award<'a>>,
     ) -> ResponseBuilder<'a, response_state::SetBadgeAward<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ResponseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -325,11 +328,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ResponseBuilder<'a, response_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ResponseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -344,11 +347,11 @@ where
         mut self,
         value: impl Into<ResponseResponse<'a>>,
     ) -> ResponseBuilder<'a, response_state::SetResponse<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ResponseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -356,12 +359,12 @@ where
 impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
     /// Set the `weight` field (optional)
     pub fn weight(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `weight` field to an Option value (optional)
     pub fn maybe_weight(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -369,17 +372,17 @@ impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
 impl<'a, S> ResponseBuilder<'a, S>
 where
     S: response_state::State,
-    S::BadgeAward: response_state::IsSet,
-    S::Response: response_state::IsSet,
     S::CreatedAt: response_state::IsSet,
+    S::Response: response_state::IsSet,
+    S::BadgeAward: response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Response<'a> {
         Response {
-            badge_award: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            response: self.__unsafe_private_named.2.unwrap(),
-            weight: self.__unsafe_private_named.3,
+            badge_award: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            response: self._fields.2.unwrap(),
+            weight: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -392,10 +395,10 @@ where
         >,
     ) -> Response<'a> {
         Response {
-            badge_award: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            response: self.__unsafe_private_named.2.unwrap(),
-            weight: self.__unsafe_private_named.3,
+            badge_award: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            response: self._fields.2.unwrap(),
+            weight: self._fields.3,
             extra_data: Some(extra_data),
         }
     }

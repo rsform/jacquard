@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -242,8 +245,8 @@ pub mod room_state {
 
 /// Builder for constructing an instance of this type
 pub struct RoomBuilder<'a, S: room_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<room::ModlistRef<'a>>,
         Option<room::ModlistRef<'a>>,
         Option<Vec<Language>>,
@@ -251,7 +254,7 @@ pub struct RoomBuilder<'a, S: room_state::State> {
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Room<'a> {
@@ -265,9 +268,9 @@ impl<'a> RoomBuilder<'a, room_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RoomBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -275,12 +278,12 @@ impl<'a> RoomBuilder<'a, room_state::Empty> {
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `allowlist` field (optional)
     pub fn allowlist(mut self, value: impl Into<Option<room::ModlistRef<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `allowlist` field to an Option value (optional)
     pub fn maybe_allowlist(mut self, value: Option<room::ModlistRef<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -288,12 +291,12 @@ impl<'a, S: room_state::State> RoomBuilder<'a, S> {
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `denylist` field (optional)
     pub fn denylist(mut self, value: impl Into<Option<room::ModlistRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `denylist` field to an Option value (optional)
     pub fn maybe_denylist(mut self, value: Option<room::ModlistRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -301,12 +304,12 @@ impl<'a, S: room_state::State> RoomBuilder<'a, S> {
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `languages` field (optional)
     pub fn languages(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `languages` field to an Option value (optional)
     pub fn maybe_languages(mut self, value: Option<Vec<Language>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -321,11 +324,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RoomBuilder<'a, room_state::SetName<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         RoomBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -333,12 +336,12 @@ where
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -346,12 +349,12 @@ impl<'a, S: room_state::State> RoomBuilder<'a, S> {
 impl<'a, S: room_state::State> RoomBuilder<'a, S> {
     /// Set the `topic` field (optional)
     pub fn topic(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `topic` field to an Option value (optional)
     pub fn maybe_topic(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -364,12 +367,12 @@ where
     /// Build the final struct
     pub fn build(self) -> Room<'a> {
         Room {
-            allowlist: self.__unsafe_private_named.0,
-            denylist: self.__unsafe_private_named.1,
-            languages: self.__unsafe_private_named.2,
-            name: self.__unsafe_private_named.3.unwrap(),
-            tags: self.__unsafe_private_named.4,
-            topic: self.__unsafe_private_named.5,
+            allowlist: self._fields.0,
+            denylist: self._fields.1,
+            languages: self._fields.2,
+            name: self._fields.3.unwrap(),
+            tags: self._fields.4,
+            topic: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -382,12 +385,12 @@ where
         >,
     ) -> Room<'a> {
         Room {
-            allowlist: self.__unsafe_private_named.0,
-            denylist: self.__unsafe_private_named.1,
-            languages: self.__unsafe_private_named.2,
-            name: self.__unsafe_private_named.3.unwrap(),
-            tags: self.__unsafe_private_named.4,
-            topic: self.__unsafe_private_named.5,
+            allowlist: self._fields.0,
+            denylist: self._fields.1,
+            languages: self._fields.2,
+            name: self._fields.3.unwrap(),
+            tags: self._fields.4,
+            topic: self._fields.5,
             extra_data: Some(extra_data),
         }
     }
@@ -562,9 +565,9 @@ pub mod modlist_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct ModlistRefBuilder<'a, S: modlist_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>, Option<Vec<Did<'a>>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<Vec<Did<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ModlistRef<'a> {
@@ -578,9 +581,9 @@ impl<'a> ModlistRefBuilder<'a, modlist_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ModlistRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -595,11 +598,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ModlistRefBuilder<'a, modlist_ref_state::SetActive<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ModlistRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -614,11 +617,11 @@ where
         mut self,
         value: impl Into<Vec<Did<'a>>>,
     ) -> ModlistRefBuilder<'a, modlist_ref_state::SetUsers<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ModlistRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -632,8 +635,8 @@ where
     /// Build the final struct
     pub fn build(self) -> ModlistRef<'a> {
         ModlistRef {
-            active: self.__unsafe_private_named.0.unwrap(),
-            users: self.__unsafe_private_named.1.unwrap(),
+            active: self._fields.0.unwrap(),
+            users: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -646,8 +649,8 @@ where
         >,
     ) -> ModlistRef<'a> {
         ModlistRef {
-            active: self.__unsafe_private_named.0.unwrap(),
-            users: self.__unsafe_private_named.1.unwrap(),
+            active: self._fields.0.unwrap(),
+            users: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -184,64 +187,64 @@ pub mod page_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Repository;
         type UpdatedAt;
+        type Repository;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Repository = Unset;
         type UpdatedAt = Unset;
+        type Repository = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type CreatedAt = Set<members::created_at>;
+        type UpdatedAt = S::UpdatedAt;
         type Repository = S::Repository;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type CreatedAt = S::CreatedAt;
-        type Repository = Set<members::repository>;
-        type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
         type CreatedAt = S::CreatedAt;
-        type Repository = S::Repository;
         type UpdatedAt = Set<members::updated_at>;
+        type Repository = S::Repository;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepository<S> {}
+    impl<S: State> State for SetRepository<S> {
+        type CreatedAt = S::CreatedAt;
+        type UpdatedAt = S::UpdatedAt;
+        type Repository = Set<members::repository>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `repository` field
-        pub struct repository(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PageBuilder<'a, S: page_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<BlobRef<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Page<'a> {
@@ -255,9 +258,9 @@ impl<'a> PageBuilder<'a, page_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -265,12 +268,12 @@ impl<'a> PageBuilder<'a, page_state::Empty> {
 impl<'a, S: page_state::State> PageBuilder<'a, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
     pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -285,11 +288,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PageBuilder<'a, page_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -297,12 +300,12 @@ where
 impl<'a, S: page_state::State> PageBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -317,11 +320,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PageBuilder<'a, page_state::SetRepository<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         PageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -336,11 +339,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PageBuilder<'a, page_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         PageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -349,17 +352,17 @@ impl<'a, S> PageBuilder<'a, S>
 where
     S: page_state::State,
     S::CreatedAt: page_state::IsSet,
-    S::Repository: page_state::IsSet,
     S::UpdatedAt: page_state::IsSet,
+    S::Repository: page_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Page<'a> {
         Page {
-            avatar: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            repository: self.__unsafe_private_named.3.unwrap(),
-            updated_at: self.__unsafe_private_named.4.unwrap(),
+            avatar: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            repository: self._fields.3.unwrap(),
+            updated_at: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -372,11 +375,11 @@ where
         >,
     ) -> Page<'a> {
         Page {
-            avatar: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            repository: self.__unsafe_private_named.3.unwrap(),
-            updated_at: self.__unsafe_private_named.4.unwrap(),
+            avatar: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            repository: self._fields.3.unwrap(),
+            updated_at: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -983,13 +986,9 @@ pub mod checkin_image_state {
 
 /// Builder for constructing an instance of this type
 pub struct CheckinImageBuilder<'a, S: checkin_image_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<CowStr<'a>>,
-        Option<BlobRef<'a>>,
-        Option<BlobRef<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<BlobRef<'a>>, Option<BlobRef<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CheckinImage<'a> {
@@ -1003,9 +1002,9 @@ impl<'a> CheckinImageBuilder<'a, checkin_image_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CheckinImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1013,12 +1012,12 @@ impl<'a> CheckinImageBuilder<'a, checkin_image_state::Empty> {
 impl<'a, S: checkin_image_state::State> CheckinImageBuilder<'a, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
     pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1033,11 +1032,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> CheckinImageBuilder<'a, checkin_image_state::SetFullsize<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CheckinImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1052,11 +1051,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> CheckinImageBuilder<'a, checkin_image_state::SetThumb<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CheckinImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1070,9 +1069,9 @@ where
     /// Build the final struct
     pub fn build(self) -> CheckinImage<'a> {
         CheckinImage {
-            alt: self.__unsafe_private_named.0,
-            fullsize: self.__unsafe_private_named.1.unwrap(),
-            thumb: self.__unsafe_private_named.2.unwrap(),
+            alt: self._fields.0,
+            fullsize: self._fields.1.unwrap(),
+            thumb: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1085,9 +1084,9 @@ where
         >,
     ) -> CheckinImage<'a> {
         CheckinImage {
-            alt: self.__unsafe_private_named.0,
-            fullsize: self.__unsafe_private_named.1.unwrap(),
-            thumb: self.__unsafe_private_named.2.unwrap(),
+            alt: self._fields.0,
+            fullsize: self._fields.1.unwrap(),
+            thumb: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1104,8 +1103,8 @@ pub mod checkin_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Text;
-        type Address;
         type CreatedAt;
+        type Address;
         type Geo;
     }
     /// Empty state - all required fields are unset
@@ -1113,8 +1112,8 @@ pub mod checkin_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Text = Unset;
-        type Address = Unset;
         type CreatedAt = Unset;
+        type Address = Unset;
         type Geo = Unset;
     }
     ///State transition - sets the `text` field to Set
@@ -1122,17 +1121,8 @@ pub mod checkin_state {
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
         type Text = Set<members::text>;
+        type CreatedAt = S::CreatedAt;
         type Address = S::Address;
-        type CreatedAt = S::CreatedAt;
-        type Geo = S::Geo;
-    }
-    ///State transition - sets the `address` field to Set
-    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddress<S> {}
-    impl<S: State> State for SetAddress<S> {
-        type Text = S::Text;
-        type Address = Set<members::address>;
-        type CreatedAt = S::CreatedAt;
         type Geo = S::Geo;
     }
     ///State transition - sets the `created_at` field to Set
@@ -1140,8 +1130,17 @@ pub mod checkin_state {
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Text = S::Text;
-        type Address = S::Address;
         type CreatedAt = Set<members::created_at>;
+        type Address = S::Address;
+        type Geo = S::Geo;
+    }
+    ///State transition - sets the `address` field to Set
+    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddress<S> {}
+    impl<S: State> State for SetAddress<S> {
+        type Text = S::Text;
+        type CreatedAt = S::CreatedAt;
+        type Address = Set<members::address>;
         type Geo = S::Geo;
     }
     ///State transition - sets the `geo` field to Set
@@ -1149,8 +1148,8 @@ pub mod checkin_state {
     impl<S: State> sealed::Sealed for SetGeo<S> {}
     impl<S: State> State for SetGeo<S> {
         type Text = S::Text;
-        type Address = S::Address;
         type CreatedAt = S::CreatedAt;
+        type Address = S::Address;
         type Geo = Set<members::geo>;
     }
     /// Marker types for field names
@@ -1158,10 +1157,10 @@ pub mod checkin_state {
     pub mod members {
         ///Marker type for the `text` field
         pub struct text(());
-        ///Marker type for the `address` field
-        pub struct address(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `address` field
+        pub struct address(());
         ///Marker type for the `geo` field
         pub struct geo(());
     }
@@ -1169,8 +1168,8 @@ pub mod checkin_state {
 
 /// Builder for constructing an instance of this type
 pub struct CheckinBuilder<'a, S: checkin_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<checkin::Address<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
@@ -1181,7 +1180,7 @@ pub struct CheckinBuilder<'a, S: checkin_state::State> {
         Option<checkin::CheckinImage<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Checkin<'a> {
@@ -1195,19 +1194,9 @@ impl<'a> CheckinBuilder<'a, checkin_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CheckinBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1222,11 +1211,11 @@ where
         mut self,
         value: impl Into<checkin::Address<'a>>,
     ) -> CheckinBuilder<'a, checkin_state::SetAddress<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CheckinBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1234,12 +1223,12 @@ where
 impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
     pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1247,12 +1236,12 @@ impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
 impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
     /// Set the `categoryGroup` field (optional)
     pub fn category_group(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `categoryGroup` field to an Option value (optional)
     pub fn maybe_category_group(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1260,12 +1249,12 @@ impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
 impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
     /// Set the `categoryIcon` field (optional)
     pub fn category_icon(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `categoryIcon` field to an Option value (optional)
     pub fn maybe_category_icon(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1280,11 +1269,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CheckinBuilder<'a, checkin_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         CheckinBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1292,12 +1281,12 @@ where
 impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
     /// Set the `fsq` field (optional)
     pub fn fsq(mut self, value: impl Into<Option<checkin::FsqPlace<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `fsq` field to an Option value (optional)
     pub fn maybe_fsq(mut self, value: Option<checkin::FsqPlace<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1312,11 +1301,11 @@ where
         mut self,
         value: impl Into<checkin::Geo<'a>>,
     ) -> CheckinBuilder<'a, checkin_state::SetGeo<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         CheckinBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1324,12 +1313,12 @@ where
 impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<checkin::CheckinImage<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<checkin::CheckinImage<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -1344,11 +1333,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CheckinBuilder<'a, checkin_state::SetText<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         CheckinBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1357,22 +1346,22 @@ impl<'a, S> CheckinBuilder<'a, S>
 where
     S: checkin_state::State,
     S::Text: checkin_state::IsSet,
-    S::Address: checkin_state::IsSet,
     S::CreatedAt: checkin_state::IsSet,
+    S::Address: checkin_state::IsSet,
     S::Geo: checkin_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Checkin<'a> {
         Checkin {
-            address: self.__unsafe_private_named.0.unwrap(),
-            category: self.__unsafe_private_named.1,
-            category_group: self.__unsafe_private_named.2,
-            category_icon: self.__unsafe_private_named.3,
-            created_at: self.__unsafe_private_named.4.unwrap(),
-            fsq: self.__unsafe_private_named.5,
-            geo: self.__unsafe_private_named.6.unwrap(),
-            image: self.__unsafe_private_named.7,
-            text: self.__unsafe_private_named.8.unwrap(),
+            address: self._fields.0.unwrap(),
+            category: self._fields.1,
+            category_group: self._fields.2,
+            category_icon: self._fields.3,
+            created_at: self._fields.4.unwrap(),
+            fsq: self._fields.5,
+            geo: self._fields.6.unwrap(),
+            image: self._fields.7,
+            text: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1385,15 +1374,15 @@ where
         >,
     ) -> Checkin<'a> {
         Checkin {
-            address: self.__unsafe_private_named.0.unwrap(),
-            category: self.__unsafe_private_named.1,
-            category_group: self.__unsafe_private_named.2,
-            category_icon: self.__unsafe_private_named.3,
-            created_at: self.__unsafe_private_named.4.unwrap(),
-            fsq: self.__unsafe_private_named.5,
-            geo: self.__unsafe_private_named.6.unwrap(),
-            image: self.__unsafe_private_named.7,
-            text: self.__unsafe_private_named.8.unwrap(),
+            address: self._fields.0.unwrap(),
+            category: self._fields.1,
+            category_group: self._fields.2,
+            category_icon: self._fields.3,
+            created_at: self._fields.4.unwrap(),
+            fsq: self._fields.5,
+            geo: self._fields.6.unwrap(),
+            image: self._fields.7,
+            text: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }

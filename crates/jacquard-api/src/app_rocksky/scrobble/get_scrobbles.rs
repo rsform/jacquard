@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -83,14 +86,9 @@ pub mod get_scrobbles_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetScrobblesBuilder<'a, S: get_scrobbles_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<AtIdentifier<'a>>,
-        Option<bool>,
-        Option<i64>,
-        Option<i64>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtIdentifier<'a>>, Option<bool>, Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetScrobbles<'a> {
@@ -104,9 +102,9 @@ impl<'a> GetScrobblesBuilder<'a, get_scrobbles_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetScrobblesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -114,12 +112,12 @@ impl<'a> GetScrobblesBuilder<'a, get_scrobbles_state::Empty> {
 impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
     /// Set the `did` field (optional)
     pub fn did(mut self, value: impl Into<Option<AtIdentifier<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `did` field to an Option value (optional)
     pub fn maybe_did(mut self, value: Option<AtIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -127,12 +125,12 @@ impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
 impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
     /// Set the `following` field (optional)
     pub fn following(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `following` field to an Option value (optional)
     pub fn maybe_following(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -140,12 +138,12 @@ impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
 impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -153,12 +151,12 @@ impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
 impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `offset` field to an Option value (optional)
     pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -170,10 +168,10 @@ where
     /// Build the final struct
     pub fn build(self) -> GetScrobbles<'a> {
         GetScrobbles {
-            did: self.__unsafe_private_named.0,
-            following: self.__unsafe_private_named.1,
-            limit: self.__unsafe_private_named.2,
-            offset: self.__unsafe_private_named.3,
+            did: self._fields.0,
+            following: self._fields.1,
+            limit: self._fields.2,
+            offset: self._fields.3,
         }
     }
 }

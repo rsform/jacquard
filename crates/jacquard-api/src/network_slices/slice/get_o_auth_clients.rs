@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -161,9 +164,9 @@ pub mod get_o_auth_clients_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetOAuthClientsBuilder<'a, S: get_o_auth_clients_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetOAuthClients<'a> {
@@ -177,9 +180,9 @@ impl<'a> GetOAuthClientsBuilder<'a, get_o_auth_clients_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetOAuthClientsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -194,11 +197,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GetOAuthClientsBuilder<'a, get_o_auth_clients_state::SetSlice<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetOAuthClientsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -211,7 +214,7 @@ where
     /// Build the final struct
     pub fn build(self) -> GetOAuthClients<'a> {
         GetOAuthClients {
-            slice: self.__unsafe_private_named.0.unwrap(),
+            slice: self._fields.0.unwrap(),
         }
     }
 }
@@ -226,134 +229,134 @@ pub mod oauth_client_details_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ClientName;
-        type RedirectUris;
+        type CreatedAt;
+        type ClientId;
         type GrantTypes;
         type CreatedByDid;
         type ResponseTypes;
-        type CreatedAt;
-        type ClientId;
+        type ClientName;
+        type RedirectUris;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ClientName = Unset;
-        type RedirectUris = Unset;
+        type CreatedAt = Unset;
+        type ClientId = Unset;
         type GrantTypes = Unset;
         type CreatedByDid = Unset;
         type ResponseTypes = Unset;
-        type CreatedAt = Unset;
-        type ClientId = Unset;
-    }
-    ///State transition - sets the `client_name` field to Set
-    pub struct SetClientName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClientName<S> {}
-    impl<S: State> State for SetClientName<S> {
-        type ClientName = Set<members::client_name>;
-        type RedirectUris = S::RedirectUris;
-        type GrantTypes = S::GrantTypes;
-        type CreatedByDid = S::CreatedByDid;
-        type ResponseTypes = S::ResponseTypes;
-        type CreatedAt = S::CreatedAt;
-        type ClientId = S::ClientId;
-    }
-    ///State transition - sets the `redirect_uris` field to Set
-    pub struct SetRedirectUris<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRedirectUris<S> {}
-    impl<S: State> State for SetRedirectUris<S> {
-        type ClientName = S::ClientName;
-        type RedirectUris = Set<members::redirect_uris>;
-        type GrantTypes = S::GrantTypes;
-        type CreatedByDid = S::CreatedByDid;
-        type ResponseTypes = S::ResponseTypes;
-        type CreatedAt = S::CreatedAt;
-        type ClientId = S::ClientId;
-    }
-    ///State transition - sets the `grant_types` field to Set
-    pub struct SetGrantTypes<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGrantTypes<S> {}
-    impl<S: State> State for SetGrantTypes<S> {
-        type ClientName = S::ClientName;
-        type RedirectUris = S::RedirectUris;
-        type GrantTypes = Set<members::grant_types>;
-        type CreatedByDid = S::CreatedByDid;
-        type ResponseTypes = S::ResponseTypes;
-        type CreatedAt = S::CreatedAt;
-        type ClientId = S::ClientId;
-    }
-    ///State transition - sets the `created_by_did` field to Set
-    pub struct SetCreatedByDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedByDid<S> {}
-    impl<S: State> State for SetCreatedByDid<S> {
-        type ClientName = S::ClientName;
-        type RedirectUris = S::RedirectUris;
-        type GrantTypes = S::GrantTypes;
-        type CreatedByDid = Set<members::created_by_did>;
-        type ResponseTypes = S::ResponseTypes;
-        type CreatedAt = S::CreatedAt;
-        type ClientId = S::ClientId;
-    }
-    ///State transition - sets the `response_types` field to Set
-    pub struct SetResponseTypes<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResponseTypes<S> {}
-    impl<S: State> State for SetResponseTypes<S> {
-        type ClientName = S::ClientName;
-        type RedirectUris = S::RedirectUris;
-        type GrantTypes = S::GrantTypes;
-        type CreatedByDid = S::CreatedByDid;
-        type ResponseTypes = Set<members::response_types>;
-        type CreatedAt = S::CreatedAt;
-        type ClientId = S::ClientId;
+        type ClientName = Unset;
+        type RedirectUris = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type ClientName = S::ClientName;
-        type RedirectUris = S::RedirectUris;
+        type CreatedAt = Set<members::created_at>;
+        type ClientId = S::ClientId;
         type GrantTypes = S::GrantTypes;
         type CreatedByDid = S::CreatedByDid;
         type ResponseTypes = S::ResponseTypes;
-        type CreatedAt = Set<members::created_at>;
-        type ClientId = S::ClientId;
+        type ClientName = S::ClientName;
+        type RedirectUris = S::RedirectUris;
     }
     ///State transition - sets the `client_id` field to Set
     pub struct SetClientId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetClientId<S> {}
     impl<S: State> State for SetClientId<S> {
-        type ClientName = S::ClientName;
-        type RedirectUris = S::RedirectUris;
+        type CreatedAt = S::CreatedAt;
+        type ClientId = Set<members::client_id>;
         type GrantTypes = S::GrantTypes;
         type CreatedByDid = S::CreatedByDid;
         type ResponseTypes = S::ResponseTypes;
+        type ClientName = S::ClientName;
+        type RedirectUris = S::RedirectUris;
+    }
+    ///State transition - sets the `grant_types` field to Set
+    pub struct SetGrantTypes<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGrantTypes<S> {}
+    impl<S: State> State for SetGrantTypes<S> {
         type CreatedAt = S::CreatedAt;
-        type ClientId = Set<members::client_id>;
+        type ClientId = S::ClientId;
+        type GrantTypes = Set<members::grant_types>;
+        type CreatedByDid = S::CreatedByDid;
+        type ResponseTypes = S::ResponseTypes;
+        type ClientName = S::ClientName;
+        type RedirectUris = S::RedirectUris;
+    }
+    ///State transition - sets the `created_by_did` field to Set
+    pub struct SetCreatedByDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedByDid<S> {}
+    impl<S: State> State for SetCreatedByDid<S> {
+        type CreatedAt = S::CreatedAt;
+        type ClientId = S::ClientId;
+        type GrantTypes = S::GrantTypes;
+        type CreatedByDid = Set<members::created_by_did>;
+        type ResponseTypes = S::ResponseTypes;
+        type ClientName = S::ClientName;
+        type RedirectUris = S::RedirectUris;
+    }
+    ///State transition - sets the `response_types` field to Set
+    pub struct SetResponseTypes<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetResponseTypes<S> {}
+    impl<S: State> State for SetResponseTypes<S> {
+        type CreatedAt = S::CreatedAt;
+        type ClientId = S::ClientId;
+        type GrantTypes = S::GrantTypes;
+        type CreatedByDid = S::CreatedByDid;
+        type ResponseTypes = Set<members::response_types>;
+        type ClientName = S::ClientName;
+        type RedirectUris = S::RedirectUris;
+    }
+    ///State transition - sets the `client_name` field to Set
+    pub struct SetClientName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetClientName<S> {}
+    impl<S: State> State for SetClientName<S> {
+        type CreatedAt = S::CreatedAt;
+        type ClientId = S::ClientId;
+        type GrantTypes = S::GrantTypes;
+        type CreatedByDid = S::CreatedByDid;
+        type ResponseTypes = S::ResponseTypes;
+        type ClientName = Set<members::client_name>;
+        type RedirectUris = S::RedirectUris;
+    }
+    ///State transition - sets the `redirect_uris` field to Set
+    pub struct SetRedirectUris<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRedirectUris<S> {}
+    impl<S: State> State for SetRedirectUris<S> {
+        type CreatedAt = S::CreatedAt;
+        type ClientId = S::ClientId;
+        type GrantTypes = S::GrantTypes;
+        type CreatedByDid = S::CreatedByDid;
+        type ResponseTypes = S::ResponseTypes;
+        type ClientName = S::ClientName;
+        type RedirectUris = Set<members::redirect_uris>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `client_name` field
-        pub struct client_name(());
-        ///Marker type for the `redirect_uris` field
-        pub struct redirect_uris(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `client_id` field
+        pub struct client_id(());
         ///Marker type for the `grant_types` field
         pub struct grant_types(());
         ///Marker type for the `created_by_did` field
         pub struct created_by_did(());
         ///Marker type for the `response_types` field
         pub struct response_types(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `client_id` field
-        pub struct client_id(());
+        ///Marker type for the `client_name` field
+        pub struct client_name(());
+        ///Marker type for the `redirect_uris` field
+        pub struct redirect_uris(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct OauthClientDetailsBuilder<'a, S: oauth_client_details_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
@@ -368,7 +371,7 @@ pub struct OauthClientDetailsBuilder<'a, S: oauth_client_details_state::State> {
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> OauthClientDetails<'a> {
@@ -382,8 +385,8 @@ impl<'a> OauthClientDetailsBuilder<'a, oauth_client_details_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         OauthClientDetailsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -398,7 +401,7 @@ impl<'a> OauthClientDetailsBuilder<'a, oauth_client_details_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -413,11 +416,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> OauthClientDetailsBuilder<'a, oauth_client_details_state::SetClientId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         OauthClientDetailsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -432,11 +435,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> OauthClientDetailsBuilder<'a, oauth_client_details_state::SetClientName<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         OauthClientDetailsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -444,12 +447,12 @@ where
 impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> {
     /// Set the `clientSecret` field (optional)
     pub fn client_secret(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `clientSecret` field to an Option value (optional)
     pub fn maybe_client_secret(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -457,12 +460,12 @@ impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> 
 impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> {
     /// Set the `clientUri` field (optional)
     pub fn client_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `clientUri` field to an Option value (optional)
     pub fn maybe_client_uri(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -477,11 +480,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> OauthClientDetailsBuilder<'a, oauth_client_details_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         OauthClientDetailsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -496,11 +499,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> OauthClientDetailsBuilder<'a, oauth_client_details_state::SetCreatedByDid<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         OauthClientDetailsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -515,11 +518,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> OauthClientDetailsBuilder<'a, oauth_client_details_state::SetGrantTypes<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         OauthClientDetailsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -527,12 +530,12 @@ where
 impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> {
     /// Set the `logoUri` field (optional)
     pub fn logo_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `logoUri` field to an Option value (optional)
     pub fn maybe_logo_uri(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -540,12 +543,12 @@ impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> 
 impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> {
     /// Set the `policyUri` field (optional)
     pub fn policy_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `policyUri` field to an Option value (optional)
     pub fn maybe_policy_uri(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -560,11 +563,11 @@ where
         mut self,
         value: impl Into<Vec<UriValue<'a>>>,
     ) -> OauthClientDetailsBuilder<'a, oauth_client_details_state::SetRedirectUris<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         OauthClientDetailsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -579,11 +582,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> OauthClientDetailsBuilder<'a, oauth_client_details_state::SetResponseTypes<S>> {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         OauthClientDetailsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -591,12 +594,12 @@ where
 impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> {
     /// Set the `scope` field (optional)
     pub fn scope(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `scope` field to an Option value (optional)
     pub fn maybe_scope(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -604,12 +607,12 @@ impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> 
 impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> {
     /// Set the `tosUri` field (optional)
     pub fn tos_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `tosUri` field to an Option value (optional)
     pub fn maybe_tos_uri(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -617,30 +620,30 @@ impl<'a, S: oauth_client_details_state::State> OauthClientDetailsBuilder<'a, S> 
 impl<'a, S> OauthClientDetailsBuilder<'a, S>
 where
     S: oauth_client_details_state::State,
-    S::ClientName: oauth_client_details_state::IsSet,
-    S::RedirectUris: oauth_client_details_state::IsSet,
+    S::CreatedAt: oauth_client_details_state::IsSet,
+    S::ClientId: oauth_client_details_state::IsSet,
     S::GrantTypes: oauth_client_details_state::IsSet,
     S::CreatedByDid: oauth_client_details_state::IsSet,
     S::ResponseTypes: oauth_client_details_state::IsSet,
-    S::CreatedAt: oauth_client_details_state::IsSet,
-    S::ClientId: oauth_client_details_state::IsSet,
+    S::ClientName: oauth_client_details_state::IsSet,
+    S::RedirectUris: oauth_client_details_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> OauthClientDetails<'a> {
         OauthClientDetails {
-            client_id: self.__unsafe_private_named.0.unwrap(),
-            client_name: self.__unsafe_private_named.1.unwrap(),
-            client_secret: self.__unsafe_private_named.2,
-            client_uri: self.__unsafe_private_named.3,
-            created_at: self.__unsafe_private_named.4.unwrap(),
-            created_by_did: self.__unsafe_private_named.5.unwrap(),
-            grant_types: self.__unsafe_private_named.6.unwrap(),
-            logo_uri: self.__unsafe_private_named.7,
-            policy_uri: self.__unsafe_private_named.8,
-            redirect_uris: self.__unsafe_private_named.9.unwrap(),
-            response_types: self.__unsafe_private_named.10.unwrap(),
-            scope: self.__unsafe_private_named.11,
-            tos_uri: self.__unsafe_private_named.12,
+            client_id: self._fields.0.unwrap(),
+            client_name: self._fields.1.unwrap(),
+            client_secret: self._fields.2,
+            client_uri: self._fields.3,
+            created_at: self._fields.4.unwrap(),
+            created_by_did: self._fields.5.unwrap(),
+            grant_types: self._fields.6.unwrap(),
+            logo_uri: self._fields.7,
+            policy_uri: self._fields.8,
+            redirect_uris: self._fields.9.unwrap(),
+            response_types: self._fields.10.unwrap(),
+            scope: self._fields.11,
+            tos_uri: self._fields.12,
             extra_data: Default::default(),
         }
     }
@@ -653,19 +656,19 @@ where
         >,
     ) -> OauthClientDetails<'a> {
         OauthClientDetails {
-            client_id: self.__unsafe_private_named.0.unwrap(),
-            client_name: self.__unsafe_private_named.1.unwrap(),
-            client_secret: self.__unsafe_private_named.2,
-            client_uri: self.__unsafe_private_named.3,
-            created_at: self.__unsafe_private_named.4.unwrap(),
-            created_by_did: self.__unsafe_private_named.5.unwrap(),
-            grant_types: self.__unsafe_private_named.6.unwrap(),
-            logo_uri: self.__unsafe_private_named.7,
-            policy_uri: self.__unsafe_private_named.8,
-            redirect_uris: self.__unsafe_private_named.9.unwrap(),
-            response_types: self.__unsafe_private_named.10.unwrap(),
-            scope: self.__unsafe_private_named.11,
-            tos_uri: self.__unsafe_private_named.12,
+            client_id: self._fields.0.unwrap(),
+            client_name: self._fields.1.unwrap(),
+            client_secret: self._fields.2,
+            client_uri: self._fields.3,
+            created_at: self._fields.4.unwrap(),
+            created_by_did: self._fields.5.unwrap(),
+            grant_types: self._fields.6.unwrap(),
+            logo_uri: self._fields.7,
+            policy_uri: self._fields.8,
+            redirect_uris: self._fields.9.unwrap(),
+            response_types: self._fields.10.unwrap(),
+            scope: self._fields.11,
+            tos_uri: self._fields.12,
             extra_data: Some(extra_data),
         }
     }

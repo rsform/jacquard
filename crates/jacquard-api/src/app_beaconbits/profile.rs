@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -765,8 +768,8 @@ pub mod profile_state {
 
 /// Builder for constructing an instance of this type
 pub struct ProfileBuilder<'a, S: profile_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ProfileAllowTags<'a>>,
         Option<Datetime>,
         Option<ProfileDefaultDelayedReveal<'a>>,
@@ -778,7 +781,7 @@ pub struct ProfileBuilder<'a, S: profile_state::State> {
         Option<bool>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Profile<'a> {
@@ -792,20 +795,9 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -813,12 +805,12 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `allowTags` field (optional)
     pub fn allow_tags(mut self, value: impl Into<Option<ProfileAllowTags<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `allowTags` field to an Option value (optional)
     pub fn maybe_allow_tags(mut self, value: Option<ProfileAllowTags<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -826,12 +818,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -842,7 +834,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProfileDefaultDelayedReveal<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `defaultDelayedReveal` field to an Option value (optional)
@@ -850,7 +842,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: Option<ProfileDefaultDelayedReveal<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -861,7 +853,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProfileDefaultVisibility<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `defaultVisibility` field to an Option value (optional)
@@ -869,7 +861,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: Option<ProfileDefaultVisibility<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -880,7 +872,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProfileDistanceUnit<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `distanceUnit` field to an Option value (optional)
@@ -888,7 +880,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
         mut self,
         value: Option<ProfileDistanceUnit<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -896,12 +888,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `hidePastBeacons` field (optional)
     pub fn hide_past_beacons(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `hidePastBeacons` field to an Option value (optional)
     pub fn maybe_hide_past_beacons(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -909,12 +901,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `language` field (optional)
     pub fn language(mut self, value: impl Into<Option<ProfileLanguage<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `language` field to an Option value (optional)
     pub fn maybe_language(mut self, value: Option<ProfileLanguage<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -922,12 +914,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `markerColor` field (optional)
     pub fn marker_color(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `markerColor` field to an Option value (optional)
     pub fn maybe_marker_color(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -935,12 +927,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
 impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     /// Set the `postBeaconLinks` field (optional)
     pub fn post_beacon_links(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `postBeaconLinks` field to an Option value (optional)
     pub fn maybe_post_beacon_links(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -955,11 +947,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ProfileBuilder<'a, profile_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -972,16 +964,16 @@ where
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
         Profile {
-            allow_tags: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            default_delayed_reveal: self.__unsafe_private_named.2,
-            default_visibility: self.__unsafe_private_named.3,
-            distance_unit: self.__unsafe_private_named.4,
-            hide_past_beacons: self.__unsafe_private_named.5.or_else(|| Some(false)),
-            language: self.__unsafe_private_named.6,
-            marker_color: self.__unsafe_private_named.7,
-            post_beacon_links: self.__unsafe_private_named.8.or_else(|| Some(true)),
-            updated_at: self.__unsafe_private_named.9.unwrap(),
+            allow_tags: self._fields.0,
+            created_at: self._fields.1,
+            default_delayed_reveal: self._fields.2,
+            default_visibility: self._fields.3,
+            distance_unit: self._fields.4,
+            hide_past_beacons: self._fields.5.or_else(|| Some(false)),
+            language: self._fields.6,
+            marker_color: self._fields.7,
+            post_beacon_links: self._fields.8.or_else(|| Some(true)),
+            updated_at: self._fields.9.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -994,16 +986,16 @@ where
         >,
     ) -> Profile<'a> {
         Profile {
-            allow_tags: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            default_delayed_reveal: self.__unsafe_private_named.2,
-            default_visibility: self.__unsafe_private_named.3,
-            distance_unit: self.__unsafe_private_named.4,
-            hide_past_beacons: self.__unsafe_private_named.5.or_else(|| Some(false)),
-            language: self.__unsafe_private_named.6,
-            marker_color: self.__unsafe_private_named.7,
-            post_beacon_links: self.__unsafe_private_named.8.or_else(|| Some(true)),
-            updated_at: self.__unsafe_private_named.9.unwrap(),
+            allow_tags: self._fields.0,
+            created_at: self._fields.1,
+            default_delayed_reveal: self._fields.2,
+            default_visibility: self._fields.3,
+            distance_unit: self._fields.4,
+            hide_past_beacons: self._fields.5.or_else(|| Some(false)),
+            language: self._fields.6,
+            marker_color: self._fields.7,
+            post_beacon_links: self._fields.8.or_else(|| Some(true)),
+            updated_at: self._fields.9.unwrap(),
             extra_data: Some(extra_data),
         }
     }

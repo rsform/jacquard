@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -183,15 +186,15 @@ pub mod external_video_state {
 
 /// Builder for constructing an instance of this type
 pub struct ExternalVideoBuilder<'a, S: external_video_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<BlobRef<'a>>,
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ExternalVideo<'a> {
@@ -205,9 +208,9 @@ impl<'a> ExternalVideoBuilder<'a, external_video_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ExternalVideoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -215,12 +218,12 @@ impl<'a> ExternalVideoBuilder<'a, external_video_state::Empty> {
 impl<'a, S: external_video_state::State> ExternalVideoBuilder<'a, S> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `id` field to an Option value (optional)
     pub fn maybe_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -228,12 +231,12 @@ impl<'a, S: external_video_state::State> ExternalVideoBuilder<'a, S> {
 impl<'a, S: external_video_state::State> ExternalVideoBuilder<'a, S> {
     /// Set the `service` field (optional)
     pub fn service(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `service` field to an Option value (optional)
     pub fn maybe_service(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -241,12 +244,12 @@ impl<'a, S: external_video_state::State> ExternalVideoBuilder<'a, S> {
 impl<'a, S: external_video_state::State> ExternalVideoBuilder<'a, S> {
     /// Set the `thumb` field (optional)
     pub fn thumb(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `thumb` field to an Option value (optional)
     pub fn maybe_thumb(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -254,12 +257,12 @@ impl<'a, S: external_video_state::State> ExternalVideoBuilder<'a, S> {
 impl<'a, S: external_video_state::State> ExternalVideoBuilder<'a, S> {
     /// Set the `thumbHash` field (optional)
     pub fn thumb_hash(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `thumbHash` field to an Option value (optional)
     pub fn maybe_thumb_hash(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -274,11 +277,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ExternalVideoBuilder<'a, external_video_state::SetUri<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ExternalVideoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -291,11 +294,11 @@ where
     /// Build the final struct
     pub fn build(self) -> ExternalVideo<'a> {
         ExternalVideo {
-            id: self.__unsafe_private_named.0,
-            service: self.__unsafe_private_named.1,
-            thumb: self.__unsafe_private_named.2,
-            thumb_hash: self.__unsafe_private_named.3,
-            uri: self.__unsafe_private_named.4.unwrap(),
+            id: self._fields.0,
+            service: self._fields.1,
+            thumb: self._fields.2,
+            thumb_hash: self._fields.3,
+            uri: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -308,11 +311,11 @@ where
         >,
     ) -> ExternalVideo<'a> {
         ExternalVideo {
-            id: self.__unsafe_private_named.0,
-            service: self.__unsafe_private_named.1,
-            thumb: self.__unsafe_private_named.2,
-            thumb_hash: self.__unsafe_private_named.3,
-            uri: self.__unsafe_private_named.4.unwrap(),
+            id: self._fields.0,
+            service: self._fields.1,
+            thumb: self._fields.2,
+            thumb_hash: self._fields.3,
+            uri: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -441,14 +444,14 @@ pub mod view_state {
 
 /// Builder for constructing an instance of this type
 pub struct ViewBuilder<'a, S: view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> View<'a> {
@@ -462,9 +465,9 @@ impl<'a> ViewBuilder<'a, view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -472,12 +475,12 @@ impl<'a> ViewBuilder<'a, view_state::Empty> {
 impl<'a, S: view_state::State> ViewBuilder<'a, S> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `id` field to an Option value (optional)
     pub fn maybe_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -485,12 +488,12 @@ impl<'a, S: view_state::State> ViewBuilder<'a, S> {
 impl<'a, S: view_state::State> ViewBuilder<'a, S> {
     /// Set the `service` field (optional)
     pub fn service(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `service` field to an Option value (optional)
     pub fn maybe_service(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -498,12 +501,12 @@ impl<'a, S: view_state::State> ViewBuilder<'a, S> {
 impl<'a, S: view_state::State> ViewBuilder<'a, S> {
     /// Set the `thumb` field (optional)
     pub fn thumb(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `thumb` field to an Option value (optional)
     pub fn maybe_thumb(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -518,11 +521,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ViewBuilder<'a, view_state::SetUri<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -535,10 +538,10 @@ where
     /// Build the final struct
     pub fn build(self) -> View<'a> {
         View {
-            id: self.__unsafe_private_named.0,
-            service: self.__unsafe_private_named.1,
-            thumb: self.__unsafe_private_named.2,
-            uri: self.__unsafe_private_named.3.unwrap(),
+            id: self._fields.0,
+            service: self._fields.1,
+            thumb: self._fields.2,
+            uri: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -551,10 +554,10 @@ where
         >,
     ) -> View<'a> {
         View {
-            id: self.__unsafe_private_named.0,
-            service: self.__unsafe_private_named.1,
-            thumb: self.__unsafe_private_named.2,
-            uri: self.__unsafe_private_named.3.unwrap(),
+            id: self._fields.0,
+            service: self._fields.1,
+            thumb: self._fields.2,
+            uri: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

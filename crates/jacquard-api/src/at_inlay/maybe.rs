@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -96,9 +99,9 @@ pub mod maybe_state {
 
 /// Builder for constructing an instance of this type
 pub struct MaybeBuilder<'a, S: maybe_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Data<'a>>, Option<Element<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Data<'a>>, Option<Element<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Maybe<'a> {
@@ -112,9 +115,9 @@ impl<'a> MaybeBuilder<'a, maybe_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MaybeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -129,11 +132,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> MaybeBuilder<'a, maybe_state::SetChildren<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MaybeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -141,12 +144,12 @@ where
 impl<'a, S: maybe_state::State> MaybeBuilder<'a, S> {
     /// Set the `fallback` field (optional)
     pub fn fallback(mut self, value: impl Into<Option<Element<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `fallback` field to an Option value (optional)
     pub fn maybe_fallback(mut self, value: Option<Element<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -159,8 +162,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Maybe<'a> {
         Maybe {
-            children: self.__unsafe_private_named.0.unwrap(),
-            fallback: self.__unsafe_private_named.1,
+            children: self._fields.0.unwrap(),
+            fallback: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -170,8 +173,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Maybe<'a> {
         Maybe {
-            children: self.__unsafe_private_named.0.unwrap(),
-            fallback: self.__unsafe_private_named.1,
+            children: self._fields.0.unwrap(),
+            fallback: self._fields.1,
             extra_data: Some(extra_data),
         }
     }

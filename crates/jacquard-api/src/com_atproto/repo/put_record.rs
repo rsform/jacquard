@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::ident::AtIdentifier;
@@ -296,8 +299,8 @@ pub mod put_record_state {
 
 /// Builder for constructing an instance of this type
 pub struct PutRecordBuilder<'a, S: put_record_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Nsid<'a>>,
         Option<Data<'a>>,
         Option<AtIdentifier<'a>>,
@@ -306,7 +309,7 @@ pub struct PutRecordBuilder<'a, S: put_record_state::State> {
         Option<Cid<'a>>,
         Option<bool>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> PutRecord<'a> {
@@ -320,9 +323,9 @@ impl<'a> PutRecordBuilder<'a, put_record_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PutRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -337,11 +340,11 @@ where
         mut self,
         value: impl Into<Nsid<'a>>,
     ) -> PutRecordBuilder<'a, put_record_state::SetCollection<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PutRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -356,11 +359,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> PutRecordBuilder<'a, put_record_state::SetRecord<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PutRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -375,11 +378,11 @@ where
         mut self,
         value: impl Into<AtIdentifier<'a>>,
     ) -> PutRecordBuilder<'a, put_record_state::SetRepo<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PutRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -394,11 +397,11 @@ where
         mut self,
         value: impl Into<RecordKey<Rkey<'a>>>,
     ) -> PutRecordBuilder<'a, put_record_state::SetRkey<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         PutRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -406,12 +409,12 @@ where
 impl<'a, S: put_record_state::State> PutRecordBuilder<'a, S> {
     /// Set the `swapCommit` field (optional)
     pub fn swap_commit(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `swapCommit` field to an Option value (optional)
     pub fn maybe_swap_commit(mut self, value: Option<Cid<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -419,12 +422,12 @@ impl<'a, S: put_record_state::State> PutRecordBuilder<'a, S> {
 impl<'a, S: put_record_state::State> PutRecordBuilder<'a, S> {
     /// Set the `swapRecord` field (optional)
     pub fn swap_record(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `swapRecord` field to an Option value (optional)
     pub fn maybe_swap_record(mut self, value: Option<Cid<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -432,12 +435,12 @@ impl<'a, S: put_record_state::State> PutRecordBuilder<'a, S> {
 impl<'a, S: put_record_state::State> PutRecordBuilder<'a, S> {
     /// Set the `validate` field (optional)
     pub fn validate(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `validate` field to an Option value (optional)
     pub fn maybe_validate(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -453,13 +456,13 @@ where
     /// Build the final struct
     pub fn build(self) -> PutRecord<'a> {
         PutRecord {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            record: self.__unsafe_private_named.1.unwrap(),
-            repo: self.__unsafe_private_named.2.unwrap(),
-            rkey: self.__unsafe_private_named.3.unwrap(),
-            swap_commit: self.__unsafe_private_named.4,
-            swap_record: self.__unsafe_private_named.5,
-            validate: self.__unsafe_private_named.6,
+            collection: self._fields.0.unwrap(),
+            record: self._fields.1.unwrap(),
+            repo: self._fields.2.unwrap(),
+            rkey: self._fields.3.unwrap(),
+            swap_commit: self._fields.4,
+            swap_record: self._fields.5,
+            validate: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -469,13 +472,13 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> PutRecord<'a> {
         PutRecord {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            record: self.__unsafe_private_named.1.unwrap(),
-            repo: self.__unsafe_private_named.2.unwrap(),
-            rkey: self.__unsafe_private_named.3.unwrap(),
-            swap_commit: self.__unsafe_private_named.4,
-            swap_record: self.__unsafe_private_named.5,
-            validate: self.__unsafe_private_named.6,
+            collection: self._fields.0.unwrap(),
+            record: self._fields.1.unwrap(),
+            repo: self._fields.2.unwrap(),
+            rkey: self._fields.3.unwrap(),
+            swap_commit: self._fields.4,
+            swap_record: self._fields.5,
+            validate: self._fields.6,
             extra_data: Some(extra_data),
         }
     }

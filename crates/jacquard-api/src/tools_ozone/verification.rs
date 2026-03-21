@@ -9,7 +9,11 @@ pub mod grant_verifications;
 pub mod list_verifications;
 pub mod revoke_verifications;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -123,112 +127,112 @@ pub mod verification_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type DisplayName;
         type Issuer;
+        type CreatedAt;
         type Subject;
         type Handle;
         type Uri;
-        type CreatedAt;
-        type DisplayName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type DisplayName = Unset;
         type Issuer = Unset;
+        type CreatedAt = Unset;
         type Subject = Unset;
         type Handle = Unset;
         type Uri = Unset;
-        type CreatedAt = Unset;
-        type DisplayName = Unset;
-    }
-    ///State transition - sets the `issuer` field to Set
-    pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIssuer<S> {}
-    impl<S: State> State for SetIssuer<S> {
-        type Issuer = Set<members::issuer>;
-        type Subject = S::Subject;
-        type Handle = S::Handle;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Issuer = S::Issuer;
-        type Subject = Set<members::subject>;
-        type Handle = S::Handle;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Issuer = S::Issuer;
-        type Subject = S::Subject;
-        type Handle = Set<members::handle>;
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Issuer = S::Issuer;
-        type Subject = S::Subject;
-        type Handle = S::Handle;
-        type Uri = Set<members::uri>;
-        type CreatedAt = S::CreatedAt;
-        type DisplayName = S::DisplayName;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Issuer = S::Issuer;
-        type Subject = S::Subject;
-        type Handle = S::Handle;
-        type Uri = S::Uri;
-        type CreatedAt = Set<members::created_at>;
-        type DisplayName = S::DisplayName;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisplayName<S> {}
     impl<S: State> State for SetDisplayName<S> {
+        type DisplayName = Set<members::display_name>;
         type Issuer = S::Issuer;
+        type CreatedAt = S::CreatedAt;
         type Subject = S::Subject;
         type Handle = S::Handle;
         type Uri = S::Uri;
+    }
+    ///State transition - sets the `issuer` field to Set
+    pub struct SetIssuer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIssuer<S> {}
+    impl<S: State> State for SetIssuer<S> {
+        type DisplayName = S::DisplayName;
+        type Issuer = Set<members::issuer>;
         type CreatedAt = S::CreatedAt;
-        type DisplayName = Set<members::display_name>;
+        type Subject = S::Subject;
+        type Handle = S::Handle;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type DisplayName = S::DisplayName;
+        type Issuer = S::Issuer;
+        type CreatedAt = Set<members::created_at>;
+        type Subject = S::Subject;
+        type Handle = S::Handle;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type DisplayName = S::DisplayName;
+        type Issuer = S::Issuer;
+        type CreatedAt = S::CreatedAt;
+        type Subject = Set<members::subject>;
+        type Handle = S::Handle;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHandle<S> {}
+    impl<S: State> State for SetHandle<S> {
+        type DisplayName = S::DisplayName;
+        type Issuer = S::Issuer;
+        type CreatedAt = S::CreatedAt;
+        type Subject = S::Subject;
+        type Handle = Set<members::handle>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type DisplayName = S::DisplayName;
+        type Issuer = S::Issuer;
+        type CreatedAt = S::CreatedAt;
+        type Subject = S::Subject;
+        type Handle = S::Handle;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
         ///Marker type for the `issuer` field
         pub struct issuer(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
         ///Marker type for the `handle` field
         pub struct handle(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct VerificationViewBuilder<'a, S: verification_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<Handle<'a>>,
@@ -243,7 +247,7 @@ pub struct VerificationViewBuilder<'a, S: verification_view_state::State> {
         Option<VerificationViewSubjectRepo<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> VerificationView<'a> {
@@ -257,8 +261,8 @@ impl<'a> VerificationViewBuilder<'a, verification_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         VerificationViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -273,7 +277,7 @@ impl<'a> VerificationViewBuilder<'a, verification_view_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -288,11 +292,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> VerificationViewBuilder<'a, verification_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         VerificationViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -307,11 +311,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> VerificationViewBuilder<'a, verification_view_state::SetDisplayName<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         VerificationViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -326,11 +330,11 @@ where
         mut self,
         value: impl Into<Handle<'a>>,
     ) -> VerificationViewBuilder<'a, verification_view_state::SetHandle<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         VerificationViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -345,11 +349,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> VerificationViewBuilder<'a, verification_view_state::SetIssuer<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         VerificationViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -357,12 +361,12 @@ where
 impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
     /// Set the `issuerProfile` field (optional)
     pub fn issuer_profile(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `issuerProfile` field to an Option value (optional)
     pub fn maybe_issuer_profile(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -373,7 +377,7 @@ impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<VerificationViewIssuerRepo<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `issuerRepo` field to an Option value (optional)
@@ -381,7 +385,7 @@ impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
         mut self,
         value: Option<VerificationViewIssuerRepo<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -389,12 +393,12 @@ impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
 impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
     /// Set the `revokeReason` field (optional)
     pub fn revoke_reason(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `revokeReason` field to an Option value (optional)
     pub fn maybe_revoke_reason(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -402,12 +406,12 @@ impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
 impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
     /// Set the `revokedAt` field (optional)
     pub fn revoked_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `revokedAt` field to an Option value (optional)
     pub fn maybe_revoked_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -415,12 +419,12 @@ impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
 impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
     /// Set the `revokedBy` field (optional)
     pub fn revoked_by(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `revokedBy` field to an Option value (optional)
     pub fn maybe_revoked_by(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -435,11 +439,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> VerificationViewBuilder<'a, verification_view_state::SetSubject<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         VerificationViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -447,12 +451,12 @@ where
 impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
     /// Set the `subjectProfile` field (optional)
     pub fn subject_profile(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `subjectProfile` field to an Option value (optional)
     pub fn maybe_subject_profile(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -463,7 +467,7 @@ impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<VerificationViewSubjectRepo<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `subjectRepo` field to an Option value (optional)
@@ -471,7 +475,7 @@ impl<'a, S: verification_view_state::State> VerificationViewBuilder<'a, S> {
         mut self,
         value: Option<VerificationViewSubjectRepo<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -486,11 +490,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> VerificationViewBuilder<'a, verification_view_state::SetUri<S>> {
-        self.__unsafe_private_named.12 = Option::Some(value.into());
+        self._fields.12 = Option::Some(value.into());
         VerificationViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -498,29 +502,29 @@ where
 impl<'a, S> VerificationViewBuilder<'a, S>
 where
     S: verification_view_state::State,
+    S::DisplayName: verification_view_state::IsSet,
     S::Issuer: verification_view_state::IsSet,
+    S::CreatedAt: verification_view_state::IsSet,
     S::Subject: verification_view_state::IsSet,
     S::Handle: verification_view_state::IsSet,
     S::Uri: verification_view_state::IsSet,
-    S::CreatedAt: verification_view_state::IsSet,
-    S::DisplayName: verification_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> VerificationView<'a> {
         VerificationView {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            display_name: self.__unsafe_private_named.1.unwrap(),
-            handle: self.__unsafe_private_named.2.unwrap(),
-            issuer: self.__unsafe_private_named.3.unwrap(),
-            issuer_profile: self.__unsafe_private_named.4,
-            issuer_repo: self.__unsafe_private_named.5,
-            revoke_reason: self.__unsafe_private_named.6,
-            revoked_at: self.__unsafe_private_named.7,
-            revoked_by: self.__unsafe_private_named.8,
-            subject: self.__unsafe_private_named.9.unwrap(),
-            subject_profile: self.__unsafe_private_named.10,
-            subject_repo: self.__unsafe_private_named.11,
-            uri: self.__unsafe_private_named.12.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            display_name: self._fields.1.unwrap(),
+            handle: self._fields.2.unwrap(),
+            issuer: self._fields.3.unwrap(),
+            issuer_profile: self._fields.4,
+            issuer_repo: self._fields.5,
+            revoke_reason: self._fields.6,
+            revoked_at: self._fields.7,
+            revoked_by: self._fields.8,
+            subject: self._fields.9.unwrap(),
+            subject_profile: self._fields.10,
+            subject_repo: self._fields.11,
+            uri: self._fields.12.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -530,19 +534,19 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> VerificationView<'a> {
         VerificationView {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            display_name: self.__unsafe_private_named.1.unwrap(),
-            handle: self.__unsafe_private_named.2.unwrap(),
-            issuer: self.__unsafe_private_named.3.unwrap(),
-            issuer_profile: self.__unsafe_private_named.4,
-            issuer_repo: self.__unsafe_private_named.5,
-            revoke_reason: self.__unsafe_private_named.6,
-            revoked_at: self.__unsafe_private_named.7,
-            revoked_by: self.__unsafe_private_named.8,
-            subject: self.__unsafe_private_named.9.unwrap(),
-            subject_profile: self.__unsafe_private_named.10,
-            subject_repo: self.__unsafe_private_named.11,
-            uri: self.__unsafe_private_named.12.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            display_name: self._fields.1.unwrap(),
+            handle: self._fields.2.unwrap(),
+            issuer: self._fields.3.unwrap(),
+            issuer_profile: self._fields.4,
+            issuer_repo: self._fields.5,
+            revoke_reason: self._fields.6,
+            revoked_at: self._fields.7,
+            revoked_by: self._fields.8,
+            subject: self._fields.9.unwrap(),
+            subject_profile: self._fields.10,
+            subject_repo: self._fields.11,
+            uri: self._fields.12.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -165,49 +168,49 @@ pub mod question_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type CreatedAt;
+        type Content;
         type Summary;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type CreatedAt = Unset;
+        type Content = Unset;
         type Summary = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type CreatedAt = S::CreatedAt;
-        type Summary = S::Summary;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Content = S::Content;
         type CreatedAt = Set<members::created_at>;
+        type Content = S::Content;
+        type Summary = S::Summary;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type CreatedAt = S::CreatedAt;
+        type Content = Set<members::content>;
         type Summary = S::Summary;
     }
     ///State transition - sets the `summary` field to Set
     pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSummary<S> {}
     impl<S: State> State for SetSummary<S> {
-        type Content = S::Content;
         type CreatedAt = S::CreatedAt;
+        type Content = S::Content;
         type Summary = Set<members::summary>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `content` field
+        pub struct content(());
         ///Marker type for the `summary` field
         pub struct summary(());
     }
@@ -215,15 +218,15 @@ pub mod question_state {
 
 /// Builder for constructing an instance of this type
 pub struct QuestionBuilder<'a, S: question_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Content<'a>>,
         Option<StrongRef<'a>>,
         Option<Datetime>,
         Option<Vec<Language>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Question<'a> {
@@ -237,9 +240,9 @@ impl<'a> QuestionBuilder<'a, question_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         QuestionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -254,11 +257,11 @@ where
         mut self,
         value: impl Into<Content<'a>>,
     ) -> QuestionBuilder<'a, question_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         QuestionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -266,12 +269,12 @@ where
 impl<'a, S: question_state::State> QuestionBuilder<'a, S> {
     /// Set the `contextRef` field (optional)
     pub fn context_ref(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `contextRef` field to an Option value (optional)
     pub fn maybe_context_ref(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -286,11 +289,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> QuestionBuilder<'a, question_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         QuestionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -298,12 +301,12 @@ where
 impl<'a, S: question_state::State> QuestionBuilder<'a, S> {
     /// Set the `languages` field (optional)
     pub fn languages(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `languages` field to an Option value (optional)
     pub fn maybe_languages(mut self, value: Option<Vec<Language>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -318,11 +321,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> QuestionBuilder<'a, question_state::SetSummary<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         QuestionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -330,18 +333,18 @@ where
 impl<'a, S> QuestionBuilder<'a, S>
 where
     S: question_state::State,
-    S::Content: question_state::IsSet,
     S::CreatedAt: question_state::IsSet,
+    S::Content: question_state::IsSet,
     S::Summary: question_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Question<'a> {
         Question {
-            content: self.__unsafe_private_named.0.unwrap(),
-            context_ref: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            languages: self.__unsafe_private_named.3,
-            summary: self.__unsafe_private_named.4.unwrap(),
+            content: self._fields.0.unwrap(),
+            context_ref: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            languages: self._fields.3,
+            summary: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -354,11 +357,11 @@ where
         >,
     ) -> Question<'a> {
         Question {
-            content: self.__unsafe_private_named.0.unwrap(),
-            context_ref: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            languages: self.__unsafe_private_named.3,
-            summary: self.__unsafe_private_named.4.unwrap(),
+            content: self._fields.0.unwrap(),
+            context_ref: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            languages: self._fields.3,
+            summary: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -216,8 +219,8 @@ pub mod artist_state {
 
 /// Builder for constructing an instance of this type
 pub struct ArtistBuilder<'a, S: artist_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<BlobRef<'a>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
@@ -225,7 +228,7 @@ pub struct ArtistBuilder<'a, S: artist_state::State> {
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Artist<'a> {
@@ -239,9 +242,9 @@ impl<'a> ArtistBuilder<'a, artist_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ArtistBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -249,12 +252,12 @@ impl<'a> ArtistBuilder<'a, artist_state::Empty> {
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `artistPic` field (optional)
     pub fn artist_pic(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `artistPic` field to an Option value (optional)
     pub fn maybe_artist_pic(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -262,12 +265,12 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `bio` field (optional)
     pub fn bio(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `bio` field to an Option value (optional)
     pub fn maybe_bio(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -282,11 +285,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ArtistBuilder<'a, artist_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ArtistBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -297,12 +300,12 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<UriValue<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `externalLinks` field to an Option value (optional)
     pub fn maybe_external_links(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -310,12 +313,12 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
     pub fn maybe_genre(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -330,11 +333,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ArtistBuilder<'a, artist_state::SetName<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ArtistBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -348,12 +351,12 @@ where
     /// Build the final struct
     pub fn build(self) -> Artist<'a> {
         Artist {
-            artist_pic: self.__unsafe_private_named.0,
-            bio: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            external_links: self.__unsafe_private_named.3,
-            genre: self.__unsafe_private_named.4,
-            name: self.__unsafe_private_named.5.unwrap(),
+            artist_pic: self._fields.0,
+            bio: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            external_links: self._fields.3,
+            genre: self._fields.4,
+            name: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -366,12 +369,12 @@ where
         >,
     ) -> Artist<'a> {
         Artist {
-            artist_pic: self.__unsafe_private_named.0,
-            bio: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            external_links: self.__unsafe_private_named.3,
-            genre: self.__unsafe_private_named.4,
-            name: self.__unsafe_private_named.5.unwrap(),
+            artist_pic: self._fields.0,
+            bio: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            external_links: self._fields.3,
+            genre: self._fields.4,
+            name: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

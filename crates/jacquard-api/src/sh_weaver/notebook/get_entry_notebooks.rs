@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -129,9 +132,9 @@ pub mod get_entry_notebooks_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetEntryNotebooksBuilder<'a, S: get_entry_notebooks_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetEntryNotebooks<'a> {
@@ -145,9 +148,9 @@ impl<'a> GetEntryNotebooksBuilder<'a, get_entry_notebooks_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetEntryNotebooksBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -162,11 +165,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> GetEntryNotebooksBuilder<'a, get_entry_notebooks_state::SetEntry<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetEntryNotebooksBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -179,7 +182,7 @@ where
     /// Build the final struct
     pub fn build(self) -> GetEntryNotebooks<'a> {
         GetEntryNotebooks {
-            entry: self.__unsafe_private_named.0.unwrap(),
+            entry: self._fields.0.unwrap(),
         }
     }
 }
@@ -230,14 +233,14 @@ pub mod notebook_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct NotebookRefBuilder<'a, S: notebook_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Cid<'a>>,
         Option<ProfileViewBasic<'a>>,
         Option<CowStr<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> NotebookRef<'a> {
@@ -251,9 +254,9 @@ impl<'a> NotebookRefBuilder<'a, notebook_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NotebookRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -268,11 +271,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> NotebookRefBuilder<'a, notebook_ref_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         NotebookRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -280,12 +283,12 @@ where
 impl<'a, S: notebook_ref_state::State> NotebookRefBuilder<'a, S> {
     /// Set the `owner` field (optional)
     pub fn owner(mut self, value: impl Into<Option<ProfileViewBasic<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `owner` field to an Option value (optional)
     pub fn maybe_owner(mut self, value: Option<ProfileViewBasic<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -293,12 +296,12 @@ impl<'a, S: notebook_ref_state::State> NotebookRefBuilder<'a, S> {
 impl<'a, S: notebook_ref_state::State> NotebookRefBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -313,11 +316,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> NotebookRefBuilder<'a, notebook_ref_state::SetUri<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         NotebookRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -331,10 +334,10 @@ where
     /// Build the final struct
     pub fn build(self) -> NotebookRef<'a> {
         NotebookRef {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            owner: self.__unsafe_private_named.1,
-            title: self.__unsafe_private_named.2,
-            uri: self.__unsafe_private_named.3.unwrap(),
+            cid: self._fields.0.unwrap(),
+            owner: self._fields.1,
+            title: self._fields.2,
+            uri: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -347,10 +350,10 @@ where
         >,
     ) -> NotebookRef<'a> {
         NotebookRef {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            owner: self.__unsafe_private_named.1,
-            title: self.__unsafe_private_named.2,
-            uri: self.__unsafe_private_named.3.unwrap(),
+            cid: self._fields.0.unwrap(),
+            owner: self._fields.1,
+            title: self._fields.2,
+            uri: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

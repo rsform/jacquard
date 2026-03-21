@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -137,63 +140,63 @@ pub mod langs_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Moderation;
-        type Lang;
         type Title;
+        type Lang;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Moderation = Unset;
-        type Lang = Unset;
         type Title = Unset;
+        type Lang = Unset;
     }
     ///State transition - sets the `moderation` field to Set
     pub struct SetModeration<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetModeration<S> {}
     impl<S: State> State for SetModeration<S> {
         type Moderation = Set<members::moderation>;
+        type Title = S::Title;
         type Lang = S::Lang;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `lang` field to Set
-    pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLang<S> {}
-    impl<S: State> State for SetLang<S> {
-        type Moderation = S::Moderation;
-        type Lang = Set<members::lang>;
-        type Title = S::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Moderation = S::Moderation;
-        type Lang = S::Lang;
         type Title = Set<members::title>;
+        type Lang = S::Lang;
+    }
+    ///State transition - sets the `lang` field to Set
+    pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLang<S> {}
+    impl<S: State> State for SetLang<S> {
+        type Moderation = S::Moderation;
+        type Title = S::Title;
+        type Lang = Set<members::lang>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `moderation` field
         pub struct moderation(());
-        ///Marker type for the `lang` field
-        pub struct lang(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `lang` field
+        pub struct lang(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LangsBuilder<'a, S: langs_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Langs<'a> {
@@ -207,9 +210,9 @@ impl<'a> LangsBuilder<'a, langs_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LangsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -217,12 +220,12 @@ impl<'a> LangsBuilder<'a, langs_state::Empty> {
 impl<'a, S: langs_state::State> LangsBuilder<'a, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
     pub fn maybe_comment(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -237,11 +240,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LangsBuilder<'a, langs_state::SetLang<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LangsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -256,11 +259,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> LangsBuilder<'a, langs_state::SetModeration<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LangsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -275,11 +278,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LangsBuilder<'a, langs_state::SetTitle<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         LangsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -288,16 +291,16 @@ impl<'a, S> LangsBuilder<'a, S>
 where
     S: langs_state::State,
     S::Moderation: langs_state::IsSet,
-    S::Lang: langs_state::IsSet,
     S::Title: langs_state::IsSet,
+    S::Lang: langs_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Langs<'a> {
         Langs {
-            comment: self.__unsafe_private_named.0,
-            lang: self.__unsafe_private_named.1.unwrap(),
-            moderation: self.__unsafe_private_named.2.unwrap(),
-            title: self.__unsafe_private_named.3.unwrap(),
+            comment: self._fields.0,
+            lang: self._fields.1.unwrap(),
+            moderation: self._fields.2.unwrap(),
+            title: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -310,10 +313,10 @@ where
         >,
     ) -> Langs<'a> {
         Langs {
-            comment: self.__unsafe_private_named.0,
-            lang: self.__unsafe_private_named.1.unwrap(),
-            moderation: self.__unsafe_private_named.2.unwrap(),
-            title: self.__unsafe_private_named.3.unwrap(),
+            comment: self._fields.0,
+            lang: self._fields.1.unwrap(),
+            moderation: self._fields.2.unwrap(),
+            title: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

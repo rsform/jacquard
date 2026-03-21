@@ -9,7 +9,11 @@ pub mod begin;
 pub mod get_config;
 pub mod get_state;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -845,9 +849,9 @@ pub mod config_state {
 
 /// Builder for constructing an instance of this type
 pub struct ConfigBuilder<'a, S: config_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<ageassurance::ConfigRegion<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<ageassurance::ConfigRegion<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Config<'a> {
@@ -861,9 +865,9 @@ impl<'a> ConfigBuilder<'a, config_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -878,11 +882,11 @@ where
         mut self,
         value: impl Into<Vec<ageassurance::ConfigRegion<'a>>>,
     ) -> ConfigBuilder<'a, config_state::SetRegions<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ConfigBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -895,7 +899,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Config<'a> {
         Config {
-            regions: self.__unsafe_private_named.0.unwrap(),
+            regions: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -908,7 +912,7 @@ where
         >,
     ) -> Config<'a> {
         Config {
-            regions: self.__unsafe_private_named.0.unwrap(),
+            regions: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1524,64 +1528,64 @@ pub mod config_region_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type MinAccessAge;
         type Rules;
         type CountryCode;
-        type MinAccessAge;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type MinAccessAge = Unset;
         type Rules = Unset;
         type CountryCode = Unset;
-        type MinAccessAge = Unset;
-    }
-    ///State transition - sets the `rules` field to Set
-    pub struct SetRules<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRules<S> {}
-    impl<S: State> State for SetRules<S> {
-        type Rules = Set<members::rules>;
-        type CountryCode = S::CountryCode;
-        type MinAccessAge = S::MinAccessAge;
-    }
-    ///State transition - sets the `country_code` field to Set
-    pub struct SetCountryCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountryCode<S> {}
-    impl<S: State> State for SetCountryCode<S> {
-        type Rules = S::Rules;
-        type CountryCode = Set<members::country_code>;
-        type MinAccessAge = S::MinAccessAge;
     }
     ///State transition - sets the `min_access_age` field to Set
     pub struct SetMinAccessAge<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMinAccessAge<S> {}
     impl<S: State> State for SetMinAccessAge<S> {
+        type MinAccessAge = Set<members::min_access_age>;
         type Rules = S::Rules;
         type CountryCode = S::CountryCode;
-        type MinAccessAge = Set<members::min_access_age>;
+    }
+    ///State transition - sets the `rules` field to Set
+    pub struct SetRules<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRules<S> {}
+    impl<S: State> State for SetRules<S> {
+        type MinAccessAge = S::MinAccessAge;
+        type Rules = Set<members::rules>;
+        type CountryCode = S::CountryCode;
+    }
+    ///State transition - sets the `country_code` field to Set
+    pub struct SetCountryCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCountryCode<S> {}
+    impl<S: State> State for SetCountryCode<S> {
+        type MinAccessAge = S::MinAccessAge;
+        type Rules = S::Rules;
+        type CountryCode = Set<members::country_code>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `min_access_age` field
+        pub struct min_access_age(());
         ///Marker type for the `rules` field
         pub struct rules(());
         ///Marker type for the `country_code` field
         pub struct country_code(());
-        ///Marker type for the `min_access_age` field
-        pub struct min_access_age(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ConfigRegionBuilder<'a, S: config_region_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<i64>,
         Option<CowStr<'a>>,
         Option<Vec<ConfigRegionRulesItem<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ConfigRegion<'a> {
@@ -1595,9 +1599,9 @@ impl<'a> ConfigRegionBuilder<'a, config_region_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigRegionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1612,11 +1616,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ConfigRegionBuilder<'a, config_region_state::SetCountryCode<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ConfigRegionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1631,11 +1635,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ConfigRegionBuilder<'a, config_region_state::SetMinAccessAge<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ConfigRegionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1643,12 +1647,12 @@ where
 impl<'a, S: config_region_state::State> ConfigRegionBuilder<'a, S> {
     /// Set the `regionCode` field (optional)
     pub fn region_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `regionCode` field to an Option value (optional)
     pub fn maybe_region_code(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1663,11 +1667,11 @@ where
         mut self,
         value: impl Into<Vec<ConfigRegionRulesItem<'a>>>,
     ) -> ConfigRegionBuilder<'a, config_region_state::SetRules<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ConfigRegionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1675,17 +1679,17 @@ where
 impl<'a, S> ConfigRegionBuilder<'a, S>
 where
     S: config_region_state::State,
+    S::MinAccessAge: config_region_state::IsSet,
     S::Rules: config_region_state::IsSet,
     S::CountryCode: config_region_state::IsSet,
-    S::MinAccessAge: config_region_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ConfigRegion<'a> {
         ConfigRegion {
-            country_code: self.__unsafe_private_named.0.unwrap(),
-            min_access_age: self.__unsafe_private_named.1.unwrap(),
-            region_code: self.__unsafe_private_named.2,
-            rules: self.__unsafe_private_named.3.unwrap(),
+            country_code: self._fields.0.unwrap(),
+            min_access_age: self._fields.1.unwrap(),
+            region_code: self._fields.2,
+            rules: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1698,10 +1702,10 @@ where
         >,
     ) -> ConfigRegion<'a> {
         ConfigRegion {
-            country_code: self.__unsafe_private_named.0.unwrap(),
-            min_access_age: self.__unsafe_private_named.1.unwrap(),
-            region_code: self.__unsafe_private_named.2,
-            rules: self.__unsafe_private_named.3.unwrap(),
+            country_code: self._fields.0.unwrap(),
+            min_access_age: self._fields.1.unwrap(),
+            region_code: self._fields.2,
+            rules: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1744,9 +1748,9 @@ pub struct ConfigRegionRuleDefaultBuilder<
     'a,
     S: config_region_rule_default_state::State,
 > {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<ageassurance::Access<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<ageassurance::Access<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ConfigRegionRuleDefault<'a> {
@@ -1763,9 +1767,9 @@ impl<'a> ConfigRegionRuleDefaultBuilder<'a, config_region_rule_default_state::Em
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigRegionRuleDefaultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1783,11 +1787,11 @@ where
         'a,
         config_region_rule_default_state::SetAccess<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ConfigRegionRuleDefaultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1800,7 +1804,7 @@ where
     /// Build the final struct
     pub fn build(self) -> ConfigRegionRuleDefault<'a> {
         ConfigRegionRuleDefault {
-            access: self.__unsafe_private_named.0.unwrap(),
+            access: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1813,7 +1817,7 @@ where
         >,
     ) -> ConfigRegionRuleDefault<'a> {
         ConfigRegionRuleDefault {
-            access: self.__unsafe_private_named.0.unwrap(),
+            access: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1829,37 +1833,37 @@ pub mod config_region_rule_if_account_newer_than_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Date;
         type Access;
+        type Date;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Date = Unset;
         type Access = Unset;
-    }
-    ///State transition - sets the `date` field to Set
-    pub struct SetDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDate<S> {}
-    impl<S: State> State for SetDate<S> {
-        type Date = Set<members::date>;
-        type Access = S::Access;
+        type Date = Unset;
     }
     ///State transition - sets the `access` field to Set
     pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAccess<S> {}
     impl<S: State> State for SetAccess<S> {
-        type Date = S::Date;
         type Access = Set<members::access>;
+        type Date = S::Date;
+    }
+    ///State transition - sets the `date` field to Set
+    pub struct SetDate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDate<S> {}
+    impl<S: State> State for SetDate<S> {
+        type Access = S::Access;
+        type Date = Set<members::date>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `date` field
-        pub struct date(());
         ///Marker type for the `access` field
         pub struct access(());
+        ///Marker type for the `date` field
+        pub struct date(());
     }
 }
 
@@ -1868,9 +1872,9 @@ pub struct ConfigRegionRuleIfAccountNewerThanBuilder<
     'a,
     S: config_region_rule_if_account_newer_than_state::State,
 > {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<ageassurance::Access<'a>>, Option<Datetime>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<ageassurance::Access<'a>>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ConfigRegionRuleIfAccountNewerThan<'a> {
@@ -1892,9 +1896,9 @@ impl<
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigRegionRuleIfAccountNewerThanBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1912,11 +1916,11 @@ where
         'a,
         config_region_rule_if_account_newer_than_state::SetAccess<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ConfigRegionRuleIfAccountNewerThanBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1934,11 +1938,11 @@ where
         'a,
         config_region_rule_if_account_newer_than_state::SetDate<S>,
     > {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ConfigRegionRuleIfAccountNewerThanBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1946,14 +1950,14 @@ where
 impl<'a, S> ConfigRegionRuleIfAccountNewerThanBuilder<'a, S>
 where
     S: config_region_rule_if_account_newer_than_state::State,
-    S::Date: config_region_rule_if_account_newer_than_state::IsSet,
     S::Access: config_region_rule_if_account_newer_than_state::IsSet,
+    S::Date: config_region_rule_if_account_newer_than_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ConfigRegionRuleIfAccountNewerThan<'a> {
         ConfigRegionRuleIfAccountNewerThan {
-            access: self.__unsafe_private_named.0.unwrap(),
-            date: self.__unsafe_private_named.1.unwrap(),
+            access: self._fields.0.unwrap(),
+            date: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1966,8 +1970,8 @@ where
         >,
     ) -> ConfigRegionRuleIfAccountNewerThan<'a> {
         ConfigRegionRuleIfAccountNewerThan {
-            access: self.__unsafe_private_named.0.unwrap(),
-            date: self.__unsafe_private_named.1.unwrap(),
+            access: self._fields.0.unwrap(),
+            date: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1983,37 +1987,37 @@ pub mod config_region_rule_if_account_older_than_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Date;
         type Access;
+        type Date;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Date = Unset;
         type Access = Unset;
-    }
-    ///State transition - sets the `date` field to Set
-    pub struct SetDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDate<S> {}
-    impl<S: State> State for SetDate<S> {
-        type Date = Set<members::date>;
-        type Access = S::Access;
+        type Date = Unset;
     }
     ///State transition - sets the `access` field to Set
     pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAccess<S> {}
     impl<S: State> State for SetAccess<S> {
-        type Date = S::Date;
         type Access = Set<members::access>;
+        type Date = S::Date;
+    }
+    ///State transition - sets the `date` field to Set
+    pub struct SetDate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDate<S> {}
+    impl<S: State> State for SetDate<S> {
+        type Access = S::Access;
+        type Date = Set<members::date>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `date` field
-        pub struct date(());
         ///Marker type for the `access` field
         pub struct access(());
+        ///Marker type for the `date` field
+        pub struct date(());
     }
 }
 
@@ -2022,9 +2026,9 @@ pub struct ConfigRegionRuleIfAccountOlderThanBuilder<
     'a,
     S: config_region_rule_if_account_older_than_state::State,
 > {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<ageassurance::Access<'a>>, Option<Datetime>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<ageassurance::Access<'a>>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ConfigRegionRuleIfAccountOlderThan<'a> {
@@ -2046,9 +2050,9 @@ impl<
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigRegionRuleIfAccountOlderThanBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2066,11 +2070,11 @@ where
         'a,
         config_region_rule_if_account_older_than_state::SetAccess<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ConfigRegionRuleIfAccountOlderThanBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2088,11 +2092,11 @@ where
         'a,
         config_region_rule_if_account_older_than_state::SetDate<S>,
     > {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ConfigRegionRuleIfAccountOlderThanBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2100,14 +2104,14 @@ where
 impl<'a, S> ConfigRegionRuleIfAccountOlderThanBuilder<'a, S>
 where
     S: config_region_rule_if_account_older_than_state::State,
-    S::Date: config_region_rule_if_account_older_than_state::IsSet,
     S::Access: config_region_rule_if_account_older_than_state::IsSet,
+    S::Date: config_region_rule_if_account_older_than_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ConfigRegionRuleIfAccountOlderThan<'a> {
         ConfigRegionRuleIfAccountOlderThan {
-            access: self.__unsafe_private_named.0.unwrap(),
-            date: self.__unsafe_private_named.1.unwrap(),
+            access: self._fields.0.unwrap(),
+            date: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2120,8 +2124,8 @@ where
         >,
     ) -> ConfigRegionRuleIfAccountOlderThan<'a> {
         ConfigRegionRuleIfAccountOlderThan {
-            access: self.__unsafe_private_named.0.unwrap(),
-            date: self.__unsafe_private_named.1.unwrap(),
+            access: self._fields.0.unwrap(),
+            date: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2176,9 +2180,9 @@ pub struct ConfigRegionRuleIfAssuredOverAgeBuilder<
     'a,
     S: config_region_rule_if_assured_over_age_state::State,
 > {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<ageassurance::Access<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<ageassurance::Access<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ConfigRegionRuleIfAssuredOverAge<'a> {
@@ -2200,9 +2204,9 @@ impl<
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigRegionRuleIfAssuredOverAgeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2220,11 +2224,11 @@ where
         'a,
         config_region_rule_if_assured_over_age_state::SetAccess<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ConfigRegionRuleIfAssuredOverAgeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2242,11 +2246,11 @@ where
         'a,
         config_region_rule_if_assured_over_age_state::SetAge<S>,
     > {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ConfigRegionRuleIfAssuredOverAgeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2260,8 +2264,8 @@ where
     /// Build the final struct
     pub fn build(self) -> ConfigRegionRuleIfAssuredOverAge<'a> {
         ConfigRegionRuleIfAssuredOverAge {
-            access: self.__unsafe_private_named.0.unwrap(),
-            age: self.__unsafe_private_named.1.unwrap(),
+            access: self._fields.0.unwrap(),
+            age: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2274,8 +2278,8 @@ where
         >,
     ) -> ConfigRegionRuleIfAssuredOverAge<'a> {
         ConfigRegionRuleIfAssuredOverAge {
-            access: self.__unsafe_private_named.0.unwrap(),
-            age: self.__unsafe_private_named.1.unwrap(),
+            access: self._fields.0.unwrap(),
+            age: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2330,9 +2334,9 @@ pub struct ConfigRegionRuleIfAssuredUnderAgeBuilder<
     'a,
     S: config_region_rule_if_assured_under_age_state::State,
 > {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<ageassurance::Access<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<ageassurance::Access<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ConfigRegionRuleIfAssuredUnderAge<'a> {
@@ -2354,9 +2358,9 @@ impl<
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigRegionRuleIfAssuredUnderAgeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2374,11 +2378,11 @@ where
         'a,
         config_region_rule_if_assured_under_age_state::SetAccess<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ConfigRegionRuleIfAssuredUnderAgeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2396,11 +2400,11 @@ where
         'a,
         config_region_rule_if_assured_under_age_state::SetAge<S>,
     > {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ConfigRegionRuleIfAssuredUnderAgeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2414,8 +2418,8 @@ where
     /// Build the final struct
     pub fn build(self) -> ConfigRegionRuleIfAssuredUnderAge<'a> {
         ConfigRegionRuleIfAssuredUnderAge {
-            access: self.__unsafe_private_named.0.unwrap(),
-            age: self.__unsafe_private_named.1.unwrap(),
+            access: self._fields.0.unwrap(),
+            age: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2428,8 +2432,8 @@ where
         >,
     ) -> ConfigRegionRuleIfAssuredUnderAge<'a> {
         ConfigRegionRuleIfAssuredUnderAge {
-            access: self.__unsafe_private_named.0.unwrap(),
-            age: self.__unsafe_private_named.1.unwrap(),
+            access: self._fields.0.unwrap(),
+            age: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2484,9 +2488,9 @@ pub struct ConfigRegionRuleIfDeclaredOverAgeBuilder<
     'a,
     S: config_region_rule_if_declared_over_age_state::State,
 > {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<ageassurance::Access<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<ageassurance::Access<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ConfigRegionRuleIfDeclaredOverAge<'a> {
@@ -2508,9 +2512,9 @@ impl<
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigRegionRuleIfDeclaredOverAgeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2528,11 +2532,11 @@ where
         'a,
         config_region_rule_if_declared_over_age_state::SetAccess<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ConfigRegionRuleIfDeclaredOverAgeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2550,11 +2554,11 @@ where
         'a,
         config_region_rule_if_declared_over_age_state::SetAge<S>,
     > {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ConfigRegionRuleIfDeclaredOverAgeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2568,8 +2572,8 @@ where
     /// Build the final struct
     pub fn build(self) -> ConfigRegionRuleIfDeclaredOverAge<'a> {
         ConfigRegionRuleIfDeclaredOverAge {
-            access: self.__unsafe_private_named.0.unwrap(),
-            age: self.__unsafe_private_named.1.unwrap(),
+            access: self._fields.0.unwrap(),
+            age: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2582,8 +2586,8 @@ where
         >,
     ) -> ConfigRegionRuleIfDeclaredOverAge<'a> {
         ConfigRegionRuleIfDeclaredOverAge {
-            access: self.__unsafe_private_named.0.unwrap(),
-            age: self.__unsafe_private_named.1.unwrap(),
+            access: self._fields.0.unwrap(),
+            age: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2599,37 +2603,37 @@ pub mod config_region_rule_if_declared_under_age_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Age;
         type Access;
+        type Age;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Age = Unset;
         type Access = Unset;
-    }
-    ///State transition - sets the `age` field to Set
-    pub struct SetAge<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAge<S> {}
-    impl<S: State> State for SetAge<S> {
-        type Age = Set<members::age>;
-        type Access = S::Access;
+        type Age = Unset;
     }
     ///State transition - sets the `access` field to Set
     pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAccess<S> {}
     impl<S: State> State for SetAccess<S> {
-        type Age = S::Age;
         type Access = Set<members::access>;
+        type Age = S::Age;
+    }
+    ///State transition - sets the `age` field to Set
+    pub struct SetAge<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAge<S> {}
+    impl<S: State> State for SetAge<S> {
+        type Access = S::Access;
+        type Age = Set<members::age>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `age` field
-        pub struct age(());
         ///Marker type for the `access` field
         pub struct access(());
+        ///Marker type for the `age` field
+        pub struct age(());
     }
 }
 
@@ -2638,9 +2642,9 @@ pub struct ConfigRegionRuleIfDeclaredUnderAgeBuilder<
     'a,
     S: config_region_rule_if_declared_under_age_state::State,
 > {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<ageassurance::Access<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<ageassurance::Access<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ConfigRegionRuleIfDeclaredUnderAge<'a> {
@@ -2662,9 +2666,9 @@ impl<
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConfigRegionRuleIfDeclaredUnderAgeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2682,11 +2686,11 @@ where
         'a,
         config_region_rule_if_declared_under_age_state::SetAccess<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ConfigRegionRuleIfDeclaredUnderAgeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2704,11 +2708,11 @@ where
         'a,
         config_region_rule_if_declared_under_age_state::SetAge<S>,
     > {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ConfigRegionRuleIfDeclaredUnderAgeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2716,14 +2720,14 @@ where
 impl<'a, S> ConfigRegionRuleIfDeclaredUnderAgeBuilder<'a, S>
 where
     S: config_region_rule_if_declared_under_age_state::State,
-    S::Age: config_region_rule_if_declared_under_age_state::IsSet,
     S::Access: config_region_rule_if_declared_under_age_state::IsSet,
+    S::Age: config_region_rule_if_declared_under_age_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ConfigRegionRuleIfDeclaredUnderAge<'a> {
         ConfigRegionRuleIfDeclaredUnderAge {
-            access: self.__unsafe_private_named.0.unwrap(),
-            age: self.__unsafe_private_named.1.unwrap(),
+            access: self._fields.0.unwrap(),
+            age: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2736,8 +2740,8 @@ where
         >,
     ) -> ConfigRegionRuleIfDeclaredUnderAge<'a> {
         ConfigRegionRuleIfDeclaredUnderAge {
-            access: self.__unsafe_private_named.0.unwrap(),
-            age: self.__unsafe_private_named.1.unwrap(),
+            access: self._fields.0.unwrap(),
+            age: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2753,92 +2757,92 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
+        type Access;
         type AttemptId;
         type CountryCode;
-        type CreatedAt;
         type Status;
-        type Access;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
+        type Access = Unset;
         type AttemptId = Unset;
         type CountryCode = Unset;
-        type CreatedAt = Unset;
         type Status = Unset;
-        type Access = Unset;
-    }
-    ///State transition - sets the `attempt_id` field to Set
-    pub struct SetAttemptId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAttemptId<S> {}
-    impl<S: State> State for SetAttemptId<S> {
-        type AttemptId = Set<members::attempt_id>;
-        type CountryCode = S::CountryCode;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type Access = S::Access;
-    }
-    ///State transition - sets the `country_code` field to Set
-    pub struct SetCountryCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountryCode<S> {}
-    impl<S: State> State for SetCountryCode<S> {
-        type AttemptId = S::AttemptId;
-        type CountryCode = Set<members::country_code>;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type Access = S::Access;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type AttemptId = S::AttemptId;
-        type CountryCode = S::CountryCode;
         type CreatedAt = Set<members::created_at>;
-        type Status = S::Status;
         type Access = S::Access;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
         type AttemptId = S::AttemptId;
         type CountryCode = S::CountryCode;
-        type CreatedAt = S::CreatedAt;
-        type Status = Set<members::status>;
-        type Access = S::Access;
+        type Status = S::Status;
     }
     ///State transition - sets the `access` field to Set
     pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAccess<S> {}
     impl<S: State> State for SetAccess<S> {
+        type CreatedAt = S::CreatedAt;
+        type Access = Set<members::access>;
         type AttemptId = S::AttemptId;
         type CountryCode = S::CountryCode;
-        type CreatedAt = S::CreatedAt;
         type Status = S::Status;
-        type Access = Set<members::access>;
+    }
+    ///State transition - sets the `attempt_id` field to Set
+    pub struct SetAttemptId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAttemptId<S> {}
+    impl<S: State> State for SetAttemptId<S> {
+        type CreatedAt = S::CreatedAt;
+        type Access = S::Access;
+        type AttemptId = Set<members::attempt_id>;
+        type CountryCode = S::CountryCode;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `country_code` field to Set
+    pub struct SetCountryCode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCountryCode<S> {}
+    impl<S: State> State for SetCountryCode<S> {
+        type CreatedAt = S::CreatedAt;
+        type Access = S::Access;
+        type AttemptId = S::AttemptId;
+        type CountryCode = Set<members::country_code>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type CreatedAt = S::CreatedAt;
+        type Access = S::Access;
+        type AttemptId = S::AttemptId;
+        type CountryCode = S::CountryCode;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `access` field
+        pub struct access(());
         ///Marker type for the `attempt_id` field
         pub struct attempt_id(());
         ///Marker type for the `country_code` field
         pub struct country_code(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `status` field
         pub struct status(());
-        ///Marker type for the `access` field
-        pub struct access(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EventBuilder<'a, S: event_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<EventAccess<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
@@ -2851,7 +2855,7 @@ pub struct EventBuilder<'a, S: event_state::State> {
         Option<CowStr<'a>>,
         Option<EventStatus<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Event<'a> {
@@ -2865,21 +2869,9 @@ impl<'a> EventBuilder<'a, event_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2894,11 +2886,11 @@ where
         mut self,
         value: impl Into<EventAccess<'a>>,
     ) -> EventBuilder<'a, event_state::SetAccess<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2913,11 +2905,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EventBuilder<'a, event_state::SetAttemptId<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2925,12 +2917,12 @@ where
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `completeIp` field (optional)
     pub fn complete_ip(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `completeIp` field to an Option value (optional)
     pub fn maybe_complete_ip(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -2938,12 +2930,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `completeUa` field (optional)
     pub fn complete_ua(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `completeUa` field to an Option value (optional)
     pub fn maybe_complete_ua(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -2958,11 +2950,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EventBuilder<'a, event_state::SetCountryCode<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2977,11 +2969,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> EventBuilder<'a, event_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2989,12 +2981,12 @@ where
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `email` field (optional)
     pub fn email(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `email` field to an Option value (optional)
     pub fn maybe_email(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -3002,12 +2994,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `initIp` field (optional)
     pub fn init_ip(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `initIp` field to an Option value (optional)
     pub fn maybe_init_ip(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -3015,12 +3007,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `initUa` field (optional)
     pub fn init_ua(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `initUa` field to an Option value (optional)
     pub fn maybe_init_ua(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -3028,12 +3020,12 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
 impl<'a, S: event_state::State> EventBuilder<'a, S> {
     /// Set the `regionCode` field (optional)
     pub fn region_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `regionCode` field to an Option value (optional)
     pub fn maybe_region_code(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -3048,11 +3040,11 @@ where
         mut self,
         value: impl Into<EventStatus<'a>>,
     ) -> EventBuilder<'a, event_state::SetStatus<S>> {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         EventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3060,26 +3052,26 @@ where
 impl<'a, S> EventBuilder<'a, S>
 where
     S: event_state::State,
+    S::CreatedAt: event_state::IsSet,
+    S::Access: event_state::IsSet,
     S::AttemptId: event_state::IsSet,
     S::CountryCode: event_state::IsSet,
-    S::CreatedAt: event_state::IsSet,
     S::Status: event_state::IsSet,
-    S::Access: event_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Event<'a> {
         Event {
-            access: self.__unsafe_private_named.0.unwrap(),
-            attempt_id: self.__unsafe_private_named.1.unwrap(),
-            complete_ip: self.__unsafe_private_named.2,
-            complete_ua: self.__unsafe_private_named.3,
-            country_code: self.__unsafe_private_named.4.unwrap(),
-            created_at: self.__unsafe_private_named.5.unwrap(),
-            email: self.__unsafe_private_named.6,
-            init_ip: self.__unsafe_private_named.7,
-            init_ua: self.__unsafe_private_named.8,
-            region_code: self.__unsafe_private_named.9,
-            status: self.__unsafe_private_named.10.unwrap(),
+            access: self._fields.0.unwrap(),
+            attempt_id: self._fields.1.unwrap(),
+            complete_ip: self._fields.2,
+            complete_ua: self._fields.3,
+            country_code: self._fields.4.unwrap(),
+            created_at: self._fields.5.unwrap(),
+            email: self._fields.6,
+            init_ip: self._fields.7,
+            init_ua: self._fields.8,
+            region_code: self._fields.9,
+            status: self._fields.10.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -3092,17 +3084,17 @@ where
         >,
     ) -> Event<'a> {
         Event {
-            access: self.__unsafe_private_named.0.unwrap(),
-            attempt_id: self.__unsafe_private_named.1.unwrap(),
-            complete_ip: self.__unsafe_private_named.2,
-            complete_ua: self.__unsafe_private_named.3,
-            country_code: self.__unsafe_private_named.4.unwrap(),
-            created_at: self.__unsafe_private_named.5.unwrap(),
-            email: self.__unsafe_private_named.6,
-            init_ip: self.__unsafe_private_named.7,
-            init_ua: self.__unsafe_private_named.8,
-            region_code: self.__unsafe_private_named.9,
-            status: self.__unsafe_private_named.10.unwrap(),
+            access: self._fields.0.unwrap(),
+            attempt_id: self._fields.1.unwrap(),
+            complete_ip: self._fields.2,
+            complete_ua: self._fields.3,
+            country_code: self._fields.4.unwrap(),
+            created_at: self._fields.5.unwrap(),
+            email: self._fields.6,
+            init_ip: self._fields.7,
+            init_ua: self._fields.8,
+            region_code: self._fields.9,
+            status: self._fields.10.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -3154,13 +3146,13 @@ pub mod state_state {
 
 /// Builder for constructing an instance of this type
 pub struct StateBuilder<'a, S: state_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ageassurance::Access<'a>>,
         Option<Datetime>,
         Option<ageassurance::Status<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> State<'a> {
@@ -3174,9 +3166,9 @@ impl<'a> StateBuilder<'a, state_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3191,11 +3183,11 @@ where
         mut self,
         value: impl Into<ageassurance::Access<'a>>,
     ) -> StateBuilder<'a, state_state::SetAccess<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         StateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3203,12 +3195,12 @@ where
 impl<'a, S: state_state::State> StateBuilder<'a, S> {
     /// Set the `lastInitiatedAt` field (optional)
     pub fn last_initiated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `lastInitiatedAt` field to an Option value (optional)
     pub fn maybe_last_initiated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -3223,11 +3215,11 @@ where
         mut self,
         value: impl Into<ageassurance::Status<'a>>,
     ) -> StateBuilder<'a, state_state::SetStatus<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         StateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3241,9 +3233,9 @@ where
     /// Build the final struct
     pub fn build(self) -> State<'a> {
         State {
-            access: self.__unsafe_private_named.0.unwrap(),
-            last_initiated_at: self.__unsafe_private_named.1,
-            status: self.__unsafe_private_named.2.unwrap(),
+            access: self._fields.0.unwrap(),
+            last_initiated_at: self._fields.1,
+            status: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -3256,9 +3248,9 @@ where
         >,
     ) -> State<'a> {
         State {
-            access: self.__unsafe_private_named.0.unwrap(),
-            last_initiated_at: self.__unsafe_private_named.1,
-            status: self.__unsafe_private_named.2.unwrap(),
+            access: self._fields.0.unwrap(),
+            last_initiated_at: self._fields.1,
+            status: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

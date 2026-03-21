@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -227,50 +230,50 @@ pub mod team_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Members;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Members = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Members = S::Members;
+        type Name = Unset;
     }
     ///State transition - sets the `members` field to Set
     pub struct SetMembers<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMembers<S> {}
     impl<S: State> State for SetMembers<S> {
-        type Name = S::Name;
         type Members = Set<members::members>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Members = S::Members;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `members` field
         pub struct members(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TeamBuilder<'a, S: team_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<BlobRef<'a>>,
         Option<CowStr<'a>>,
         Option<Vec<Did<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Team<'a> {
@@ -284,9 +287,9 @@ impl<'a> TeamBuilder<'a, team_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TeamBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -294,12 +297,12 @@ impl<'a> TeamBuilder<'a, team_state::Empty> {
 impl<'a, S: team_state::State> TeamBuilder<'a, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
     pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -307,12 +310,12 @@ impl<'a, S: team_state::State> TeamBuilder<'a, S> {
 impl<'a, S: team_state::State> TeamBuilder<'a, S> {
     /// Set the `avatarAlt` field (optional)
     pub fn avatar_alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `avatarAlt` field to an Option value (optional)
     pub fn maybe_avatar_alt(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -327,11 +330,11 @@ where
         mut self,
         value: impl Into<Vec<Did<'a>>>,
     ) -> TeamBuilder<'a, team_state::SetMembers<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         TeamBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -346,11 +349,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TeamBuilder<'a, team_state::SetName<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         TeamBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -358,16 +361,16 @@ where
 impl<'a, S> TeamBuilder<'a, S>
 where
     S: team_state::State,
-    S::Name: team_state::IsSet,
     S::Members: team_state::IsSet,
+    S::Name: team_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Team<'a> {
         Team {
-            avatar: self.__unsafe_private_named.0,
-            avatar_alt: self.__unsafe_private_named.1,
-            members: self.__unsafe_private_named.2.unwrap(),
-            name: self.__unsafe_private_named.3.unwrap(),
+            avatar: self._fields.0,
+            avatar_alt: self._fields.1,
+            members: self._fields.2.unwrap(),
+            name: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -380,10 +383,10 @@ where
         >,
     ) -> Team<'a> {
         Team {
-            avatar: self.__unsafe_private_named.0,
-            avatar_alt: self.__unsafe_private_named.1,
-            members: self.__unsafe_private_named.2.unwrap(),
-            name: self.__unsafe_private_named.3.unwrap(),
+            avatar: self._fields.0,
+            avatar_alt: self._fields.1,
+            members: self._fields.2.unwrap(),
+            name: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

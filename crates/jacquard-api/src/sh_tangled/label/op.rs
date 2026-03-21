@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -139,65 +142,65 @@ pub mod op_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
-        type PerformedAt;
         type Add;
+        type PerformedAt;
+        type Subject;
         type Delete;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
-        type PerformedAt = Unset;
         type Add = Unset;
+        type PerformedAt = Unset;
+        type Subject = Unset;
         type Delete = Unset;
     }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
+    ///State transition - sets the `add` field to Set
+    pub struct SetAdd<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAdd<S> {}
+    impl<S: State> State for SetAdd<S> {
+        type Add = Set<members::add>;
         type PerformedAt = S::PerformedAt;
-        type Add = S::Add;
+        type Subject = S::Subject;
         type Delete = S::Delete;
     }
     ///State transition - sets the `performed_at` field to Set
     pub struct SetPerformedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPerformedAt<S> {}
     impl<S: State> State for SetPerformedAt<S> {
-        type Subject = S::Subject;
-        type PerformedAt = Set<members::performed_at>;
         type Add = S::Add;
+        type PerformedAt = Set<members::performed_at>;
+        type Subject = S::Subject;
         type Delete = S::Delete;
     }
-    ///State transition - sets the `add` field to Set
-    pub struct SetAdd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAdd<S> {}
-    impl<S: State> State for SetAdd<S> {
-        type Subject = S::Subject;
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type Add = S::Add;
         type PerformedAt = S::PerformedAt;
-        type Add = Set<members::add>;
+        type Subject = Set<members::subject>;
         type Delete = S::Delete;
     }
     ///State transition - sets the `delete` field to Set
     pub struct SetDelete<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDelete<S> {}
     impl<S: State> State for SetDelete<S> {
-        type Subject = S::Subject;
-        type PerformedAt = S::PerformedAt;
         type Add = S::Add;
+        type PerformedAt = S::PerformedAt;
+        type Subject = S::Subject;
         type Delete = Set<members::delete>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `performed_at` field
-        pub struct performed_at(());
         ///Marker type for the `add` field
         pub struct add(());
+        ///Marker type for the `performed_at` field
+        pub struct performed_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `delete` field
         pub struct delete(());
     }
@@ -205,14 +208,14 @@ pub mod op_state {
 
 /// Builder for constructing an instance of this type
 pub struct OpBuilder<'a, S: op_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<op::Operand<'a>>>,
         Option<Vec<op::Operand<'a>>>,
         Option<Datetime>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Op<'a> {
@@ -226,9 +229,9 @@ impl<'a> OpBuilder<'a, op_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         OpBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -243,11 +246,11 @@ where
         mut self,
         value: impl Into<Vec<op::Operand<'a>>>,
     ) -> OpBuilder<'a, op_state::SetAdd<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         OpBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -262,11 +265,11 @@ where
         mut self,
         value: impl Into<Vec<op::Operand<'a>>>,
     ) -> OpBuilder<'a, op_state::SetDelete<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         OpBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -281,11 +284,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> OpBuilder<'a, op_state::SetPerformedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         OpBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -300,11 +303,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> OpBuilder<'a, op_state::SetSubject<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         OpBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -312,18 +315,18 @@ where
 impl<'a, S> OpBuilder<'a, S>
 where
     S: op_state::State,
-    S::Subject: op_state::IsSet,
-    S::PerformedAt: op_state::IsSet,
     S::Add: op_state::IsSet,
+    S::PerformedAt: op_state::IsSet,
+    S::Subject: op_state::IsSet,
     S::Delete: op_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Op<'a> {
         Op {
-            add: self.__unsafe_private_named.0.unwrap(),
-            delete: self.__unsafe_private_named.1.unwrap(),
-            performed_at: self.__unsafe_private_named.2.unwrap(),
-            subject: self.__unsafe_private_named.3.unwrap(),
+            add: self._fields.0.unwrap(),
+            delete: self._fields.1.unwrap(),
+            performed_at: self._fields.2.unwrap(),
+            subject: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -336,10 +339,10 @@ where
         >,
     ) -> Op<'a> {
         Op {
-            add: self.__unsafe_private_named.0.unwrap(),
-            delete: self.__unsafe_private_named.1.unwrap(),
-            performed_at: self.__unsafe_private_named.2.unwrap(),
-            subject: self.__unsafe_private_named.3.unwrap(),
+            add: self._fields.0.unwrap(),
+            delete: self._fields.1.unwrap(),
+            performed_at: self._fields.2.unwrap(),
+            subject: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -503,9 +506,9 @@ pub mod operand_state {
 
 /// Builder for constructing an instance of this type
 pub struct OperandBuilder<'a, S: operand_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Operand<'a> {
@@ -519,9 +522,9 @@ impl<'a> OperandBuilder<'a, operand_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         OperandBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -536,11 +539,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> OperandBuilder<'a, operand_state::SetKey<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         OperandBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -555,11 +558,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> OperandBuilder<'a, operand_state::SetValue<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         OperandBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -573,8 +576,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Operand<'a> {
         Operand {
-            key: self.__unsafe_private_named.0.unwrap(),
-            value: self.__unsafe_private_named.1.unwrap(),
+            key: self._fields.0.unwrap(),
+            value: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -587,8 +590,8 @@ where
         >,
     ) -> Operand<'a> {
         Operand {
-            key: self.__unsafe_private_named.0.unwrap(),
-            value: self.__unsafe_private_named.1.unwrap(),
+            key: self._fields.0.unwrap(),
+            value: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

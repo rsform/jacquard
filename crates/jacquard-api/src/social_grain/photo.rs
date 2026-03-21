@@ -7,7 +7,11 @@
 
 pub mod exif;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -297,14 +301,14 @@ pub mod photo_state {
 
 /// Builder for constructing an instance of this type
 pub struct PhotoBuilder<'a, S: photo_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<AspectRatio<'a>>,
         Option<Datetime>,
         Option<BlobRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Photo<'a> {
@@ -318,9 +322,9 @@ impl<'a> PhotoBuilder<'a, photo_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PhotoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -335,11 +339,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PhotoBuilder<'a, photo_state::SetAlt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PhotoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -347,12 +351,12 @@ where
 impl<'a, S: photo_state::State> PhotoBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
     pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
     pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -360,12 +364,12 @@ impl<'a, S: photo_state::State> PhotoBuilder<'a, S> {
 impl<'a, S: photo_state::State> PhotoBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -380,11 +384,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> PhotoBuilder<'a, photo_state::SetPhoto<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         PhotoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -398,10 +402,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Photo<'a> {
         Photo {
-            alt: self.__unsafe_private_named.0.unwrap(),
-            aspect_ratio: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2,
-            photo: self.__unsafe_private_named.3.unwrap(),
+            alt: self._fields.0.unwrap(),
+            aspect_ratio: self._fields.1,
+            created_at: self._fields.2,
+            photo: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -414,10 +418,10 @@ where
         >,
     ) -> Photo<'a> {
         Photo {
-            alt: self.__unsafe_private_named.0.unwrap(),
-            aspect_ratio: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2,
-            photo: self.__unsafe_private_named.3.unwrap(),
+            alt: self._fields.0.unwrap(),
+            aspect_ratio: self._fields.1,
+            created_at: self._fields.2,
+            photo: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -534,8 +538,8 @@ pub mod exif_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct ExifViewBuilder<'a, S: exif_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Cid<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -551,7 +555,7 @@ pub struct ExifViewBuilder<'a, S: exif_view_state::State> {
         Option<AtUri<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ExifView<'a> {
@@ -565,8 +569,8 @@ impl<'a> ExifViewBuilder<'a, exif_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ExifViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -582,7 +586,7 @@ impl<'a> ExifViewBuilder<'a, exif_view_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -590,12 +594,12 @@ impl<'a> ExifViewBuilder<'a, exif_view_state::Empty> {
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `cid` field (optional)
     pub fn cid(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cid` field to an Option value (optional)
     pub fn maybe_cid(mut self, value: Option<Cid<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -610,11 +614,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ExifViewBuilder<'a, exif_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ExifViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -622,12 +626,12 @@ where
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `dateTimeOriginal` field (optional)
     pub fn date_time_original(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `dateTimeOriginal` field to an Option value (optional)
     pub fn maybe_date_time_original(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -635,12 +639,12 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `exposureTime` field (optional)
     pub fn exposure_time(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `exposureTime` field to an Option value (optional)
     pub fn maybe_exposure_time(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -648,12 +652,12 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `fNumber` field (optional)
     pub fn f_number(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `fNumber` field to an Option value (optional)
     pub fn maybe_f_number(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -661,12 +665,12 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `flash` field (optional)
     pub fn flash(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `flash` field to an Option value (optional)
     pub fn maybe_flash(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -677,7 +681,7 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `focalLengthIn35mmFormat` field to an Option value (optional)
@@ -685,7 +689,7 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
         mut self,
         value: Option<CowStr<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -693,12 +697,12 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `iSO` field (optional)
     pub fn i_so(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `iSO` field to an Option value (optional)
     pub fn maybe_i_so(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -706,12 +710,12 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `lensMake` field (optional)
     pub fn lens_make(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `lensMake` field to an Option value (optional)
     pub fn maybe_lens_make(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -719,12 +723,12 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `lensModel` field (optional)
     pub fn lens_model(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `lensModel` field to an Option value (optional)
     pub fn maybe_lens_model(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -732,12 +736,12 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `make` field (optional)
     pub fn make(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `make` field to an Option value (optional)
     pub fn maybe_make(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -745,12 +749,12 @@ impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `model` field (optional)
     pub fn model(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `model` field to an Option value (optional)
     pub fn maybe_model(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -765,11 +769,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ExifViewBuilder<'a, exif_view_state::SetPhoto<S>> {
-        self.__unsafe_private_named.12 = Option::Some(value.into());
+        self._fields.12 = Option::Some(value.into());
         ExifViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -777,12 +781,12 @@ where
 impl<'a, S: exif_view_state::State> ExifViewBuilder<'a, S> {
     /// Set the `uri` field (optional)
     pub fn uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `uri` field to an Option value (optional)
     pub fn maybe_uri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -796,20 +800,20 @@ where
     /// Build the final struct
     pub fn build(self) -> ExifView<'a> {
         ExifView {
-            cid: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            date_time_original: self.__unsafe_private_named.2,
-            exposure_time: self.__unsafe_private_named.3,
-            f_number: self.__unsafe_private_named.4,
-            flash: self.__unsafe_private_named.5,
-            focal_length_in35mm_format: self.__unsafe_private_named.6,
-            i_so: self.__unsafe_private_named.7,
-            lens_make: self.__unsafe_private_named.8,
-            lens_model: self.__unsafe_private_named.9,
-            make: self.__unsafe_private_named.10,
-            model: self.__unsafe_private_named.11,
-            photo: self.__unsafe_private_named.12.unwrap(),
-            uri: self.__unsafe_private_named.13,
+            cid: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            date_time_original: self._fields.2,
+            exposure_time: self._fields.3,
+            f_number: self._fields.4,
+            flash: self._fields.5,
+            focal_length_in35mm_format: self._fields.6,
+            i_so: self._fields.7,
+            lens_make: self._fields.8,
+            lens_model: self._fields.9,
+            make: self._fields.10,
+            model: self._fields.11,
+            photo: self._fields.12.unwrap(),
+            uri: self._fields.13,
             extra_data: Default::default(),
         }
     }
@@ -822,20 +826,20 @@ where
         >,
     ) -> ExifView<'a> {
         ExifView {
-            cid: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            date_time_original: self.__unsafe_private_named.2,
-            exposure_time: self.__unsafe_private_named.3,
-            f_number: self.__unsafe_private_named.4,
-            flash: self.__unsafe_private_named.5,
-            focal_length_in35mm_format: self.__unsafe_private_named.6,
-            i_so: self.__unsafe_private_named.7,
-            lens_make: self.__unsafe_private_named.8,
-            lens_model: self.__unsafe_private_named.9,
-            make: self.__unsafe_private_named.10,
-            model: self.__unsafe_private_named.11,
-            photo: self.__unsafe_private_named.12.unwrap(),
-            uri: self.__unsafe_private_named.13,
+            cid: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            date_time_original: self._fields.2,
+            exposure_time: self._fields.3,
+            f_number: self._fields.4,
+            flash: self._fields.5,
+            focal_length_in35mm_format: self._fields.6,
+            i_so: self._fields.7,
+            lens_make: self._fields.8,
+            lens_model: self._fields.9,
+            make: self._fields.10,
+            model: self._fields.11,
+            photo: self._fields.12.unwrap(),
+            uri: self._fields.13,
             extra_data: Some(extra_data),
         }
     }
@@ -1037,92 +1041,92 @@ pub mod photo_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Thumb;
+        type Cid;
         type Fullsize;
         type Alt;
-        type Cid;
         type Uri;
+        type Thumb;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Thumb = Unset;
+        type Cid = Unset;
         type Fullsize = Unset;
         type Alt = Unset;
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `thumb` field to Set
-    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThumb<S> {}
-    impl<S: State> State for SetThumb<S> {
-        type Thumb = Set<members::thumb>;
-        type Fullsize = S::Fullsize;
-        type Alt = S::Alt;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `fullsize` field to Set
-    pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFullsize<S> {}
-    impl<S: State> State for SetFullsize<S> {
-        type Thumb = S::Thumb;
-        type Fullsize = Set<members::fullsize>;
-        type Alt = S::Alt;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `alt` field to Set
-    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlt<S> {}
-    impl<S: State> State for SetAlt<S> {
-        type Thumb = S::Thumb;
-        type Fullsize = S::Fullsize;
-        type Alt = Set<members::alt>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
+        type Thumb = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Thumb = S::Thumb;
+        type Cid = Set<members::cid>;
         type Fullsize = S::Fullsize;
         type Alt = S::Alt;
-        type Cid = Set<members::cid>;
         type Uri = S::Uri;
+        type Thumb = S::Thumb;
+    }
+    ///State transition - sets the `fullsize` field to Set
+    pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFullsize<S> {}
+    impl<S: State> State for SetFullsize<S> {
+        type Cid = S::Cid;
+        type Fullsize = Set<members::fullsize>;
+        type Alt = S::Alt;
+        type Uri = S::Uri;
+        type Thumb = S::Thumb;
+    }
+    ///State transition - sets the `alt` field to Set
+    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlt<S> {}
+    impl<S: State> State for SetAlt<S> {
+        type Cid = S::Cid;
+        type Fullsize = S::Fullsize;
+        type Alt = Set<members::alt>;
+        type Uri = S::Uri;
+        type Thumb = S::Thumb;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Thumb = S::Thumb;
+        type Cid = S::Cid;
         type Fullsize = S::Fullsize;
         type Alt = S::Alt;
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Thumb = S::Thumb;
+    }
+    ///State transition - sets the `thumb` field to Set
+    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetThumb<S> {}
+    impl<S: State> State for SetThumb<S> {
+        type Cid = S::Cid;
+        type Fullsize = S::Fullsize;
+        type Alt = S::Alt;
+        type Uri = S::Uri;
+        type Thumb = Set<members::thumb>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `thumb` field
-        pub struct thumb(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `fullsize` field
         pub struct fullsize(());
         ///Marker type for the `alt` field
         pub struct alt(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `thumb` field
+        pub struct thumb(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PhotoViewBuilder<'a, S: photo_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<AspectRatio<'a>>,
         Option<Cid<'a>>,
@@ -1131,7 +1135,7 @@ pub struct PhotoViewBuilder<'a, S: photo_view_state::State> {
         Option<UriValue<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> PhotoView<'a> {
@@ -1145,9 +1149,9 @@ impl<'a> PhotoViewBuilder<'a, photo_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PhotoViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1162,11 +1166,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PhotoViewBuilder<'a, photo_view_state::SetAlt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PhotoViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1174,12 +1178,12 @@ where
 impl<'a, S: photo_view_state::State> PhotoViewBuilder<'a, S> {
     /// Set the `aspectRatio` field (optional)
     pub fn aspect_ratio(mut self, value: impl Into<Option<AspectRatio<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
     pub fn maybe_aspect_ratio(mut self, value: Option<AspectRatio<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1194,11 +1198,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> PhotoViewBuilder<'a, photo_view_state::SetCid<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PhotoViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1206,12 +1210,12 @@ where
 impl<'a, S: photo_view_state::State> PhotoViewBuilder<'a, S> {
     /// Set the `exif` field (optional)
     pub fn exif(mut self, value: impl Into<Option<photo::ExifView<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `exif` field to an Option value (optional)
     pub fn maybe_exif(mut self, value: Option<photo::ExifView<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1226,11 +1230,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> PhotoViewBuilder<'a, photo_view_state::SetFullsize<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         PhotoViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1245,11 +1249,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> PhotoViewBuilder<'a, photo_view_state::SetThumb<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         PhotoViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1264,11 +1268,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> PhotoViewBuilder<'a, photo_view_state::SetUri<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         PhotoViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1276,22 +1280,22 @@ where
 impl<'a, S> PhotoViewBuilder<'a, S>
 where
     S: photo_view_state::State,
-    S::Thumb: photo_view_state::IsSet,
+    S::Cid: photo_view_state::IsSet,
     S::Fullsize: photo_view_state::IsSet,
     S::Alt: photo_view_state::IsSet,
-    S::Cid: photo_view_state::IsSet,
     S::Uri: photo_view_state::IsSet,
+    S::Thumb: photo_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PhotoView<'a> {
         PhotoView {
-            alt: self.__unsafe_private_named.0.unwrap(),
-            aspect_ratio: self.__unsafe_private_named.1,
-            cid: self.__unsafe_private_named.2.unwrap(),
-            exif: self.__unsafe_private_named.3,
-            fullsize: self.__unsafe_private_named.4.unwrap(),
-            thumb: self.__unsafe_private_named.5.unwrap(),
-            uri: self.__unsafe_private_named.6.unwrap(),
+            alt: self._fields.0.unwrap(),
+            aspect_ratio: self._fields.1,
+            cid: self._fields.2.unwrap(),
+            exif: self._fields.3,
+            fullsize: self._fields.4.unwrap(),
+            thumb: self._fields.5.unwrap(),
+            uri: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1304,13 +1308,13 @@ where
         >,
     ) -> PhotoView<'a> {
         PhotoView {
-            alt: self.__unsafe_private_named.0.unwrap(),
-            aspect_ratio: self.__unsafe_private_named.1,
-            cid: self.__unsafe_private_named.2.unwrap(),
-            exif: self.__unsafe_private_named.3,
-            fullsize: self.__unsafe_private_named.4.unwrap(),
-            thumb: self.__unsafe_private_named.5.unwrap(),
-            uri: self.__unsafe_private_named.6.unwrap(),
+            alt: self._fields.0.unwrap(),
+            aspect_ratio: self._fields.1,
+            cid: self._fields.2.unwrap(),
+            exif: self._fields.3,
+            fullsize: self._fields.4.unwrap(),
+            thumb: self._fields.5.unwrap(),
+            uri: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

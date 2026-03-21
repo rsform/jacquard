@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::deps::bytes::Bytes;
@@ -361,15 +364,15 @@ pub mod declaration_state {
 
 /// Builder for constructing an instance of this type
 pub struct DeclarationBuilder<'a, S: declaration_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<Bytes>>,
         Option<Bytes>,
         Option<Bytes>,
         Option<declaration::MessageMe<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Declaration<'a> {
@@ -383,9 +386,9 @@ impl<'a> DeclarationBuilder<'a, declaration_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeclarationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -393,12 +396,12 @@ impl<'a> DeclarationBuilder<'a, declaration_state::Empty> {
 impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     /// Set the `continuityProofs` field (optional)
     pub fn continuity_proofs(mut self, value: impl Into<Option<Vec<Bytes>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `continuityProofs` field to an Option value (optional)
     pub fn maybe_continuity_proofs(mut self, value: Option<Vec<Bytes>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -413,11 +416,11 @@ where
         mut self,
         value: impl Into<Bytes>,
     ) -> DeclarationBuilder<'a, declaration_state::SetCurrentKey<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DeclarationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -425,12 +428,12 @@ where
 impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     /// Set the `keyPackage` field (optional)
     pub fn key_package(mut self, value: impl Into<Option<Bytes>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `keyPackage` field to an Option value (optional)
     pub fn maybe_key_package(mut self, value: Option<Bytes>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -441,7 +444,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<declaration::MessageMe<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `messageMe` field to an Option value (optional)
@@ -449,7 +452,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
         mut self,
         value: Option<declaration::MessageMe<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -464,11 +467,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DeclarationBuilder<'a, declaration_state::SetVersion<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         DeclarationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -482,11 +485,11 @@ where
     /// Build the final struct
     pub fn build(self) -> Declaration<'a> {
         Declaration {
-            continuity_proofs: self.__unsafe_private_named.0,
-            current_key: self.__unsafe_private_named.1.unwrap(),
-            key_package: self.__unsafe_private_named.2,
-            message_me: self.__unsafe_private_named.3,
-            version: self.__unsafe_private_named.4.unwrap(),
+            continuity_proofs: self._fields.0,
+            current_key: self._fields.1.unwrap(),
+            key_package: self._fields.2,
+            message_me: self._fields.3,
+            version: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -499,11 +502,11 @@ where
         >,
     ) -> Declaration<'a> {
         Declaration {
-            continuity_proofs: self.__unsafe_private_named.0,
-            current_key: self.__unsafe_private_named.1.unwrap(),
-            key_package: self.__unsafe_private_named.2,
-            message_me: self.__unsafe_private_named.3,
-            version: self.__unsafe_private_named.4.unwrap(),
+            continuity_proofs: self._fields.0,
+            current_key: self._fields.1.unwrap(),
+            key_package: self._fields.2,
+            message_me: self._fields.3,
+            version: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -646,45 +649,45 @@ pub mod message_me_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MessageMeUrl;
         type ShowButtonTo;
+        type MessageMeUrl;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MessageMeUrl = Unset;
         type ShowButtonTo = Unset;
-    }
-    ///State transition - sets the `message_me_url` field to Set
-    pub struct SetMessageMeUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessageMeUrl<S> {}
-    impl<S: State> State for SetMessageMeUrl<S> {
-        type MessageMeUrl = Set<members::message_me_url>;
-        type ShowButtonTo = S::ShowButtonTo;
+        type MessageMeUrl = Unset;
     }
     ///State transition - sets the `show_button_to` field to Set
     pub struct SetShowButtonTo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShowButtonTo<S> {}
     impl<S: State> State for SetShowButtonTo<S> {
-        type MessageMeUrl = S::MessageMeUrl;
         type ShowButtonTo = Set<members::show_button_to>;
+        type MessageMeUrl = S::MessageMeUrl;
+    }
+    ///State transition - sets the `message_me_url` field to Set
+    pub struct SetMessageMeUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessageMeUrl<S> {}
+    impl<S: State> State for SetMessageMeUrl<S> {
+        type ShowButtonTo = S::ShowButtonTo;
+        type MessageMeUrl = Set<members::message_me_url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message_me_url` field
-        pub struct message_me_url(());
         ///Marker type for the `show_button_to` field
         pub struct show_button_to(());
+        ///Marker type for the `message_me_url` field
+        pub struct message_me_url(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MessageMeBuilder<'a, S: message_me_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<UriValue<'a>>, Option<MessageMeShowButtonTo<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<UriValue<'a>>, Option<MessageMeShowButtonTo<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> MessageMe<'a> {
@@ -698,9 +701,9 @@ impl<'a> MessageMeBuilder<'a, message_me_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MessageMeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -715,11 +718,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> MessageMeBuilder<'a, message_me_state::SetMessageMeUrl<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MessageMeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -734,11 +737,11 @@ where
         mut self,
         value: impl Into<MessageMeShowButtonTo<'a>>,
     ) -> MessageMeBuilder<'a, message_me_state::SetShowButtonTo<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MessageMeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -746,14 +749,14 @@ where
 impl<'a, S> MessageMeBuilder<'a, S>
 where
     S: message_me_state::State,
-    S::MessageMeUrl: message_me_state::IsSet,
     S::ShowButtonTo: message_me_state::IsSet,
+    S::MessageMeUrl: message_me_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MessageMe<'a> {
         MessageMe {
-            message_me_url: self.__unsafe_private_named.0.unwrap(),
-            show_button_to: self.__unsafe_private_named.1.unwrap(),
+            message_me_url: self._fields.0.unwrap(),
+            show_button_to: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -766,8 +769,8 @@ where
         >,
     ) -> MessageMe<'a> {
         MessageMe {
-            message_me_url: self.__unsafe_private_named.0.unwrap(),
-            show_button_to: self.__unsafe_private_named.1.unwrap(),
+            message_me_url: self._fields.0.unwrap(),
+            show_button_to: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

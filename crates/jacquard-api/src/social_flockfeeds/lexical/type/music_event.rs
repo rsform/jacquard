@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -2446,8 +2449,8 @@ pub mod music_event_state {
 
 /// Builder for constructing an instance of this type
 pub struct MusicEventBuilder<'a, S: music_event_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<MusicEventAbout<'a>>,
         Option<MusicEventActor<'a>>,
         Option<MusicEventAdditionalType<'a>>,
@@ -2502,7 +2505,7 @@ pub struct MusicEventBuilder<'a, S: music_event_state::State> {
         Option<MusicEventWorkFeatured<'a>>,
         Option<MusicEventWorkPerformed<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> MusicEvent<'a> {
@@ -2516,8 +2519,8 @@ impl<'a> MusicEventBuilder<'a, music_event_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MusicEventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -2572,7 +2575,7 @@ impl<'a> MusicEventBuilder<'a, music_event_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2580,12 +2583,12 @@ impl<'a> MusicEventBuilder<'a, music_event_state::Empty> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `about` field (optional)
     pub fn about(mut self, value: impl Into<Option<MusicEventAbout<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `about` field to an Option value (optional)
     pub fn maybe_about(mut self, value: Option<MusicEventAbout<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -2593,12 +2596,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `actor` field (optional)
     pub fn actor(mut self, value: impl Into<Option<MusicEventActor<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `actor` field to an Option value (optional)
     pub fn maybe_actor(mut self, value: Option<MusicEventActor<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -2609,7 +2612,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventAdditionalType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
@@ -2617,7 +2620,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventAdditionalType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -2628,7 +2631,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventAggregateRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
@@ -2636,7 +2639,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventAggregateRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -2647,7 +2650,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventAlternateName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
@@ -2655,7 +2658,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventAlternateName<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -2663,12 +2666,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `attendee` field (optional)
     pub fn attendee(mut self, value: impl Into<Option<MusicEventAttendee<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `attendee` field to an Option value (optional)
     pub fn maybe_attendee(mut self, value: Option<MusicEventAttendee<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -2679,12 +2682,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventAttendees<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `attendees` field to an Option value (optional)
     pub fn maybe_attendees(mut self, value: Option<MusicEventAttendees<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -2692,12 +2695,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `audience` field (optional)
     pub fn audience(mut self, value: impl Into<Option<MusicEventAudience<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `audience` field to an Option value (optional)
     pub fn maybe_audience(mut self, value: Option<MusicEventAudience<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -2705,12 +2708,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `composer` field (optional)
     pub fn composer(mut self, value: impl Into<Option<MusicEventComposer<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `composer` field to an Option value (optional)
     pub fn maybe_composer(mut self, value: Option<MusicEventComposer<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -2721,7 +2724,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventContributor<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `contributor` field to an Option value (optional)
@@ -2729,7 +2732,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventContributor<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -2740,7 +2743,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
@@ -2748,7 +2751,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -2756,12 +2759,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `director` field (optional)
     pub fn director(mut self, value: impl Into<Option<MusicEventDirector<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `director` field to an Option value (optional)
     pub fn maybe_director(mut self, value: Option<MusicEventDirector<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -2772,7 +2775,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventDisambiguatingDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `disambiguatingDescription` field to an Option value (optional)
@@ -2780,7 +2783,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventDisambiguatingDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -2791,12 +2794,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventDoorTime<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `doorTime` field to an Option value (optional)
     pub fn maybe_door_time(mut self, value: Option<MusicEventDoorTime<'a>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -2804,12 +2807,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `duration` field (optional)
     pub fn duration(mut self, value: impl Into<Option<MusicEventDuration<'a>>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `duration` field to an Option value (optional)
     pub fn maybe_duration(mut self, value: Option<MusicEventDuration<'a>>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -2817,12 +2820,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `endDate` field (optional)
     pub fn end_date(mut self, value: impl Into<Option<MusicEventEndDate<'a>>>) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `endDate` field to an Option value (optional)
     pub fn maybe_end_date(mut self, value: Option<MusicEventEndDate<'a>>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -2833,7 +2836,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventEventAttendanceMode<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `eventAttendanceMode` field to an Option value (optional)
@@ -2841,7 +2844,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventEventAttendanceMode<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -2852,7 +2855,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventEventSchedule<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `eventSchedule` field to an Option value (optional)
@@ -2860,7 +2863,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventEventSchedule<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -2871,7 +2874,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventEventStatus<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `eventStatus` field to an Option value (optional)
@@ -2879,7 +2882,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventEventStatus<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -2887,12 +2890,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `funder` field (optional)
     pub fn funder(mut self, value: impl Into<Option<MusicEventFunder<'a>>>) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `funder` field to an Option value (optional)
     pub fn maybe_funder(mut self, value: Option<MusicEventFunder<'a>>) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -2900,12 +2903,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<MusicEventFunding<'a>>>) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
     pub fn maybe_funding(mut self, value: Option<MusicEventFunding<'a>>) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -2916,12 +2919,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventIdentifier<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
     pub fn maybe_identifier(mut self, value: Option<MusicEventIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -2929,12 +2932,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<MusicEventImage<'a>>>) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<MusicEventImage<'a>>) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -2945,12 +2948,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventInLanguage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.23 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `inLanguage` field to an Option value (optional)
     pub fn maybe_in_language(mut self, value: Option<MusicEventInLanguage<'a>>) -> Self {
-        self.__unsafe_private_named.23 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -2961,7 +2964,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventIsAccessibleForFree<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.24 = value.into();
+        self._fields.24 = value.into();
         self
     }
     /// Set the `isAccessibleForFree` field to an Option value (optional)
@@ -2969,7 +2972,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventIsAccessibleForFree<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.24 = value;
+        self._fields.24 = value;
         self
     }
 }
@@ -2977,12 +2980,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<MusicEventKeywords<'a>>>) -> Self {
-        self.__unsafe_private_named.25 = value.into();
+        self._fields.25 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
     pub fn maybe_keywords(mut self, value: Option<MusicEventKeywords<'a>>) -> Self {
-        self.__unsafe_private_named.25 = value;
+        self._fields.25 = value;
         self
     }
 }
@@ -2990,12 +2993,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<MusicEventLocation<'a>>>) -> Self {
-        self.__unsafe_private_named.26 = value.into();
+        self._fields.26 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
     pub fn maybe_location(mut self, value: Option<MusicEventLocation<'a>>) -> Self {
-        self.__unsafe_private_named.26 = value;
+        self._fields.26 = value;
         self
     }
 }
@@ -3006,7 +3009,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventMainEntityOfPage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.27 = value.into();
+        self._fields.27 = value.into();
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
@@ -3014,7 +3017,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventMainEntityOfPage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.27 = value;
+        self._fields.27 = value;
         self
     }
 }
@@ -3025,7 +3028,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventMaximumAttendeeCapacity<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.28 = value.into();
+        self._fields.28 = value.into();
         self
     }
     /// Set the `maximumAttendeeCapacity` field to an Option value (optional)
@@ -3033,7 +3036,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventMaximumAttendeeCapacity<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.28 = value;
+        self._fields.28 = value;
         self
     }
 }
@@ -3044,7 +3047,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventMaximumPhysicalAttendeeCapacity<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.29 = value.into();
+        self._fields.29 = value.into();
         self
     }
     /// Set the `maximumPhysicalAttendeeCapacity` field to an Option value (optional)
@@ -3052,7 +3055,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventMaximumPhysicalAttendeeCapacity<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.29 = value;
+        self._fields.29 = value;
         self
     }
 }
@@ -3063,7 +3066,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventMaximumVirtualAttendeeCapacity<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.30 = value.into();
+        self._fields.30 = value.into();
         self
     }
     /// Set the `maximumVirtualAttendeeCapacity` field to an Option value (optional)
@@ -3071,7 +3074,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventMaximumVirtualAttendeeCapacity<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.30 = value;
+        self._fields.30 = value;
         self
     }
 }
@@ -3079,12 +3082,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<MusicEventName<'a>>>) -> Self {
-        self.__unsafe_private_named.31 = value.into();
+        self._fields.31 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<MusicEventName<'a>>) -> Self {
-        self.__unsafe_private_named.31 = value;
+        self._fields.31 = value;
         self
     }
 }
@@ -3092,12 +3095,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `offers` field (optional)
     pub fn offers(mut self, value: impl Into<Option<MusicEventOffers<'a>>>) -> Self {
-        self.__unsafe_private_named.32 = value.into();
+        self._fields.32 = value.into();
         self
     }
     /// Set the `offers` field to an Option value (optional)
     pub fn maybe_offers(mut self, value: Option<MusicEventOffers<'a>>) -> Self {
-        self.__unsafe_private_named.32 = value;
+        self._fields.32 = value;
         self
     }
 }
@@ -3108,12 +3111,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventOrganizer<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value.into();
+        self._fields.33 = value.into();
         self
     }
     /// Set the `organizer` field to an Option value (optional)
     pub fn maybe_organizer(mut self, value: Option<MusicEventOrganizer<'a>>) -> Self {
-        self.__unsafe_private_named.33 = value;
+        self._fields.33 = value;
         self
     }
 }
@@ -3124,12 +3127,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventPerformer<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.34 = value.into();
+        self._fields.34 = value.into();
         self
     }
     /// Set the `performer` field to an Option value (optional)
     pub fn maybe_performer(mut self, value: Option<MusicEventPerformer<'a>>) -> Self {
-        self.__unsafe_private_named.34 = value;
+        self._fields.34 = value;
         self
     }
 }
@@ -3140,12 +3143,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventPerformers<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value.into();
+        self._fields.35 = value.into();
         self
     }
     /// Set the `performers` field to an Option value (optional)
     pub fn maybe_performers(mut self, value: Option<MusicEventPerformers<'a>>) -> Self {
-        self.__unsafe_private_named.35 = value;
+        self._fields.35 = value;
         self
     }
 }
@@ -3156,7 +3159,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventPotentialAction<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value.into();
+        self._fields.36 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
@@ -3164,7 +3167,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventPotentialAction<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value;
+        self._fields.36 = value;
         self
     }
 }
@@ -3175,7 +3178,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventPreviousStartDate<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.37 = value.into();
+        self._fields.37 = value.into();
         self
     }
     /// Set the `previousStartDate` field to an Option value (optional)
@@ -3183,7 +3186,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventPreviousStartDate<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.37 = value;
+        self._fields.37 = value;
         self
     }
 }
@@ -3194,12 +3197,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventRecordedIn<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.38 = value.into();
+        self._fields.38 = value.into();
         self
     }
     /// Set the `recordedIn` field to an Option value (optional)
     pub fn maybe_recorded_in(mut self, value: Option<MusicEventRecordedIn<'a>>) -> Self {
-        self.__unsafe_private_named.38 = value;
+        self._fields.38 = value;
         self
     }
 }
@@ -3210,7 +3213,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventRemainingAttendeeCapacity<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value.into();
+        self._fields.39 = value.into();
         self
     }
     /// Set the `remainingAttendeeCapacity` field to an Option value (optional)
@@ -3218,7 +3221,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventRemainingAttendeeCapacity<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value;
+        self._fields.39 = value;
         self
     }
 }
@@ -3226,12 +3229,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<MusicEventReview<'a>>>) -> Self {
-        self.__unsafe_private_named.40 = value.into();
+        self._fields.40 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
     pub fn maybe_review(mut self, value: Option<MusicEventReview<'a>>) -> Self {
-        self.__unsafe_private_named.40 = value;
+        self._fields.40 = value;
         self
     }
 }
@@ -3239,12 +3242,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<MusicEventSameAs<'a>>>) -> Self {
-        self.__unsafe_private_named.41 = value.into();
+        self._fields.41 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
     pub fn maybe_same_as(mut self, value: Option<MusicEventSameAs<'a>>) -> Self {
-        self.__unsafe_private_named.41 = value;
+        self._fields.41 = value;
         self
     }
 }
@@ -3252,12 +3255,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `sponsor` field (optional)
     pub fn sponsor(mut self, value: impl Into<Option<MusicEventSponsor<'a>>>) -> Self {
-        self.__unsafe_private_named.42 = value.into();
+        self._fields.42 = value.into();
         self
     }
     /// Set the `sponsor` field to an Option value (optional)
     pub fn maybe_sponsor(mut self, value: Option<MusicEventSponsor<'a>>) -> Self {
-        self.__unsafe_private_named.42 = value;
+        self._fields.42 = value;
         self
     }
 }
@@ -3268,12 +3271,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventStartDate<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.43 = value.into();
+        self._fields.43 = value.into();
         self
     }
     /// Set the `startDate` field to an Option value (optional)
     pub fn maybe_start_date(mut self, value: Option<MusicEventStartDate<'a>>) -> Self {
-        self.__unsafe_private_named.43 = value;
+        self._fields.43 = value;
         self
     }
 }
@@ -3284,12 +3287,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventSubEvent<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.44 = value.into();
+        self._fields.44 = value.into();
         self
     }
     /// Set the `subEvent` field to an Option value (optional)
     pub fn maybe_sub_event(mut self, value: Option<MusicEventSubEvent<'a>>) -> Self {
-        self.__unsafe_private_named.44 = value;
+        self._fields.44 = value;
         self
     }
 }
@@ -3300,12 +3303,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventSubEvents<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value.into();
+        self._fields.45 = value.into();
         self
     }
     /// Set the `subEvents` field to an Option value (optional)
     pub fn maybe_sub_events(mut self, value: Option<MusicEventSubEvents<'a>>) -> Self {
-        self.__unsafe_private_named.45 = value;
+        self._fields.45 = value;
         self
     }
 }
@@ -3316,12 +3319,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventSubjectOf<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.46 = value.into();
+        self._fields.46 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
     pub fn maybe_subject_of(mut self, value: Option<MusicEventSubjectOf<'a>>) -> Self {
-        self.__unsafe_private_named.46 = value;
+        self._fields.46 = value;
         self
     }
 }
@@ -3332,12 +3335,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventSuperEvent<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.47 = value.into();
+        self._fields.47 = value.into();
         self
     }
     /// Set the `superEvent` field to an Option value (optional)
     pub fn maybe_super_event(mut self, value: Option<MusicEventSuperEvent<'a>>) -> Self {
-        self.__unsafe_private_named.47 = value;
+        self._fields.47 = value;
         self
     }
 }
@@ -3348,12 +3351,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventTranslator<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value.into();
+        self._fields.48 = value.into();
         self
     }
     /// Set the `translator` field to an Option value (optional)
     pub fn maybe_translator(mut self, value: Option<MusicEventTranslator<'a>>) -> Self {
-        self.__unsafe_private_named.48 = value;
+        self._fields.48 = value;
         self
     }
 }
@@ -3364,7 +3367,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventTypicalAgeRange<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.49 = value.into();
+        self._fields.49 = value.into();
         self
     }
     /// Set the `typicalAgeRange` field to an Option value (optional)
@@ -3372,7 +3375,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventTypicalAgeRange<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.49 = value;
+        self._fields.49 = value;
         self
     }
 }
@@ -3380,12 +3383,12 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
 impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<MusicEventUrl<'a>>>) -> Self {
-        self.__unsafe_private_named.50 = value.into();
+        self._fields.50 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<MusicEventUrl<'a>>) -> Self {
-        self.__unsafe_private_named.50 = value;
+        self._fields.50 = value;
         self
     }
 }
@@ -3396,7 +3399,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventWorkFeatured<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.51 = value.into();
+        self._fields.51 = value.into();
         self
     }
     /// Set the `workFeatured` field to an Option value (optional)
@@ -3404,7 +3407,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventWorkFeatured<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.51 = value;
+        self._fields.51 = value;
         self
     }
 }
@@ -3415,7 +3418,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MusicEventWorkPerformed<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.52 = value.into();
+        self._fields.52 = value.into();
         self
     }
     /// Set the `workPerformed` field to an Option value (optional)
@@ -3423,7 +3426,7 @@ impl<'a, S: music_event_state::State> MusicEventBuilder<'a, S> {
         mut self,
         value: Option<MusicEventWorkPerformed<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.52 = value;
+        self._fields.52 = value;
         self
     }
 }
@@ -3435,59 +3438,59 @@ where
     /// Build the final struct
     pub fn build(self) -> MusicEvent<'a> {
         MusicEvent {
-            about: self.__unsafe_private_named.0,
-            actor: self.__unsafe_private_named.1,
-            additional_type: self.__unsafe_private_named.2,
-            aggregate_rating: self.__unsafe_private_named.3,
-            alternate_name: self.__unsafe_private_named.4,
-            attendee: self.__unsafe_private_named.5,
-            attendees: self.__unsafe_private_named.6,
-            audience: self.__unsafe_private_named.7,
-            composer: self.__unsafe_private_named.8,
-            contributor: self.__unsafe_private_named.9,
-            description: self.__unsafe_private_named.10,
-            director: self.__unsafe_private_named.11,
-            disambiguating_description: self.__unsafe_private_named.12,
-            door_time: self.__unsafe_private_named.13,
-            duration: self.__unsafe_private_named.14,
-            end_date: self.__unsafe_private_named.15,
-            event_attendance_mode: self.__unsafe_private_named.16,
-            event_schedule: self.__unsafe_private_named.17,
-            event_status: self.__unsafe_private_named.18,
-            funder: self.__unsafe_private_named.19,
-            funding: self.__unsafe_private_named.20,
-            identifier: self.__unsafe_private_named.21,
-            image: self.__unsafe_private_named.22,
-            in_language: self.__unsafe_private_named.23,
-            is_accessible_for_free: self.__unsafe_private_named.24,
-            keywords: self.__unsafe_private_named.25,
-            location: self.__unsafe_private_named.26,
-            main_entity_of_page: self.__unsafe_private_named.27,
-            maximum_attendee_capacity: self.__unsafe_private_named.28,
-            maximum_physical_attendee_capacity: self.__unsafe_private_named.29,
-            maximum_virtual_attendee_capacity: self.__unsafe_private_named.30,
-            name: self.__unsafe_private_named.31,
-            offers: self.__unsafe_private_named.32,
-            organizer: self.__unsafe_private_named.33,
-            performer: self.__unsafe_private_named.34,
-            performers: self.__unsafe_private_named.35,
-            potential_action: self.__unsafe_private_named.36,
-            previous_start_date: self.__unsafe_private_named.37,
-            recorded_in: self.__unsafe_private_named.38,
-            remaining_attendee_capacity: self.__unsafe_private_named.39,
-            review: self.__unsafe_private_named.40,
-            same_as: self.__unsafe_private_named.41,
-            sponsor: self.__unsafe_private_named.42,
-            start_date: self.__unsafe_private_named.43,
-            sub_event: self.__unsafe_private_named.44,
-            sub_events: self.__unsafe_private_named.45,
-            subject_of: self.__unsafe_private_named.46,
-            super_event: self.__unsafe_private_named.47,
-            translator: self.__unsafe_private_named.48,
-            typical_age_range: self.__unsafe_private_named.49,
-            url: self.__unsafe_private_named.50,
-            work_featured: self.__unsafe_private_named.51,
-            work_performed: self.__unsafe_private_named.52,
+            about: self._fields.0,
+            actor: self._fields.1,
+            additional_type: self._fields.2,
+            aggregate_rating: self._fields.3,
+            alternate_name: self._fields.4,
+            attendee: self._fields.5,
+            attendees: self._fields.6,
+            audience: self._fields.7,
+            composer: self._fields.8,
+            contributor: self._fields.9,
+            description: self._fields.10,
+            director: self._fields.11,
+            disambiguating_description: self._fields.12,
+            door_time: self._fields.13,
+            duration: self._fields.14,
+            end_date: self._fields.15,
+            event_attendance_mode: self._fields.16,
+            event_schedule: self._fields.17,
+            event_status: self._fields.18,
+            funder: self._fields.19,
+            funding: self._fields.20,
+            identifier: self._fields.21,
+            image: self._fields.22,
+            in_language: self._fields.23,
+            is_accessible_for_free: self._fields.24,
+            keywords: self._fields.25,
+            location: self._fields.26,
+            main_entity_of_page: self._fields.27,
+            maximum_attendee_capacity: self._fields.28,
+            maximum_physical_attendee_capacity: self._fields.29,
+            maximum_virtual_attendee_capacity: self._fields.30,
+            name: self._fields.31,
+            offers: self._fields.32,
+            organizer: self._fields.33,
+            performer: self._fields.34,
+            performers: self._fields.35,
+            potential_action: self._fields.36,
+            previous_start_date: self._fields.37,
+            recorded_in: self._fields.38,
+            remaining_attendee_capacity: self._fields.39,
+            review: self._fields.40,
+            same_as: self._fields.41,
+            sponsor: self._fields.42,
+            start_date: self._fields.43,
+            sub_event: self._fields.44,
+            sub_events: self._fields.45,
+            subject_of: self._fields.46,
+            super_event: self._fields.47,
+            translator: self._fields.48,
+            typical_age_range: self._fields.49,
+            url: self._fields.50,
+            work_featured: self._fields.51,
+            work_performed: self._fields.52,
             extra_data: Default::default(),
         }
     }
@@ -3497,59 +3500,59 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> MusicEvent<'a> {
         MusicEvent {
-            about: self.__unsafe_private_named.0,
-            actor: self.__unsafe_private_named.1,
-            additional_type: self.__unsafe_private_named.2,
-            aggregate_rating: self.__unsafe_private_named.3,
-            alternate_name: self.__unsafe_private_named.4,
-            attendee: self.__unsafe_private_named.5,
-            attendees: self.__unsafe_private_named.6,
-            audience: self.__unsafe_private_named.7,
-            composer: self.__unsafe_private_named.8,
-            contributor: self.__unsafe_private_named.9,
-            description: self.__unsafe_private_named.10,
-            director: self.__unsafe_private_named.11,
-            disambiguating_description: self.__unsafe_private_named.12,
-            door_time: self.__unsafe_private_named.13,
-            duration: self.__unsafe_private_named.14,
-            end_date: self.__unsafe_private_named.15,
-            event_attendance_mode: self.__unsafe_private_named.16,
-            event_schedule: self.__unsafe_private_named.17,
-            event_status: self.__unsafe_private_named.18,
-            funder: self.__unsafe_private_named.19,
-            funding: self.__unsafe_private_named.20,
-            identifier: self.__unsafe_private_named.21,
-            image: self.__unsafe_private_named.22,
-            in_language: self.__unsafe_private_named.23,
-            is_accessible_for_free: self.__unsafe_private_named.24,
-            keywords: self.__unsafe_private_named.25,
-            location: self.__unsafe_private_named.26,
-            main_entity_of_page: self.__unsafe_private_named.27,
-            maximum_attendee_capacity: self.__unsafe_private_named.28,
-            maximum_physical_attendee_capacity: self.__unsafe_private_named.29,
-            maximum_virtual_attendee_capacity: self.__unsafe_private_named.30,
-            name: self.__unsafe_private_named.31,
-            offers: self.__unsafe_private_named.32,
-            organizer: self.__unsafe_private_named.33,
-            performer: self.__unsafe_private_named.34,
-            performers: self.__unsafe_private_named.35,
-            potential_action: self.__unsafe_private_named.36,
-            previous_start_date: self.__unsafe_private_named.37,
-            recorded_in: self.__unsafe_private_named.38,
-            remaining_attendee_capacity: self.__unsafe_private_named.39,
-            review: self.__unsafe_private_named.40,
-            same_as: self.__unsafe_private_named.41,
-            sponsor: self.__unsafe_private_named.42,
-            start_date: self.__unsafe_private_named.43,
-            sub_event: self.__unsafe_private_named.44,
-            sub_events: self.__unsafe_private_named.45,
-            subject_of: self.__unsafe_private_named.46,
-            super_event: self.__unsafe_private_named.47,
-            translator: self.__unsafe_private_named.48,
-            typical_age_range: self.__unsafe_private_named.49,
-            url: self.__unsafe_private_named.50,
-            work_featured: self.__unsafe_private_named.51,
-            work_performed: self.__unsafe_private_named.52,
+            about: self._fields.0,
+            actor: self._fields.1,
+            additional_type: self._fields.2,
+            aggregate_rating: self._fields.3,
+            alternate_name: self._fields.4,
+            attendee: self._fields.5,
+            attendees: self._fields.6,
+            audience: self._fields.7,
+            composer: self._fields.8,
+            contributor: self._fields.9,
+            description: self._fields.10,
+            director: self._fields.11,
+            disambiguating_description: self._fields.12,
+            door_time: self._fields.13,
+            duration: self._fields.14,
+            end_date: self._fields.15,
+            event_attendance_mode: self._fields.16,
+            event_schedule: self._fields.17,
+            event_status: self._fields.18,
+            funder: self._fields.19,
+            funding: self._fields.20,
+            identifier: self._fields.21,
+            image: self._fields.22,
+            in_language: self._fields.23,
+            is_accessible_for_free: self._fields.24,
+            keywords: self._fields.25,
+            location: self._fields.26,
+            main_entity_of_page: self._fields.27,
+            maximum_attendee_capacity: self._fields.28,
+            maximum_physical_attendee_capacity: self._fields.29,
+            maximum_virtual_attendee_capacity: self._fields.30,
+            name: self._fields.31,
+            offers: self._fields.32,
+            organizer: self._fields.33,
+            performer: self._fields.34,
+            performers: self._fields.35,
+            potential_action: self._fields.36,
+            previous_start_date: self._fields.37,
+            recorded_in: self._fields.38,
+            remaining_attendee_capacity: self._fields.39,
+            review: self._fields.40,
+            same_as: self._fields.41,
+            sponsor: self._fields.42,
+            start_date: self._fields.43,
+            sub_event: self._fields.44,
+            sub_events: self._fields.45,
+            subject_of: self._fields.46,
+            super_event: self._fields.47,
+            translator: self._fields.48,
+            typical_age_range: self._fields.49,
+            url: self._fields.50,
+            work_featured: self._fields.51,
+            work_performed: self._fields.52,
             extra_data: Some(extra_data),
         }
     }

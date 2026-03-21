@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -267,8 +270,8 @@ pub mod draft_state {
 
 /// Builder for constructing an instance of this type
 pub struct DraftBuilder<'a, S: draft_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<DraftEmbed<'a>>,
         Option<Vec<Facet<'a>>>,
@@ -279,7 +282,7 @@ pub struct DraftBuilder<'a, S: draft_state::State> {
         Option<CowStr<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Draft<'a> {
@@ -293,19 +296,9 @@ impl<'a> DraftBuilder<'a, draft_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DraftBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -320,11 +313,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> DraftBuilder<'a, draft_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DraftBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -332,12 +325,12 @@ where
 impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
     /// Set the `embed` field (optional)
     pub fn embed(mut self, value: impl Into<Option<DraftEmbed<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `embed` field to an Option value (optional)
     pub fn maybe_embed(mut self, value: Option<DraftEmbed<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -345,12 +338,12 @@ impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
 impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
     pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -358,12 +351,12 @@ impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
 impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -371,12 +364,12 @@ impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
 impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
     /// Set the `langs` field (optional)
     pub fn langs(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `langs` field to an Option value (optional)
     pub fn maybe_langs(mut self, value: Option<Vec<Language>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -384,12 +377,12 @@ impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
 impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
     /// Set the `reply` field (optional)
     pub fn reply(mut self, value: impl Into<Option<draft::ReplyRef<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `reply` field to an Option value (optional)
     pub fn maybe_reply(mut self, value: Option<draft::ReplyRef<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -397,12 +390,12 @@ impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
 impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -417,11 +410,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DraftBuilder<'a, draft_state::SetText<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         DraftBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -429,12 +422,12 @@ where
 impl<'a, S: draft_state::State> DraftBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -448,15 +441,15 @@ where
     /// Build the final struct
     pub fn build(self) -> Draft<'a> {
         Draft {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            embed: self.__unsafe_private_named.1,
-            facets: self.__unsafe_private_named.2,
-            labels: self.__unsafe_private_named.3,
-            langs: self.__unsafe_private_named.4,
-            reply: self.__unsafe_private_named.5,
-            tags: self.__unsafe_private_named.6,
-            text: self.__unsafe_private_named.7.unwrap(),
-            updated_at: self.__unsafe_private_named.8,
+            created_at: self._fields.0.unwrap(),
+            embed: self._fields.1,
+            facets: self._fields.2,
+            labels: self._fields.3,
+            langs: self._fields.4,
+            reply: self._fields.5,
+            tags: self._fields.6,
+            text: self._fields.7.unwrap(),
+            updated_at: self._fields.8,
             extra_data: Default::default(),
         }
     }
@@ -469,15 +462,15 @@ where
         >,
     ) -> Draft<'a> {
         Draft {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            embed: self.__unsafe_private_named.1,
-            facets: self.__unsafe_private_named.2,
-            labels: self.__unsafe_private_named.3,
-            langs: self.__unsafe_private_named.4,
-            reply: self.__unsafe_private_named.5,
-            tags: self.__unsafe_private_named.6,
-            text: self.__unsafe_private_named.7.unwrap(),
-            updated_at: self.__unsafe_private_named.8,
+            created_at: self._fields.0.unwrap(),
+            embed: self._fields.1,
+            facets: self._fields.2,
+            labels: self._fields.3,
+            langs: self._fields.4,
+            reply: self._fields.5,
+            tags: self._fields.6,
+            text: self._fields.7.unwrap(),
+            updated_at: self._fields.8,
             extra_data: Some(extra_data),
         }
     }
@@ -718,9 +711,9 @@ pub mod reply_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct ReplyRefBuilder<'a, S: reply_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<StrongRef<'a>>, Option<StrongRef<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<StrongRef<'a>>, Option<StrongRef<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ReplyRef<'a> {
@@ -734,9 +727,9 @@ impl<'a> ReplyRefBuilder<'a, reply_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ReplyRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -751,11 +744,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> ReplyRefBuilder<'a, reply_ref_state::SetParent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ReplyRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -770,11 +763,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> ReplyRefBuilder<'a, reply_ref_state::SetRoot<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ReplyRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -788,8 +781,8 @@ where
     /// Build the final struct
     pub fn build(self) -> ReplyRef<'a> {
         ReplyRef {
-            parent: self.__unsafe_private_named.0.unwrap(),
-            root: self.__unsafe_private_named.1.unwrap(),
+            parent: self._fields.0.unwrap(),
+            root: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -802,8 +795,8 @@ where
         >,
     ) -> ReplyRef<'a> {
         ReplyRef {
-            parent: self.__unsafe_private_named.0.unwrap(),
-            root: self.__unsafe_private_named.1.unwrap(),
+            parent: self._fields.0.unwrap(),
+            root: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

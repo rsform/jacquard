@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::{Did, Cid};
@@ -277,8 +280,8 @@ pub mod emit_event_state {
 
 /// Builder for constructing an instance of this type
 pub struct EmitEventBuilder<'a, S: emit_event_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Did<'a>>,
         Option<EmitEventEvent<'a>>,
         Option<CowStr<'a>>,
@@ -286,7 +289,7 @@ pub struct EmitEventBuilder<'a, S: emit_event_state::State> {
         Option<EmitEventSubject<'a>>,
         Option<Vec<Cid<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> EmitEvent<'a> {
@@ -300,9 +303,9 @@ impl<'a> EmitEventBuilder<'a, emit_event_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EmitEventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -317,11 +320,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> EmitEventBuilder<'a, emit_event_state::SetCreatedBy<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         EmitEventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -336,11 +339,11 @@ where
         mut self,
         value: impl Into<EmitEventEvent<'a>>,
     ) -> EmitEventBuilder<'a, emit_event_state::SetEvent<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         EmitEventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -348,12 +351,12 @@ where
 impl<'a, S: emit_event_state::State> EmitEventBuilder<'a, S> {
     /// Set the `externalId` field (optional)
     pub fn external_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `externalId` field to an Option value (optional)
     pub fn maybe_external_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -361,12 +364,12 @@ impl<'a, S: emit_event_state::State> EmitEventBuilder<'a, S> {
 impl<'a, S: emit_event_state::State> EmitEventBuilder<'a, S> {
     /// Set the `modTool` field (optional)
     pub fn mod_tool(mut self, value: impl Into<Option<ModTool<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `modTool` field to an Option value (optional)
     pub fn maybe_mod_tool(mut self, value: Option<ModTool<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -381,11 +384,11 @@ where
         mut self,
         value: impl Into<EmitEventSubject<'a>>,
     ) -> EmitEventBuilder<'a, emit_event_state::SetSubject<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         EmitEventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -393,12 +396,12 @@ where
 impl<'a, S: emit_event_state::State> EmitEventBuilder<'a, S> {
     /// Set the `subjectBlobCids` field (optional)
     pub fn subject_blob_cids(mut self, value: impl Into<Option<Vec<Cid<'a>>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `subjectBlobCids` field to an Option value (optional)
     pub fn maybe_subject_blob_cids(mut self, value: Option<Vec<Cid<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -413,12 +416,12 @@ where
     /// Build the final struct
     pub fn build(self) -> EmitEvent<'a> {
         EmitEvent {
-            created_by: self.__unsafe_private_named.0.unwrap(),
-            event: self.__unsafe_private_named.1.unwrap(),
-            external_id: self.__unsafe_private_named.2,
-            mod_tool: self.__unsafe_private_named.3,
-            subject: self.__unsafe_private_named.4.unwrap(),
-            subject_blob_cids: self.__unsafe_private_named.5,
+            created_by: self._fields.0.unwrap(),
+            event: self._fields.1.unwrap(),
+            external_id: self._fields.2,
+            mod_tool: self._fields.3,
+            subject: self._fields.4.unwrap(),
+            subject_blob_cids: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -431,12 +434,12 @@ where
         >,
     ) -> EmitEvent<'a> {
         EmitEvent {
-            created_by: self.__unsafe_private_named.0.unwrap(),
-            event: self.__unsafe_private_named.1.unwrap(),
-            external_id: self.__unsafe_private_named.2,
-            mod_tool: self.__unsafe_private_named.3,
-            subject: self.__unsafe_private_named.4.unwrap(),
-            subject_blob_cids: self.__unsafe_private_named.5,
+            created_by: self._fields.0.unwrap(),
+            event: self._fields.1.unwrap(),
+            external_id: self._fields.2,
+            mod_tool: self._fields.3,
+            subject: self._fields.4.unwrap(),
+            subject_blob_cids: self._fields.5,
             extra_data: Some(extra_data),
         }
     }

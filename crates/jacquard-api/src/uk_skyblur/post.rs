@@ -11,7 +11,11 @@ pub mod encrypt;
 pub mod get_post;
 pub mod store;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -200,74 +204,74 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
-        type Uri;
         type Visibility;
         type CreatedAt;
+        type Text;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
-        type Uri = Unset;
         type Visibility = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Text = Set<members::text>;
-        type Uri = S::Uri;
-        type Visibility = S::Visibility;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Text = S::Text;
-        type Uri = Set<members::uri>;
-        type Visibility = S::Visibility;
-        type CreatedAt = S::CreatedAt;
+        type Text = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `visibility` field to Set
     pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVisibility<S> {}
     impl<S: State> State for SetVisibility<S> {
-        type Text = S::Text;
-        type Uri = S::Uri;
         type Visibility = Set<members::visibility>;
         type CreatedAt = S::CreatedAt;
+        type Text = S::Text;
+        type Uri = S::Uri;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Text = S::Text;
-        type Uri = S::Uri;
         type Visibility = S::Visibility;
         type CreatedAt = Set<members::created_at>;
+        type Text = S::Text;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Visibility = S::Visibility;
+        type CreatedAt = S::CreatedAt;
+        type Text = Set<members::text>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Visibility = S::Visibility;
+        type CreatedAt = S::CreatedAt;
+        type Text = S::Text;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PostBuilder<'a, S: post_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<BlobRef<'a>>,
@@ -275,7 +279,7 @@ pub struct PostBuilder<'a, S: post_state::State> {
         Option<AtUri<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Post<'a> {
@@ -289,9 +293,9 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -299,12 +303,12 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `additional` field (optional)
     pub fn additional(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `additional` field to an Option value (optional)
     pub fn maybe_additional(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -319,11 +323,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PostBuilder<'a, post_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -331,12 +335,12 @@ where
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `encryptBody` field (optional)
     pub fn encrypt_body(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `encryptBody` field to an Option value (optional)
     pub fn maybe_encrypt_body(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -351,11 +355,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PostBuilder<'a, post_state::SetText<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -370,11 +374,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> PostBuilder<'a, post_state::SetUri<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -389,11 +393,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PostBuilder<'a, post_state::SetVisibility<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -401,20 +405,20 @@ where
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::Text: post_state::IsSet,
-    S::Uri: post_state::IsSet,
     S::Visibility: post_state::IsSet,
     S::CreatedAt: post_state::IsSet,
+    S::Text: post_state::IsSet,
+    S::Uri: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
         Post {
-            additional: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            encrypt_body: self.__unsafe_private_named.2,
-            text: self.__unsafe_private_named.3.unwrap(),
-            uri: self.__unsafe_private_named.4.unwrap(),
-            visibility: self.__unsafe_private_named.5.unwrap(),
+            additional: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            encrypt_body: self._fields.2,
+            text: self._fields.3.unwrap(),
+            uri: self._fields.4.unwrap(),
+            visibility: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -427,12 +431,12 @@ where
         >,
     ) -> Post<'a> {
         Post {
-            additional: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            encrypt_body: self.__unsafe_private_named.2,
-            text: self.__unsafe_private_named.3.unwrap(),
-            uri: self.__unsafe_private_named.4.unwrap(),
-            visibility: self.__unsafe_private_named.5.unwrap(),
+            additional: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            encrypt_body: self._fields.2,
+            text: self._fields.3.unwrap(),
+            uri: self._fields.4.unwrap(),
+            visibility: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

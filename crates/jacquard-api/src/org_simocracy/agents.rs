@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -173,58 +176,58 @@ pub mod agents_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type ShortDescription;
         type Sim;
+        type ShortDescription;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type ShortDescription = Unset;
         type Sim = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type ShortDescription = S::ShortDescription;
-        type Sim = S::Sim;
-    }
-    ///State transition - sets the `short_description` field to Set
-    pub struct SetShortDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShortDescription<S> {}
-    impl<S: State> State for SetShortDescription<S> {
-        type CreatedAt = S::CreatedAt;
-        type ShortDescription = Set<members::short_description>;
-        type Sim = S::Sim;
+        type ShortDescription = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `sim` field to Set
     pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSim<S> {}
     impl<S: State> State for SetSim<S> {
-        type CreatedAt = S::CreatedAt;
-        type ShortDescription = S::ShortDescription;
         type Sim = Set<members::sim>;
+        type ShortDescription = S::ShortDescription;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `short_description` field to Set
+    pub struct SetShortDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShortDescription<S> {}
+    impl<S: State> State for SetShortDescription<S> {
+        type Sim = S::Sim;
+        type ShortDescription = Set<members::short_description>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Sim = S::Sim;
+        type ShortDescription = S::ShortDescription;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `short_description` field
-        pub struct short_description(());
         ///Marker type for the `sim` field
         pub struct sim(());
+        ///Marker type for the `short_description` field
+        pub struct short_description(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AgentsBuilder<'a, S: agents_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<Vec<Facet<'a>>>,
@@ -232,7 +235,7 @@ pub struct AgentsBuilder<'a, S: agents_state::State> {
         Option<Vec<Facet<'a>>>,
         Option<StrongRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Agents<'a> {
@@ -246,9 +249,9 @@ impl<'a> AgentsBuilder<'a, agents_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AgentsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -263,11 +266,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> AgentsBuilder<'a, agents_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AgentsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -275,12 +278,12 @@ where
 impl<'a, S: agents_state::State> AgentsBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -291,12 +294,12 @@ impl<'a, S: agents_state::State> AgentsBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<Facet<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `descriptionFacets` field to an Option value (optional)
     pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -311,11 +314,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AgentsBuilder<'a, agents_state::SetShortDescription<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         AgentsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -326,7 +329,7 @@ impl<'a, S: agents_state::State> AgentsBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<Facet<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `shortDescriptionFacets` field to an Option value (optional)
@@ -334,7 +337,7 @@ impl<'a, S: agents_state::State> AgentsBuilder<'a, S> {
         mut self,
         value: Option<Vec<Facet<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -349,11 +352,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> AgentsBuilder<'a, agents_state::SetSim<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         AgentsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -361,19 +364,19 @@ where
 impl<'a, S> AgentsBuilder<'a, S>
 where
     S: agents_state::State,
-    S::CreatedAt: agents_state::IsSet,
-    S::ShortDescription: agents_state::IsSet,
     S::Sim: agents_state::IsSet,
+    S::ShortDescription: agents_state::IsSet,
+    S::CreatedAt: agents_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Agents<'a> {
         Agents {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            description_facets: self.__unsafe_private_named.2,
-            short_description: self.__unsafe_private_named.3.unwrap(),
-            short_description_facets: self.__unsafe_private_named.4,
-            sim: self.__unsafe_private_named.5.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1,
+            description_facets: self._fields.2,
+            short_description: self._fields.3.unwrap(),
+            short_description_facets: self._fields.4,
+            sim: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -386,12 +389,12 @@ where
         >,
     ) -> Agents<'a> {
         Agents {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            description_facets: self.__unsafe_private_named.2,
-            short_description: self.__unsafe_private_named.3.unwrap(),
-            short_description_facets: self.__unsafe_private_named.4,
-            sim: self.__unsafe_private_named.5.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1,
+            description_facets: self._fields.2,
+            short_description: self._fields.3.unwrap(),
+            short_description_facets: self._fields.4,
+            sim: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

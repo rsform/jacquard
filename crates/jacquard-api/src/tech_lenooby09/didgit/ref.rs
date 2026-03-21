@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -147,59 +150,59 @@ pub mod ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ObjectId;
-        type Repo;
         type RefName;
+        type Repo;
+        type ObjectId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ObjectId = Unset;
-        type Repo = Unset;
         type RefName = Unset;
-    }
-    ///State transition - sets the `object_id` field to Set
-    pub struct SetObjectId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObjectId<S> {}
-    impl<S: State> State for SetObjectId<S> {
-        type ObjectId = Set<members::object_id>;
-        type Repo = S::Repo;
-        type RefName = S::RefName;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type ObjectId = S::ObjectId;
-        type Repo = Set<members::repo>;
-        type RefName = S::RefName;
+        type Repo = Unset;
+        type ObjectId = Unset;
     }
     ///State transition - sets the `ref_name` field to Set
     pub struct SetRefName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRefName<S> {}
     impl<S: State> State for SetRefName<S> {
-        type ObjectId = S::ObjectId;
-        type Repo = S::Repo;
         type RefName = Set<members::ref_name>;
+        type Repo = S::Repo;
+        type ObjectId = S::ObjectId;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type RefName = S::RefName;
+        type Repo = Set<members::repo>;
+        type ObjectId = S::ObjectId;
+    }
+    ///State transition - sets the `object_id` field to Set
+    pub struct SetObjectId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObjectId<S> {}
+    impl<S: State> State for SetObjectId<S> {
+        type RefName = S::RefName;
+        type Repo = S::Repo;
+        type ObjectId = Set<members::object_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `object_id` field
-        pub struct object_id(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `ref_name` field
         pub struct ref_name(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `object_id` field
+        pub struct object_id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RefBuilder<'a, S: ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Ref<'a> {
@@ -213,9 +216,9 @@ impl<'a> RefBuilder<'a, ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -230,11 +233,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RefBuilder<'a, ref_state::SetObjectId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -249,11 +252,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RefBuilder<'a, ref_state::SetRefName<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -268,11 +271,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RefBuilder<'a, ref_state::SetRepo<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -280,16 +283,16 @@ where
 impl<'a, S> RefBuilder<'a, S>
 where
     S: ref_state::State,
-    S::ObjectId: ref_state::IsSet,
-    S::Repo: ref_state::IsSet,
     S::RefName: ref_state::IsSet,
+    S::Repo: ref_state::IsSet,
+    S::ObjectId: ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Ref<'a> {
         Ref {
-            object_id: self.__unsafe_private_named.0.unwrap(),
-            ref_name: self.__unsafe_private_named.1.unwrap(),
-            repo: self.__unsafe_private_named.2.unwrap(),
+            object_id: self._fields.0.unwrap(),
+            ref_name: self._fields.1.unwrap(),
+            repo: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -302,9 +305,9 @@ where
         >,
     ) -> Ref<'a> {
         Ref {
-            object_id: self.__unsafe_private_named.0.unwrap(),
-            ref_name: self.__unsafe_private_named.1.unwrap(),
-            repo: self.__unsafe_private_named.2.unwrap(),
+            object_id: self._fields.0.unwrap(),
+            ref_name: self._fields.1.unwrap(),
+            repo: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

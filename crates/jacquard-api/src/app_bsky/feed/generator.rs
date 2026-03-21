@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -313,49 +316,49 @@ pub mod generator_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Did;
+        type CreatedAt;
         type DisplayName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Did = Unset;
+        type CreatedAt = Unset;
         type DisplayName = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Did = S::Did;
-        type DisplayName = S::DisplayName;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type CreatedAt = S::CreatedAt;
         type Did = Set<members::did>;
+        type CreatedAt = S::CreatedAt;
+        type DisplayName = S::DisplayName;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Did = S::Did;
+        type CreatedAt = Set<members::created_at>;
         type DisplayName = S::DisplayName;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDisplayName<S> {}
     impl<S: State> State for SetDisplayName<S> {
-        type CreatedAt = S::CreatedAt;
         type Did = S::Did;
+        type CreatedAt = S::CreatedAt;
         type DisplayName = Set<members::display_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
     }
@@ -363,8 +366,8 @@ pub mod generator_state {
 
 /// Builder for constructing an instance of this type
 pub struct GeneratorBuilder<'a, S: generator_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<bool>,
         Option<BlobRef<'a>>,
         Option<GeneratorContentMode<'a>>,
@@ -375,7 +378,7 @@ pub struct GeneratorBuilder<'a, S: generator_state::State> {
         Option<CowStr<'a>>,
         Option<SelfLabels<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Generator<'a> {
@@ -389,19 +392,9 @@ impl<'a> GeneratorBuilder<'a, generator_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GeneratorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -409,12 +402,12 @@ impl<'a> GeneratorBuilder<'a, generator_state::Empty> {
 impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
     /// Set the `acceptsInteractions` field (optional)
     pub fn accepts_interactions(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `acceptsInteractions` field to an Option value (optional)
     pub fn maybe_accepts_interactions(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -422,12 +415,12 @@ impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
 impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `avatar` field to an Option value (optional)
     pub fn maybe_avatar(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -438,7 +431,7 @@ impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
         mut self,
         value: impl Into<Option<GeneratorContentMode<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `contentMode` field to an Option value (optional)
@@ -446,7 +439,7 @@ impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
         mut self,
         value: Option<GeneratorContentMode<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -461,11 +454,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> GeneratorBuilder<'a, generator_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         GeneratorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -473,12 +466,12 @@ where
 impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -489,12 +482,12 @@ impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<Facet<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `descriptionFacets` field to an Option value (optional)
     pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -509,11 +502,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> GeneratorBuilder<'a, generator_state::SetDid<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         GeneratorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -528,11 +521,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GeneratorBuilder<'a, generator_state::SetDisplayName<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         GeneratorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -540,12 +533,12 @@ where
 impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -553,22 +546,22 @@ impl<'a, S: generator_state::State> GeneratorBuilder<'a, S> {
 impl<'a, S> GeneratorBuilder<'a, S>
 where
     S: generator_state::State,
-    S::CreatedAt: generator_state::IsSet,
     S::Did: generator_state::IsSet,
+    S::CreatedAt: generator_state::IsSet,
     S::DisplayName: generator_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Generator<'a> {
         Generator {
-            accepts_interactions: self.__unsafe_private_named.0,
-            avatar: self.__unsafe_private_named.1,
-            content_mode: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            description: self.__unsafe_private_named.4,
-            description_facets: self.__unsafe_private_named.5,
-            did: self.__unsafe_private_named.6.unwrap(),
-            display_name: self.__unsafe_private_named.7.unwrap(),
-            labels: self.__unsafe_private_named.8,
+            accepts_interactions: self._fields.0,
+            avatar: self._fields.1,
+            content_mode: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            description: self._fields.4,
+            description_facets: self._fields.5,
+            did: self._fields.6.unwrap(),
+            display_name: self._fields.7.unwrap(),
+            labels: self._fields.8,
             extra_data: Default::default(),
         }
     }
@@ -581,15 +574,15 @@ where
         >,
     ) -> Generator<'a> {
         Generator {
-            accepts_interactions: self.__unsafe_private_named.0,
-            avatar: self.__unsafe_private_named.1,
-            content_mode: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            description: self.__unsafe_private_named.4,
-            description_facets: self.__unsafe_private_named.5,
-            did: self.__unsafe_private_named.6.unwrap(),
-            display_name: self.__unsafe_private_named.7.unwrap(),
-            labels: self.__unsafe_private_named.8,
+            accepts_interactions: self._fields.0,
+            avatar: self._fields.1,
+            content_mode: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            description: self._fields.4,
+            description_facets: self._fields.5,
+            did: self._fields.6.unwrap(),
+            display_name: self._fields.7.unwrap(),
+            labels: self._fields.8,
             extra_data: Some(extra_data),
         }
     }

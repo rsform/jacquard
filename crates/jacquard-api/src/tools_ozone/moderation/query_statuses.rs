@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::{Did, Nsid, Datetime, UriValue};
@@ -182,8 +185,8 @@ pub mod query_statuses_state {
 
 /// Builder for constructing an instance of this type
 pub struct QueryStatusesBuilder<'a, S: query_statuses_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<bool>,
         Option<Vec<Nsid<'a>>>,
@@ -221,7 +224,7 @@ pub struct QueryStatusesBuilder<'a, S: query_statuses_state::State> {
         Option<Vec<CowStr<'a>>>,
         Option<bool>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> QueryStatuses<'a> {
@@ -235,8 +238,8 @@ impl<'a> QueryStatusesBuilder<'a, query_statuses_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         QueryStatusesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -274,7 +277,7 @@ impl<'a> QueryStatusesBuilder<'a, query_statuses_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -282,12 +285,12 @@ impl<'a> QueryStatusesBuilder<'a, query_statuses_state::Empty> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `ageAssuranceState` field (optional)
     pub fn age_assurance_state(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `ageAssuranceState` field to an Option value (optional)
     pub fn maybe_age_assurance_state(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -295,12 +298,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `appealed` field (optional)
     pub fn appealed(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `appealed` field to an Option value (optional)
     pub fn maybe_appealed(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -308,12 +311,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `collections` field (optional)
     pub fn collections(mut self, value: impl Into<Option<Vec<Nsid<'a>>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `collections` field to an Option value (optional)
     pub fn maybe_collections(mut self, value: Option<Vec<Nsid<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -321,12 +324,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
     pub fn maybe_comment(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -334,12 +337,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -347,12 +350,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `excludeTags` field (optional)
     pub fn exclude_tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `excludeTags` field to an Option value (optional)
     pub fn maybe_exclude_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -360,12 +363,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `hostingDeletedAfter` field (optional)
     pub fn hosting_deleted_after(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `hostingDeletedAfter` field to an Option value (optional)
     pub fn maybe_hosting_deleted_after(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -373,12 +376,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `hostingDeletedBefore` field (optional)
     pub fn hosting_deleted_before(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `hostingDeletedBefore` field to an Option value (optional)
     pub fn maybe_hosting_deleted_before(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -389,12 +392,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `hostingStatuses` field to an Option value (optional)
     pub fn maybe_hosting_statuses(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -402,12 +405,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `hostingUpdatedAfter` field (optional)
     pub fn hosting_updated_after(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `hostingUpdatedAfter` field to an Option value (optional)
     pub fn maybe_hosting_updated_after(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -415,12 +418,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `hostingUpdatedBefore` field (optional)
     pub fn hosting_updated_before(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `hostingUpdatedBefore` field to an Option value (optional)
     pub fn maybe_hosting_updated_before(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -431,12 +434,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<UriValue<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `ignoreSubjects` field to an Option value (optional)
     pub fn maybe_ignore_subjects(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -444,12 +447,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `includeAllUserRecords` field (optional)
     pub fn include_all_user_records(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `includeAllUserRecords` field to an Option value (optional)
     pub fn maybe_include_all_user_records(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -457,12 +460,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `includeMuted` field (optional)
     pub fn include_muted(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `includeMuted` field to an Option value (optional)
     pub fn maybe_include_muted(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -470,12 +473,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `lastReviewedBy` field (optional)
     pub fn last_reviewed_by(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `lastReviewedBy` field to an Option value (optional)
     pub fn maybe_last_reviewed_by(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -483,12 +486,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -496,12 +499,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `minAccountSuspendCount` field (optional)
     pub fn min_account_suspend_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `minAccountSuspendCount` field to an Option value (optional)
     pub fn maybe_min_account_suspend_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -509,12 +512,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `minPriorityScore` field (optional)
     pub fn min_priority_score(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `minPriorityScore` field to an Option value (optional)
     pub fn maybe_min_priority_score(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -522,12 +525,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `minReportedRecordsCount` field (optional)
     pub fn min_reported_records_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `minReportedRecordsCount` field to an Option value (optional)
     pub fn maybe_min_reported_records_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -535,12 +538,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `minStrikeCount` field (optional)
     pub fn min_strike_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `minStrikeCount` field to an Option value (optional)
     pub fn maybe_min_strike_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -548,12 +551,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `minTakendownRecordsCount` field (optional)
     pub fn min_takendown_records_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `minTakendownRecordsCount` field to an Option value (optional)
     pub fn maybe_min_takendown_records_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -561,12 +564,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `onlyMuted` field (optional)
     pub fn only_muted(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `onlyMuted` field to an Option value (optional)
     pub fn maybe_only_muted(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -574,12 +577,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `queueCount` field (optional)
     pub fn queue_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `queueCount` field to an Option value (optional)
     pub fn maybe_queue_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -587,12 +590,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `queueIndex` field (optional)
     pub fn queue_index(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.23 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `queueIndex` field to an Option value (optional)
     pub fn maybe_queue_index(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.23 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -600,12 +603,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `queueSeed` field (optional)
     pub fn queue_seed(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.24 = value.into();
+        self._fields.24 = value.into();
         self
     }
     /// Set the `queueSeed` field to an Option value (optional)
     pub fn maybe_queue_seed(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.24 = value;
+        self._fields.24 = value;
         self
     }
 }
@@ -613,12 +616,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `reportedAfter` field (optional)
     pub fn reported_after(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.25 = value.into();
+        self._fields.25 = value.into();
         self
     }
     /// Set the `reportedAfter` field to an Option value (optional)
     pub fn maybe_reported_after(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.25 = value;
+        self._fields.25 = value;
         self
     }
 }
@@ -626,12 +629,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `reportedBefore` field (optional)
     pub fn reported_before(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.26 = value.into();
+        self._fields.26 = value.into();
         self
     }
     /// Set the `reportedBefore` field to an Option value (optional)
     pub fn maybe_reported_before(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.26 = value;
+        self._fields.26 = value;
         self
     }
 }
@@ -639,12 +642,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `reviewState` field (optional)
     pub fn review_state(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.27 = value.into();
+        self._fields.27 = value.into();
         self
     }
     /// Set the `reviewState` field to an Option value (optional)
     pub fn maybe_review_state(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.27 = value;
+        self._fields.27 = value;
         self
     }
 }
@@ -652,12 +655,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `reviewedAfter` field (optional)
     pub fn reviewed_after(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.28 = value.into();
+        self._fields.28 = value.into();
         self
     }
     /// Set the `reviewedAfter` field to an Option value (optional)
     pub fn maybe_reviewed_after(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.28 = value;
+        self._fields.28 = value;
         self
     }
 }
@@ -665,12 +668,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `reviewedBefore` field (optional)
     pub fn reviewed_before(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.29 = value.into();
+        self._fields.29 = value.into();
         self
     }
     /// Set the `reviewedBefore` field to an Option value (optional)
     pub fn maybe_reviewed_before(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.29 = value;
+        self._fields.29 = value;
         self
     }
 }
@@ -678,12 +681,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `sortDirection` field (optional)
     pub fn sort_direction(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.30 = value.into();
+        self._fields.30 = value.into();
         self
     }
     /// Set the `sortDirection` field to an Option value (optional)
     pub fn maybe_sort_direction(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.30 = value;
+        self._fields.30 = value;
         self
     }
 }
@@ -691,12 +694,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `sortField` field (optional)
     pub fn sort_field(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.31 = value.into();
+        self._fields.31 = value.into();
         self
     }
     /// Set the `sortField` field to an Option value (optional)
     pub fn maybe_sort_field(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.31 = value;
+        self._fields.31 = value;
         self
     }
 }
@@ -704,12 +707,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.32 = value.into();
+        self._fields.32 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
     pub fn maybe_subject(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.32 = value;
+        self._fields.32 = value;
         self
     }
 }
@@ -717,12 +720,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `subjectType` field (optional)
     pub fn subject_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.33 = value.into();
+        self._fields.33 = value.into();
         self
     }
     /// Set the `subjectType` field to an Option value (optional)
     pub fn maybe_subject_type(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.33 = value;
+        self._fields.33 = value;
         self
     }
 }
@@ -730,12 +733,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.34 = value.into();
+        self._fields.34 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.34 = value;
+        self._fields.34 = value;
         self
     }
 }
@@ -743,12 +746,12 @@ impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
 impl<'a, S: query_statuses_state::State> QueryStatusesBuilder<'a, S> {
     /// Set the `takendown` field (optional)
     pub fn takendown(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.35 = value.into();
+        self._fields.35 = value.into();
         self
     }
     /// Set the `takendown` field to an Option value (optional)
     pub fn maybe_takendown(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.35 = value;
+        self._fields.35 = value;
         self
     }
 }
@@ -760,42 +763,42 @@ where
     /// Build the final struct
     pub fn build(self) -> QueryStatuses<'a> {
         QueryStatuses {
-            age_assurance_state: self.__unsafe_private_named.0,
-            appealed: self.__unsafe_private_named.1,
-            collections: self.__unsafe_private_named.2,
-            comment: self.__unsafe_private_named.3,
-            cursor: self.__unsafe_private_named.4,
-            exclude_tags: self.__unsafe_private_named.5,
-            hosting_deleted_after: self.__unsafe_private_named.6,
-            hosting_deleted_before: self.__unsafe_private_named.7,
-            hosting_statuses: self.__unsafe_private_named.8,
-            hosting_updated_after: self.__unsafe_private_named.9,
-            hosting_updated_before: self.__unsafe_private_named.10,
-            ignore_subjects: self.__unsafe_private_named.11,
-            include_all_user_records: self.__unsafe_private_named.12,
-            include_muted: self.__unsafe_private_named.13,
-            last_reviewed_by: self.__unsafe_private_named.14,
-            limit: self.__unsafe_private_named.15,
-            min_account_suspend_count: self.__unsafe_private_named.16,
-            min_priority_score: self.__unsafe_private_named.17,
-            min_reported_records_count: self.__unsafe_private_named.18,
-            min_strike_count: self.__unsafe_private_named.19,
-            min_takendown_records_count: self.__unsafe_private_named.20,
-            only_muted: self.__unsafe_private_named.21,
-            queue_count: self.__unsafe_private_named.22,
-            queue_index: self.__unsafe_private_named.23,
-            queue_seed: self.__unsafe_private_named.24,
-            reported_after: self.__unsafe_private_named.25,
-            reported_before: self.__unsafe_private_named.26,
-            review_state: self.__unsafe_private_named.27,
-            reviewed_after: self.__unsafe_private_named.28,
-            reviewed_before: self.__unsafe_private_named.29,
-            sort_direction: self.__unsafe_private_named.30,
-            sort_field: self.__unsafe_private_named.31,
-            subject: self.__unsafe_private_named.32,
-            subject_type: self.__unsafe_private_named.33,
-            tags: self.__unsafe_private_named.34,
-            takendown: self.__unsafe_private_named.35,
+            age_assurance_state: self._fields.0,
+            appealed: self._fields.1,
+            collections: self._fields.2,
+            comment: self._fields.3,
+            cursor: self._fields.4,
+            exclude_tags: self._fields.5,
+            hosting_deleted_after: self._fields.6,
+            hosting_deleted_before: self._fields.7,
+            hosting_statuses: self._fields.8,
+            hosting_updated_after: self._fields.9,
+            hosting_updated_before: self._fields.10,
+            ignore_subjects: self._fields.11,
+            include_all_user_records: self._fields.12,
+            include_muted: self._fields.13,
+            last_reviewed_by: self._fields.14,
+            limit: self._fields.15,
+            min_account_suspend_count: self._fields.16,
+            min_priority_score: self._fields.17,
+            min_reported_records_count: self._fields.18,
+            min_strike_count: self._fields.19,
+            min_takendown_records_count: self._fields.20,
+            only_muted: self._fields.21,
+            queue_count: self._fields.22,
+            queue_index: self._fields.23,
+            queue_seed: self._fields.24,
+            reported_after: self._fields.25,
+            reported_before: self._fields.26,
+            review_state: self._fields.27,
+            reviewed_after: self._fields.28,
+            reviewed_before: self._fields.29,
+            sort_direction: self._fields.30,
+            sort_field: self._fields.31,
+            subject: self._fields.32,
+            subject_type: self._fields.33,
+            tags: self._fields.34,
+            takendown: self._fields.35,
         }
     }
 }

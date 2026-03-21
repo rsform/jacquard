@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -125,58 +128,58 @@ pub mod mood_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type When;
-        type Ref;
         type Mood;
+        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type When = Unset;
-        type Ref = Unset;
         type Mood = Unset;
+        type Ref = Unset;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
         type When = Set<members::when>;
+        type Mood = S::Mood;
         type Ref = S::Ref;
-        type Mood = S::Mood;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type When = S::When;
-        type Ref = Set<members::r#ref>;
-        type Mood = S::Mood;
     }
     ///State transition - sets the `mood` field to Set
     pub struct SetMood<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMood<S> {}
     impl<S: State> State for SetMood<S> {
         type When = S::When;
-        type Ref = S::Ref;
         type Mood = Set<members::mood>;
+        type Ref = S::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type When = S::When;
+        type Mood = S::Mood;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `when` field
         pub struct when(());
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `mood` field
         pub struct mood(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MoodBuilder<'a, S: mood_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Mood<'a> {
@@ -190,9 +193,9 @@ impl<'a> MoodBuilder<'a, mood_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MoodBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -207,11 +210,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> MoodBuilder<'a, mood_state::SetMood<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MoodBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -226,11 +229,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> MoodBuilder<'a, mood_state::SetRef<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MoodBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -245,11 +248,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> MoodBuilder<'a, mood_state::SetWhen<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         MoodBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -258,15 +261,15 @@ impl<'a, S> MoodBuilder<'a, S>
 where
     S: mood_state::State,
     S::When: mood_state::IsSet,
-    S::Ref: mood_state::IsSet,
     S::Mood: mood_state::IsSet,
+    S::Ref: mood_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Mood<'a> {
         Mood {
-            mood: self.__unsafe_private_named.0.unwrap(),
-            r#ref: self.__unsafe_private_named.1.unwrap(),
-            when: self.__unsafe_private_named.2.unwrap(),
+            mood: self._fields.0.unwrap(),
+            r#ref: self._fields.1.unwrap(),
+            when: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -279,9 +282,9 @@ where
         >,
     ) -> Mood<'a> {
         Mood {
-            mood: self.__unsafe_private_named.0.unwrap(),
-            r#ref: self.__unsafe_private_named.1.unwrap(),
-            when: self.__unsafe_private_named.2.unwrap(),
+            mood: self._fields.0.unwrap(),
+            r#ref: self._fields.1.unwrap(),
+            when: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -125,14 +128,14 @@ pub mod website_state {
 
 /// Builder for constructing an instance of this type
 pub struct WebsiteBuilder<'a, S: website_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<BlobRef<'a>>,
         Option<UriValue<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Website<'a> {
@@ -146,9 +149,9 @@ impl<'a> WebsiteBuilder<'a, website_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         WebsiteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -156,12 +159,12 @@ impl<'a> WebsiteBuilder<'a, website_state::Empty> {
 impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -169,12 +172,12 @@ impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
 impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
     /// Set the `previewImage` field (optional)
     pub fn preview_image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `previewImage` field to an Option value (optional)
     pub fn maybe_preview_image(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -189,11 +192,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> WebsiteBuilder<'a, website_state::SetSrc<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         WebsiteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -201,12 +204,12 @@ where
 impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -219,10 +222,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Website<'a> {
         Website {
-            description: self.__unsafe_private_named.0,
-            preview_image: self.__unsafe_private_named.1,
-            src: self.__unsafe_private_named.2.unwrap(),
-            title: self.__unsafe_private_named.3,
+            description: self._fields.0,
+            preview_image: self._fields.1,
+            src: self._fields.2.unwrap(),
+            title: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -235,10 +238,10 @@ where
         >,
     ) -> Website<'a> {
         Website {
-            description: self.__unsafe_private_named.0,
-            preview_image: self.__unsafe_private_named.1,
-            src: self.__unsafe_private_named.2.unwrap(),
-            title: self.__unsafe_private_named.3,
+            description: self._fields.0,
+            preview_image: self._fields.1,
+            src: self._fields.2.unwrap(),
+            title: self._fields.3,
             extra_data: Some(extra_data),
         }
     }

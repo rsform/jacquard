@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -603,9 +606,9 @@ pub mod image_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct ImageViewBuilder<'a, S: image_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<list_posts::ImageViewImage<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<list_posts::ImageViewImage<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ImageView<'a> {
@@ -619,9 +622,9 @@ impl<'a> ImageViewBuilder<'a, image_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ImageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -636,11 +639,11 @@ where
         mut self,
         value: impl Into<Vec<list_posts::ImageViewImage<'a>>>,
     ) -> ImageViewBuilder<'a, image_view_state::SetImages<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ImageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -653,7 +656,7 @@ where
     /// Build the final struct
     pub fn build(self) -> ImageView<'a> {
         ImageView {
-            images: self.__unsafe_private_named.0.unwrap(),
+            images: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -666,7 +669,7 @@ where
         >,
     ) -> ImageView<'a> {
         ImageView {
-            images: self.__unsafe_private_named.0.unwrap(),
+            images: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1229,9 +1232,9 @@ pub mod list_posts_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListPostsBuilder<'a, S: list_posts_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ListPosts<'a> {
@@ -1245,9 +1248,9 @@ impl<'a> ListPostsBuilder<'a, list_posts_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListPostsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1255,12 +1258,12 @@ impl<'a> ListPostsBuilder<'a, list_posts_state::Empty> {
 impl<'a, S: list_posts_state::State> ListPostsBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1268,12 +1271,12 @@ impl<'a, S: list_posts_state::State> ListPostsBuilder<'a, S> {
 impl<'a, S: list_posts_state::State> ListPostsBuilder<'a, S> {
     /// Set the `page` field (optional)
     pub fn page(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `page` field to an Option value (optional)
     pub fn maybe_page(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1281,12 +1284,12 @@ impl<'a, S: list_posts_state::State> ListPostsBuilder<'a, S> {
 impl<'a, S: list_posts_state::State> ListPostsBuilder<'a, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1298,9 +1301,9 @@ where
     /// Build the final struct
     pub fn build(self) -> ListPosts<'a> {
         ListPosts {
-            limit: self.__unsafe_private_named.0,
-            page: self.__unsafe_private_named.1,
-            status: self.__unsafe_private_named.2,
+            limit: self._fields.0,
+            page: self._fields.1,
+            status: self._fields.2,
         }
     }
 }
@@ -1315,75 +1318,75 @@ pub mod pagination_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Limit;
-        type TotalPages;
         type Total;
         type Page;
+        type TotalPages;
+        type Limit;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Limit = Unset;
-        type TotalPages = Unset;
         type Total = Unset;
         type Page = Unset;
-    }
-    ///State transition - sets the `limit` field to Set
-    pub struct SetLimit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLimit<S> {}
-    impl<S: State> State for SetLimit<S> {
-        type Limit = Set<members::limit>;
-        type TotalPages = S::TotalPages;
-        type Total = S::Total;
-        type Page = S::Page;
-    }
-    ///State transition - sets the `total_pages` field to Set
-    pub struct SetTotalPages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalPages<S> {}
-    impl<S: State> State for SetTotalPages<S> {
-        type Limit = S::Limit;
-        type TotalPages = Set<members::total_pages>;
-        type Total = S::Total;
-        type Page = S::Page;
+        type TotalPages = Unset;
+        type Limit = Unset;
     }
     ///State transition - sets the `total` field to Set
     pub struct SetTotal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotal<S> {}
     impl<S: State> State for SetTotal<S> {
-        type Limit = S::Limit;
-        type TotalPages = S::TotalPages;
         type Total = Set<members::total>;
         type Page = S::Page;
+        type TotalPages = S::TotalPages;
+        type Limit = S::Limit;
     }
     ///State transition - sets the `page` field to Set
     pub struct SetPage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPage<S> {}
     impl<S: State> State for SetPage<S> {
-        type Limit = S::Limit;
-        type TotalPages = S::TotalPages;
         type Total = S::Total;
         type Page = Set<members::page>;
+        type TotalPages = S::TotalPages;
+        type Limit = S::Limit;
+    }
+    ///State transition - sets the `total_pages` field to Set
+    pub struct SetTotalPages<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalPages<S> {}
+    impl<S: State> State for SetTotalPages<S> {
+        type Total = S::Total;
+        type Page = S::Page;
+        type TotalPages = Set<members::total_pages>;
+        type Limit = S::Limit;
+    }
+    ///State transition - sets the `limit` field to Set
+    pub struct SetLimit<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLimit<S> {}
+    impl<S: State> State for SetLimit<S> {
+        type Total = S::Total;
+        type Page = S::Page;
+        type TotalPages = S::TotalPages;
+        type Limit = Set<members::limit>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `limit` field
-        pub struct limit(());
-        ///Marker type for the `total_pages` field
-        pub struct total_pages(());
         ///Marker type for the `total` field
         pub struct total(());
         ///Marker type for the `page` field
         pub struct page(());
+        ///Marker type for the `total_pages` field
+        pub struct total_pages(());
+        ///Marker type for the `limit` field
+        pub struct limit(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PaginationBuilder<'a, S: pagination_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>, Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>, Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Pagination<'a> {
@@ -1397,9 +1400,9 @@ impl<'a> PaginationBuilder<'a, pagination_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PaginationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1414,11 +1417,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PaginationBuilder<'a, pagination_state::SetLimit<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PaginationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1433,11 +1436,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PaginationBuilder<'a, pagination_state::SetPage<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PaginationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1452,11 +1455,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PaginationBuilder<'a, pagination_state::SetTotal<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PaginationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1471,11 +1474,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PaginationBuilder<'a, pagination_state::SetTotalPages<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         PaginationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1483,18 +1486,18 @@ where
 impl<'a, S> PaginationBuilder<'a, S>
 where
     S: pagination_state::State,
-    S::Limit: pagination_state::IsSet,
-    S::TotalPages: pagination_state::IsSet,
     S::Total: pagination_state::IsSet,
     S::Page: pagination_state::IsSet,
+    S::TotalPages: pagination_state::IsSet,
+    S::Limit: pagination_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pagination<'a> {
         Pagination {
-            limit: self.__unsafe_private_named.0.unwrap(),
-            page: self.__unsafe_private_named.1.unwrap(),
-            total: self.__unsafe_private_named.2.unwrap(),
-            total_pages: self.__unsafe_private_named.3.unwrap(),
+            limit: self._fields.0.unwrap(),
+            page: self._fields.1.unwrap(),
+            total: self._fields.2.unwrap(),
+            total_pages: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1507,10 +1510,10 @@ where
         >,
     ) -> Pagination<'a> {
         Pagination {
-            limit: self.__unsafe_private_named.0.unwrap(),
-            page: self.__unsafe_private_named.1.unwrap(),
-            total: self.__unsafe_private_named.2.unwrap(),
-            total_pages: self.__unsafe_private_named.3.unwrap(),
+            limit: self._fields.0.unwrap(),
+            page: self._fields.1.unwrap(),
+            total: self._fields.2.unwrap(),
+            total_pages: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1526,184 +1529,184 @@ pub mod scheduled_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Langs;
-        type Status;
-        type CreatedAt;
-        type UserId;
-        type UpdatedAt;
-        type ScheduledAt;
         type Text;
+        type ScheduledAt;
         type Id;
+        type UpdatedAt;
+        type CreatedAt;
+        type Status;
+        type UserId;
         type RetryCount;
+        type Langs;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Langs = Unset;
-        type Status = Unset;
-        type CreatedAt = Unset;
-        type UserId = Unset;
-        type UpdatedAt = Unset;
-        type ScheduledAt = Unset;
         type Text = Unset;
+        type ScheduledAt = Unset;
         type Id = Unset;
+        type UpdatedAt = Unset;
+        type CreatedAt = Unset;
+        type Status = Unset;
+        type UserId = Unset;
         type RetryCount = Unset;
-    }
-    ///State transition - sets the `langs` field to Set
-    pub struct SetLangs<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLangs<S> {}
-    impl<S: State> State for SetLangs<S> {
-        type Langs = Set<members::langs>;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-        type UserId = S::UserId;
-        type UpdatedAt = S::UpdatedAt;
-        type ScheduledAt = S::ScheduledAt;
-        type Text = S::Text;
-        type Id = S::Id;
-        type RetryCount = S::RetryCount;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Langs = S::Langs;
-        type Status = Set<members::status>;
-        type CreatedAt = S::CreatedAt;
-        type UserId = S::UserId;
-        type UpdatedAt = S::UpdatedAt;
-        type ScheduledAt = S::ScheduledAt;
-        type Text = S::Text;
-        type Id = S::Id;
-        type RetryCount = S::RetryCount;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Langs = S::Langs;
-        type Status = S::Status;
-        type CreatedAt = Set<members::created_at>;
-        type UserId = S::UserId;
-        type UpdatedAt = S::UpdatedAt;
-        type ScheduledAt = S::ScheduledAt;
-        type Text = S::Text;
-        type Id = S::Id;
-        type RetryCount = S::RetryCount;
-    }
-    ///State transition - sets the `user_id` field to Set
-    pub struct SetUserId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserId<S> {}
-    impl<S: State> State for SetUserId<S> {
-        type Langs = S::Langs;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-        type UserId = Set<members::user_id>;
-        type UpdatedAt = S::UpdatedAt;
-        type ScheduledAt = S::ScheduledAt;
-        type Text = S::Text;
-        type Id = S::Id;
-        type RetryCount = S::RetryCount;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type Langs = S::Langs;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-        type UserId = S::UserId;
-        type UpdatedAt = Set<members::updated_at>;
-        type ScheduledAt = S::ScheduledAt;
-        type Text = S::Text;
-        type Id = S::Id;
-        type RetryCount = S::RetryCount;
-    }
-    ///State transition - sets the `scheduled_at` field to Set
-    pub struct SetScheduledAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScheduledAt<S> {}
-    impl<S: State> State for SetScheduledAt<S> {
-        type Langs = S::Langs;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-        type UserId = S::UserId;
-        type UpdatedAt = S::UpdatedAt;
-        type ScheduledAt = Set<members::scheduled_at>;
-        type Text = S::Text;
-        type Id = S::Id;
-        type RetryCount = S::RetryCount;
+        type Langs = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type Langs = S::Langs;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-        type UserId = S::UserId;
-        type UpdatedAt = S::UpdatedAt;
-        type ScheduledAt = S::ScheduledAt;
         type Text = Set<members::text>;
+        type ScheduledAt = S::ScheduledAt;
         type Id = S::Id;
+        type UpdatedAt = S::UpdatedAt;
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+        type UserId = S::UserId;
         type RetryCount = S::RetryCount;
+        type Langs = S::Langs;
+    }
+    ///State transition - sets the `scheduled_at` field to Set
+    pub struct SetScheduledAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScheduledAt<S> {}
+    impl<S: State> State for SetScheduledAt<S> {
+        type Text = S::Text;
+        type ScheduledAt = Set<members::scheduled_at>;
+        type Id = S::Id;
+        type UpdatedAt = S::UpdatedAt;
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+        type UserId = S::UserId;
+        type RetryCount = S::RetryCount;
+        type Langs = S::Langs;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Langs = S::Langs;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-        type UserId = S::UserId;
-        type UpdatedAt = S::UpdatedAt;
-        type ScheduledAt = S::ScheduledAt;
         type Text = S::Text;
+        type ScheduledAt = S::ScheduledAt;
         type Id = Set<members::id>;
+        type UpdatedAt = S::UpdatedAt;
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+        type UserId = S::UserId;
         type RetryCount = S::RetryCount;
+        type Langs = S::Langs;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Text = S::Text;
+        type ScheduledAt = S::ScheduledAt;
+        type Id = S::Id;
+        type UpdatedAt = Set<members::updated_at>;
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+        type UserId = S::UserId;
+        type RetryCount = S::RetryCount;
+        type Langs = S::Langs;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Text = S::Text;
+        type ScheduledAt = S::ScheduledAt;
+        type Id = S::Id;
+        type UpdatedAt = S::UpdatedAt;
+        type CreatedAt = Set<members::created_at>;
+        type Status = S::Status;
+        type UserId = S::UserId;
+        type RetryCount = S::RetryCount;
+        type Langs = S::Langs;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type Text = S::Text;
+        type ScheduledAt = S::ScheduledAt;
+        type Id = S::Id;
+        type UpdatedAt = S::UpdatedAt;
+        type CreatedAt = S::CreatedAt;
+        type Status = Set<members::status>;
+        type UserId = S::UserId;
+        type RetryCount = S::RetryCount;
+        type Langs = S::Langs;
+    }
+    ///State transition - sets the `user_id` field to Set
+    pub struct SetUserId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUserId<S> {}
+    impl<S: State> State for SetUserId<S> {
+        type Text = S::Text;
+        type ScheduledAt = S::ScheduledAt;
+        type Id = S::Id;
+        type UpdatedAt = S::UpdatedAt;
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+        type UserId = Set<members::user_id>;
+        type RetryCount = S::RetryCount;
+        type Langs = S::Langs;
     }
     ///State transition - sets the `retry_count` field to Set
     pub struct SetRetryCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRetryCount<S> {}
     impl<S: State> State for SetRetryCount<S> {
-        type Langs = S::Langs;
-        type Status = S::Status;
-        type CreatedAt = S::CreatedAt;
-        type UserId = S::UserId;
-        type UpdatedAt = S::UpdatedAt;
-        type ScheduledAt = S::ScheduledAt;
         type Text = S::Text;
+        type ScheduledAt = S::ScheduledAt;
         type Id = S::Id;
+        type UpdatedAt = S::UpdatedAt;
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+        type UserId = S::UserId;
         type RetryCount = Set<members::retry_count>;
+        type Langs = S::Langs;
+    }
+    ///State transition - sets the `langs` field to Set
+    pub struct SetLangs<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLangs<S> {}
+    impl<S: State> State for SetLangs<S> {
+        type Text = S::Text;
+        type ScheduledAt = S::ScheduledAt;
+        type Id = S::Id;
+        type UpdatedAt = S::UpdatedAt;
+        type CreatedAt = S::CreatedAt;
+        type Status = S::Status;
+        type UserId = S::UserId;
+        type RetryCount = S::RetryCount;
+        type Langs = Set<members::langs>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `langs` field
-        pub struct langs(());
-        ///Marker type for the `status` field
-        pub struct status(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `user_id` field
-        pub struct user_id(());
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
-        ///Marker type for the `scheduled_at` field
-        pub struct scheduled_at(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `scheduled_at` field
+        pub struct scheduled_at(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `user_id` field
+        pub struct user_id(());
         ///Marker type for the `retry_count` field
         pub struct retry_count(());
+        ///Marker type for the `langs` field
+        pub struct langs(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ScheduledPostBuilder<'a, S: scheduled_post_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<Vec<list_posts::ScheduledPost<'a>>>,
@@ -1731,7 +1734,7 @@ pub struct ScheduledPostBuilder<'a, S: scheduled_post_state::State> {
         Option<Datetime>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ScheduledPost<'a> {
@@ -1745,8 +1748,8 @@ impl<'a> ScheduledPostBuilder<'a, scheduled_post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ScheduledPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -1774,7 +1777,7 @@ impl<'a> ScheduledPostBuilder<'a, scheduled_post_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1782,12 +1785,12 @@ impl<'a> ScheduledPostBuilder<'a, scheduled_post_state::Empty> {
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `atRkey` field (optional)
     pub fn at_rkey(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `atRkey` field to an Option value (optional)
     pub fn maybe_at_rkey(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1795,12 +1798,12 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `atUri` field (optional)
     pub fn at_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `atUri` field to an Option value (optional)
     pub fn maybe_at_uri(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1811,7 +1814,7 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<list_posts::ScheduledPost<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `children` field to an Option value (optional)
@@ -1819,7 +1822,7 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
         mut self,
         value: Option<Vec<list_posts::ScheduledPost<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1834,11 +1837,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ScheduledPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1846,12 +1849,12 @@ where
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `embed` field (optional)
     pub fn embed(mut self, value: impl Into<Option<ScheduledPostEmbed<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `embed` field to an Option value (optional)
     pub fn maybe_embed(mut self, value: Option<ScheduledPostEmbed<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1859,12 +1862,12 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `errorMsg` field (optional)
     pub fn error_msg(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `errorMsg` field to an Option value (optional)
     pub fn maybe_error_msg(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1872,12 +1875,12 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `executedAt` field (optional)
     pub fn executed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `executedAt` field to an Option value (optional)
     pub fn maybe_executed_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1885,12 +1888,12 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
     pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -1905,11 +1908,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetId<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         ScheduledPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1917,12 +1920,12 @@ where
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -1937,11 +1940,11 @@ where
         mut self,
         value: impl Into<Vec<Language>>,
     ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetLangs<S>> {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         ScheduledPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1949,12 +1952,12 @@ where
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `parentPostId` field (optional)
     pub fn parent_post_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `parentPostId` field to an Option value (optional)
     pub fn maybe_parent_post_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -1962,12 +1965,12 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `postgateCid` field (optional)
     pub fn postgate_cid(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `postgateCid` field to an Option value (optional)
     pub fn maybe_postgate_cid(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -1975,12 +1978,12 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `postgateDisableEmbedding` field (optional)
     pub fn postgate_disable_embedding(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `postgateDisableEmbedding` field to an Option value (optional)
     pub fn maybe_postgate_disable_embedding(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -1988,12 +1991,12 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `postgateUri` field (optional)
     pub fn postgate_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `postgateUri` field to an Option value (optional)
     pub fn maybe_postgate_uri(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -2008,11 +2011,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetRetryCount<S>> {
-        self.__unsafe_private_named.15 = Option::Some(value.into());
+        self._fields.15 = Option::Some(value.into());
         ScheduledPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2027,11 +2030,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetScheduledAt<S>> {
-        self.__unsafe_private_named.16 = Option::Some(value.into());
+        self._fields.16 = Option::Some(value.into());
         ScheduledPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2046,11 +2049,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetStatus<S>> {
-        self.__unsafe_private_named.17 = Option::Some(value.into());
+        self._fields.17 = Option::Some(value.into());
         ScheduledPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2065,11 +2068,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetText<S>> {
-        self.__unsafe_private_named.18 = Option::Some(value.into());
+        self._fields.18 = Option::Some(value.into());
         ScheduledPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2077,12 +2080,12 @@ where
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `threadDepth` field (optional)
     pub fn thread_depth(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `threadDepth` field to an Option value (optional)
     pub fn maybe_thread_depth(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -2090,12 +2093,12 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `threadPosition` field (optional)
     pub fn thread_position(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `threadPosition` field to an Option value (optional)
     pub fn maybe_thread_position(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -2103,12 +2106,12 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `threadgateCid` field (optional)
     pub fn threadgate_cid(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `threadgateCid` field to an Option value (optional)
     pub fn maybe_threadgate_cid(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -2119,7 +2122,7 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<ScheduledPostThreadgateRulesItem<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `threadgateRules` field to an Option value (optional)
@@ -2127,7 +2130,7 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
         mut self,
         value: Option<Vec<ScheduledPostThreadgateRulesItem<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -2135,12 +2138,12 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
 impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     /// Set the `threadgateUri` field (optional)
     pub fn threadgate_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.23 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `threadgateUri` field to an Option value (optional)
     pub fn maybe_threadgate_uri(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.23 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -2155,11 +2158,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.24 = Option::Some(value.into());
+        self._fields.24 = Option::Some(value.into());
         ScheduledPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2174,11 +2177,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetUserId<S>> {
-        self.__unsafe_private_named.25 = Option::Some(value.into());
+        self._fields.25 = Option::Some(value.into());
         ScheduledPostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2186,45 +2189,45 @@ where
 impl<'a, S> ScheduledPostBuilder<'a, S>
 where
     S: scheduled_post_state::State,
-    S::Langs: scheduled_post_state::IsSet,
-    S::Status: scheduled_post_state::IsSet,
-    S::CreatedAt: scheduled_post_state::IsSet,
-    S::UserId: scheduled_post_state::IsSet,
-    S::UpdatedAt: scheduled_post_state::IsSet,
-    S::ScheduledAt: scheduled_post_state::IsSet,
     S::Text: scheduled_post_state::IsSet,
+    S::ScheduledAt: scheduled_post_state::IsSet,
     S::Id: scheduled_post_state::IsSet,
+    S::UpdatedAt: scheduled_post_state::IsSet,
+    S::CreatedAt: scheduled_post_state::IsSet,
+    S::Status: scheduled_post_state::IsSet,
+    S::UserId: scheduled_post_state::IsSet,
     S::RetryCount: scheduled_post_state::IsSet,
+    S::Langs: scheduled_post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ScheduledPost<'a> {
         ScheduledPost {
-            at_rkey: self.__unsafe_private_named.0,
-            at_uri: self.__unsafe_private_named.1,
-            children: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            embed: self.__unsafe_private_named.4,
-            error_msg: self.__unsafe_private_named.5,
-            executed_at: self.__unsafe_private_named.6,
-            facets: self.__unsafe_private_named.7,
-            id: self.__unsafe_private_named.8.unwrap(),
-            labels: self.__unsafe_private_named.9,
-            langs: self.__unsafe_private_named.10.unwrap(),
-            parent_post_id: self.__unsafe_private_named.11,
-            postgate_cid: self.__unsafe_private_named.12,
-            postgate_disable_embedding: self.__unsafe_private_named.13,
-            postgate_uri: self.__unsafe_private_named.14,
-            retry_count: self.__unsafe_private_named.15.unwrap(),
-            scheduled_at: self.__unsafe_private_named.16.unwrap(),
-            status: self.__unsafe_private_named.17.unwrap(),
-            text: self.__unsafe_private_named.18.unwrap(),
-            thread_depth: self.__unsafe_private_named.19,
-            thread_position: self.__unsafe_private_named.20,
-            threadgate_cid: self.__unsafe_private_named.21,
-            threadgate_rules: self.__unsafe_private_named.22,
-            threadgate_uri: self.__unsafe_private_named.23,
-            updated_at: self.__unsafe_private_named.24.unwrap(),
-            user_id: self.__unsafe_private_named.25.unwrap(),
+            at_rkey: self._fields.0,
+            at_uri: self._fields.1,
+            children: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            embed: self._fields.4,
+            error_msg: self._fields.5,
+            executed_at: self._fields.6,
+            facets: self._fields.7,
+            id: self._fields.8.unwrap(),
+            labels: self._fields.9,
+            langs: self._fields.10.unwrap(),
+            parent_post_id: self._fields.11,
+            postgate_cid: self._fields.12,
+            postgate_disable_embedding: self._fields.13,
+            postgate_uri: self._fields.14,
+            retry_count: self._fields.15.unwrap(),
+            scheduled_at: self._fields.16.unwrap(),
+            status: self._fields.17.unwrap(),
+            text: self._fields.18.unwrap(),
+            thread_depth: self._fields.19,
+            thread_position: self._fields.20,
+            threadgate_cid: self._fields.21,
+            threadgate_rules: self._fields.22,
+            threadgate_uri: self._fields.23,
+            updated_at: self._fields.24.unwrap(),
+            user_id: self._fields.25.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2237,32 +2240,32 @@ where
         >,
     ) -> ScheduledPost<'a> {
         ScheduledPost {
-            at_rkey: self.__unsafe_private_named.0,
-            at_uri: self.__unsafe_private_named.1,
-            children: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            embed: self.__unsafe_private_named.4,
-            error_msg: self.__unsafe_private_named.5,
-            executed_at: self.__unsafe_private_named.6,
-            facets: self.__unsafe_private_named.7,
-            id: self.__unsafe_private_named.8.unwrap(),
-            labels: self.__unsafe_private_named.9,
-            langs: self.__unsafe_private_named.10.unwrap(),
-            parent_post_id: self.__unsafe_private_named.11,
-            postgate_cid: self.__unsafe_private_named.12,
-            postgate_disable_embedding: self.__unsafe_private_named.13,
-            postgate_uri: self.__unsafe_private_named.14,
-            retry_count: self.__unsafe_private_named.15.unwrap(),
-            scheduled_at: self.__unsafe_private_named.16.unwrap(),
-            status: self.__unsafe_private_named.17.unwrap(),
-            text: self.__unsafe_private_named.18.unwrap(),
-            thread_depth: self.__unsafe_private_named.19,
-            thread_position: self.__unsafe_private_named.20,
-            threadgate_cid: self.__unsafe_private_named.21,
-            threadgate_rules: self.__unsafe_private_named.22,
-            threadgate_uri: self.__unsafe_private_named.23,
-            updated_at: self.__unsafe_private_named.24.unwrap(),
-            user_id: self.__unsafe_private_named.25.unwrap(),
+            at_rkey: self._fields.0,
+            at_uri: self._fields.1,
+            children: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            embed: self._fields.4,
+            error_msg: self._fields.5,
+            executed_at: self._fields.6,
+            facets: self._fields.7,
+            id: self._fields.8.unwrap(),
+            labels: self._fields.9,
+            langs: self._fields.10.unwrap(),
+            parent_post_id: self._fields.11,
+            postgate_cid: self._fields.12,
+            postgate_disable_embedding: self._fields.13,
+            postgate_uri: self._fields.14,
+            retry_count: self._fields.15.unwrap(),
+            scheduled_at: self._fields.16.unwrap(),
+            status: self._fields.17.unwrap(),
+            text: self._fields.18.unwrap(),
+            thread_depth: self._fields.19,
+            thread_position: self._fields.20,
+            threadgate_cid: self._fields.21,
+            threadgate_rules: self._fields.22,
+            threadgate_uri: self._fields.23,
+            updated_at: self._fields.24.unwrap(),
+            user_id: self._fields.25.unwrap(),
             extra_data: Some(extra_data),
         }
     }

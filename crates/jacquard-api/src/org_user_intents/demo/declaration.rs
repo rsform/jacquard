@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -176,9 +179,9 @@ pub mod intent_state {
 
 /// Builder for constructing an instance of this type
 pub struct IntentBuilder<'a, S: intent_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>, Option<Datetime>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Intent<'a> {
@@ -192,9 +195,9 @@ impl<'a> IntentBuilder<'a, intent_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         IntentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -202,12 +205,12 @@ impl<'a> IntentBuilder<'a, intent_state::Empty> {
 impl<'a, S: intent_state::State> IntentBuilder<'a, S> {
     /// Set the `allow` field (optional)
     pub fn allow(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `allow` field to an Option value (optional)
     pub fn maybe_allow(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -222,11 +225,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> IntentBuilder<'a, intent_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         IntentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -239,8 +242,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Intent<'a> {
         Intent {
-            allow: self.__unsafe_private_named.0,
-            updated_at: self.__unsafe_private_named.1.unwrap(),
+            allow: self._fields.0,
+            updated_at: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -253,8 +256,8 @@ where
         >,
     ) -> Intent<'a> {
         Intent {
-            allow: self.__unsafe_private_named.0,
-            updated_at: self.__unsafe_private_named.1.unwrap(),
+            allow: self._fields.0,
+            updated_at: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -375,15 +378,15 @@ pub mod declaration_state {
 
 /// Builder for constructing an instance of this type
 pub struct DeclarationBuilder<'a, S: declaration_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<declaration::Intent<'a>>,
         Option<declaration::Intent<'a>>,
         Option<declaration::Intent<'a>>,
         Option<declaration::Intent<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Declaration<'a> {
@@ -397,9 +400,9 @@ impl<'a> DeclarationBuilder<'a, declaration_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeclarationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -410,12 +413,12 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<declaration::Intent<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `bulkDataset` field to an Option value (optional)
     pub fn maybe_bulk_dataset(mut self, value: Option<declaration::Intent<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -426,7 +429,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<declaration::Intent<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `protocolBridging` field to an Option value (optional)
@@ -434,7 +437,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
         mut self,
         value: Option<declaration::Intent<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -445,7 +448,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<declaration::Intent<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `publicAccessArchive` field to an Option value (optional)
@@ -453,7 +456,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
         mut self,
         value: Option<declaration::Intent<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -464,7 +467,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<declaration::Intent<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `syntheticContentGeneration` field to an Option value (optional)
@@ -472,7 +475,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
         mut self,
         value: Option<declaration::Intent<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -480,12 +483,12 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
 impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -497,11 +500,11 @@ where
     /// Build the final struct
     pub fn build(self) -> Declaration<'a> {
         Declaration {
-            bulk_dataset: self.__unsafe_private_named.0,
-            protocol_bridging: self.__unsafe_private_named.1,
-            public_access_archive: self.__unsafe_private_named.2,
-            synthetic_content_generation: self.__unsafe_private_named.3,
-            updated_at: self.__unsafe_private_named.4,
+            bulk_dataset: self._fields.0,
+            protocol_bridging: self._fields.1,
+            public_access_archive: self._fields.2,
+            synthetic_content_generation: self._fields.3,
+            updated_at: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -514,11 +517,11 @@ where
         >,
     ) -> Declaration<'a> {
         Declaration {
-            bulk_dataset: self.__unsafe_private_named.0,
-            protocol_bridging: self.__unsafe_private_named.1,
-            public_access_archive: self.__unsafe_private_named.2,
-            synthetic_content_generation: self.__unsafe_private_named.3,
-            updated_at: self.__unsafe_private_named.4,
+            bulk_dataset: self._fields.0,
+            protocol_bridging: self._fields.1,
+            public_access_archive: self._fields.2,
+            synthetic_content_generation: self._fields.3,
+            updated_at: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

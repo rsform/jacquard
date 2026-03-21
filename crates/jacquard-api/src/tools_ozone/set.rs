@@ -12,7 +12,11 @@ pub mod get_values;
 pub mod query_sets;
 pub mod upsert_set;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -279,81 +283,81 @@ pub mod set_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
         type Name;
         type CreatedAt;
         type SetSize;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
         type Name = Unset;
         type CreatedAt = Unset;
         type SetSize = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-        type SetSize = S::SetSize;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Name = Set<members::name>;
         type CreatedAt = S::CreatedAt;
         type SetSize = S::SetSize;
+        type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
         type SetSize = S::SetSize;
+        type UpdatedAt = S::UpdatedAt;
     }
     ///State transition - sets the `set_size` field to Set
     pub struct SetSetSize<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSetSize<S> {}
     impl<S: State> State for SetSetSize<S> {
-        type UpdatedAt = S::UpdatedAt;
         type Name = S::Name;
         type CreatedAt = S::CreatedAt;
         type SetSize = Set<members::set_size>;
+        type UpdatedAt = S::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type SetSize = S::SetSize;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `set_size` field
         pub struct set_size(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SetViewBuilder<'a, S: set_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<i64>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SetView<'a> {
@@ -367,9 +371,9 @@ impl<'a> SetViewBuilder<'a, set_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SetViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -384,11 +388,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SetViewBuilder<'a, set_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SetViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -396,12 +400,12 @@ where
 impl<'a, S: set_view_state::State> SetViewBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -416,11 +420,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SetViewBuilder<'a, set_view_state::SetName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SetViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -435,11 +439,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SetViewBuilder<'a, set_view_state::SetSetSize<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         SetViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -454,11 +458,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SetViewBuilder<'a, set_view_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         SetViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -466,19 +470,19 @@ where
 impl<'a, S> SetViewBuilder<'a, S>
 where
     S: set_view_state::State,
-    S::UpdatedAt: set_view_state::IsSet,
     S::Name: set_view_state::IsSet,
     S::CreatedAt: set_view_state::IsSet,
     S::SetSize: set_view_state::IsSet,
+    S::UpdatedAt: set_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SetView<'a> {
         SetView {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            name: self.__unsafe_private_named.2.unwrap(),
-            set_size: self.__unsafe_private_named.3.unwrap(),
-            updated_at: self.__unsafe_private_named.4.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1,
+            name: self._fields.2.unwrap(),
+            set_size: self._fields.3.unwrap(),
+            updated_at: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -491,11 +495,11 @@ where
         >,
     ) -> SetView<'a> {
         SetView {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            name: self.__unsafe_private_named.2.unwrap(),
-            set_size: self.__unsafe_private_named.3.unwrap(),
-            updated_at: self.__unsafe_private_named.4.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1,
+            name: self._fields.2.unwrap(),
+            set_size: self._fields.3.unwrap(),
+            updated_at: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

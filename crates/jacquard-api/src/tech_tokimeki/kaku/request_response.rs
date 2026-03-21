@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -139,64 +142,64 @@ pub mod request_response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Request;
         type Post;
         type CreatedAt;
-        type Request;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Request = Unset;
         type Post = Unset;
         type CreatedAt = Unset;
-        type Request = Unset;
-    }
-    ///State transition - sets the `post` field to Set
-    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPost<S> {}
-    impl<S: State> State for SetPost<S> {
-        type Post = Set<members::post>;
-        type CreatedAt = S::CreatedAt;
-        type Request = S::Request;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Post = S::Post;
-        type CreatedAt = Set<members::created_at>;
-        type Request = S::Request;
     }
     ///State transition - sets the `request` field to Set
     pub struct SetRequest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRequest<S> {}
     impl<S: State> State for SetRequest<S> {
+        type Request = Set<members::request>;
         type Post = S::Post;
         type CreatedAt = S::CreatedAt;
-        type Request = Set<members::request>;
+    }
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPost<S> {}
+    impl<S: State> State for SetPost<S> {
+        type Request = S::Request;
+        type Post = Set<members::post>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Request = S::Request;
+        type Post = S::Post;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `request` field
+        pub struct request(());
         ///Marker type for the `post` field
         pub struct post(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `request` field
-        pub struct request(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RequestResponseBuilder<'a, S: request_response_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<StrongRef<'a>>,
         Option<StrongRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RequestResponse<'a> {
@@ -210,9 +213,9 @@ impl<'a> RequestResponseBuilder<'a, request_response_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RequestResponseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -227,11 +230,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> RequestResponseBuilder<'a, request_response_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RequestResponseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -239,12 +242,12 @@ where
 impl<'a, S: request_response_state::State> RequestResponseBuilder<'a, S> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
     pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -259,11 +262,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> RequestResponseBuilder<'a, request_response_state::SetPost<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RequestResponseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -278,11 +281,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> RequestResponseBuilder<'a, request_response_state::SetRequest<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         RequestResponseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -290,17 +293,17 @@ where
 impl<'a, S> RequestResponseBuilder<'a, S>
 where
     S: request_response_state::State,
+    S::Request: request_response_state::IsSet,
     S::Post: request_response_state::IsSet,
     S::CreatedAt: request_response_state::IsSet,
-    S::Request: request_response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RequestResponse<'a> {
         RequestResponse {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            message: self.__unsafe_private_named.1,
-            post: self.__unsafe_private_named.2.unwrap(),
-            request: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            message: self._fields.1,
+            post: self._fields.2.unwrap(),
+            request: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -313,10 +316,10 @@ where
         >,
     ) -> RequestResponse<'a> {
         RequestResponse {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            message: self.__unsafe_private_named.1,
-            post: self.__unsafe_private_named.2.unwrap(),
-            request: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            message: self._fields.1,
+            post: self._fields.2.unwrap(),
+            request: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

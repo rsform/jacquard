@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -290,8 +293,8 @@ pub mod invite_state {
 
 /// Builder for constructing an instance of this type
 pub struct InviteBuilder<'a, S: invite_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Datetime>,
         Option<Did<'a>>,
@@ -299,7 +302,7 @@ pub struct InviteBuilder<'a, S: invite_state::State> {
         Option<StrongRef<'a>>,
         Option<invite::CollabScope<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Invite<'a> {
@@ -313,9 +316,9 @@ impl<'a> InviteBuilder<'a, invite_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         InviteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -330,11 +333,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> InviteBuilder<'a, invite_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         InviteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -342,12 +345,12 @@ where
 impl<'a, S: invite_state::State> InviteBuilder<'a, S> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `expiresAt` field to an Option value (optional)
     pub fn maybe_expires_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -362,11 +365,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> InviteBuilder<'a, invite_state::SetInvitee<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         InviteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -374,12 +377,12 @@ where
 impl<'a, S: invite_state::State> InviteBuilder<'a, S> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
     pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -394,11 +397,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> InviteBuilder<'a, invite_state::SetResource<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         InviteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -406,12 +409,12 @@ where
 impl<'a, S: invite_state::State> InviteBuilder<'a, S> {
     /// Set the `scope` field (optional)
     pub fn scope(mut self, value: impl Into<Option<invite::CollabScope<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `scope` field to an Option value (optional)
     pub fn maybe_scope(mut self, value: Option<invite::CollabScope<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -426,12 +429,12 @@ where
     /// Build the final struct
     pub fn build(self) -> Invite<'a> {
         Invite {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            expires_at: self.__unsafe_private_named.1,
-            invitee: self.__unsafe_private_named.2.unwrap(),
-            message: self.__unsafe_private_named.3,
-            resource: self.__unsafe_private_named.4.unwrap(),
-            scope: self.__unsafe_private_named.5,
+            created_at: self._fields.0.unwrap(),
+            expires_at: self._fields.1,
+            invitee: self._fields.2.unwrap(),
+            message: self._fields.3,
+            resource: self._fields.4.unwrap(),
+            scope: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -444,12 +447,12 @@ where
         >,
     ) -> Invite<'a> {
         Invite {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            expires_at: self.__unsafe_private_named.1,
-            invitee: self.__unsafe_private_named.2.unwrap(),
-            message: self.__unsafe_private_named.3,
-            resource: self.__unsafe_private_named.4.unwrap(),
-            scope: self.__unsafe_private_named.5,
+            created_at: self._fields.0.unwrap(),
+            expires_at: self._fields.1,
+            invitee: self._fields.2.unwrap(),
+            message: self._fields.3,
+            resource: self._fields.4.unwrap(),
+            scope: self._fields.5,
             extra_data: Some(extra_data),
         }
     }

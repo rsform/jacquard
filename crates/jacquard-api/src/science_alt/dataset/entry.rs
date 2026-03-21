@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::deps::bytes::Bytes;
@@ -583,65 +586,65 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type SchemaRef;
         type CreatedAt;
+        type Name;
         type Storage;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type SchemaRef = Unset;
         type CreatedAt = Unset;
+        type Name = Unset;
         type Storage = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type SchemaRef = S::SchemaRef;
-        type CreatedAt = S::CreatedAt;
-        type Storage = S::Storage;
     }
     ///State transition - sets the `schema_ref` field to Set
     pub struct SetSchemaRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSchemaRef<S> {}
     impl<S: State> State for SetSchemaRef<S> {
-        type Name = S::Name;
         type SchemaRef = Set<members::schema_ref>;
         type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
         type Storage = S::Storage;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type SchemaRef = S::SchemaRef;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+        type Storage = S::Storage;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type SchemaRef = S::SchemaRef;
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
         type Storage = S::Storage;
     }
     ///State transition - sets the `storage` field to Set
     pub struct SetStorage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStorage<S> {}
     impl<S: State> State for SetStorage<S> {
-        type Name = S::Name;
         type SchemaRef = S::SchemaRef;
         type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
         type Storage = Set<members::storage>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `schema_ref` field
         pub struct schema_ref(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `storage` field
         pub struct storage(());
     }
@@ -649,8 +652,8 @@ pub mod entry_state {
 
 /// Builder for constructing an instance of this type
 pub struct EntryBuilder<'a, S: entry_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Data<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -663,7 +666,7 @@ pub struct EntryBuilder<'a, S: entry_state::State> {
         Option<EntryStorage<'a>>,
         Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Entry<'a> {
@@ -677,21 +680,9 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -699,12 +690,12 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `contentMetadata` field (optional)
     pub fn content_metadata(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `contentMetadata` field to an Option value (optional)
     pub fn maybe_content_metadata(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -719,11 +710,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> EntryBuilder<'a, entry_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -731,12 +722,12 @@ where
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -744,12 +735,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `license` field (optional)
     pub fn license(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `license` field to an Option value (optional)
     pub fn maybe_license(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -757,12 +748,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<Bytes>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
     pub fn maybe_metadata(mut self, value: Option<Bytes>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -770,12 +761,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `metadataSchemaRef` field (optional)
     pub fn metadata_schema_ref(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `metadataSchemaRef` field to an Option value (optional)
     pub fn maybe_metadata_schema_ref(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -790,11 +781,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EntryBuilder<'a, entry_state::SetName<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -809,11 +800,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> EntryBuilder<'a, entry_state::SetSchemaRef<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -821,12 +812,12 @@ where
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<entry::DatasetSize<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
     pub fn maybe_size(mut self, value: Option<entry::DatasetSize<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -841,11 +832,11 @@ where
         mut self,
         value: impl Into<EntryStorage<'a>>,
     ) -> EntryBuilder<'a, entry_state::SetStorage<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -853,12 +844,12 @@ where
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -866,25 +857,25 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
-    S::Name: entry_state::IsSet,
     S::SchemaRef: entry_state::IsSet,
     S::CreatedAt: entry_state::IsSet,
+    S::Name: entry_state::IsSet,
     S::Storage: entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Entry<'a> {
         Entry {
-            content_metadata: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            license: self.__unsafe_private_named.3,
-            metadata: self.__unsafe_private_named.4,
-            metadata_schema_ref: self.__unsafe_private_named.5,
-            name: self.__unsafe_private_named.6.unwrap(),
-            schema_ref: self.__unsafe_private_named.7.unwrap(),
-            size: self.__unsafe_private_named.8,
-            storage: self.__unsafe_private_named.9.unwrap(),
-            tags: self.__unsafe_private_named.10,
+            content_metadata: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            license: self._fields.3,
+            metadata: self._fields.4,
+            metadata_schema_ref: self._fields.5,
+            name: self._fields.6.unwrap(),
+            schema_ref: self._fields.7.unwrap(),
+            size: self._fields.8,
+            storage: self._fields.9.unwrap(),
+            tags: self._fields.10,
             extra_data: Default::default(),
         }
     }
@@ -894,17 +885,17 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Entry<'a> {
         Entry {
-            content_metadata: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            license: self.__unsafe_private_named.3,
-            metadata: self.__unsafe_private_named.4,
-            metadata_schema_ref: self.__unsafe_private_named.5,
-            name: self.__unsafe_private_named.6.unwrap(),
-            schema_ref: self.__unsafe_private_named.7.unwrap(),
-            size: self.__unsafe_private_named.8,
-            storage: self.__unsafe_private_named.9.unwrap(),
-            tags: self.__unsafe_private_named.10,
+            content_metadata: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            license: self._fields.3,
+            metadata: self._fields.4,
+            metadata_schema_ref: self._fields.5,
+            name: self._fields.6.unwrap(),
+            schema_ref: self._fields.7.unwrap(),
+            size: self._fields.8,
+            storage: self._fields.9.unwrap(),
+            tags: self._fields.10,
             extra_data: Some(extra_data),
         }
     }

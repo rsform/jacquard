@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -680,9 +683,9 @@ pub mod get_account_timeline_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetAccountTimelineBuilder<'a, S: get_account_timeline_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetAccountTimeline<'a> {
@@ -696,9 +699,9 @@ impl<'a> GetAccountTimelineBuilder<'a, get_account_timeline_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetAccountTimelineBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -713,11 +716,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> GetAccountTimelineBuilder<'a, get_account_timeline_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetAccountTimelineBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -730,7 +733,7 @@ where
     /// Build the final struct
     pub fn build(self) -> GetAccountTimeline<'a> {
         GetAccountTimeline {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
         }
     }
 }
@@ -781,12 +784,12 @@ pub mod timeline_item_state {
 
 /// Builder for constructing an instance of this type
 pub struct TimelineItemBuilder<'a, S: timeline_item_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Vec<get_account_timeline::TimelineItemSummary<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TimelineItem<'a> {
@@ -800,9 +803,9 @@ impl<'a> TimelineItemBuilder<'a, timeline_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TimelineItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -817,11 +820,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TimelineItemBuilder<'a, timeline_item_state::SetDay<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TimelineItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -836,11 +839,11 @@ where
         mut self,
         value: impl Into<Vec<get_account_timeline::TimelineItemSummary<'a>>>,
     ) -> TimelineItemBuilder<'a, timeline_item_state::SetSummary<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TimelineItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -854,8 +857,8 @@ where
     /// Build the final struct
     pub fn build(self) -> TimelineItem<'a> {
         TimelineItem {
-            day: self.__unsafe_private_named.0.unwrap(),
-            summary: self.__unsafe_private_named.1.unwrap(),
+            day: self._fields.0.unwrap(),
+            summary: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -868,8 +871,8 @@ where
         >,
     ) -> TimelineItem<'a> {
         TimelineItem {
-            day: self.__unsafe_private_named.0.unwrap(),
-            summary: self.__unsafe_private_named.1.unwrap(),
+            day: self._fields.0.unwrap(),
+            summary: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -985,49 +988,49 @@ pub mod timeline_item_summary_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Count;
         type EventSubjectType;
+        type Count;
         type EventType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Count = Unset;
         type EventSubjectType = Unset;
+        type Count = Unset;
         type EventType = Unset;
-    }
-    ///State transition - sets the `count` field to Set
-    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCount<S> {}
-    impl<S: State> State for SetCount<S> {
-        type Count = Set<members::count>;
-        type EventSubjectType = S::EventSubjectType;
-        type EventType = S::EventType;
     }
     ///State transition - sets the `event_subject_type` field to Set
     pub struct SetEventSubjectType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEventSubjectType<S> {}
     impl<S: State> State for SetEventSubjectType<S> {
-        type Count = S::Count;
         type EventSubjectType = Set<members::event_subject_type>;
+        type Count = S::Count;
+        type EventType = S::EventType;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCount<S> {}
+    impl<S: State> State for SetCount<S> {
+        type EventSubjectType = S::EventSubjectType;
+        type Count = Set<members::count>;
         type EventType = S::EventType;
     }
     ///State transition - sets the `event_type` field to Set
     pub struct SetEventType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEventType<S> {}
     impl<S: State> State for SetEventType<S> {
-        type Count = S::Count;
         type EventSubjectType = S::EventSubjectType;
+        type Count = S::Count;
         type EventType = Set<members::event_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `count` field
-        pub struct count(());
         ///Marker type for the `event_subject_type` field
         pub struct event_subject_type(());
+        ///Marker type for the `count` field
+        pub struct count(());
         ///Marker type for the `event_type` field
         pub struct event_type(());
     }
@@ -1035,13 +1038,13 @@ pub mod timeline_item_summary_state {
 
 /// Builder for constructing an instance of this type
 pub struct TimelineItemSummaryBuilder<'a, S: timeline_item_summary_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<i64>,
         Option<TimelineItemSummaryEventSubjectType<'a>>,
         Option<TimelineItemSummaryEventType<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TimelineItemSummary<'a> {
@@ -1055,9 +1058,9 @@ impl<'a> TimelineItemSummaryBuilder<'a, timeline_item_summary_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TimelineItemSummaryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1072,11 +1075,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> TimelineItemSummaryBuilder<'a, timeline_item_summary_state::SetCount<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TimelineItemSummaryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1094,11 +1097,11 @@ where
         'a,
         timeline_item_summary_state::SetEventSubjectType<S>,
     > {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TimelineItemSummaryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1113,11 +1116,11 @@ where
         mut self,
         value: impl Into<TimelineItemSummaryEventType<'a>>,
     ) -> TimelineItemSummaryBuilder<'a, timeline_item_summary_state::SetEventType<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         TimelineItemSummaryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1125,16 +1128,16 @@ where
 impl<'a, S> TimelineItemSummaryBuilder<'a, S>
 where
     S: timeline_item_summary_state::State,
-    S::Count: timeline_item_summary_state::IsSet,
     S::EventSubjectType: timeline_item_summary_state::IsSet,
+    S::Count: timeline_item_summary_state::IsSet,
     S::EventType: timeline_item_summary_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TimelineItemSummary<'a> {
         TimelineItemSummary {
-            count: self.__unsafe_private_named.0.unwrap(),
-            event_subject_type: self.__unsafe_private_named.1.unwrap(),
-            event_type: self.__unsafe_private_named.2.unwrap(),
+            count: self._fields.0.unwrap(),
+            event_subject_type: self._fields.1.unwrap(),
+            event_type: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1147,9 +1150,9 @@ where
         >,
     ) -> TimelineItemSummary<'a> {
         TimelineItemSummary {
-            count: self.__unsafe_private_named.0.unwrap(),
-            event_subject_type: self.__unsafe_private_named.1.unwrap(),
-            event_type: self.__unsafe_private_named.2.unwrap(),
+            count: self._fields.0.unwrap(),
+            event_subject_type: self._fields.1.unwrap(),
+            event_type: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

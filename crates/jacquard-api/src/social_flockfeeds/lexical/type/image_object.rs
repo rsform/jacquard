@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -6236,8 +6239,8 @@ pub mod image_object_state {
 
 /// Builder for constructing an instance of this type
 pub struct ImageObjectBuilder<'a, S: image_object_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ImageObjectAbout<'a>>,
         Option<ImageObjectAbstract<'a>>,
         Option<ImageObjectAccessMode<'a>>,
@@ -6388,7 +6391,7 @@ pub struct ImageObjectBuilder<'a, S: image_object_state::State> {
         Option<ImageObjectWorkExample<'a>>,
         Option<ImageObjectWorkTranslation<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ImageObject<'a> {
@@ -6402,8 +6405,8 @@ impl<'a> ImageObjectBuilder<'a, image_object_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ImageObjectBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -6554,7 +6557,7 @@ impl<'a> ImageObjectBuilder<'a, image_object_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -6562,12 +6565,12 @@ impl<'a> ImageObjectBuilder<'a, image_object_state::Empty> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `about` field (optional)
     pub fn about(mut self, value: impl Into<Option<ImageObjectAbout<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `about` field to an Option value (optional)
     pub fn maybe_about(mut self, value: Option<ImageObjectAbout<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -6578,12 +6581,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectAbstract<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `abstract` field to an Option value (optional)
     pub fn maybe_abstract(mut self, value: Option<ImageObjectAbstract<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -6594,7 +6597,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectAccessMode<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `accessMode` field to an Option value (optional)
@@ -6602,7 +6605,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectAccessMode<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -6613,7 +6616,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectAccessModeSufficient<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `accessModeSufficient` field to an Option value (optional)
@@ -6621,7 +6624,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectAccessModeSufficient<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -6632,7 +6635,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectAccessibilityApi<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `accessibilityAPI` field to an Option value (optional)
@@ -6640,7 +6643,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectAccessibilityApi<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -6651,7 +6654,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectAccessibilityControl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `accessibilityControl` field to an Option value (optional)
@@ -6659,7 +6662,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectAccessibilityControl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -6670,7 +6673,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectAccessibilityFeature<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `accessibilityFeature` field to an Option value (optional)
@@ -6678,7 +6681,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectAccessibilityFeature<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -6689,7 +6692,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectAccessibilityHazard<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `accessibilityHazard` field to an Option value (optional)
@@ -6697,7 +6700,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectAccessibilityHazard<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -6708,7 +6711,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectAccessibilitySummary<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `accessibilitySummary` field to an Option value (optional)
@@ -6716,7 +6719,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectAccessibilitySummary<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -6727,7 +6730,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectAccountablePerson<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `accountablePerson` field to an Option value (optional)
@@ -6735,7 +6738,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectAccountablePerson<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -6746,7 +6749,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectAcquireLicensePage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `acquireLicensePage` field to an Option value (optional)
@@ -6754,7 +6757,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectAcquireLicensePage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -6765,7 +6768,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectAdditionalType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
@@ -6773,7 +6776,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectAdditionalType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -6784,7 +6787,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectAggregateRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
@@ -6792,7 +6795,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectAggregateRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -6803,7 +6806,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectAlternateName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
@@ -6811,7 +6814,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectAlternateName<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -6822,7 +6825,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectAlternativeHeadline<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `alternativeHeadline` field to an Option value (optional)
@@ -6830,7 +6833,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectAlternativeHeadline<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -6841,7 +6844,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectArchivedAt<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `archivedAt` field to an Option value (optional)
@@ -6849,7 +6852,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectArchivedAt<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -6860,12 +6863,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectAssesses<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `assesses` field to an Option value (optional)
     pub fn maybe_assesses(mut self, value: Option<ImageObjectAssesses<'a>>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -6876,7 +6879,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectAssociatedArticle<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `associatedArticle` field to an Option value (optional)
@@ -6884,7 +6887,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectAssociatedArticle<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -6895,7 +6898,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectAssociatedMedia<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `associatedMedia` field to an Option value (optional)
@@ -6903,7 +6906,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectAssociatedMedia<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -6914,12 +6917,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectAudience<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `audience` field to an Option value (optional)
     pub fn maybe_audience(mut self, value: Option<ImageObjectAudience<'a>>) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -6927,12 +6930,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `audio` field (optional)
     pub fn audio(mut self, value: impl Into<Option<ImageObjectAudio<'a>>>) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `audio` field to an Option value (optional)
     pub fn maybe_audio(mut self, value: Option<ImageObjectAudio<'a>>) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -6940,12 +6943,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `author` field (optional)
     pub fn author(mut self, value: impl Into<Option<ImageObjectAuthor<'a>>>) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
     pub fn maybe_author(mut self, value: Option<ImageObjectAuthor<'a>>) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -6953,12 +6956,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<ImageObjectAward<'a>>>) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
     pub fn maybe_award(mut self, value: Option<ImageObjectAward<'a>>) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -6966,12 +6969,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<ImageObjectAwards<'a>>>) -> Self {
-        self.__unsafe_private_named.23 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
     pub fn maybe_awards(mut self, value: Option<ImageObjectAwards<'a>>) -> Self {
-        self.__unsafe_private_named.23 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -6979,12 +6982,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `bitrate` field (optional)
     pub fn bitrate(mut self, value: impl Into<Option<ImageObjectBitrate<'a>>>) -> Self {
-        self.__unsafe_private_named.24 = value.into();
+        self._fields.24 = value.into();
         self
     }
     /// Set the `bitrate` field to an Option value (optional)
     pub fn maybe_bitrate(mut self, value: Option<ImageObjectBitrate<'a>>) -> Self {
-        self.__unsafe_private_named.24 = value;
+        self._fields.24 = value;
         self
     }
 }
@@ -6992,12 +6995,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `caption` field (optional)
     pub fn caption(mut self, value: impl Into<Option<ImageObjectCaption<'a>>>) -> Self {
-        self.__unsafe_private_named.25 = value.into();
+        self._fields.25 = value.into();
         self
     }
     /// Set the `caption` field to an Option value (optional)
     pub fn maybe_caption(mut self, value: Option<ImageObjectCaption<'a>>) -> Self {
-        self.__unsafe_private_named.25 = value;
+        self._fields.25 = value;
         self
     }
 }
@@ -7008,12 +7011,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectCharacter<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.26 = value.into();
+        self._fields.26 = value.into();
         self
     }
     /// Set the `character` field to an Option value (optional)
     pub fn maybe_character(mut self, value: Option<ImageObjectCharacter<'a>>) -> Self {
-        self.__unsafe_private_named.26 = value;
+        self._fields.26 = value;
         self
     }
 }
@@ -7024,12 +7027,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectCitation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.27 = value.into();
+        self._fields.27 = value.into();
         self
     }
     /// Set the `citation` field to an Option value (optional)
     pub fn maybe_citation(mut self, value: Option<ImageObjectCitation<'a>>) -> Self {
-        self.__unsafe_private_named.27 = value;
+        self._fields.27 = value;
         self
     }
 }
@@ -7037,12 +7040,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<ImageObjectComment<'a>>>) -> Self {
-        self.__unsafe_private_named.28 = value.into();
+        self._fields.28 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
     pub fn maybe_comment(mut self, value: Option<ImageObjectComment<'a>>) -> Self {
-        self.__unsafe_private_named.28 = value;
+        self._fields.28 = value;
         self
     }
 }
@@ -7053,7 +7056,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectCommentCount<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.29 = value.into();
+        self._fields.29 = value.into();
         self
     }
     /// Set the `commentCount` field to an Option value (optional)
@@ -7061,7 +7064,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectCommentCount<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.29 = value;
+        self._fields.29 = value;
         self
     }
 }
@@ -7072,7 +7075,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectConditionsOfAccess<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.30 = value.into();
+        self._fields.30 = value.into();
         self
     }
     /// Set the `conditionsOfAccess` field to an Option value (optional)
@@ -7080,7 +7083,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectConditionsOfAccess<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.30 = value;
+        self._fields.30 = value;
         self
     }
 }
@@ -7091,7 +7094,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectContentLocation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value.into();
+        self._fields.31 = value.into();
         self
     }
     /// Set the `contentLocation` field to an Option value (optional)
@@ -7099,7 +7102,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectContentLocation<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value;
+        self._fields.31 = value;
         self
     }
 }
@@ -7110,7 +7113,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectContentRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value.into();
+        self._fields.32 = value.into();
         self
     }
     /// Set the `contentRating` field to an Option value (optional)
@@ -7118,7 +7121,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectContentRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value;
+        self._fields.32 = value;
         self
     }
 }
@@ -7129,7 +7132,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectContentReferenceTime<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value.into();
+        self._fields.33 = value.into();
         self
     }
     /// Set the `contentReferenceTime` field to an Option value (optional)
@@ -7137,7 +7140,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectContentReferenceTime<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value;
+        self._fields.33 = value;
         self
     }
 }
@@ -7148,7 +7151,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectContentSize<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.34 = value.into();
+        self._fields.34 = value.into();
         self
     }
     /// Set the `contentSize` field to an Option value (optional)
@@ -7156,7 +7159,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectContentSize<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.34 = value;
+        self._fields.34 = value;
         self
     }
 }
@@ -7167,7 +7170,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectContentUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value.into();
+        self._fields.35 = value.into();
         self
     }
     /// Set the `contentUrl` field to an Option value (optional)
@@ -7175,7 +7178,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectContentUrl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value;
+        self._fields.35 = value;
         self
     }
 }
@@ -7186,7 +7189,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectContributor<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value.into();
+        self._fields.36 = value.into();
         self
     }
     /// Set the `contributor` field to an Option value (optional)
@@ -7194,7 +7197,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectContributor<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value;
+        self._fields.36 = value;
         self
     }
 }
@@ -7205,7 +7208,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectCopyrightHolder<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.37 = value.into();
+        self._fields.37 = value.into();
         self
     }
     /// Set the `copyrightHolder` field to an Option value (optional)
@@ -7213,7 +7216,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectCopyrightHolder<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.37 = value;
+        self._fields.37 = value;
         self
     }
 }
@@ -7224,7 +7227,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectCopyrightNotice<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.38 = value.into();
+        self._fields.38 = value.into();
         self
     }
     /// Set the `copyrightNotice` field to an Option value (optional)
@@ -7232,7 +7235,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectCopyrightNotice<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.38 = value;
+        self._fields.38 = value;
         self
     }
 }
@@ -7243,7 +7246,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectCopyrightYear<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value.into();
+        self._fields.39 = value.into();
         self
     }
     /// Set the `copyrightYear` field to an Option value (optional)
@@ -7251,7 +7254,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectCopyrightYear<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value;
+        self._fields.39 = value;
         self
     }
 }
@@ -7262,12 +7265,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectCorrection<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.40 = value.into();
+        self._fields.40 = value.into();
         self
     }
     /// Set the `correction` field to an Option value (optional)
     pub fn maybe_correction(mut self, value: Option<ImageObjectCorrection<'a>>) -> Self {
-        self.__unsafe_private_named.40 = value;
+        self._fields.40 = value;
         self
     }
 }
@@ -7278,7 +7281,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectCountryOfOrigin<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.41 = value.into();
+        self._fields.41 = value.into();
         self
     }
     /// Set the `countryOfOrigin` field to an Option value (optional)
@@ -7286,7 +7289,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectCountryOfOrigin<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.41 = value;
+        self._fields.41 = value;
         self
     }
 }
@@ -7297,7 +7300,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectCreativeWorkStatus<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.42 = value.into();
+        self._fields.42 = value.into();
         self
     }
     /// Set the `creativeWorkStatus` field to an Option value (optional)
@@ -7305,7 +7308,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectCreativeWorkStatus<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.42 = value;
+        self._fields.42 = value;
         self
     }
 }
@@ -7313,12 +7316,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `creator` field (optional)
     pub fn creator(mut self, value: impl Into<Option<ImageObjectCreator<'a>>>) -> Self {
-        self.__unsafe_private_named.43 = value.into();
+        self._fields.43 = value.into();
         self
     }
     /// Set the `creator` field to an Option value (optional)
     pub fn maybe_creator(mut self, value: Option<ImageObjectCreator<'a>>) -> Self {
-        self.__unsafe_private_named.43 = value;
+        self._fields.43 = value;
         self
     }
 }
@@ -7329,7 +7332,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectCreditText<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.44 = value.into();
+        self._fields.44 = value.into();
         self
     }
     /// Set the `creditText` field to an Option value (optional)
@@ -7337,7 +7340,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectCreditText<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.44 = value;
+        self._fields.44 = value;
         self
     }
 }
@@ -7348,7 +7351,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectDateCreated<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value.into();
+        self._fields.45 = value.into();
         self
     }
     /// Set the `dateCreated` field to an Option value (optional)
@@ -7356,7 +7359,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectDateCreated<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value;
+        self._fields.45 = value;
         self
     }
 }
@@ -7367,7 +7370,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectDateModified<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.46 = value.into();
+        self._fields.46 = value.into();
         self
     }
     /// Set the `dateModified` field to an Option value (optional)
@@ -7375,7 +7378,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectDateModified<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.46 = value;
+        self._fields.46 = value;
         self
     }
 }
@@ -7386,7 +7389,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectDatePublished<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.47 = value.into();
+        self._fields.47 = value.into();
         self
     }
     /// Set the `datePublished` field to an Option value (optional)
@@ -7394,7 +7397,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectDatePublished<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.47 = value;
+        self._fields.47 = value;
         self
     }
 }
@@ -7405,7 +7408,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value.into();
+        self._fields.48 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
@@ -7413,7 +7416,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value;
+        self._fields.48 = value;
         self
     }
 }
@@ -7424,7 +7427,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectDigitalSourceType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.49 = value.into();
+        self._fields.49 = value.into();
         self
     }
     /// Set the `digitalSourceType` field to an Option value (optional)
@@ -7432,7 +7435,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectDigitalSourceType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.49 = value;
+        self._fields.49 = value;
         self
     }
 }
@@ -7443,7 +7446,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectDisambiguatingDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.50 = value.into();
+        self._fields.50 = value.into();
         self
     }
     /// Set the `disambiguatingDescription` field to an Option value (optional)
@@ -7451,7 +7454,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectDisambiguatingDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.50 = value;
+        self._fields.50 = value;
         self
     }
 }
@@ -7462,7 +7465,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectDiscussionUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.51 = value.into();
+        self._fields.51 = value.into();
         self
     }
     /// Set the `discussionUrl` field to an Option value (optional)
@@ -7470,7 +7473,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectDiscussionUrl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.51 = value;
+        self._fields.51 = value;
         self
     }
 }
@@ -7481,12 +7484,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectDuration<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.52 = value.into();
+        self._fields.52 = value.into();
         self
     }
     /// Set the `duration` field to an Option value (optional)
     pub fn maybe_duration(mut self, value: Option<ImageObjectDuration<'a>>) -> Self {
-        self.__unsafe_private_named.52 = value;
+        self._fields.52 = value;
         self
     }
 }
@@ -7497,12 +7500,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectEditEidr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.53 = value.into();
+        self._fields.53 = value.into();
         self
     }
     /// Set the `editEIDR` field to an Option value (optional)
     pub fn maybe_edit_eidr(mut self, value: Option<ImageObjectEditEidr<'a>>) -> Self {
-        self.__unsafe_private_named.53 = value;
+        self._fields.53 = value;
         self
     }
 }
@@ -7510,12 +7513,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `editor` field (optional)
     pub fn editor(mut self, value: impl Into<Option<ImageObjectEditor<'a>>>) -> Self {
-        self.__unsafe_private_named.54 = value.into();
+        self._fields.54 = value.into();
         self
     }
     /// Set the `editor` field to an Option value (optional)
     pub fn maybe_editor(mut self, value: Option<ImageObjectEditor<'a>>) -> Self {
-        self.__unsafe_private_named.54 = value;
+        self._fields.54 = value;
         self
     }
 }
@@ -7526,7 +7529,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectEducationalAlignment<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.55 = value.into();
+        self._fields.55 = value.into();
         self
     }
     /// Set the `educationalAlignment` field to an Option value (optional)
@@ -7534,7 +7537,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectEducationalAlignment<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.55 = value;
+        self._fields.55 = value;
         self
     }
 }
@@ -7545,7 +7548,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectEducationalLevel<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value.into();
+        self._fields.56 = value.into();
         self
     }
     /// Set the `educationalLevel` field to an Option value (optional)
@@ -7553,7 +7556,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectEducationalLevel<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value;
+        self._fields.56 = value;
         self
     }
 }
@@ -7564,7 +7567,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectEducationalUse<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.57 = value.into();
+        self._fields.57 = value.into();
         self
     }
     /// Set the `educationalUse` field to an Option value (optional)
@@ -7572,7 +7575,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectEducationalUse<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.57 = value;
+        self._fields.57 = value;
         self
     }
 }
@@ -7583,12 +7586,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectEmbedUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.58 = value.into();
+        self._fields.58 = value.into();
         self
     }
     /// Set the `embedUrl` field to an Option value (optional)
     pub fn maybe_embed_url(mut self, value: Option<ImageObjectEmbedUrl<'a>>) -> Self {
-        self.__unsafe_private_named.58 = value;
+        self._fields.58 = value;
         self
     }
 }
@@ -7599,7 +7602,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectEmbeddedTextCaption<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.59 = value.into();
+        self._fields.59 = value.into();
         self
     }
     /// Set the `embeddedTextCaption` field to an Option value (optional)
@@ -7607,7 +7610,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectEmbeddedTextCaption<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.59 = value;
+        self._fields.59 = value;
         self
     }
 }
@@ -7618,7 +7621,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectEncodesCreativeWork<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.60 = value.into();
+        self._fields.60 = value.into();
         self
     }
     /// Set the `encodesCreativeWork` field to an Option value (optional)
@@ -7626,7 +7629,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectEncodesCreativeWork<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.60 = value;
+        self._fields.60 = value;
         self
     }
 }
@@ -7637,12 +7640,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectEncoding<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.61 = value.into();
+        self._fields.61 = value.into();
         self
     }
     /// Set the `encoding` field to an Option value (optional)
     pub fn maybe_encoding(mut self, value: Option<ImageObjectEncoding<'a>>) -> Self {
-        self.__unsafe_private_named.61 = value;
+        self._fields.61 = value;
         self
     }
 }
@@ -7653,7 +7656,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectEncodingFormat<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.62 = value.into();
+        self._fields.62 = value.into();
         self
     }
     /// Set the `encodingFormat` field to an Option value (optional)
@@ -7661,7 +7664,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectEncodingFormat<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.62 = value;
+        self._fields.62 = value;
         self
     }
 }
@@ -7672,12 +7675,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectEncodings<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.63 = value.into();
+        self._fields.63 = value.into();
         self
     }
     /// Set the `encodings` field to an Option value (optional)
     pub fn maybe_encodings(mut self, value: Option<ImageObjectEncodings<'a>>) -> Self {
-        self.__unsafe_private_named.63 = value;
+        self._fields.63 = value;
         self
     }
 }
@@ -7685,12 +7688,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `endTime` field (optional)
     pub fn end_time(mut self, value: impl Into<Option<ImageObjectEndTime<'a>>>) -> Self {
-        self.__unsafe_private_named.64 = value.into();
+        self._fields.64 = value.into();
         self
     }
     /// Set the `endTime` field to an Option value (optional)
     pub fn maybe_end_time(mut self, value: Option<ImageObjectEndTime<'a>>) -> Self {
-        self.__unsafe_private_named.64 = value;
+        self._fields.64 = value;
         self
     }
 }
@@ -7701,7 +7704,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectExampleOfWork<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.65 = value.into();
+        self._fields.65 = value.into();
         self
     }
     /// Set the `exampleOfWork` field to an Option value (optional)
@@ -7709,7 +7712,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectExampleOfWork<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.65 = value;
+        self._fields.65 = value;
         self
     }
 }
@@ -7720,12 +7723,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectExifData<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.66 = value.into();
+        self._fields.66 = value.into();
         self
     }
     /// Set the `exifData` field to an Option value (optional)
     pub fn maybe_exif_data(mut self, value: Option<ImageObjectExifData<'a>>) -> Self {
-        self.__unsafe_private_named.66 = value;
+        self._fields.66 = value;
         self
     }
 }
@@ -7733,12 +7736,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `expires` field (optional)
     pub fn expires(mut self, value: impl Into<Option<ImageObjectExpires<'a>>>) -> Self {
-        self.__unsafe_private_named.67 = value.into();
+        self._fields.67 = value.into();
         self
     }
     /// Set the `expires` field to an Option value (optional)
     pub fn maybe_expires(mut self, value: Option<ImageObjectExpires<'a>>) -> Self {
-        self.__unsafe_private_named.67 = value;
+        self._fields.67 = value;
         self
     }
 }
@@ -7749,7 +7752,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectFileFormat<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.68 = value.into();
+        self._fields.68 = value.into();
         self
     }
     /// Set the `fileFormat` field to an Option value (optional)
@@ -7757,7 +7760,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectFileFormat<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.68 = value;
+        self._fields.68 = value;
         self
     }
 }
@@ -7765,12 +7768,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `funder` field (optional)
     pub fn funder(mut self, value: impl Into<Option<ImageObjectFunder<'a>>>) -> Self {
-        self.__unsafe_private_named.69 = value.into();
+        self._fields.69 = value.into();
         self
     }
     /// Set the `funder` field to an Option value (optional)
     pub fn maybe_funder(mut self, value: Option<ImageObjectFunder<'a>>) -> Self {
-        self.__unsafe_private_named.69 = value;
+        self._fields.69 = value;
         self
     }
 }
@@ -7778,12 +7781,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<ImageObjectFunding<'a>>>) -> Self {
-        self.__unsafe_private_named.70 = value.into();
+        self._fields.70 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
     pub fn maybe_funding(mut self, value: Option<ImageObjectFunding<'a>>) -> Self {
-        self.__unsafe_private_named.70 = value;
+        self._fields.70 = value;
         self
     }
 }
@@ -7791,12 +7794,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<ImageObjectGenre<'a>>>) -> Self {
-        self.__unsafe_private_named.71 = value.into();
+        self._fields.71 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
     pub fn maybe_genre(mut self, value: Option<ImageObjectGenre<'a>>) -> Self {
-        self.__unsafe_private_named.71 = value;
+        self._fields.71 = value;
         self
     }
 }
@@ -7804,12 +7807,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `hasPart` field (optional)
     pub fn has_part(mut self, value: impl Into<Option<ImageObjectHasPart<'a>>>) -> Self {
-        self.__unsafe_private_named.72 = value.into();
+        self._fields.72 = value.into();
         self
     }
     /// Set the `hasPart` field to an Option value (optional)
     pub fn maybe_has_part(mut self, value: Option<ImageObjectHasPart<'a>>) -> Self {
-        self.__unsafe_private_named.72 = value;
+        self._fields.72 = value;
         self
     }
 }
@@ -7820,12 +7823,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectHeadline<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.73 = value.into();
+        self._fields.73 = value.into();
         self
     }
     /// Set the `headline` field to an Option value (optional)
     pub fn maybe_headline(mut self, value: Option<ImageObjectHeadline<'a>>) -> Self {
-        self.__unsafe_private_named.73 = value;
+        self._fields.73 = value;
         self
     }
 }
@@ -7833,12 +7836,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `height` field (optional)
     pub fn height(mut self, value: impl Into<Option<ImageObjectHeight<'a>>>) -> Self {
-        self.__unsafe_private_named.74 = value.into();
+        self._fields.74 = value.into();
         self
     }
     /// Set the `height` field to an Option value (optional)
     pub fn maybe_height(mut self, value: Option<ImageObjectHeight<'a>>) -> Self {
-        self.__unsafe_private_named.74 = value;
+        self._fields.74 = value;
         self
     }
 }
@@ -7849,12 +7852,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectIdentifier<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.75 = value.into();
+        self._fields.75 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
     pub fn maybe_identifier(mut self, value: Option<ImageObjectIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.75 = value;
+        self._fields.75 = value;
         self
     }
 }
@@ -7862,12 +7865,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<ImageObjectImage<'a>>>) -> Self {
-        self.__unsafe_private_named.76 = value.into();
+        self._fields.76 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<ImageObjectImage<'a>>) -> Self {
-        self.__unsafe_private_named.76 = value;
+        self._fields.76 = value;
         self
     }
 }
@@ -7878,7 +7881,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectInLanguage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.77 = value.into();
+        self._fields.77 = value.into();
         self
     }
     /// Set the `inLanguage` field to an Option value (optional)
@@ -7886,7 +7889,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectInLanguage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.77 = value;
+        self._fields.77 = value;
         self
     }
 }
@@ -7897,7 +7900,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectIneligibleRegion<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.78 = value.into();
+        self._fields.78 = value.into();
         self
     }
     /// Set the `ineligibleRegion` field to an Option value (optional)
@@ -7905,7 +7908,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectIneligibleRegion<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.78 = value;
+        self._fields.78 = value;
         self
     }
 }
@@ -7916,7 +7919,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectInteractionStatistic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.79 = value.into();
+        self._fields.79 = value.into();
         self
     }
     /// Set the `interactionStatistic` field to an Option value (optional)
@@ -7924,7 +7927,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectInteractionStatistic<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.79 = value;
+        self._fields.79 = value;
         self
     }
 }
@@ -7935,7 +7938,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectInteractivityType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.80 = value.into();
+        self._fields.80 = value.into();
         self
     }
     /// Set the `interactivityType` field to an Option value (optional)
@@ -7943,7 +7946,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectInteractivityType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.80 = value;
+        self._fields.80 = value;
         self
     }
 }
@@ -7954,7 +7957,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectInterpretedAsClaim<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.81 = value.into();
+        self._fields.81 = value.into();
         self
     }
     /// Set the `interpretedAsClaim` field to an Option value (optional)
@@ -7962,7 +7965,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectInterpretedAsClaim<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.81 = value;
+        self._fields.81 = value;
         self
     }
 }
@@ -7973,7 +7976,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectIsAccessibleForFree<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.82 = value.into();
+        self._fields.82 = value.into();
         self
     }
     /// Set the `isAccessibleForFree` field to an Option value (optional)
@@ -7981,7 +7984,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectIsAccessibleForFree<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.82 = value;
+        self._fields.82 = value;
         self
     }
 }
@@ -7992,12 +7995,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectIsBasedOn<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.83 = value.into();
+        self._fields.83 = value.into();
         self
     }
     /// Set the `isBasedOn` field to an Option value (optional)
     pub fn maybe_is_based_on(mut self, value: Option<ImageObjectIsBasedOn<'a>>) -> Self {
-        self.__unsafe_private_named.83 = value;
+        self._fields.83 = value;
         self
     }
 }
@@ -8008,7 +8011,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectIsBasedOnUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.84 = value.into();
+        self._fields.84 = value.into();
         self
     }
     /// Set the `isBasedOnUrl` field to an Option value (optional)
@@ -8016,7 +8019,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectIsBasedOnUrl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.84 = value;
+        self._fields.84 = value;
         self
     }
 }
@@ -8027,7 +8030,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectIsFamilyFriendly<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.85 = value.into();
+        self._fields.85 = value.into();
         self
     }
     /// Set the `isFamilyFriendly` field to an Option value (optional)
@@ -8035,7 +8038,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectIsFamilyFriendly<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.85 = value;
+        self._fields.85 = value;
         self
     }
 }
@@ -8046,12 +8049,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectIsPartOf<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.86 = value.into();
+        self._fields.86 = value.into();
         self
     }
     /// Set the `isPartOf` field to an Option value (optional)
     pub fn maybe_is_part_of(mut self, value: Option<ImageObjectIsPartOf<'a>>) -> Self {
-        self.__unsafe_private_named.86 = value;
+        self._fields.86 = value;
         self
     }
 }
@@ -8062,12 +8065,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectKeywords<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.87 = value.into();
+        self._fields.87 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
     pub fn maybe_keywords(mut self, value: Option<ImageObjectKeywords<'a>>) -> Self {
-        self.__unsafe_private_named.87 = value;
+        self._fields.87 = value;
         self
     }
 }
@@ -8078,7 +8081,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectLearningResourceType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.88 = value.into();
+        self._fields.88 = value.into();
         self
     }
     /// Set the `learningResourceType` field to an Option value (optional)
@@ -8086,7 +8089,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectLearningResourceType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.88 = value;
+        self._fields.88 = value;
         self
     }
 }
@@ -8094,12 +8097,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `license` field (optional)
     pub fn license(mut self, value: impl Into<Option<ImageObjectLicense<'a>>>) -> Self {
-        self.__unsafe_private_named.89 = value.into();
+        self._fields.89 = value.into();
         self
     }
     /// Set the `license` field to an Option value (optional)
     pub fn maybe_license(mut self, value: Option<ImageObjectLicense<'a>>) -> Self {
-        self.__unsafe_private_named.89 = value;
+        self._fields.89 = value;
         self
     }
 }
@@ -8110,7 +8113,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectLocationCreated<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.90 = value.into();
+        self._fields.90 = value.into();
         self
     }
     /// Set the `locationCreated` field to an Option value (optional)
@@ -8118,7 +8121,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectLocationCreated<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.90 = value;
+        self._fields.90 = value;
         self
     }
 }
@@ -8129,7 +8132,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectMainEntity<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.91 = value.into();
+        self._fields.91 = value.into();
         self
     }
     /// Set the `mainEntity` field to an Option value (optional)
@@ -8137,7 +8140,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectMainEntity<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.91 = value;
+        self._fields.91 = value;
         self
     }
 }
@@ -8148,7 +8151,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectMainEntityOfPage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.92 = value.into();
+        self._fields.92 = value.into();
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
@@ -8156,7 +8159,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectMainEntityOfPage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.92 = value;
+        self._fields.92 = value;
         self
     }
 }
@@ -8167,12 +8170,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectMaintainer<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.93 = value.into();
+        self._fields.93 = value.into();
         self
     }
     /// Set the `maintainer` field to an Option value (optional)
     pub fn maybe_maintainer(mut self, value: Option<ImageObjectMaintainer<'a>>) -> Self {
-        self.__unsafe_private_named.93 = value;
+        self._fields.93 = value;
         self
     }
 }
@@ -8183,12 +8186,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectMaterial<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.94 = value.into();
+        self._fields.94 = value.into();
         self
     }
     /// Set the `material` field to an Option value (optional)
     pub fn maybe_material(mut self, value: Option<ImageObjectMaterial<'a>>) -> Self {
-        self.__unsafe_private_named.94 = value;
+        self._fields.94 = value;
         self
     }
 }
@@ -8199,7 +8202,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectMaterialExtent<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.95 = value.into();
+        self._fields.95 = value.into();
         self
     }
     /// Set the `materialExtent` field to an Option value (optional)
@@ -8207,7 +8210,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectMaterialExtent<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.95 = value;
+        self._fields.95 = value;
         self
     }
 }
@@ -8218,12 +8221,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectMentions<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.96 = value.into();
+        self._fields.96 = value.into();
         self
     }
     /// Set the `mentions` field to an Option value (optional)
     pub fn maybe_mentions(mut self, value: Option<ImageObjectMentions<'a>>) -> Self {
-        self.__unsafe_private_named.96 = value;
+        self._fields.96 = value;
         self
     }
 }
@@ -8231,12 +8234,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<ImageObjectName<'a>>>) -> Self {
-        self.__unsafe_private_named.97 = value.into();
+        self._fields.97 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<ImageObjectName<'a>>) -> Self {
-        self.__unsafe_private_named.97 = value;
+        self._fields.97 = value;
         self
     }
 }
@@ -8244,12 +8247,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `offers` field (optional)
     pub fn offers(mut self, value: impl Into<Option<ImageObjectOffers<'a>>>) -> Self {
-        self.__unsafe_private_named.98 = value.into();
+        self._fields.98 = value.into();
         self
     }
     /// Set the `offers` field to an Option value (optional)
     pub fn maybe_offers(mut self, value: Option<ImageObjectOffers<'a>>) -> Self {
-        self.__unsafe_private_named.98 = value;
+        self._fields.98 = value;
         self
     }
 }
@@ -8257,12 +8260,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `pattern` field (optional)
     pub fn pattern(mut self, value: impl Into<Option<ImageObjectPattern<'a>>>) -> Self {
-        self.__unsafe_private_named.99 = value.into();
+        self._fields.99 = value.into();
         self
     }
     /// Set the `pattern` field to an Option value (optional)
     pub fn maybe_pattern(mut self, value: Option<ImageObjectPattern<'a>>) -> Self {
-        self.__unsafe_private_named.99 = value;
+        self._fields.99 = value;
         self
     }
 }
@@ -8273,7 +8276,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectPlayerType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.100 = value.into();
+        self._fields.100 = value.into();
         self
     }
     /// Set the `playerType` field to an Option value (optional)
@@ -8281,7 +8284,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectPlayerType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.100 = value;
+        self._fields.100 = value;
         self
     }
 }
@@ -8292,12 +8295,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectPosition<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.101 = value.into();
+        self._fields.101 = value.into();
         self
     }
     /// Set the `position` field to an Option value (optional)
     pub fn maybe_position(mut self, value: Option<ImageObjectPosition<'a>>) -> Self {
-        self.__unsafe_private_named.101 = value;
+        self._fields.101 = value;
         self
     }
 }
@@ -8308,7 +8311,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectPotentialAction<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.102 = value.into();
+        self._fields.102 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
@@ -8316,7 +8319,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectPotentialAction<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.102 = value;
+        self._fields.102 = value;
         self
     }
 }
@@ -8327,12 +8330,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectProducer<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.103 = value.into();
+        self._fields.103 = value.into();
         self
     }
     /// Set the `producer` field to an Option value (optional)
     pub fn maybe_producer(mut self, value: Option<ImageObjectProducer<'a>>) -> Self {
-        self.__unsafe_private_named.103 = value;
+        self._fields.103 = value;
         self
     }
 }
@@ -8343,7 +8346,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectProductionCompany<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.104 = value.into();
+        self._fields.104 = value.into();
         self
     }
     /// Set the `productionCompany` field to an Option value (optional)
@@ -8351,7 +8354,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectProductionCompany<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.104 = value;
+        self._fields.104 = value;
         self
     }
 }
@@ -8362,12 +8365,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectProvider<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.105 = value.into();
+        self._fields.105 = value.into();
         self
     }
     /// Set the `provider` field to an Option value (optional)
     pub fn maybe_provider(mut self, value: Option<ImageObjectProvider<'a>>) -> Self {
-        self.__unsafe_private_named.105 = value;
+        self._fields.105 = value;
         self
     }
 }
@@ -8378,7 +8381,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectPublication<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.106 = value.into();
+        self._fields.106 = value.into();
         self
     }
     /// Set the `publication` field to an Option value (optional)
@@ -8386,7 +8389,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectPublication<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.106 = value;
+        self._fields.106 = value;
         self
     }
 }
@@ -8397,12 +8400,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectPublisher<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.107 = value.into();
+        self._fields.107 = value.into();
         self
     }
     /// Set the `publisher` field to an Option value (optional)
     pub fn maybe_publisher(mut self, value: Option<ImageObjectPublisher<'a>>) -> Self {
-        self.__unsafe_private_named.107 = value;
+        self._fields.107 = value;
         self
     }
 }
@@ -8413,7 +8416,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectPublisherImprint<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.108 = value.into();
+        self._fields.108 = value.into();
         self
     }
     /// Set the `publisherImprint` field to an Option value (optional)
@@ -8421,7 +8424,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectPublisherImprint<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.108 = value;
+        self._fields.108 = value;
         self
     }
 }
@@ -8432,7 +8435,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectPublishingPrinciples<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.109 = value.into();
+        self._fields.109 = value.into();
         self
     }
     /// Set the `publishingPrinciples` field to an Option value (optional)
@@ -8440,7 +8443,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectPublishingPrinciples<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.109 = value;
+        self._fields.109 = value;
         self
     }
 }
@@ -8451,7 +8454,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectRecordedAt<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.110 = value.into();
+        self._fields.110 = value.into();
         self
     }
     /// Set the `recordedAt` field to an Option value (optional)
@@ -8459,7 +8462,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectRecordedAt<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.110 = value;
+        self._fields.110 = value;
         self
     }
 }
@@ -8470,7 +8473,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectRegionsAllowed<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.111 = value.into();
+        self._fields.111 = value.into();
         self
     }
     /// Set the `regionsAllowed` field to an Option value (optional)
@@ -8478,7 +8481,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectRegionsAllowed<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.111 = value;
+        self._fields.111 = value;
         self
     }
 }
@@ -8489,7 +8492,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectReleasedEvent<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.112 = value.into();
+        self._fields.112 = value.into();
         self
     }
     /// Set the `releasedEvent` field to an Option value (optional)
@@ -8497,7 +8500,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectReleasedEvent<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.112 = value;
+        self._fields.112 = value;
         self
     }
 }
@@ -8508,7 +8511,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectRepresentativeOfPage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.113 = value.into();
+        self._fields.113 = value.into();
         self
     }
     /// Set the `representativeOfPage` field to an Option value (optional)
@@ -8516,7 +8519,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectRepresentativeOfPage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.113 = value;
+        self._fields.113 = value;
         self
     }
 }
@@ -8527,7 +8530,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectRequiresSubscription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.114 = value.into();
+        self._fields.114 = value.into();
         self
     }
     /// Set the `requiresSubscription` field to an Option value (optional)
@@ -8535,7 +8538,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectRequiresSubscription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.114 = value;
+        self._fields.114 = value;
         self
     }
 }
@@ -8543,12 +8546,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<ImageObjectReview<'a>>>) -> Self {
-        self.__unsafe_private_named.115 = value.into();
+        self._fields.115 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
     pub fn maybe_review(mut self, value: Option<ImageObjectReview<'a>>) -> Self {
-        self.__unsafe_private_named.115 = value;
+        self._fields.115 = value;
         self
     }
 }
@@ -8556,12 +8559,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `reviews` field (optional)
     pub fn reviews(mut self, value: impl Into<Option<ImageObjectReviews<'a>>>) -> Self {
-        self.__unsafe_private_named.116 = value.into();
+        self._fields.116 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
     pub fn maybe_reviews(mut self, value: Option<ImageObjectReviews<'a>>) -> Self {
-        self.__unsafe_private_named.116 = value;
+        self._fields.116 = value;
         self
     }
 }
@@ -8569,12 +8572,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<ImageObjectSameAs<'a>>>) -> Self {
-        self.__unsafe_private_named.117 = value.into();
+        self._fields.117 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
     pub fn maybe_same_as(mut self, value: Option<ImageObjectSameAs<'a>>) -> Self {
-        self.__unsafe_private_named.117 = value;
+        self._fields.117 = value;
         self
     }
 }
@@ -8585,7 +8588,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectSchemaVersion<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.118 = value.into();
+        self._fields.118 = value.into();
         self
     }
     /// Set the `schemaVersion` field to an Option value (optional)
@@ -8593,7 +8596,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectSchemaVersion<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.118 = value;
+        self._fields.118 = value;
         self
     }
 }
@@ -8604,7 +8607,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectSdDatePublished<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.119 = value.into();
+        self._fields.119 = value.into();
         self
     }
     /// Set the `sdDatePublished` field to an Option value (optional)
@@ -8612,7 +8615,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectSdDatePublished<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.119 = value;
+        self._fields.119 = value;
         self
     }
 }
@@ -8623,12 +8626,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectSdLicense<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.120 = value.into();
+        self._fields.120 = value.into();
         self
     }
     /// Set the `sdLicense` field to an Option value (optional)
     pub fn maybe_sd_license(mut self, value: Option<ImageObjectSdLicense<'a>>) -> Self {
-        self.__unsafe_private_named.120 = value;
+        self._fields.120 = value;
         self
     }
 }
@@ -8639,7 +8642,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectSdPublisher<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.121 = value.into();
+        self._fields.121 = value.into();
         self
     }
     /// Set the `sdPublisher` field to an Option value (optional)
@@ -8647,7 +8650,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectSdPublisher<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.121 = value;
+        self._fields.121 = value;
         self
     }
 }
@@ -8655,12 +8658,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `sha256` field (optional)
     pub fn sha256(mut self, value: impl Into<Option<ImageObjectSha256<'a>>>) -> Self {
-        self.__unsafe_private_named.122 = value.into();
+        self._fields.122 = value.into();
         self
     }
     /// Set the `sha256` field to an Option value (optional)
     pub fn maybe_sha256(mut self, value: Option<ImageObjectSha256<'a>>) -> Self {
-        self.__unsafe_private_named.122 = value;
+        self._fields.122 = value;
         self
     }
 }
@@ -8668,12 +8671,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<ImageObjectSize<'a>>>) -> Self {
-        self.__unsafe_private_named.123 = value.into();
+        self._fields.123 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
     pub fn maybe_size(mut self, value: Option<ImageObjectSize<'a>>) -> Self {
-        self.__unsafe_private_named.123 = value;
+        self._fields.123 = value;
         self
     }
 }
@@ -8684,7 +8687,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectSourceOrganization<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.124 = value.into();
+        self._fields.124 = value.into();
         self
     }
     /// Set the `sourceOrganization` field to an Option value (optional)
@@ -8692,7 +8695,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectSourceOrganization<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.124 = value;
+        self._fields.124 = value;
         self
     }
 }
@@ -8700,12 +8703,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `spatial` field (optional)
     pub fn spatial(mut self, value: impl Into<Option<ImageObjectSpatial<'a>>>) -> Self {
-        self.__unsafe_private_named.125 = value.into();
+        self._fields.125 = value.into();
         self
     }
     /// Set the `spatial` field to an Option value (optional)
     pub fn maybe_spatial(mut self, value: Option<ImageObjectSpatial<'a>>) -> Self {
-        self.__unsafe_private_named.125 = value;
+        self._fields.125 = value;
         self
     }
 }
@@ -8716,7 +8719,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectSpatialCoverage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.126 = value.into();
+        self._fields.126 = value.into();
         self
     }
     /// Set the `spatialCoverage` field to an Option value (optional)
@@ -8724,7 +8727,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectSpatialCoverage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.126 = value;
+        self._fields.126 = value;
         self
     }
 }
@@ -8732,12 +8735,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `sponsor` field (optional)
     pub fn sponsor(mut self, value: impl Into<Option<ImageObjectSponsor<'a>>>) -> Self {
-        self.__unsafe_private_named.127 = value.into();
+        self._fields.127 = value.into();
         self
     }
     /// Set the `sponsor` field to an Option value (optional)
     pub fn maybe_sponsor(mut self, value: Option<ImageObjectSponsor<'a>>) -> Self {
-        self.__unsafe_private_named.127 = value;
+        self._fields.127 = value;
         self
     }
 }
@@ -8748,12 +8751,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectStartTime<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.128 = value.into();
+        self._fields.128 = value.into();
         self
     }
     /// Set the `startTime` field to an Option value (optional)
     pub fn maybe_start_time(mut self, value: Option<ImageObjectStartTime<'a>>) -> Self {
-        self.__unsafe_private_named.128 = value;
+        self._fields.128 = value;
         self
     }
 }
@@ -8764,12 +8767,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectSubjectOf<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.129 = value.into();
+        self._fields.129 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
     pub fn maybe_subject_of(mut self, value: Option<ImageObjectSubjectOf<'a>>) -> Self {
-        self.__unsafe_private_named.129 = value;
+        self._fields.129 = value;
         self
     }
 }
@@ -8777,12 +8780,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `teaches` field (optional)
     pub fn teaches(mut self, value: impl Into<Option<ImageObjectTeaches<'a>>>) -> Self {
-        self.__unsafe_private_named.130 = value.into();
+        self._fields.130 = value.into();
         self
     }
     /// Set the `teaches` field to an Option value (optional)
     pub fn maybe_teaches(mut self, value: Option<ImageObjectTeaches<'a>>) -> Self {
-        self.__unsafe_private_named.130 = value;
+        self._fields.130 = value;
         self
     }
 }
@@ -8793,12 +8796,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectTemporal<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.131 = value.into();
+        self._fields.131 = value.into();
         self
     }
     /// Set the `temporal` field to an Option value (optional)
     pub fn maybe_temporal(mut self, value: Option<ImageObjectTemporal<'a>>) -> Self {
-        self.__unsafe_private_named.131 = value;
+        self._fields.131 = value;
         self
     }
 }
@@ -8809,7 +8812,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectTemporalCoverage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.132 = value.into();
+        self._fields.132 = value.into();
         self
     }
     /// Set the `temporalCoverage` field to an Option value (optional)
@@ -8817,7 +8820,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectTemporalCoverage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.132 = value;
+        self._fields.132 = value;
         self
     }
 }
@@ -8825,12 +8828,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<ImageObjectText<'a>>>) -> Self {
-        self.__unsafe_private_named.133 = value.into();
+        self._fields.133 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
     pub fn maybe_text(mut self, value: Option<ImageObjectText<'a>>) -> Self {
-        self.__unsafe_private_named.133 = value;
+        self._fields.133 = value;
         self
     }
 }
@@ -8841,12 +8844,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectThumbnail<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.134 = value.into();
+        self._fields.134 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
     pub fn maybe_thumbnail(mut self, value: Option<ImageObjectThumbnail<'a>>) -> Self {
-        self.__unsafe_private_named.134 = value;
+        self._fields.134 = value;
         self
     }
 }
@@ -8857,7 +8860,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectThumbnailUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.135 = value.into();
+        self._fields.135 = value.into();
         self
     }
     /// Set the `thumbnailUrl` field to an Option value (optional)
@@ -8865,7 +8868,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectThumbnailUrl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.135 = value;
+        self._fields.135 = value;
         self
     }
 }
@@ -8876,7 +8879,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectTimeRequired<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.136 = value.into();
+        self._fields.136 = value.into();
         self
     }
     /// Set the `timeRequired` field to an Option value (optional)
@@ -8884,7 +8887,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectTimeRequired<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.136 = value;
+        self._fields.136 = value;
         self
     }
 }
@@ -8895,7 +8898,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectTranslationOfWork<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.137 = value.into();
+        self._fields.137 = value.into();
         self
     }
     /// Set the `translationOfWork` field to an Option value (optional)
@@ -8903,7 +8906,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectTranslationOfWork<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.137 = value;
+        self._fields.137 = value;
         self
     }
 }
@@ -8914,12 +8917,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectTranslator<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.138 = value.into();
+        self._fields.138 = value.into();
         self
     }
     /// Set the `translator` field to an Option value (optional)
     pub fn maybe_translator(mut self, value: Option<ImageObjectTranslator<'a>>) -> Self {
-        self.__unsafe_private_named.138 = value;
+        self._fields.138 = value;
         self
     }
 }
@@ -8930,7 +8933,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectTypicalAgeRange<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.139 = value.into();
+        self._fields.139 = value.into();
         self
     }
     /// Set the `typicalAgeRange` field to an Option value (optional)
@@ -8938,7 +8941,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectTypicalAgeRange<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.139 = value;
+        self._fields.139 = value;
         self
     }
 }
@@ -8949,7 +8952,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectUploadDate<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.140 = value.into();
+        self._fields.140 = value.into();
         self
     }
     /// Set the `uploadDate` field to an Option value (optional)
@@ -8957,7 +8960,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectUploadDate<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.140 = value;
+        self._fields.140 = value;
         self
     }
 }
@@ -8965,12 +8968,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<ImageObjectUrl<'a>>>) -> Self {
-        self.__unsafe_private_named.141 = value.into();
+        self._fields.141 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<ImageObjectUrl<'a>>) -> Self {
-        self.__unsafe_private_named.141 = value;
+        self._fields.141 = value;
         self
     }
 }
@@ -8981,12 +8984,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectUsageInfo<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.142 = value.into();
+        self._fields.142 = value.into();
         self
     }
     /// Set the `usageInfo` field to an Option value (optional)
     pub fn maybe_usage_info(mut self, value: Option<ImageObjectUsageInfo<'a>>) -> Self {
-        self.__unsafe_private_named.142 = value;
+        self._fields.142 = value;
         self
     }
 }
@@ -8994,12 +8997,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `version` field (optional)
     pub fn version(mut self, value: impl Into<Option<ImageObjectVersion<'a>>>) -> Self {
-        self.__unsafe_private_named.143 = value.into();
+        self._fields.143 = value.into();
         self
     }
     /// Set the `version` field to an Option value (optional)
     pub fn maybe_version(mut self, value: Option<ImageObjectVersion<'a>>) -> Self {
-        self.__unsafe_private_named.143 = value;
+        self._fields.143 = value;
         self
     }
 }
@@ -9007,12 +9010,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `video` field (optional)
     pub fn video(mut self, value: impl Into<Option<ImageObjectVideo<'a>>>) -> Self {
-        self.__unsafe_private_named.144 = value.into();
+        self._fields.144 = value.into();
         self
     }
     /// Set the `video` field to an Option value (optional)
     pub fn maybe_video(mut self, value: Option<ImageObjectVideo<'a>>) -> Self {
-        self.__unsafe_private_named.144 = value;
+        self._fields.144 = value;
         self
     }
 }
@@ -9020,12 +9023,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
 impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
     /// Set the `width` field (optional)
     pub fn width(mut self, value: impl Into<Option<ImageObjectWidth<'a>>>) -> Self {
-        self.__unsafe_private_named.145 = value.into();
+        self._fields.145 = value.into();
         self
     }
     /// Set the `width` field to an Option value (optional)
     pub fn maybe_width(mut self, value: Option<ImageObjectWidth<'a>>) -> Self {
-        self.__unsafe_private_named.145 = value;
+        self._fields.145 = value;
         self
     }
 }
@@ -9036,12 +9039,12 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectWordCount<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.146 = value.into();
+        self._fields.146 = value.into();
         self
     }
     /// Set the `wordCount` field to an Option value (optional)
     pub fn maybe_word_count(mut self, value: Option<ImageObjectWordCount<'a>>) -> Self {
-        self.__unsafe_private_named.146 = value;
+        self._fields.146 = value;
         self
     }
 }
@@ -9052,7 +9055,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectWorkExample<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.147 = value.into();
+        self._fields.147 = value.into();
         self
     }
     /// Set the `workExample` field to an Option value (optional)
@@ -9060,7 +9063,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectWorkExample<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.147 = value;
+        self._fields.147 = value;
         self
     }
 }
@@ -9071,7 +9074,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ImageObjectWorkTranslation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.148 = value.into();
+        self._fields.148 = value.into();
         self
     }
     /// Set the `workTranslation` field to an Option value (optional)
@@ -9079,7 +9082,7 @@ impl<'a, S: image_object_state::State> ImageObjectBuilder<'a, S> {
         mut self,
         value: Option<ImageObjectWorkTranslation<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.148 = value;
+        self._fields.148 = value;
         self
     }
 }
@@ -9091,155 +9094,155 @@ where
     /// Build the final struct
     pub fn build(self) -> ImageObject<'a> {
         ImageObject {
-            about: self.__unsafe_private_named.0,
-            r#abstract: self.__unsafe_private_named.1,
-            access_mode: self.__unsafe_private_named.2,
-            access_mode_sufficient: self.__unsafe_private_named.3,
-            accessibility_api: self.__unsafe_private_named.4,
-            accessibility_control: self.__unsafe_private_named.5,
-            accessibility_feature: self.__unsafe_private_named.6,
-            accessibility_hazard: self.__unsafe_private_named.7,
-            accessibility_summary: self.__unsafe_private_named.8,
-            accountable_person: self.__unsafe_private_named.9,
-            acquire_license_page: self.__unsafe_private_named.10,
-            additional_type: self.__unsafe_private_named.11,
-            aggregate_rating: self.__unsafe_private_named.12,
-            alternate_name: self.__unsafe_private_named.13,
-            alternative_headline: self.__unsafe_private_named.14,
-            archived_at: self.__unsafe_private_named.15,
-            assesses: self.__unsafe_private_named.16,
-            associated_article: self.__unsafe_private_named.17,
-            associated_media: self.__unsafe_private_named.18,
-            audience: self.__unsafe_private_named.19,
-            audio: self.__unsafe_private_named.20,
-            author: self.__unsafe_private_named.21,
-            award: self.__unsafe_private_named.22,
-            awards: self.__unsafe_private_named.23,
-            bitrate: self.__unsafe_private_named.24,
-            caption: self.__unsafe_private_named.25,
-            character: self.__unsafe_private_named.26,
-            citation: self.__unsafe_private_named.27,
-            comment: self.__unsafe_private_named.28,
-            comment_count: self.__unsafe_private_named.29,
-            conditions_of_access: self.__unsafe_private_named.30,
-            content_location: self.__unsafe_private_named.31,
-            content_rating: self.__unsafe_private_named.32,
-            content_reference_time: self.__unsafe_private_named.33,
-            content_size: self.__unsafe_private_named.34,
-            content_url: self.__unsafe_private_named.35,
-            contributor: self.__unsafe_private_named.36,
-            copyright_holder: self.__unsafe_private_named.37,
-            copyright_notice: self.__unsafe_private_named.38,
-            copyright_year: self.__unsafe_private_named.39,
-            correction: self.__unsafe_private_named.40,
-            country_of_origin: self.__unsafe_private_named.41,
-            creative_work_status: self.__unsafe_private_named.42,
-            creator: self.__unsafe_private_named.43,
-            credit_text: self.__unsafe_private_named.44,
-            date_created: self.__unsafe_private_named.45,
-            date_modified: self.__unsafe_private_named.46,
-            date_published: self.__unsafe_private_named.47,
-            description: self.__unsafe_private_named.48,
-            digital_source_type: self.__unsafe_private_named.49,
-            disambiguating_description: self.__unsafe_private_named.50,
-            discussion_url: self.__unsafe_private_named.51,
-            duration: self.__unsafe_private_named.52,
-            edit_eidr: self.__unsafe_private_named.53,
-            editor: self.__unsafe_private_named.54,
-            educational_alignment: self.__unsafe_private_named.55,
-            educational_level: self.__unsafe_private_named.56,
-            educational_use: self.__unsafe_private_named.57,
-            embed_url: self.__unsafe_private_named.58,
-            embedded_text_caption: self.__unsafe_private_named.59,
-            encodes_creative_work: self.__unsafe_private_named.60,
-            encoding: self.__unsafe_private_named.61,
-            encoding_format: self.__unsafe_private_named.62,
-            encodings: self.__unsafe_private_named.63,
-            end_time: self.__unsafe_private_named.64,
-            example_of_work: self.__unsafe_private_named.65,
-            exif_data: self.__unsafe_private_named.66,
-            expires: self.__unsafe_private_named.67,
-            file_format: self.__unsafe_private_named.68,
-            funder: self.__unsafe_private_named.69,
-            funding: self.__unsafe_private_named.70,
-            genre: self.__unsafe_private_named.71,
-            has_part: self.__unsafe_private_named.72,
-            headline: self.__unsafe_private_named.73,
-            height: self.__unsafe_private_named.74,
-            identifier: self.__unsafe_private_named.75,
-            image: self.__unsafe_private_named.76,
-            in_language: self.__unsafe_private_named.77,
-            ineligible_region: self.__unsafe_private_named.78,
-            interaction_statistic: self.__unsafe_private_named.79,
-            interactivity_type: self.__unsafe_private_named.80,
-            interpreted_as_claim: self.__unsafe_private_named.81,
-            is_accessible_for_free: self.__unsafe_private_named.82,
-            is_based_on: self.__unsafe_private_named.83,
-            is_based_on_url: self.__unsafe_private_named.84,
-            is_family_friendly: self.__unsafe_private_named.85,
-            is_part_of: self.__unsafe_private_named.86,
-            keywords: self.__unsafe_private_named.87,
-            learning_resource_type: self.__unsafe_private_named.88,
-            license: self.__unsafe_private_named.89,
-            location_created: self.__unsafe_private_named.90,
-            main_entity: self.__unsafe_private_named.91,
-            main_entity_of_page: self.__unsafe_private_named.92,
-            maintainer: self.__unsafe_private_named.93,
-            material: self.__unsafe_private_named.94,
-            material_extent: self.__unsafe_private_named.95,
-            mentions: self.__unsafe_private_named.96,
-            name: self.__unsafe_private_named.97,
-            offers: self.__unsafe_private_named.98,
-            pattern: self.__unsafe_private_named.99,
-            player_type: self.__unsafe_private_named.100,
-            position: self.__unsafe_private_named.101,
-            potential_action: self.__unsafe_private_named.102,
-            producer: self.__unsafe_private_named.103,
-            production_company: self.__unsafe_private_named.104,
-            provider: self.__unsafe_private_named.105,
-            publication: self.__unsafe_private_named.106,
-            publisher: self.__unsafe_private_named.107,
-            publisher_imprint: self.__unsafe_private_named.108,
-            publishing_principles: self.__unsafe_private_named.109,
-            recorded_at: self.__unsafe_private_named.110,
-            regions_allowed: self.__unsafe_private_named.111,
-            released_event: self.__unsafe_private_named.112,
-            representative_of_page: self.__unsafe_private_named.113,
-            requires_subscription: self.__unsafe_private_named.114,
-            review: self.__unsafe_private_named.115,
-            reviews: self.__unsafe_private_named.116,
-            same_as: self.__unsafe_private_named.117,
-            schema_version: self.__unsafe_private_named.118,
-            sd_date_published: self.__unsafe_private_named.119,
-            sd_license: self.__unsafe_private_named.120,
-            sd_publisher: self.__unsafe_private_named.121,
-            sha256: self.__unsafe_private_named.122,
-            size: self.__unsafe_private_named.123,
-            source_organization: self.__unsafe_private_named.124,
-            spatial: self.__unsafe_private_named.125,
-            spatial_coverage: self.__unsafe_private_named.126,
-            sponsor: self.__unsafe_private_named.127,
-            start_time: self.__unsafe_private_named.128,
-            subject_of: self.__unsafe_private_named.129,
-            teaches: self.__unsafe_private_named.130,
-            temporal: self.__unsafe_private_named.131,
-            temporal_coverage: self.__unsafe_private_named.132,
-            text: self.__unsafe_private_named.133,
-            thumbnail: self.__unsafe_private_named.134,
-            thumbnail_url: self.__unsafe_private_named.135,
-            time_required: self.__unsafe_private_named.136,
-            translation_of_work: self.__unsafe_private_named.137,
-            translator: self.__unsafe_private_named.138,
-            typical_age_range: self.__unsafe_private_named.139,
-            upload_date: self.__unsafe_private_named.140,
-            url: self.__unsafe_private_named.141,
-            usage_info: self.__unsafe_private_named.142,
-            version: self.__unsafe_private_named.143,
-            video: self.__unsafe_private_named.144,
-            width: self.__unsafe_private_named.145,
-            word_count: self.__unsafe_private_named.146,
-            work_example: self.__unsafe_private_named.147,
-            work_translation: self.__unsafe_private_named.148,
+            about: self._fields.0,
+            r#abstract: self._fields.1,
+            access_mode: self._fields.2,
+            access_mode_sufficient: self._fields.3,
+            accessibility_api: self._fields.4,
+            accessibility_control: self._fields.5,
+            accessibility_feature: self._fields.6,
+            accessibility_hazard: self._fields.7,
+            accessibility_summary: self._fields.8,
+            accountable_person: self._fields.9,
+            acquire_license_page: self._fields.10,
+            additional_type: self._fields.11,
+            aggregate_rating: self._fields.12,
+            alternate_name: self._fields.13,
+            alternative_headline: self._fields.14,
+            archived_at: self._fields.15,
+            assesses: self._fields.16,
+            associated_article: self._fields.17,
+            associated_media: self._fields.18,
+            audience: self._fields.19,
+            audio: self._fields.20,
+            author: self._fields.21,
+            award: self._fields.22,
+            awards: self._fields.23,
+            bitrate: self._fields.24,
+            caption: self._fields.25,
+            character: self._fields.26,
+            citation: self._fields.27,
+            comment: self._fields.28,
+            comment_count: self._fields.29,
+            conditions_of_access: self._fields.30,
+            content_location: self._fields.31,
+            content_rating: self._fields.32,
+            content_reference_time: self._fields.33,
+            content_size: self._fields.34,
+            content_url: self._fields.35,
+            contributor: self._fields.36,
+            copyright_holder: self._fields.37,
+            copyright_notice: self._fields.38,
+            copyright_year: self._fields.39,
+            correction: self._fields.40,
+            country_of_origin: self._fields.41,
+            creative_work_status: self._fields.42,
+            creator: self._fields.43,
+            credit_text: self._fields.44,
+            date_created: self._fields.45,
+            date_modified: self._fields.46,
+            date_published: self._fields.47,
+            description: self._fields.48,
+            digital_source_type: self._fields.49,
+            disambiguating_description: self._fields.50,
+            discussion_url: self._fields.51,
+            duration: self._fields.52,
+            edit_eidr: self._fields.53,
+            editor: self._fields.54,
+            educational_alignment: self._fields.55,
+            educational_level: self._fields.56,
+            educational_use: self._fields.57,
+            embed_url: self._fields.58,
+            embedded_text_caption: self._fields.59,
+            encodes_creative_work: self._fields.60,
+            encoding: self._fields.61,
+            encoding_format: self._fields.62,
+            encodings: self._fields.63,
+            end_time: self._fields.64,
+            example_of_work: self._fields.65,
+            exif_data: self._fields.66,
+            expires: self._fields.67,
+            file_format: self._fields.68,
+            funder: self._fields.69,
+            funding: self._fields.70,
+            genre: self._fields.71,
+            has_part: self._fields.72,
+            headline: self._fields.73,
+            height: self._fields.74,
+            identifier: self._fields.75,
+            image: self._fields.76,
+            in_language: self._fields.77,
+            ineligible_region: self._fields.78,
+            interaction_statistic: self._fields.79,
+            interactivity_type: self._fields.80,
+            interpreted_as_claim: self._fields.81,
+            is_accessible_for_free: self._fields.82,
+            is_based_on: self._fields.83,
+            is_based_on_url: self._fields.84,
+            is_family_friendly: self._fields.85,
+            is_part_of: self._fields.86,
+            keywords: self._fields.87,
+            learning_resource_type: self._fields.88,
+            license: self._fields.89,
+            location_created: self._fields.90,
+            main_entity: self._fields.91,
+            main_entity_of_page: self._fields.92,
+            maintainer: self._fields.93,
+            material: self._fields.94,
+            material_extent: self._fields.95,
+            mentions: self._fields.96,
+            name: self._fields.97,
+            offers: self._fields.98,
+            pattern: self._fields.99,
+            player_type: self._fields.100,
+            position: self._fields.101,
+            potential_action: self._fields.102,
+            producer: self._fields.103,
+            production_company: self._fields.104,
+            provider: self._fields.105,
+            publication: self._fields.106,
+            publisher: self._fields.107,
+            publisher_imprint: self._fields.108,
+            publishing_principles: self._fields.109,
+            recorded_at: self._fields.110,
+            regions_allowed: self._fields.111,
+            released_event: self._fields.112,
+            representative_of_page: self._fields.113,
+            requires_subscription: self._fields.114,
+            review: self._fields.115,
+            reviews: self._fields.116,
+            same_as: self._fields.117,
+            schema_version: self._fields.118,
+            sd_date_published: self._fields.119,
+            sd_license: self._fields.120,
+            sd_publisher: self._fields.121,
+            sha256: self._fields.122,
+            size: self._fields.123,
+            source_organization: self._fields.124,
+            spatial: self._fields.125,
+            spatial_coverage: self._fields.126,
+            sponsor: self._fields.127,
+            start_time: self._fields.128,
+            subject_of: self._fields.129,
+            teaches: self._fields.130,
+            temporal: self._fields.131,
+            temporal_coverage: self._fields.132,
+            text: self._fields.133,
+            thumbnail: self._fields.134,
+            thumbnail_url: self._fields.135,
+            time_required: self._fields.136,
+            translation_of_work: self._fields.137,
+            translator: self._fields.138,
+            typical_age_range: self._fields.139,
+            upload_date: self._fields.140,
+            url: self._fields.141,
+            usage_info: self._fields.142,
+            version: self._fields.143,
+            video: self._fields.144,
+            width: self._fields.145,
+            word_count: self._fields.146,
+            work_example: self._fields.147,
+            work_translation: self._fields.148,
             extra_data: Default::default(),
         }
     }
@@ -9249,155 +9252,155 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ImageObject<'a> {
         ImageObject {
-            about: self.__unsafe_private_named.0,
-            r#abstract: self.__unsafe_private_named.1,
-            access_mode: self.__unsafe_private_named.2,
-            access_mode_sufficient: self.__unsafe_private_named.3,
-            accessibility_api: self.__unsafe_private_named.4,
-            accessibility_control: self.__unsafe_private_named.5,
-            accessibility_feature: self.__unsafe_private_named.6,
-            accessibility_hazard: self.__unsafe_private_named.7,
-            accessibility_summary: self.__unsafe_private_named.8,
-            accountable_person: self.__unsafe_private_named.9,
-            acquire_license_page: self.__unsafe_private_named.10,
-            additional_type: self.__unsafe_private_named.11,
-            aggregate_rating: self.__unsafe_private_named.12,
-            alternate_name: self.__unsafe_private_named.13,
-            alternative_headline: self.__unsafe_private_named.14,
-            archived_at: self.__unsafe_private_named.15,
-            assesses: self.__unsafe_private_named.16,
-            associated_article: self.__unsafe_private_named.17,
-            associated_media: self.__unsafe_private_named.18,
-            audience: self.__unsafe_private_named.19,
-            audio: self.__unsafe_private_named.20,
-            author: self.__unsafe_private_named.21,
-            award: self.__unsafe_private_named.22,
-            awards: self.__unsafe_private_named.23,
-            bitrate: self.__unsafe_private_named.24,
-            caption: self.__unsafe_private_named.25,
-            character: self.__unsafe_private_named.26,
-            citation: self.__unsafe_private_named.27,
-            comment: self.__unsafe_private_named.28,
-            comment_count: self.__unsafe_private_named.29,
-            conditions_of_access: self.__unsafe_private_named.30,
-            content_location: self.__unsafe_private_named.31,
-            content_rating: self.__unsafe_private_named.32,
-            content_reference_time: self.__unsafe_private_named.33,
-            content_size: self.__unsafe_private_named.34,
-            content_url: self.__unsafe_private_named.35,
-            contributor: self.__unsafe_private_named.36,
-            copyright_holder: self.__unsafe_private_named.37,
-            copyright_notice: self.__unsafe_private_named.38,
-            copyright_year: self.__unsafe_private_named.39,
-            correction: self.__unsafe_private_named.40,
-            country_of_origin: self.__unsafe_private_named.41,
-            creative_work_status: self.__unsafe_private_named.42,
-            creator: self.__unsafe_private_named.43,
-            credit_text: self.__unsafe_private_named.44,
-            date_created: self.__unsafe_private_named.45,
-            date_modified: self.__unsafe_private_named.46,
-            date_published: self.__unsafe_private_named.47,
-            description: self.__unsafe_private_named.48,
-            digital_source_type: self.__unsafe_private_named.49,
-            disambiguating_description: self.__unsafe_private_named.50,
-            discussion_url: self.__unsafe_private_named.51,
-            duration: self.__unsafe_private_named.52,
-            edit_eidr: self.__unsafe_private_named.53,
-            editor: self.__unsafe_private_named.54,
-            educational_alignment: self.__unsafe_private_named.55,
-            educational_level: self.__unsafe_private_named.56,
-            educational_use: self.__unsafe_private_named.57,
-            embed_url: self.__unsafe_private_named.58,
-            embedded_text_caption: self.__unsafe_private_named.59,
-            encodes_creative_work: self.__unsafe_private_named.60,
-            encoding: self.__unsafe_private_named.61,
-            encoding_format: self.__unsafe_private_named.62,
-            encodings: self.__unsafe_private_named.63,
-            end_time: self.__unsafe_private_named.64,
-            example_of_work: self.__unsafe_private_named.65,
-            exif_data: self.__unsafe_private_named.66,
-            expires: self.__unsafe_private_named.67,
-            file_format: self.__unsafe_private_named.68,
-            funder: self.__unsafe_private_named.69,
-            funding: self.__unsafe_private_named.70,
-            genre: self.__unsafe_private_named.71,
-            has_part: self.__unsafe_private_named.72,
-            headline: self.__unsafe_private_named.73,
-            height: self.__unsafe_private_named.74,
-            identifier: self.__unsafe_private_named.75,
-            image: self.__unsafe_private_named.76,
-            in_language: self.__unsafe_private_named.77,
-            ineligible_region: self.__unsafe_private_named.78,
-            interaction_statistic: self.__unsafe_private_named.79,
-            interactivity_type: self.__unsafe_private_named.80,
-            interpreted_as_claim: self.__unsafe_private_named.81,
-            is_accessible_for_free: self.__unsafe_private_named.82,
-            is_based_on: self.__unsafe_private_named.83,
-            is_based_on_url: self.__unsafe_private_named.84,
-            is_family_friendly: self.__unsafe_private_named.85,
-            is_part_of: self.__unsafe_private_named.86,
-            keywords: self.__unsafe_private_named.87,
-            learning_resource_type: self.__unsafe_private_named.88,
-            license: self.__unsafe_private_named.89,
-            location_created: self.__unsafe_private_named.90,
-            main_entity: self.__unsafe_private_named.91,
-            main_entity_of_page: self.__unsafe_private_named.92,
-            maintainer: self.__unsafe_private_named.93,
-            material: self.__unsafe_private_named.94,
-            material_extent: self.__unsafe_private_named.95,
-            mentions: self.__unsafe_private_named.96,
-            name: self.__unsafe_private_named.97,
-            offers: self.__unsafe_private_named.98,
-            pattern: self.__unsafe_private_named.99,
-            player_type: self.__unsafe_private_named.100,
-            position: self.__unsafe_private_named.101,
-            potential_action: self.__unsafe_private_named.102,
-            producer: self.__unsafe_private_named.103,
-            production_company: self.__unsafe_private_named.104,
-            provider: self.__unsafe_private_named.105,
-            publication: self.__unsafe_private_named.106,
-            publisher: self.__unsafe_private_named.107,
-            publisher_imprint: self.__unsafe_private_named.108,
-            publishing_principles: self.__unsafe_private_named.109,
-            recorded_at: self.__unsafe_private_named.110,
-            regions_allowed: self.__unsafe_private_named.111,
-            released_event: self.__unsafe_private_named.112,
-            representative_of_page: self.__unsafe_private_named.113,
-            requires_subscription: self.__unsafe_private_named.114,
-            review: self.__unsafe_private_named.115,
-            reviews: self.__unsafe_private_named.116,
-            same_as: self.__unsafe_private_named.117,
-            schema_version: self.__unsafe_private_named.118,
-            sd_date_published: self.__unsafe_private_named.119,
-            sd_license: self.__unsafe_private_named.120,
-            sd_publisher: self.__unsafe_private_named.121,
-            sha256: self.__unsafe_private_named.122,
-            size: self.__unsafe_private_named.123,
-            source_organization: self.__unsafe_private_named.124,
-            spatial: self.__unsafe_private_named.125,
-            spatial_coverage: self.__unsafe_private_named.126,
-            sponsor: self.__unsafe_private_named.127,
-            start_time: self.__unsafe_private_named.128,
-            subject_of: self.__unsafe_private_named.129,
-            teaches: self.__unsafe_private_named.130,
-            temporal: self.__unsafe_private_named.131,
-            temporal_coverage: self.__unsafe_private_named.132,
-            text: self.__unsafe_private_named.133,
-            thumbnail: self.__unsafe_private_named.134,
-            thumbnail_url: self.__unsafe_private_named.135,
-            time_required: self.__unsafe_private_named.136,
-            translation_of_work: self.__unsafe_private_named.137,
-            translator: self.__unsafe_private_named.138,
-            typical_age_range: self.__unsafe_private_named.139,
-            upload_date: self.__unsafe_private_named.140,
-            url: self.__unsafe_private_named.141,
-            usage_info: self.__unsafe_private_named.142,
-            version: self.__unsafe_private_named.143,
-            video: self.__unsafe_private_named.144,
-            width: self.__unsafe_private_named.145,
-            word_count: self.__unsafe_private_named.146,
-            work_example: self.__unsafe_private_named.147,
-            work_translation: self.__unsafe_private_named.148,
+            about: self._fields.0,
+            r#abstract: self._fields.1,
+            access_mode: self._fields.2,
+            access_mode_sufficient: self._fields.3,
+            accessibility_api: self._fields.4,
+            accessibility_control: self._fields.5,
+            accessibility_feature: self._fields.6,
+            accessibility_hazard: self._fields.7,
+            accessibility_summary: self._fields.8,
+            accountable_person: self._fields.9,
+            acquire_license_page: self._fields.10,
+            additional_type: self._fields.11,
+            aggregate_rating: self._fields.12,
+            alternate_name: self._fields.13,
+            alternative_headline: self._fields.14,
+            archived_at: self._fields.15,
+            assesses: self._fields.16,
+            associated_article: self._fields.17,
+            associated_media: self._fields.18,
+            audience: self._fields.19,
+            audio: self._fields.20,
+            author: self._fields.21,
+            award: self._fields.22,
+            awards: self._fields.23,
+            bitrate: self._fields.24,
+            caption: self._fields.25,
+            character: self._fields.26,
+            citation: self._fields.27,
+            comment: self._fields.28,
+            comment_count: self._fields.29,
+            conditions_of_access: self._fields.30,
+            content_location: self._fields.31,
+            content_rating: self._fields.32,
+            content_reference_time: self._fields.33,
+            content_size: self._fields.34,
+            content_url: self._fields.35,
+            contributor: self._fields.36,
+            copyright_holder: self._fields.37,
+            copyright_notice: self._fields.38,
+            copyright_year: self._fields.39,
+            correction: self._fields.40,
+            country_of_origin: self._fields.41,
+            creative_work_status: self._fields.42,
+            creator: self._fields.43,
+            credit_text: self._fields.44,
+            date_created: self._fields.45,
+            date_modified: self._fields.46,
+            date_published: self._fields.47,
+            description: self._fields.48,
+            digital_source_type: self._fields.49,
+            disambiguating_description: self._fields.50,
+            discussion_url: self._fields.51,
+            duration: self._fields.52,
+            edit_eidr: self._fields.53,
+            editor: self._fields.54,
+            educational_alignment: self._fields.55,
+            educational_level: self._fields.56,
+            educational_use: self._fields.57,
+            embed_url: self._fields.58,
+            embedded_text_caption: self._fields.59,
+            encodes_creative_work: self._fields.60,
+            encoding: self._fields.61,
+            encoding_format: self._fields.62,
+            encodings: self._fields.63,
+            end_time: self._fields.64,
+            example_of_work: self._fields.65,
+            exif_data: self._fields.66,
+            expires: self._fields.67,
+            file_format: self._fields.68,
+            funder: self._fields.69,
+            funding: self._fields.70,
+            genre: self._fields.71,
+            has_part: self._fields.72,
+            headline: self._fields.73,
+            height: self._fields.74,
+            identifier: self._fields.75,
+            image: self._fields.76,
+            in_language: self._fields.77,
+            ineligible_region: self._fields.78,
+            interaction_statistic: self._fields.79,
+            interactivity_type: self._fields.80,
+            interpreted_as_claim: self._fields.81,
+            is_accessible_for_free: self._fields.82,
+            is_based_on: self._fields.83,
+            is_based_on_url: self._fields.84,
+            is_family_friendly: self._fields.85,
+            is_part_of: self._fields.86,
+            keywords: self._fields.87,
+            learning_resource_type: self._fields.88,
+            license: self._fields.89,
+            location_created: self._fields.90,
+            main_entity: self._fields.91,
+            main_entity_of_page: self._fields.92,
+            maintainer: self._fields.93,
+            material: self._fields.94,
+            material_extent: self._fields.95,
+            mentions: self._fields.96,
+            name: self._fields.97,
+            offers: self._fields.98,
+            pattern: self._fields.99,
+            player_type: self._fields.100,
+            position: self._fields.101,
+            potential_action: self._fields.102,
+            producer: self._fields.103,
+            production_company: self._fields.104,
+            provider: self._fields.105,
+            publication: self._fields.106,
+            publisher: self._fields.107,
+            publisher_imprint: self._fields.108,
+            publishing_principles: self._fields.109,
+            recorded_at: self._fields.110,
+            regions_allowed: self._fields.111,
+            released_event: self._fields.112,
+            representative_of_page: self._fields.113,
+            requires_subscription: self._fields.114,
+            review: self._fields.115,
+            reviews: self._fields.116,
+            same_as: self._fields.117,
+            schema_version: self._fields.118,
+            sd_date_published: self._fields.119,
+            sd_license: self._fields.120,
+            sd_publisher: self._fields.121,
+            sha256: self._fields.122,
+            size: self._fields.123,
+            source_organization: self._fields.124,
+            spatial: self._fields.125,
+            spatial_coverage: self._fields.126,
+            sponsor: self._fields.127,
+            start_time: self._fields.128,
+            subject_of: self._fields.129,
+            teaches: self._fields.130,
+            temporal: self._fields.131,
+            temporal_coverage: self._fields.132,
+            text: self._fields.133,
+            thumbnail: self._fields.134,
+            thumbnail_url: self._fields.135,
+            time_required: self._fields.136,
+            translation_of_work: self._fields.137,
+            translator: self._fields.138,
+            typical_age_range: self._fields.139,
+            upload_date: self._fields.140,
+            url: self._fields.141,
+            usage_info: self._fields.142,
+            version: self._fields.143,
+            video: self._fields.144,
+            width: self._fields.145,
+            word_count: self._fields.146,
+            work_example: self._fields.147,
+            work_translation: self._fields.148,
             extra_data: Some(extra_data),
         }
     }

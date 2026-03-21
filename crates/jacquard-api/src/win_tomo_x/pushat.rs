@@ -8,7 +8,11 @@
 pub mod allow;
 pub mod push_notify;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -127,58 +131,58 @@ pub mod device_list_item_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type Id;
         type Current;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type Id = Unset;
         type Current = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
         type Name = Set<members::name>;
+        type Current = S::Current;
         type Id = S::Id;
-        type Current = S::Current;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Name = S::Name;
-        type Id = Set<members::id>;
-        type Current = S::Current;
     }
     ///State transition - sets the `current` field to Set
     pub struct SetCurrent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCurrent<S> {}
     impl<S: State> State for SetCurrent<S> {
         type Name = S::Name;
-        type Id = S::Id;
         type Current = Set<members::current>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Name = S::Name;
+        type Current = S::Current;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `current` field
         pub struct current(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DeviceListItemBuilder<'a, S: device_list_item_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>, Option<Tid>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<Tid>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DeviceListItem<'a> {
@@ -192,9 +196,9 @@ impl<'a> DeviceListItemBuilder<'a, device_list_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeviceListItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -209,11 +213,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> DeviceListItemBuilder<'a, device_list_item_state::SetCurrent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DeviceListItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -228,11 +232,11 @@ where
         mut self,
         value: impl Into<Tid>,
     ) -> DeviceListItemBuilder<'a, device_list_item_state::SetId<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DeviceListItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -247,11 +251,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DeviceListItemBuilder<'a, device_list_item_state::SetName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         DeviceListItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -260,15 +264,15 @@ impl<'a, S> DeviceListItemBuilder<'a, S>
 where
     S: device_list_item_state::State,
     S::Name: device_list_item_state::IsSet,
-    S::Id: device_list_item_state::IsSet,
     S::Current: device_list_item_state::IsSet,
+    S::Id: device_list_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeviceListItem<'a> {
         DeviceListItem {
-            current: self.__unsafe_private_named.0.unwrap(),
-            id: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
+            current: self._fields.0.unwrap(),
+            id: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -281,9 +285,9 @@ where
         >,
     ) -> DeviceListItem<'a> {
         DeviceListItem {
-            current: self.__unsafe_private_named.0.unwrap(),
-            id: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
+            current: self._fields.0.unwrap(),
+            id: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

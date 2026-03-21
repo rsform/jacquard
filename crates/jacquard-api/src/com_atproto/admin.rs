@@ -21,7 +21,11 @@ pub mod update_account_password;
 pub mod update_account_signing_key;
 pub mod update_subject_status;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -205,57 +209,57 @@ pub mod account_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Handle;
-        type Did;
         type IndexedAt;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Handle = Unset;
-        type Did = Unset;
         type IndexedAt = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
         type Handle = Set<members::handle>;
+        type IndexedAt = S::IndexedAt;
         type Did = S::Did;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Handle = S::Handle;
-        type Did = Set<members::did>;
-        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
         type Handle = S::Handle;
-        type Did = S::Did;
         type IndexedAt = Set<members::indexed_at>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Handle = S::Handle;
+        type IndexedAt = S::IndexedAt;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `handle` field
         pub struct handle(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AccountViewBuilder<'a, S: account_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Did<'a>>,
         Option<CowStr<'a>>,
@@ -269,7 +273,7 @@ pub struct AccountViewBuilder<'a, S: account_view_state::State> {
         Option<Vec<Data<'a>>>,
         Option<Vec<admin::ThreatSignature<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> AccountView<'a> {
@@ -283,8 +287,8 @@ impl<'a> AccountViewBuilder<'a, account_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AccountViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -298,7 +302,7 @@ impl<'a> AccountViewBuilder<'a, account_view_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -306,12 +310,12 @@ impl<'a> AccountViewBuilder<'a, account_view_state::Empty> {
 impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
     /// Set the `deactivatedAt` field (optional)
     pub fn deactivated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `deactivatedAt` field to an Option value (optional)
     pub fn maybe_deactivated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -326,11 +330,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> AccountViewBuilder<'a, account_view_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AccountViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -338,12 +342,12 @@ where
 impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
     /// Set the `email` field (optional)
     pub fn email(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `email` field to an Option value (optional)
     pub fn maybe_email(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -351,12 +355,12 @@ impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
 impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
     /// Set the `emailConfirmedAt` field (optional)
     pub fn email_confirmed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `emailConfirmedAt` field to an Option value (optional)
     pub fn maybe_email_confirmed_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -371,11 +375,11 @@ where
         mut self,
         value: impl Into<Handle<'a>>,
     ) -> AccountViewBuilder<'a, account_view_state::SetHandle<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         AccountViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -390,11 +394,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> AccountViewBuilder<'a, account_view_state::SetIndexedAt<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         AccountViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -402,12 +406,12 @@ where
 impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
     /// Set the `inviteNote` field (optional)
     pub fn invite_note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `inviteNote` field to an Option value (optional)
     pub fn maybe_invite_note(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -415,12 +419,12 @@ impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
 impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
     /// Set the `invitedBy` field (optional)
     pub fn invited_by(mut self, value: impl Into<Option<InviteCode<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `invitedBy` field to an Option value (optional)
     pub fn maybe_invited_by(mut self, value: Option<InviteCode<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -428,12 +432,12 @@ impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
 impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
     /// Set the `invites` field (optional)
     pub fn invites(mut self, value: impl Into<Option<Vec<InviteCode<'a>>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `invites` field to an Option value (optional)
     pub fn maybe_invites(mut self, value: Option<Vec<InviteCode<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -441,12 +445,12 @@ impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
 impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
     /// Set the `invitesDisabled` field (optional)
     pub fn invites_disabled(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `invitesDisabled` field to an Option value (optional)
     pub fn maybe_invites_disabled(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -454,12 +458,12 @@ impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
 impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
     /// Set the `relatedRecords` field (optional)
     pub fn related_records(mut self, value: impl Into<Option<Vec<Data<'a>>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `relatedRecords` field to an Option value (optional)
     pub fn maybe_related_records(mut self, value: Option<Vec<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -470,7 +474,7 @@ impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<admin::ThreatSignature<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `threatSignatures` field to an Option value (optional)
@@ -478,7 +482,7 @@ impl<'a, S: account_view_state::State> AccountViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<admin::ThreatSignature<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -487,24 +491,24 @@ impl<'a, S> AccountViewBuilder<'a, S>
 where
     S: account_view_state::State,
     S::Handle: account_view_state::IsSet,
-    S::Did: account_view_state::IsSet,
     S::IndexedAt: account_view_state::IsSet,
+    S::Did: account_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AccountView<'a> {
         AccountView {
-            deactivated_at: self.__unsafe_private_named.0,
-            did: self.__unsafe_private_named.1.unwrap(),
-            email: self.__unsafe_private_named.2,
-            email_confirmed_at: self.__unsafe_private_named.3,
-            handle: self.__unsafe_private_named.4.unwrap(),
-            indexed_at: self.__unsafe_private_named.5.unwrap(),
-            invite_note: self.__unsafe_private_named.6,
-            invited_by: self.__unsafe_private_named.7,
-            invites: self.__unsafe_private_named.8,
-            invites_disabled: self.__unsafe_private_named.9,
-            related_records: self.__unsafe_private_named.10,
-            threat_signatures: self.__unsafe_private_named.11,
+            deactivated_at: self._fields.0,
+            did: self._fields.1.unwrap(),
+            email: self._fields.2,
+            email_confirmed_at: self._fields.3,
+            handle: self._fields.4.unwrap(),
+            indexed_at: self._fields.5.unwrap(),
+            invite_note: self._fields.6,
+            invited_by: self._fields.7,
+            invites: self._fields.8,
+            invites_disabled: self._fields.9,
+            related_records: self._fields.10,
+            threat_signatures: self._fields.11,
             extra_data: Default::default(),
         }
     }
@@ -514,18 +518,18 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> AccountView<'a> {
         AccountView {
-            deactivated_at: self.__unsafe_private_named.0,
-            did: self.__unsafe_private_named.1.unwrap(),
-            email: self.__unsafe_private_named.2,
-            email_confirmed_at: self.__unsafe_private_named.3,
-            handle: self.__unsafe_private_named.4.unwrap(),
-            indexed_at: self.__unsafe_private_named.5.unwrap(),
-            invite_note: self.__unsafe_private_named.6,
-            invited_by: self.__unsafe_private_named.7,
-            invites: self.__unsafe_private_named.8,
-            invites_disabled: self.__unsafe_private_named.9,
-            related_records: self.__unsafe_private_named.10,
-            threat_signatures: self.__unsafe_private_named.11,
+            deactivated_at: self._fields.0,
+            did: self._fields.1.unwrap(),
+            email: self._fields.2,
+            email_confirmed_at: self._fields.3,
+            handle: self._fields.4.unwrap(),
+            indexed_at: self._fields.5.unwrap(),
+            invite_note: self._fields.6,
+            invited_by: self._fields.7,
+            invites: self._fields.8,
+            invites_disabled: self._fields.9,
+            related_records: self._fields.10,
+            threat_signatures: self._fields.11,
             extra_data: Some(extra_data),
         }
     }
@@ -763,45 +767,45 @@ pub mod repo_blob_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Cid;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Cid = S::Cid;
+        type Did = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Did = S::Did;
         type Cid = Set<members::cid>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Cid = S::Cid;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RepoBlobRefBuilder<'a, S: repo_blob_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Cid<'a>>, Option<Did<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Cid<'a>>, Option<Did<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RepoBlobRef<'a> {
@@ -815,9 +819,9 @@ impl<'a> RepoBlobRefBuilder<'a, repo_blob_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RepoBlobRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -832,11 +836,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> RepoBlobRefBuilder<'a, repo_blob_ref_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RepoBlobRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -851,11 +855,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> RepoBlobRefBuilder<'a, repo_blob_ref_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RepoBlobRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -863,12 +867,12 @@ where
 impl<'a, S: repo_blob_ref_state::State> RepoBlobRefBuilder<'a, S> {
     /// Set the `recordUri` field (optional)
     pub fn record_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `recordUri` field to an Option value (optional)
     pub fn maybe_record_uri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -876,15 +880,15 @@ impl<'a, S: repo_blob_ref_state::State> RepoBlobRefBuilder<'a, S> {
 impl<'a, S> RepoBlobRefBuilder<'a, S>
 where
     S: repo_blob_ref_state::State,
-    S::Did: repo_blob_ref_state::IsSet,
     S::Cid: repo_blob_ref_state::IsSet,
+    S::Did: repo_blob_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RepoBlobRef<'a> {
         RepoBlobRef {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            record_uri: self.__unsafe_private_named.2,
+            cid: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            record_uri: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -894,9 +898,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> RepoBlobRef<'a> {
         RepoBlobRef {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            record_uri: self.__unsafe_private_named.2,
+            cid: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            record_uri: self._fields.2,
             extra_data: Some(extra_data),
         }
     }
@@ -936,9 +940,9 @@ pub mod repo_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct RepoRefBuilder<'a, S: repo_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RepoRef<'a> {
@@ -952,9 +956,9 @@ impl<'a> RepoRefBuilder<'a, repo_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RepoRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -969,11 +973,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> RepoRefBuilder<'a, repo_ref_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RepoRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -986,7 +990,7 @@ where
     /// Build the final struct
     pub fn build(self) -> RepoRef<'a> {
         RepoRef {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -996,7 +1000,7 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> RepoRef<'a> {
         RepoRef {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1036,9 +1040,9 @@ pub mod status_attr_state {
 
 /// Builder for constructing an instance of this type
 pub struct StatusAttrBuilder<'a, S: status_attr_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> StatusAttr<'a> {
@@ -1052,9 +1056,9 @@ impl<'a> StatusAttrBuilder<'a, status_attr_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StatusAttrBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1069,11 +1073,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> StatusAttrBuilder<'a, status_attr_state::SetApplied<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         StatusAttrBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1081,12 +1085,12 @@ where
 impl<'a, S: status_attr_state::State> StatusAttrBuilder<'a, S> {
     /// Set the `ref` field (optional)
     pub fn r#ref(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `ref` field to an Option value (optional)
     pub fn maybe_ref(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1099,8 +1103,8 @@ where
     /// Build the final struct
     pub fn build(self) -> StatusAttr<'a> {
         StatusAttr {
-            applied: self.__unsafe_private_named.0.unwrap(),
-            r#ref: self.__unsafe_private_named.1,
+            applied: self._fields.0.unwrap(),
+            r#ref: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -1110,8 +1114,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> StatusAttr<'a> {
         StatusAttr {
-            applied: self.__unsafe_private_named.0.unwrap(),
-            r#ref: self.__unsafe_private_named.1,
+            applied: self._fields.0.unwrap(),
+            r#ref: self._fields.1,
             extra_data: Some(extra_data),
         }
     }

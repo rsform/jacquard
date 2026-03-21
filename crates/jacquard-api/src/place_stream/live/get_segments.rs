@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::string::{Did, Datetime};
 use jacquard_derive::{IntoStatic, lexicon};
@@ -97,9 +100,9 @@ pub mod get_segments_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetSegmentsBuilder<'a, S: get_segments_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<i64>, Option<Did<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<i64>, Option<Did<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetSegments<'a> {
@@ -113,9 +116,9 @@ impl<'a> GetSegmentsBuilder<'a, get_segments_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSegmentsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -123,12 +126,12 @@ impl<'a> GetSegmentsBuilder<'a, get_segments_state::Empty> {
 impl<'a, S: get_segments_state::State> GetSegmentsBuilder<'a, S> {
     /// Set the `before` field (optional)
     pub fn before(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `before` field to an Option value (optional)
     pub fn maybe_before(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -136,12 +139,12 @@ impl<'a, S: get_segments_state::State> GetSegmentsBuilder<'a, S> {
 impl<'a, S: get_segments_state::State> GetSegmentsBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -156,11 +159,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> GetSegmentsBuilder<'a, get_segments_state::SetUserDid<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         GetSegmentsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -173,9 +176,9 @@ where
     /// Build the final struct
     pub fn build(self) -> GetSegments<'a> {
         GetSegments {
-            before: self.__unsafe_private_named.0,
-            limit: self.__unsafe_private_named.1,
-            user_did: self.__unsafe_private_named.2.unwrap(),
+            before: self._fields.0,
+            limit: self._fields.1,
+            user_did: self._fields.2.unwrap(),
         }
     }
 }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -468,45 +471,45 @@ pub mod chapters_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type MimeType;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type MimeType = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type MimeType = S::MimeType;
+        type Url = Unset;
     }
     ///State transition - sets the `mime_type` field to Set
     pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMimeType<S> {}
     impl<S: State> State for SetMimeType<S> {
-        type Url = S::Url;
         type MimeType = Set<members::mime_type>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type MimeType = S::MimeType;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `mime_type` field
         pub struct mime_type(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ChaptersRefBuilder<'a, S: chapters_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<UriValue<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ChaptersRef<'a> {
@@ -520,9 +523,9 @@ impl<'a> ChaptersRefBuilder<'a, chapters_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ChaptersRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -537,11 +540,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ChaptersRefBuilder<'a, chapters_ref_state::SetMimeType<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ChaptersRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -556,11 +559,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ChaptersRefBuilder<'a, chapters_ref_state::SetUrl<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ChaptersRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -568,14 +571,14 @@ where
 impl<'a, S> ChaptersRefBuilder<'a, S>
 where
     S: chapters_ref_state::State,
-    S::Url: chapters_ref_state::IsSet,
     S::MimeType: chapters_ref_state::IsSet,
+    S::Url: chapters_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ChaptersRef<'a> {
         ChaptersRef {
-            mime_type: self.__unsafe_private_named.0.unwrap(),
-            url: self.__unsafe_private_named.1.unwrap(),
+            mime_type: self._fields.0.unwrap(),
+            url: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -588,8 +591,8 @@ where
         >,
     ) -> ChaptersRef<'a> {
         ChaptersRef {
-            mime_type: self.__unsafe_private_named.0.unwrap(),
-            url: self.__unsafe_private_named.1.unwrap(),
+            mime_type: self._fields.0.unwrap(),
+            url: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -944,134 +947,134 @@ pub mod episode_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type FeedItemGuid;
-        type Media;
-        type CreatedAt;
         type Title;
         type PublishedAt;
-        type Duration;
+        type FeedItemGuid;
         type Podcast;
+        type Duration;
+        type CreatedAt;
+        type Media;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type FeedItemGuid = Unset;
-        type Media = Unset;
-        type CreatedAt = Unset;
         type Title = Unset;
         type PublishedAt = Unset;
-        type Duration = Unset;
+        type FeedItemGuid = Unset;
         type Podcast = Unset;
-    }
-    ///State transition - sets the `feed_item_guid` field to Set
-    pub struct SetFeedItemGuid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFeedItemGuid<S> {}
-    impl<S: State> State for SetFeedItemGuid<S> {
-        type FeedItemGuid = Set<members::feed_item_guid>;
-        type Media = S::Media;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type PublishedAt = S::PublishedAt;
-        type Duration = S::Duration;
-        type Podcast = S::Podcast;
-    }
-    ///State transition - sets the `media` field to Set
-    pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMedia<S> {}
-    impl<S: State> State for SetMedia<S> {
-        type FeedItemGuid = S::FeedItemGuid;
-        type Media = Set<members::media>;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-        type PublishedAt = S::PublishedAt;
-        type Duration = S::Duration;
-        type Podcast = S::Podcast;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type FeedItemGuid = S::FeedItemGuid;
-        type Media = S::Media;
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
-        type PublishedAt = S::PublishedAt;
-        type Duration = S::Duration;
-        type Podcast = S::Podcast;
+        type Duration = Unset;
+        type CreatedAt = Unset;
+        type Media = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type FeedItemGuid = S::FeedItemGuid;
-        type Media = S::Media;
-        type CreatedAt = S::CreatedAt;
         type Title = Set<members::title>;
         type PublishedAt = S::PublishedAt;
-        type Duration = S::Duration;
+        type FeedItemGuid = S::FeedItemGuid;
         type Podcast = S::Podcast;
+        type Duration = S::Duration;
+        type CreatedAt = S::CreatedAt;
+        type Media = S::Media;
     }
     ///State transition - sets the `published_at` field to Set
     pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
     impl<S: State> State for SetPublishedAt<S> {
-        type FeedItemGuid = S::FeedItemGuid;
-        type Media = S::Media;
-        type CreatedAt = S::CreatedAt;
         type Title = S::Title;
         type PublishedAt = Set<members::published_at>;
-        type Duration = S::Duration;
-        type Podcast = S::Podcast;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
         type FeedItemGuid = S::FeedItemGuid;
-        type Media = S::Media;
+        type Podcast = S::Podcast;
+        type Duration = S::Duration;
         type CreatedAt = S::CreatedAt;
+        type Media = S::Media;
+    }
+    ///State transition - sets the `feed_item_guid` field to Set
+    pub struct SetFeedItemGuid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFeedItemGuid<S> {}
+    impl<S: State> State for SetFeedItemGuid<S> {
         type Title = S::Title;
         type PublishedAt = S::PublishedAt;
-        type Duration = Set<members::duration>;
+        type FeedItemGuid = Set<members::feed_item_guid>;
         type Podcast = S::Podcast;
+        type Duration = S::Duration;
+        type CreatedAt = S::CreatedAt;
+        type Media = S::Media;
     }
     ///State transition - sets the `podcast` field to Set
     pub struct SetPodcast<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPodcast<S> {}
     impl<S: State> State for SetPodcast<S> {
-        type FeedItemGuid = S::FeedItemGuid;
-        type Media = S::Media;
-        type CreatedAt = S::CreatedAt;
         type Title = S::Title;
         type PublishedAt = S::PublishedAt;
-        type Duration = S::Duration;
+        type FeedItemGuid = S::FeedItemGuid;
         type Podcast = Set<members::podcast>;
+        type Duration = S::Duration;
+        type CreatedAt = S::CreatedAt;
+        type Media = S::Media;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuration<S> {}
+    impl<S: State> State for SetDuration<S> {
+        type Title = S::Title;
+        type PublishedAt = S::PublishedAt;
+        type FeedItemGuid = S::FeedItemGuid;
+        type Podcast = S::Podcast;
+        type Duration = Set<members::duration>;
+        type CreatedAt = S::CreatedAt;
+        type Media = S::Media;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type PublishedAt = S::PublishedAt;
+        type FeedItemGuid = S::FeedItemGuid;
+        type Podcast = S::Podcast;
+        type Duration = S::Duration;
+        type CreatedAt = Set<members::created_at>;
+        type Media = S::Media;
+    }
+    ///State transition - sets the `media` field to Set
+    pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMedia<S> {}
+    impl<S: State> State for SetMedia<S> {
+        type Title = S::Title;
+        type PublishedAt = S::PublishedAt;
+        type FeedItemGuid = S::FeedItemGuid;
+        type Podcast = S::Podcast;
+        type Duration = S::Duration;
+        type CreatedAt = S::CreatedAt;
+        type Media = Set<members::media>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `feed_item_guid` field
-        pub struct feed_item_guid(());
-        ///Marker type for the `media` field
-        pub struct media(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `published_at` field
         pub struct published_at(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
+        ///Marker type for the `feed_item_guid` field
+        pub struct feed_item_guid(());
         ///Marker type for the `podcast` field
         pub struct podcast(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `media` field
+        pub struct media(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EpisodeBuilder<'a, S: episode_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<episode::MediaRef<'a>>>,
         Option<BlobRef<'a>>,
         Option<episode::ChaptersRef<'a>>,
@@ -1090,7 +1093,7 @@ pub struct EpisodeBuilder<'a, S: episode_state::State> {
         Option<CowStr<'a>>,
         Option<Vec<episode::TranscriptRef<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Episode<'a> {
@@ -1104,8 +1107,8 @@ impl<'a> EpisodeBuilder<'a, episode_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EpisodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -1124,7 +1127,7 @@ impl<'a> EpisodeBuilder<'a, episode_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1135,7 +1138,7 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<episode::MediaRef<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `alternateMedia` field to an Option value (optional)
@@ -1143,7 +1146,7 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
         mut self,
         value: Option<Vec<episode::MediaRef<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1151,12 +1154,12 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `artwork` field (optional)
     pub fn artwork(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `artwork` field to an Option value (optional)
     pub fn maybe_artwork(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1167,12 +1170,12 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
         mut self,
         value: impl Into<Option<episode::ChaptersRef<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `chapters` field to an Option value (optional)
     pub fn maybe_chapters(mut self, value: Option<episode::ChaptersRef<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1187,11 +1190,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> EpisodeBuilder<'a, episode_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1199,12 +1202,12 @@ where
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1219,11 +1222,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> EpisodeBuilder<'a, episode_state::SetDuration<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1231,12 +1234,12 @@ where
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `episodeNumber` field (optional)
     pub fn episode_number(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `episodeNumber` field to an Option value (optional)
     pub fn maybe_episode_number(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1247,12 +1250,12 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
         mut self,
         value: impl Into<Option<EpisodeEpisodeType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `episodeType` field to an Option value (optional)
     pub fn maybe_episode_type(mut self, value: Option<EpisodeEpisodeType<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -1260,12 +1263,12 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `explicit` field (optional)
     pub fn explicit(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `explicit` field to an Option value (optional)
     pub fn maybe_explicit(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -1280,11 +1283,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EpisodeBuilder<'a, episode_state::SetFeedItemGuid<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1292,12 +1295,12 @@ where
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `link` field (optional)
     pub fn link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `link` field to an Option value (optional)
     pub fn maybe_link(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -1312,11 +1315,11 @@ where
         mut self,
         value: impl Into<episode::MediaRef<'a>>,
     ) -> EpisodeBuilder<'a, episode_state::SetMedia<S>> {
-        self.__unsafe_private_named.11 = Option::Some(value.into());
+        self._fields.11 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1331,11 +1334,11 @@ where
         mut self,
         value: impl Into<PodcastRef<'a>>,
     ) -> EpisodeBuilder<'a, episode_state::SetPodcast<S>> {
-        self.__unsafe_private_named.12 = Option::Some(value.into());
+        self._fields.12 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1350,11 +1353,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> EpisodeBuilder<'a, episode_state::SetPublishedAt<S>> {
-        self.__unsafe_private_named.13 = Option::Some(value.into());
+        self._fields.13 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1362,12 +1365,12 @@ where
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `seasonNumber` field (optional)
     pub fn season_number(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `seasonNumber` field to an Option value (optional)
     pub fn maybe_season_number(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -1382,11 +1385,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EpisodeBuilder<'a, episode_state::SetTitle<S>> {
-        self.__unsafe_private_named.15 = Option::Some(value.into());
+        self._fields.15 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1397,7 +1400,7 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<episode::TranscriptRef<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `transcript` field to an Option value (optional)
@@ -1405,7 +1408,7 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
         mut self,
         value: Option<Vec<episode::TranscriptRef<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -1413,34 +1416,34 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
 impl<'a, S> EpisodeBuilder<'a, S>
 where
     S: episode_state::State,
-    S::FeedItemGuid: episode_state::IsSet,
-    S::Media: episode_state::IsSet,
-    S::CreatedAt: episode_state::IsSet,
     S::Title: episode_state::IsSet,
     S::PublishedAt: episode_state::IsSet,
-    S::Duration: episode_state::IsSet,
+    S::FeedItemGuid: episode_state::IsSet,
     S::Podcast: episode_state::IsSet,
+    S::Duration: episode_state::IsSet,
+    S::CreatedAt: episode_state::IsSet,
+    S::Media: episode_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Episode<'a> {
         Episode {
-            alternate_media: self.__unsafe_private_named.0,
-            artwork: self.__unsafe_private_named.1,
-            chapters: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            description: self.__unsafe_private_named.4,
-            duration: self.__unsafe_private_named.5.unwrap(),
-            episode_number: self.__unsafe_private_named.6,
-            episode_type: self.__unsafe_private_named.7,
-            explicit: self.__unsafe_private_named.8,
-            feed_item_guid: self.__unsafe_private_named.9.unwrap(),
-            link: self.__unsafe_private_named.10,
-            media: self.__unsafe_private_named.11.unwrap(),
-            podcast: self.__unsafe_private_named.12.unwrap(),
-            published_at: self.__unsafe_private_named.13.unwrap(),
-            season_number: self.__unsafe_private_named.14,
-            title: self.__unsafe_private_named.15.unwrap(),
-            transcript: self.__unsafe_private_named.16,
+            alternate_media: self._fields.0,
+            artwork: self._fields.1,
+            chapters: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            description: self._fields.4,
+            duration: self._fields.5.unwrap(),
+            episode_number: self._fields.6,
+            episode_type: self._fields.7,
+            explicit: self._fields.8,
+            feed_item_guid: self._fields.9.unwrap(),
+            link: self._fields.10,
+            media: self._fields.11.unwrap(),
+            podcast: self._fields.12.unwrap(),
+            published_at: self._fields.13.unwrap(),
+            season_number: self._fields.14,
+            title: self._fields.15.unwrap(),
+            transcript: self._fields.16,
             extra_data: Default::default(),
         }
     }
@@ -1453,23 +1456,23 @@ where
         >,
     ) -> Episode<'a> {
         Episode {
-            alternate_media: self.__unsafe_private_named.0,
-            artwork: self.__unsafe_private_named.1,
-            chapters: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            description: self.__unsafe_private_named.4,
-            duration: self.__unsafe_private_named.5.unwrap(),
-            episode_number: self.__unsafe_private_named.6,
-            episode_type: self.__unsafe_private_named.7,
-            explicit: self.__unsafe_private_named.8,
-            feed_item_guid: self.__unsafe_private_named.9.unwrap(),
-            link: self.__unsafe_private_named.10,
-            media: self.__unsafe_private_named.11.unwrap(),
-            podcast: self.__unsafe_private_named.12.unwrap(),
-            published_at: self.__unsafe_private_named.13.unwrap(),
-            season_number: self.__unsafe_private_named.14,
-            title: self.__unsafe_private_named.15.unwrap(),
-            transcript: self.__unsafe_private_named.16,
+            alternate_media: self._fields.0,
+            artwork: self._fields.1,
+            chapters: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            description: self._fields.4,
+            duration: self._fields.5.unwrap(),
+            episode_number: self._fields.6,
+            episode_type: self._fields.7,
+            explicit: self._fields.8,
+            feed_item_guid: self._fields.9.unwrap(),
+            link: self._fields.10,
+            media: self._fields.11.unwrap(),
+            podcast: self._fields.12.unwrap(),
+            published_at: self._fields.13.unwrap(),
+            season_number: self._fields.14,
+            title: self._fields.15.unwrap(),
+            transcript: self._fields.16,
             extra_data: Some(extra_data),
         }
     }
@@ -1485,45 +1488,45 @@ pub mod media_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MimeType;
         type Url;
+        type MimeType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MimeType = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `mime_type` field to Set
-    pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMimeType<S> {}
-    impl<S: State> State for SetMimeType<S> {
-        type MimeType = Set<members::mime_type>;
-        type Url = S::Url;
+        type MimeType = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type MimeType = S::MimeType;
         type Url = Set<members::url>;
+        type MimeType = S::MimeType;
+    }
+    ///State transition - sets the `mime_type` field to Set
+    pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMimeType<S> {}
+    impl<S: State> State for SetMimeType<S> {
+        type Url = S::Url;
+        type MimeType = Set<members::mime_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `mime_type` field
-        pub struct mime_type(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `mime_type` field
+        pub struct mime_type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MediaRefBuilder<'a, S: media_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<UriValue<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> MediaRef<'a> {
@@ -1537,9 +1540,9 @@ impl<'a> MediaRefBuilder<'a, media_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MediaRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1554,11 +1557,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> MediaRefBuilder<'a, media_ref_state::SetMimeType<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MediaRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1573,11 +1576,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> MediaRefBuilder<'a, media_ref_state::SetUrl<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MediaRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1585,14 +1588,14 @@ where
 impl<'a, S> MediaRefBuilder<'a, S>
 where
     S: media_ref_state::State,
-    S::MimeType: media_ref_state::IsSet,
     S::Url: media_ref_state::IsSet,
+    S::MimeType: media_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MediaRef<'a> {
         MediaRef {
-            mime_type: self.__unsafe_private_named.0.unwrap(),
-            url: self.__unsafe_private_named.1.unwrap(),
+            mime_type: self._fields.0.unwrap(),
+            url: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1605,8 +1608,8 @@ where
         >,
     ) -> MediaRef<'a> {
         MediaRef {
-            mime_type: self.__unsafe_private_named.0.unwrap(),
-            url: self.__unsafe_private_named.1.unwrap(),
+            mime_type: self._fields.0.unwrap(),
+            url: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1622,45 +1625,45 @@ pub mod transcript_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MimeType;
         type Url;
+        type MimeType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MimeType = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `mime_type` field to Set
-    pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMimeType<S> {}
-    impl<S: State> State for SetMimeType<S> {
-        type MimeType = Set<members::mime_type>;
-        type Url = S::Url;
+        type MimeType = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type MimeType = S::MimeType;
         type Url = Set<members::url>;
+        type MimeType = S::MimeType;
+    }
+    ///State transition - sets the `mime_type` field to Set
+    pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMimeType<S> {}
+    impl<S: State> State for SetMimeType<S> {
+        type Url = S::Url;
+        type MimeType = Set<members::mime_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `mime_type` field
-        pub struct mime_type(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `mime_type` field
+        pub struct mime_type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TranscriptRefBuilder<'a, S: transcript_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Language>, Option<CowStr<'a>>, Option<UriValue<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Language>, Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TranscriptRef<'a> {
@@ -1674,9 +1677,9 @@ impl<'a> TranscriptRefBuilder<'a, transcript_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TranscriptRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1684,12 +1687,12 @@ impl<'a> TranscriptRefBuilder<'a, transcript_ref_state::Empty> {
 impl<'a, S: transcript_ref_state::State> TranscriptRefBuilder<'a, S> {
     /// Set the `language` field (optional)
     pub fn language(mut self, value: impl Into<Option<Language>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `language` field to an Option value (optional)
     pub fn maybe_language(mut self, value: Option<Language>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1704,11 +1707,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TranscriptRefBuilder<'a, transcript_ref_state::SetMimeType<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TranscriptRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1723,11 +1726,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> TranscriptRefBuilder<'a, transcript_ref_state::SetUrl<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         TranscriptRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1735,15 +1738,15 @@ where
 impl<'a, S> TranscriptRefBuilder<'a, S>
 where
     S: transcript_ref_state::State,
-    S::MimeType: transcript_ref_state::IsSet,
     S::Url: transcript_ref_state::IsSet,
+    S::MimeType: transcript_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TranscriptRef<'a> {
         TranscriptRef {
-            language: self.__unsafe_private_named.0,
-            mime_type: self.__unsafe_private_named.1.unwrap(),
-            url: self.__unsafe_private_named.2.unwrap(),
+            language: self._fields.0,
+            mime_type: self._fields.1.unwrap(),
+            url: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1756,9 +1759,9 @@ where
         >,
     ) -> TranscriptRef<'a> {
         TranscriptRef {
-            language: self.__unsafe_private_named.0,
-            mime_type: self.__unsafe_private_named.1.unwrap(),
-            url: self.__unsafe_private_named.2.unwrap(),
+            language: self._fields.0,
+            mime_type: self._fields.1.unwrap(),
+            url: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

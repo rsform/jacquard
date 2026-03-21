@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_derive::{IntoStatic, lexicon, open_union};
@@ -118,14 +121,9 @@ pub mod get_message_context_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetMessageContextBuilder<'a, S: get_message_context_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<i64>,
-        Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetMessageContext<'a> {
@@ -139,9 +137,9 @@ impl<'a> GetMessageContextBuilder<'a, get_message_context_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetMessageContextBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -149,12 +147,12 @@ impl<'a> GetMessageContextBuilder<'a, get_message_context_state::Empty> {
 impl<'a, S: get_message_context_state::State> GetMessageContextBuilder<'a, S> {
     /// Set the `after` field (optional)
     pub fn after(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `after` field to an Option value (optional)
     pub fn maybe_after(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -162,12 +160,12 @@ impl<'a, S: get_message_context_state::State> GetMessageContextBuilder<'a, S> {
 impl<'a, S: get_message_context_state::State> GetMessageContextBuilder<'a, S> {
     /// Set the `before` field (optional)
     pub fn before(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `before` field to an Option value (optional)
     pub fn maybe_before(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -175,12 +173,12 @@ impl<'a, S: get_message_context_state::State> GetMessageContextBuilder<'a, S> {
 impl<'a, S: get_message_context_state::State> GetMessageContextBuilder<'a, S> {
     /// Set the `convoId` field (optional)
     pub fn convo_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `convoId` field to an Option value (optional)
     pub fn maybe_convo_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -195,11 +193,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GetMessageContextBuilder<'a, get_message_context_state::SetMessageId<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         GetMessageContextBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -212,10 +210,10 @@ where
     /// Build the final struct
     pub fn build(self) -> GetMessageContext<'a> {
         GetMessageContext {
-            after: self.__unsafe_private_named.0,
-            before: self.__unsafe_private_named.1,
-            convo_id: self.__unsafe_private_named.2,
-            message_id: self.__unsafe_private_named.3.unwrap(),
+            after: self._fields.0,
+            before: self._fields.1,
+            convo_id: self._fields.2,
+            message_id: self._fields.3.unwrap(),
         }
     }
 }

@@ -8,7 +8,11 @@
 pub mod game;
 pub mod player;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -125,9 +129,9 @@ pub mod key_state {
 
 /// Builder for constructing an instance of this type
 pub struct KeyBuilder<'a, S: key_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Key<'a> {
@@ -141,9 +145,9 @@ impl<'a> KeyBuilder<'a, key_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         KeyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -158,11 +162,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> KeyBuilder<'a, key_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         KeyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -177,11 +181,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> KeyBuilder<'a, key_state::SetKey<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         KeyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -195,8 +199,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Key<'a> {
         Key {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            key: self.__unsafe_private_named.1.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            key: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -209,8 +213,8 @@ where
         >,
     ) -> Key<'a> {
         Key {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            key: self.__unsafe_private_named.1.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            key: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -383,9 +387,9 @@ pub mod signature_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct SignatureRefBuilder<'a, S: signature_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<Datetime>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Datetime>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SignatureRef<'a> {
@@ -399,9 +403,9 @@ impl<'a> SignatureRefBuilder<'a, signature_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SignatureRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -416,11 +420,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SignatureRefBuilder<'a, signature_ref_state::SetAtUri<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SignatureRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -435,11 +439,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SignatureRefBuilder<'a, signature_ref_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SignatureRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -454,11 +458,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SignatureRefBuilder<'a, signature_ref_state::SetSignature<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SignatureRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -473,9 +477,9 @@ where
     /// Build the final struct
     pub fn build(self) -> SignatureRef<'a> {
         SignatureRef {
-            at_uri: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            signature: self.__unsafe_private_named.2.unwrap(),
+            at_uri: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            signature: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -488,9 +492,9 @@ where
         >,
     ) -> SignatureRef<'a> {
         SignatureRef {
-            at_uri: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            signature: self.__unsafe_private_named.2.unwrap(),
+            at_uri: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            signature: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

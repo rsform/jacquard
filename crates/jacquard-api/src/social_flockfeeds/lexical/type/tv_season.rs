@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -5917,8 +5920,8 @@ pub mod tv_season_state {
 
 /// Builder for constructing an instance of this type
 pub struct TvSeasonBuilder<'a, S: tv_season_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<TvSeasonAbout<'a>>,
         Option<TvSeasonAbstract<'a>>,
         Option<TvSeasonAccessMode<'a>>,
@@ -6060,7 +6063,7 @@ pub struct TvSeasonBuilder<'a, S: tv_season_state::State> {
         Option<TvSeasonWorkExample<'a>>,
         Option<TvSeasonWorkTranslation<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TvSeason<'a> {
@@ -6074,8 +6077,8 @@ impl<'a> TvSeasonBuilder<'a, tv_season_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TvSeasonBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -6217,7 +6220,7 @@ impl<'a> TvSeasonBuilder<'a, tv_season_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -6225,12 +6228,12 @@ impl<'a> TvSeasonBuilder<'a, tv_season_state::Empty> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `about` field (optional)
     pub fn about(mut self, value: impl Into<Option<TvSeasonAbout<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `about` field to an Option value (optional)
     pub fn maybe_about(mut self, value: Option<TvSeasonAbout<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -6238,12 +6241,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `abstract` field (optional)
     pub fn r#abstract(mut self, value: impl Into<Option<TvSeasonAbstract<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `abstract` field to an Option value (optional)
     pub fn maybe_abstract(mut self, value: Option<TvSeasonAbstract<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -6254,12 +6257,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonAccessMode<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `accessMode` field to an Option value (optional)
     pub fn maybe_access_mode(mut self, value: Option<TvSeasonAccessMode<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -6270,7 +6273,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonAccessModeSufficient<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `accessModeSufficient` field to an Option value (optional)
@@ -6278,7 +6281,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonAccessModeSufficient<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -6289,7 +6292,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonAccessibilityApi<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `accessibilityAPI` field to an Option value (optional)
@@ -6297,7 +6300,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonAccessibilityApi<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -6308,7 +6311,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonAccessibilityControl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `accessibilityControl` field to an Option value (optional)
@@ -6316,7 +6319,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonAccessibilityControl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -6327,7 +6330,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonAccessibilityFeature<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `accessibilityFeature` field to an Option value (optional)
@@ -6335,7 +6338,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonAccessibilityFeature<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -6346,7 +6349,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonAccessibilityHazard<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `accessibilityHazard` field to an Option value (optional)
@@ -6354,7 +6357,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonAccessibilityHazard<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -6365,7 +6368,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonAccessibilitySummary<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `accessibilitySummary` field to an Option value (optional)
@@ -6373,7 +6376,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonAccessibilitySummary<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -6384,7 +6387,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonAccountablePerson<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `accountablePerson` field to an Option value (optional)
@@ -6392,7 +6395,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonAccountablePerson<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -6403,7 +6406,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonAcquireLicensePage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `acquireLicensePage` field to an Option value (optional)
@@ -6411,7 +6414,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonAcquireLicensePage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -6419,12 +6422,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `actor` field (optional)
     pub fn actor(mut self, value: impl Into<Option<TvSeasonActor<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `actor` field to an Option value (optional)
     pub fn maybe_actor(mut self, value: Option<TvSeasonActor<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -6435,7 +6438,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonAdditionalType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
@@ -6443,7 +6446,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonAdditionalType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -6454,7 +6457,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonAggregateRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
@@ -6462,7 +6465,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonAggregateRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -6473,7 +6476,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonAlternateName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
@@ -6481,7 +6484,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonAlternateName<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -6492,7 +6495,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonAlternativeHeadline<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `alternativeHeadline` field to an Option value (optional)
@@ -6500,7 +6503,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonAlternativeHeadline<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -6511,12 +6514,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonArchivedAt<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `archivedAt` field to an Option value (optional)
     pub fn maybe_archived_at(mut self, value: Option<TvSeasonArchivedAt<'a>>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -6524,12 +6527,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `assesses` field (optional)
     pub fn assesses(mut self, value: impl Into<Option<TvSeasonAssesses<'a>>>) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `assesses` field to an Option value (optional)
     pub fn maybe_assesses(mut self, value: Option<TvSeasonAssesses<'a>>) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -6540,7 +6543,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonAssociatedMedia<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `associatedMedia` field to an Option value (optional)
@@ -6548,7 +6551,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonAssociatedMedia<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -6556,12 +6559,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `audience` field (optional)
     pub fn audience(mut self, value: impl Into<Option<TvSeasonAudience<'a>>>) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `audience` field to an Option value (optional)
     pub fn maybe_audience(mut self, value: Option<TvSeasonAudience<'a>>) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -6569,12 +6572,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `audio` field (optional)
     pub fn audio(mut self, value: impl Into<Option<TvSeasonAudio<'a>>>) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `audio` field to an Option value (optional)
     pub fn maybe_audio(mut self, value: Option<TvSeasonAudio<'a>>) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -6582,12 +6585,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `author` field (optional)
     pub fn author(mut self, value: impl Into<Option<TvSeasonAuthor<'a>>>) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
     pub fn maybe_author(mut self, value: Option<TvSeasonAuthor<'a>>) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -6595,12 +6598,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<TvSeasonAward<'a>>>) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
     pub fn maybe_award(mut self, value: Option<TvSeasonAward<'a>>) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -6608,12 +6611,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<TvSeasonAwards<'a>>>) -> Self {
-        self.__unsafe_private_named.23 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
     pub fn maybe_awards(mut self, value: Option<TvSeasonAwards<'a>>) -> Self {
-        self.__unsafe_private_named.23 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -6621,12 +6624,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `character` field (optional)
     pub fn character(mut self, value: impl Into<Option<TvSeasonCharacter<'a>>>) -> Self {
-        self.__unsafe_private_named.24 = value.into();
+        self._fields.24 = value.into();
         self
     }
     /// Set the `character` field to an Option value (optional)
     pub fn maybe_character(mut self, value: Option<TvSeasonCharacter<'a>>) -> Self {
-        self.__unsafe_private_named.24 = value;
+        self._fields.24 = value;
         self
     }
 }
@@ -6634,12 +6637,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `citation` field (optional)
     pub fn citation(mut self, value: impl Into<Option<TvSeasonCitation<'a>>>) -> Self {
-        self.__unsafe_private_named.25 = value.into();
+        self._fields.25 = value.into();
         self
     }
     /// Set the `citation` field to an Option value (optional)
     pub fn maybe_citation(mut self, value: Option<TvSeasonCitation<'a>>) -> Self {
-        self.__unsafe_private_named.25 = value;
+        self._fields.25 = value;
         self
     }
 }
@@ -6647,12 +6650,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<TvSeasonComment<'a>>>) -> Self {
-        self.__unsafe_private_named.26 = value.into();
+        self._fields.26 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
     pub fn maybe_comment(mut self, value: Option<TvSeasonComment<'a>>) -> Self {
-        self.__unsafe_private_named.26 = value;
+        self._fields.26 = value;
         self
     }
 }
@@ -6663,7 +6666,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonCommentCount<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.27 = value.into();
+        self._fields.27 = value.into();
         self
     }
     /// Set the `commentCount` field to an Option value (optional)
@@ -6671,7 +6674,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonCommentCount<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.27 = value;
+        self._fields.27 = value;
         self
     }
 }
@@ -6682,7 +6685,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonConditionsOfAccess<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.28 = value.into();
+        self._fields.28 = value.into();
         self
     }
     /// Set the `conditionsOfAccess` field to an Option value (optional)
@@ -6690,7 +6693,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonConditionsOfAccess<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.28 = value;
+        self._fields.28 = value;
         self
     }
 }
@@ -6701,7 +6704,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonContentLocation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.29 = value.into();
+        self._fields.29 = value.into();
         self
     }
     /// Set the `contentLocation` field to an Option value (optional)
@@ -6709,7 +6712,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonContentLocation<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.29 = value;
+        self._fields.29 = value;
         self
     }
 }
@@ -6720,7 +6723,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonContentRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.30 = value.into();
+        self._fields.30 = value.into();
         self
     }
     /// Set the `contentRating` field to an Option value (optional)
@@ -6728,7 +6731,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonContentRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.30 = value;
+        self._fields.30 = value;
         self
     }
 }
@@ -6739,7 +6742,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonContentReferenceTime<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value.into();
+        self._fields.31 = value.into();
         self
     }
     /// Set the `contentReferenceTime` field to an Option value (optional)
@@ -6747,7 +6750,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonContentReferenceTime<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value;
+        self._fields.31 = value;
         self
     }
 }
@@ -6758,12 +6761,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonContributor<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value.into();
+        self._fields.32 = value.into();
         self
     }
     /// Set the `contributor` field to an Option value (optional)
     pub fn maybe_contributor(mut self, value: Option<TvSeasonContributor<'a>>) -> Self {
-        self.__unsafe_private_named.32 = value;
+        self._fields.32 = value;
         self
     }
 }
@@ -6774,7 +6777,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonCopyrightHolder<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value.into();
+        self._fields.33 = value.into();
         self
     }
     /// Set the `copyrightHolder` field to an Option value (optional)
@@ -6782,7 +6785,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonCopyrightHolder<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value;
+        self._fields.33 = value;
         self
     }
 }
@@ -6793,7 +6796,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonCopyrightNotice<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.34 = value.into();
+        self._fields.34 = value.into();
         self
     }
     /// Set the `copyrightNotice` field to an Option value (optional)
@@ -6801,7 +6804,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonCopyrightNotice<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.34 = value;
+        self._fields.34 = value;
         self
     }
 }
@@ -6812,7 +6815,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonCopyrightYear<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value.into();
+        self._fields.35 = value.into();
         self
     }
     /// Set the `copyrightYear` field to an Option value (optional)
@@ -6820,7 +6823,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonCopyrightYear<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value;
+        self._fields.35 = value;
         self
     }
 }
@@ -6831,12 +6834,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonCorrection<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value.into();
+        self._fields.36 = value.into();
         self
     }
     /// Set the `correction` field to an Option value (optional)
     pub fn maybe_correction(mut self, value: Option<TvSeasonCorrection<'a>>) -> Self {
-        self.__unsafe_private_named.36 = value;
+        self._fields.36 = value;
         self
     }
 }
@@ -6847,7 +6850,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonCountryOfOrigin<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.37 = value.into();
+        self._fields.37 = value.into();
         self
     }
     /// Set the `countryOfOrigin` field to an Option value (optional)
@@ -6855,7 +6858,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonCountryOfOrigin<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.37 = value;
+        self._fields.37 = value;
         self
     }
 }
@@ -6866,7 +6869,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonCreativeWorkStatus<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.38 = value.into();
+        self._fields.38 = value.into();
         self
     }
     /// Set the `creativeWorkStatus` field to an Option value (optional)
@@ -6874,7 +6877,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonCreativeWorkStatus<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.38 = value;
+        self._fields.38 = value;
         self
     }
 }
@@ -6882,12 +6885,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `creator` field (optional)
     pub fn creator(mut self, value: impl Into<Option<TvSeasonCreator<'a>>>) -> Self {
-        self.__unsafe_private_named.39 = value.into();
+        self._fields.39 = value.into();
         self
     }
     /// Set the `creator` field to an Option value (optional)
     pub fn maybe_creator(mut self, value: Option<TvSeasonCreator<'a>>) -> Self {
-        self.__unsafe_private_named.39 = value;
+        self._fields.39 = value;
         self
     }
 }
@@ -6898,12 +6901,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonCreditText<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.40 = value.into();
+        self._fields.40 = value.into();
         self
     }
     /// Set the `creditText` field to an Option value (optional)
     pub fn maybe_credit_text(mut self, value: Option<TvSeasonCreditText<'a>>) -> Self {
-        self.__unsafe_private_named.40 = value;
+        self._fields.40 = value;
         self
     }
 }
@@ -6914,12 +6917,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonDateCreated<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.41 = value.into();
+        self._fields.41 = value.into();
         self
     }
     /// Set the `dateCreated` field to an Option value (optional)
     pub fn maybe_date_created(mut self, value: Option<TvSeasonDateCreated<'a>>) -> Self {
-        self.__unsafe_private_named.41 = value;
+        self._fields.41 = value;
         self
     }
 }
@@ -6930,7 +6933,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonDateModified<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.42 = value.into();
+        self._fields.42 = value.into();
         self
     }
     /// Set the `dateModified` field to an Option value (optional)
@@ -6938,7 +6941,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonDateModified<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.42 = value;
+        self._fields.42 = value;
         self
     }
 }
@@ -6949,7 +6952,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonDatePublished<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.43 = value.into();
+        self._fields.43 = value.into();
         self
     }
     /// Set the `datePublished` field to an Option value (optional)
@@ -6957,7 +6960,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonDatePublished<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.43 = value;
+        self._fields.43 = value;
         self
     }
 }
@@ -6968,12 +6971,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.44 = value.into();
+        self._fields.44 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<TvSeasonDescription<'a>>) -> Self {
-        self.__unsafe_private_named.44 = value;
+        self._fields.44 = value;
         self
     }
 }
@@ -6984,7 +6987,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonDigitalSourceType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value.into();
+        self._fields.45 = value.into();
         self
     }
     /// Set the `digitalSourceType` field to an Option value (optional)
@@ -6992,7 +6995,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonDigitalSourceType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value;
+        self._fields.45 = value;
         self
     }
 }
@@ -7000,12 +7003,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `director` field (optional)
     pub fn director(mut self, value: impl Into<Option<TvSeasonDirector<'a>>>) -> Self {
-        self.__unsafe_private_named.46 = value.into();
+        self._fields.46 = value.into();
         self
     }
     /// Set the `director` field to an Option value (optional)
     pub fn maybe_director(mut self, value: Option<TvSeasonDirector<'a>>) -> Self {
-        self.__unsafe_private_named.46 = value;
+        self._fields.46 = value;
         self
     }
 }
@@ -7016,7 +7019,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonDisambiguatingDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.47 = value.into();
+        self._fields.47 = value.into();
         self
     }
     /// Set the `disambiguatingDescription` field to an Option value (optional)
@@ -7024,7 +7027,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonDisambiguatingDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.47 = value;
+        self._fields.47 = value;
         self
     }
 }
@@ -7035,7 +7038,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonDiscussionUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value.into();
+        self._fields.48 = value.into();
         self
     }
     /// Set the `discussionUrl` field to an Option value (optional)
@@ -7043,7 +7046,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonDiscussionUrl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value;
+        self._fields.48 = value;
         self
     }
 }
@@ -7051,12 +7054,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `editEIDR` field (optional)
     pub fn edit_eidr(mut self, value: impl Into<Option<TvSeasonEditEidr<'a>>>) -> Self {
-        self.__unsafe_private_named.49 = value.into();
+        self._fields.49 = value.into();
         self
     }
     /// Set the `editEIDR` field to an Option value (optional)
     pub fn maybe_edit_eidr(mut self, value: Option<TvSeasonEditEidr<'a>>) -> Self {
-        self.__unsafe_private_named.49 = value;
+        self._fields.49 = value;
         self
     }
 }
@@ -7064,12 +7067,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `editor` field (optional)
     pub fn editor(mut self, value: impl Into<Option<TvSeasonEditor<'a>>>) -> Self {
-        self.__unsafe_private_named.50 = value.into();
+        self._fields.50 = value.into();
         self
     }
     /// Set the `editor` field to an Option value (optional)
     pub fn maybe_editor(mut self, value: Option<TvSeasonEditor<'a>>) -> Self {
-        self.__unsafe_private_named.50 = value;
+        self._fields.50 = value;
         self
     }
 }
@@ -7080,7 +7083,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonEducationalAlignment<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.51 = value.into();
+        self._fields.51 = value.into();
         self
     }
     /// Set the `educationalAlignment` field to an Option value (optional)
@@ -7088,7 +7091,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonEducationalAlignment<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.51 = value;
+        self._fields.51 = value;
         self
     }
 }
@@ -7099,7 +7102,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonEducationalLevel<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.52 = value.into();
+        self._fields.52 = value.into();
         self
     }
     /// Set the `educationalLevel` field to an Option value (optional)
@@ -7107,7 +7110,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonEducationalLevel<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.52 = value;
+        self._fields.52 = value;
         self
     }
 }
@@ -7118,7 +7121,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonEducationalUse<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.53 = value.into();
+        self._fields.53 = value.into();
         self
     }
     /// Set the `educationalUse` field to an Option value (optional)
@@ -7126,7 +7129,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonEducationalUse<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.53 = value;
+        self._fields.53 = value;
         self
     }
 }
@@ -7134,12 +7137,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `encoding` field (optional)
     pub fn encoding(mut self, value: impl Into<Option<TvSeasonEncoding<'a>>>) -> Self {
-        self.__unsafe_private_named.54 = value.into();
+        self._fields.54 = value.into();
         self
     }
     /// Set the `encoding` field to an Option value (optional)
     pub fn maybe_encoding(mut self, value: Option<TvSeasonEncoding<'a>>) -> Self {
-        self.__unsafe_private_named.54 = value;
+        self._fields.54 = value;
         self
     }
 }
@@ -7150,7 +7153,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonEncodingFormat<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.55 = value.into();
+        self._fields.55 = value.into();
         self
     }
     /// Set the `encodingFormat` field to an Option value (optional)
@@ -7158,7 +7161,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonEncodingFormat<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.55 = value;
+        self._fields.55 = value;
         self
     }
 }
@@ -7166,12 +7169,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `encodings` field (optional)
     pub fn encodings(mut self, value: impl Into<Option<TvSeasonEncodings<'a>>>) -> Self {
-        self.__unsafe_private_named.56 = value.into();
+        self._fields.56 = value.into();
         self
     }
     /// Set the `encodings` field to an Option value (optional)
     pub fn maybe_encodings(mut self, value: Option<TvSeasonEncodings<'a>>) -> Self {
-        self.__unsafe_private_named.56 = value;
+        self._fields.56 = value;
         self
     }
 }
@@ -7179,12 +7182,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `endDate` field (optional)
     pub fn end_date(mut self, value: impl Into<Option<TvSeasonEndDate<'a>>>) -> Self {
-        self.__unsafe_private_named.57 = value.into();
+        self._fields.57 = value.into();
         self
     }
     /// Set the `endDate` field to an Option value (optional)
     pub fn maybe_end_date(mut self, value: Option<TvSeasonEndDate<'a>>) -> Self {
-        self.__unsafe_private_named.57 = value;
+        self._fields.57 = value;
         self
     }
 }
@@ -7192,12 +7195,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `episode` field (optional)
     pub fn episode(mut self, value: impl Into<Option<TvSeasonEpisode<'a>>>) -> Self {
-        self.__unsafe_private_named.58 = value.into();
+        self._fields.58 = value.into();
         self
     }
     /// Set the `episode` field to an Option value (optional)
     pub fn maybe_episode(mut self, value: Option<TvSeasonEpisode<'a>>) -> Self {
-        self.__unsafe_private_named.58 = value;
+        self._fields.58 = value;
         self
     }
 }
@@ -7205,12 +7208,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `episodes` field (optional)
     pub fn episodes(mut self, value: impl Into<Option<TvSeasonEpisodes<'a>>>) -> Self {
-        self.__unsafe_private_named.59 = value.into();
+        self._fields.59 = value.into();
         self
     }
     /// Set the `episodes` field to an Option value (optional)
     pub fn maybe_episodes(mut self, value: Option<TvSeasonEpisodes<'a>>) -> Self {
-        self.__unsafe_private_named.59 = value;
+        self._fields.59 = value;
         self
     }
 }
@@ -7221,7 +7224,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonExampleOfWork<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.60 = value.into();
+        self._fields.60 = value.into();
         self
     }
     /// Set the `exampleOfWork` field to an Option value (optional)
@@ -7229,7 +7232,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonExampleOfWork<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.60 = value;
+        self._fields.60 = value;
         self
     }
 }
@@ -7237,12 +7240,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `expires` field (optional)
     pub fn expires(mut self, value: impl Into<Option<TvSeasonExpires<'a>>>) -> Self {
-        self.__unsafe_private_named.61 = value.into();
+        self._fields.61 = value.into();
         self
     }
     /// Set the `expires` field to an Option value (optional)
     pub fn maybe_expires(mut self, value: Option<TvSeasonExpires<'a>>) -> Self {
-        self.__unsafe_private_named.61 = value;
+        self._fields.61 = value;
         self
     }
 }
@@ -7253,12 +7256,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonFileFormat<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.62 = value.into();
+        self._fields.62 = value.into();
         self
     }
     /// Set the `fileFormat` field to an Option value (optional)
     pub fn maybe_file_format(mut self, value: Option<TvSeasonFileFormat<'a>>) -> Self {
-        self.__unsafe_private_named.62 = value;
+        self._fields.62 = value;
         self
     }
 }
@@ -7266,12 +7269,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `funder` field (optional)
     pub fn funder(mut self, value: impl Into<Option<TvSeasonFunder<'a>>>) -> Self {
-        self.__unsafe_private_named.63 = value.into();
+        self._fields.63 = value.into();
         self
     }
     /// Set the `funder` field to an Option value (optional)
     pub fn maybe_funder(mut self, value: Option<TvSeasonFunder<'a>>) -> Self {
-        self.__unsafe_private_named.63 = value;
+        self._fields.63 = value;
         self
     }
 }
@@ -7279,12 +7282,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<TvSeasonFunding<'a>>>) -> Self {
-        self.__unsafe_private_named.64 = value.into();
+        self._fields.64 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
     pub fn maybe_funding(mut self, value: Option<TvSeasonFunding<'a>>) -> Self {
-        self.__unsafe_private_named.64 = value;
+        self._fields.64 = value;
         self
     }
 }
@@ -7292,12 +7295,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<TvSeasonGenre<'a>>>) -> Self {
-        self.__unsafe_private_named.65 = value.into();
+        self._fields.65 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
     pub fn maybe_genre(mut self, value: Option<TvSeasonGenre<'a>>) -> Self {
-        self.__unsafe_private_named.65 = value;
+        self._fields.65 = value;
         self
     }
 }
@@ -7305,12 +7308,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `hasPart` field (optional)
     pub fn has_part(mut self, value: impl Into<Option<TvSeasonHasPart<'a>>>) -> Self {
-        self.__unsafe_private_named.66 = value.into();
+        self._fields.66 = value.into();
         self
     }
     /// Set the `hasPart` field to an Option value (optional)
     pub fn maybe_has_part(mut self, value: Option<TvSeasonHasPart<'a>>) -> Self {
-        self.__unsafe_private_named.66 = value;
+        self._fields.66 = value;
         self
     }
 }
@@ -7318,12 +7321,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `headline` field (optional)
     pub fn headline(mut self, value: impl Into<Option<TvSeasonHeadline<'a>>>) -> Self {
-        self.__unsafe_private_named.67 = value.into();
+        self._fields.67 = value.into();
         self
     }
     /// Set the `headline` field to an Option value (optional)
     pub fn maybe_headline(mut self, value: Option<TvSeasonHeadline<'a>>) -> Self {
-        self.__unsafe_private_named.67 = value;
+        self._fields.67 = value;
         self
     }
 }
@@ -7334,12 +7337,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonIdentifier<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.68 = value.into();
+        self._fields.68 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
     pub fn maybe_identifier(mut self, value: Option<TvSeasonIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.68 = value;
+        self._fields.68 = value;
         self
     }
 }
@@ -7347,12 +7350,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<TvSeasonImage<'a>>>) -> Self {
-        self.__unsafe_private_named.69 = value.into();
+        self._fields.69 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<TvSeasonImage<'a>>) -> Self {
-        self.__unsafe_private_named.69 = value;
+        self._fields.69 = value;
         self
     }
 }
@@ -7363,12 +7366,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonInLanguage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.70 = value.into();
+        self._fields.70 = value.into();
         self
     }
     /// Set the `inLanguage` field to an Option value (optional)
     pub fn maybe_in_language(mut self, value: Option<TvSeasonInLanguage<'a>>) -> Self {
-        self.__unsafe_private_named.70 = value;
+        self._fields.70 = value;
         self
     }
 }
@@ -7379,7 +7382,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonInteractionStatistic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.71 = value.into();
+        self._fields.71 = value.into();
         self
     }
     /// Set the `interactionStatistic` field to an Option value (optional)
@@ -7387,7 +7390,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonInteractionStatistic<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.71 = value;
+        self._fields.71 = value;
         self
     }
 }
@@ -7398,7 +7401,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonInteractivityType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.72 = value.into();
+        self._fields.72 = value.into();
         self
     }
     /// Set the `interactivityType` field to an Option value (optional)
@@ -7406,7 +7409,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonInteractivityType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.72 = value;
+        self._fields.72 = value;
         self
     }
 }
@@ -7417,7 +7420,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonInterpretedAsClaim<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.73 = value.into();
+        self._fields.73 = value.into();
         self
     }
     /// Set the `interpretedAsClaim` field to an Option value (optional)
@@ -7425,7 +7428,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonInterpretedAsClaim<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.73 = value;
+        self._fields.73 = value;
         self
     }
 }
@@ -7436,7 +7439,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonIsAccessibleForFree<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.74 = value.into();
+        self._fields.74 = value.into();
         self
     }
     /// Set the `isAccessibleForFree` field to an Option value (optional)
@@ -7444,7 +7447,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonIsAccessibleForFree<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.74 = value;
+        self._fields.74 = value;
         self
     }
 }
@@ -7455,12 +7458,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonIsBasedOn<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.75 = value.into();
+        self._fields.75 = value.into();
         self
     }
     /// Set the `isBasedOn` field to an Option value (optional)
     pub fn maybe_is_based_on(mut self, value: Option<TvSeasonIsBasedOn<'a>>) -> Self {
-        self.__unsafe_private_named.75 = value;
+        self._fields.75 = value;
         self
     }
 }
@@ -7471,7 +7474,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonIsBasedOnUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.76 = value.into();
+        self._fields.76 = value.into();
         self
     }
     /// Set the `isBasedOnUrl` field to an Option value (optional)
@@ -7479,7 +7482,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonIsBasedOnUrl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.76 = value;
+        self._fields.76 = value;
         self
     }
 }
@@ -7490,7 +7493,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonIsFamilyFriendly<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.77 = value.into();
+        self._fields.77 = value.into();
         self
     }
     /// Set the `isFamilyFriendly` field to an Option value (optional)
@@ -7498,7 +7501,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonIsFamilyFriendly<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.77 = value;
+        self._fields.77 = value;
         self
     }
 }
@@ -7506,12 +7509,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `isPartOf` field (optional)
     pub fn is_part_of(mut self, value: impl Into<Option<TvSeasonIsPartOf<'a>>>) -> Self {
-        self.__unsafe_private_named.78 = value.into();
+        self._fields.78 = value.into();
         self
     }
     /// Set the `isPartOf` field to an Option value (optional)
     pub fn maybe_is_part_of(mut self, value: Option<TvSeasonIsPartOf<'a>>) -> Self {
-        self.__unsafe_private_named.78 = value;
+        self._fields.78 = value;
         self
     }
 }
@@ -7519,12 +7522,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<TvSeasonKeywords<'a>>>) -> Self {
-        self.__unsafe_private_named.79 = value.into();
+        self._fields.79 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
     pub fn maybe_keywords(mut self, value: Option<TvSeasonKeywords<'a>>) -> Self {
-        self.__unsafe_private_named.79 = value;
+        self._fields.79 = value;
         self
     }
 }
@@ -7535,7 +7538,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonLearningResourceType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.80 = value.into();
+        self._fields.80 = value.into();
         self
     }
     /// Set the `learningResourceType` field to an Option value (optional)
@@ -7543,7 +7546,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonLearningResourceType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.80 = value;
+        self._fields.80 = value;
         self
     }
 }
@@ -7551,12 +7554,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `license` field (optional)
     pub fn license(mut self, value: impl Into<Option<TvSeasonLicense<'a>>>) -> Self {
-        self.__unsafe_private_named.81 = value.into();
+        self._fields.81 = value.into();
         self
     }
     /// Set the `license` field to an Option value (optional)
     pub fn maybe_license(mut self, value: Option<TvSeasonLicense<'a>>) -> Self {
-        self.__unsafe_private_named.81 = value;
+        self._fields.81 = value;
         self
     }
 }
@@ -7567,7 +7570,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonLocationCreated<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.82 = value.into();
+        self._fields.82 = value.into();
         self
     }
     /// Set the `locationCreated` field to an Option value (optional)
@@ -7575,7 +7578,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonLocationCreated<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.82 = value;
+        self._fields.82 = value;
         self
     }
 }
@@ -7586,12 +7589,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonMainEntity<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.83 = value.into();
+        self._fields.83 = value.into();
         self
     }
     /// Set the `mainEntity` field to an Option value (optional)
     pub fn maybe_main_entity(mut self, value: Option<TvSeasonMainEntity<'a>>) -> Self {
-        self.__unsafe_private_named.83 = value;
+        self._fields.83 = value;
         self
     }
 }
@@ -7602,7 +7605,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonMainEntityOfPage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.84 = value.into();
+        self._fields.84 = value.into();
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
@@ -7610,7 +7613,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonMainEntityOfPage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.84 = value;
+        self._fields.84 = value;
         self
     }
 }
@@ -7621,12 +7624,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonMaintainer<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.85 = value.into();
+        self._fields.85 = value.into();
         self
     }
     /// Set the `maintainer` field to an Option value (optional)
     pub fn maybe_maintainer(mut self, value: Option<TvSeasonMaintainer<'a>>) -> Self {
-        self.__unsafe_private_named.85 = value;
+        self._fields.85 = value;
         self
     }
 }
@@ -7634,12 +7637,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `material` field (optional)
     pub fn material(mut self, value: impl Into<Option<TvSeasonMaterial<'a>>>) -> Self {
-        self.__unsafe_private_named.86 = value.into();
+        self._fields.86 = value.into();
         self
     }
     /// Set the `material` field to an Option value (optional)
     pub fn maybe_material(mut self, value: Option<TvSeasonMaterial<'a>>) -> Self {
-        self.__unsafe_private_named.86 = value;
+        self._fields.86 = value;
         self
     }
 }
@@ -7650,7 +7653,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonMaterialExtent<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.87 = value.into();
+        self._fields.87 = value.into();
         self
     }
     /// Set the `materialExtent` field to an Option value (optional)
@@ -7658,7 +7661,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonMaterialExtent<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.87 = value;
+        self._fields.87 = value;
         self
     }
 }
@@ -7666,12 +7669,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `mentions` field (optional)
     pub fn mentions(mut self, value: impl Into<Option<TvSeasonMentions<'a>>>) -> Self {
-        self.__unsafe_private_named.88 = value.into();
+        self._fields.88 = value.into();
         self
     }
     /// Set the `mentions` field to an Option value (optional)
     pub fn maybe_mentions(mut self, value: Option<TvSeasonMentions<'a>>) -> Self {
-        self.__unsafe_private_named.88 = value;
+        self._fields.88 = value;
         self
     }
 }
@@ -7679,12 +7682,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<TvSeasonName<'a>>>) -> Self {
-        self.__unsafe_private_named.89 = value.into();
+        self._fields.89 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<TvSeasonName<'a>>) -> Self {
-        self.__unsafe_private_named.89 = value;
+        self._fields.89 = value;
         self
     }
 }
@@ -7695,7 +7698,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonNumberOfEpisodes<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.90 = value.into();
+        self._fields.90 = value.into();
         self
     }
     /// Set the `numberOfEpisodes` field to an Option value (optional)
@@ -7703,7 +7706,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonNumberOfEpisodes<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.90 = value;
+        self._fields.90 = value;
         self
     }
 }
@@ -7711,12 +7714,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `offers` field (optional)
     pub fn offers(mut self, value: impl Into<Option<TvSeasonOffers<'a>>>) -> Self {
-        self.__unsafe_private_named.91 = value.into();
+        self._fields.91 = value.into();
         self
     }
     /// Set the `offers` field to an Option value (optional)
     pub fn maybe_offers(mut self, value: Option<TvSeasonOffers<'a>>) -> Self {
-        self.__unsafe_private_named.91 = value;
+        self._fields.91 = value;
         self
     }
 }
@@ -7727,7 +7730,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonPartOfSeries<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.92 = value.into();
+        self._fields.92 = value.into();
         self
     }
     /// Set the `partOfSeries` field to an Option value (optional)
@@ -7735,7 +7738,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonPartOfSeries<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.92 = value;
+        self._fields.92 = value;
         self
     }
 }
@@ -7746,7 +7749,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonPartOfTvSeries<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.93 = value.into();
+        self._fields.93 = value.into();
         self
     }
     /// Set the `partOfTVSeries` field to an Option value (optional)
@@ -7754,7 +7757,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonPartOfTvSeries<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.93 = value;
+        self._fields.93 = value;
         self
     }
 }
@@ -7762,12 +7765,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `pattern` field (optional)
     pub fn pattern(mut self, value: impl Into<Option<TvSeasonPattern<'a>>>) -> Self {
-        self.__unsafe_private_named.94 = value.into();
+        self._fields.94 = value.into();
         self
     }
     /// Set the `pattern` field to an Option value (optional)
     pub fn maybe_pattern(mut self, value: Option<TvSeasonPattern<'a>>) -> Self {
-        self.__unsafe_private_named.94 = value;
+        self._fields.94 = value;
         self
     }
 }
@@ -7775,12 +7778,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `position` field (optional)
     pub fn position(mut self, value: impl Into<Option<TvSeasonPosition<'a>>>) -> Self {
-        self.__unsafe_private_named.95 = value.into();
+        self._fields.95 = value.into();
         self
     }
     /// Set the `position` field to an Option value (optional)
     pub fn maybe_position(mut self, value: Option<TvSeasonPosition<'a>>) -> Self {
-        self.__unsafe_private_named.95 = value;
+        self._fields.95 = value;
         self
     }
 }
@@ -7791,7 +7794,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonPotentialAction<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.96 = value.into();
+        self._fields.96 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
@@ -7799,7 +7802,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonPotentialAction<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.96 = value;
+        self._fields.96 = value;
         self
     }
 }
@@ -7807,12 +7810,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `producer` field (optional)
     pub fn producer(mut self, value: impl Into<Option<TvSeasonProducer<'a>>>) -> Self {
-        self.__unsafe_private_named.97 = value.into();
+        self._fields.97 = value.into();
         self
     }
     /// Set the `producer` field to an Option value (optional)
     pub fn maybe_producer(mut self, value: Option<TvSeasonProducer<'a>>) -> Self {
-        self.__unsafe_private_named.97 = value;
+        self._fields.97 = value;
         self
     }
 }
@@ -7823,7 +7826,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonProductionCompany<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.98 = value.into();
+        self._fields.98 = value.into();
         self
     }
     /// Set the `productionCompany` field to an Option value (optional)
@@ -7831,7 +7834,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonProductionCompany<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.98 = value;
+        self._fields.98 = value;
         self
     }
 }
@@ -7839,12 +7842,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `provider` field (optional)
     pub fn provider(mut self, value: impl Into<Option<TvSeasonProvider<'a>>>) -> Self {
-        self.__unsafe_private_named.99 = value.into();
+        self._fields.99 = value.into();
         self
     }
     /// Set the `provider` field to an Option value (optional)
     pub fn maybe_provider(mut self, value: Option<TvSeasonProvider<'a>>) -> Self {
-        self.__unsafe_private_named.99 = value;
+        self._fields.99 = value;
         self
     }
 }
@@ -7855,12 +7858,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonPublication<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.100 = value.into();
+        self._fields.100 = value.into();
         self
     }
     /// Set the `publication` field to an Option value (optional)
     pub fn maybe_publication(mut self, value: Option<TvSeasonPublication<'a>>) -> Self {
-        self.__unsafe_private_named.100 = value;
+        self._fields.100 = value;
         self
     }
 }
@@ -7868,12 +7871,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `publisher` field (optional)
     pub fn publisher(mut self, value: impl Into<Option<TvSeasonPublisher<'a>>>) -> Self {
-        self.__unsafe_private_named.101 = value.into();
+        self._fields.101 = value.into();
         self
     }
     /// Set the `publisher` field to an Option value (optional)
     pub fn maybe_publisher(mut self, value: Option<TvSeasonPublisher<'a>>) -> Self {
-        self.__unsafe_private_named.101 = value;
+        self._fields.101 = value;
         self
     }
 }
@@ -7884,7 +7887,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonPublisherImprint<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.102 = value.into();
+        self._fields.102 = value.into();
         self
     }
     /// Set the `publisherImprint` field to an Option value (optional)
@@ -7892,7 +7895,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonPublisherImprint<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.102 = value;
+        self._fields.102 = value;
         self
     }
 }
@@ -7903,7 +7906,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonPublishingPrinciples<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.103 = value.into();
+        self._fields.103 = value.into();
         self
     }
     /// Set the `publishingPrinciples` field to an Option value (optional)
@@ -7911,7 +7914,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonPublishingPrinciples<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.103 = value;
+        self._fields.103 = value;
         self
     }
 }
@@ -7922,12 +7925,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonRecordedAt<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.104 = value.into();
+        self._fields.104 = value.into();
         self
     }
     /// Set the `recordedAt` field to an Option value (optional)
     pub fn maybe_recorded_at(mut self, value: Option<TvSeasonRecordedAt<'a>>) -> Self {
-        self.__unsafe_private_named.104 = value;
+        self._fields.104 = value;
         self
     }
 }
@@ -7938,7 +7941,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonReleasedEvent<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.105 = value.into();
+        self._fields.105 = value.into();
         self
     }
     /// Set the `releasedEvent` field to an Option value (optional)
@@ -7946,7 +7949,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonReleasedEvent<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.105 = value;
+        self._fields.105 = value;
         self
     }
 }
@@ -7954,12 +7957,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<TvSeasonReview<'a>>>) -> Self {
-        self.__unsafe_private_named.106 = value.into();
+        self._fields.106 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
     pub fn maybe_review(mut self, value: Option<TvSeasonReview<'a>>) -> Self {
-        self.__unsafe_private_named.106 = value;
+        self._fields.106 = value;
         self
     }
 }
@@ -7967,12 +7970,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `reviews` field (optional)
     pub fn reviews(mut self, value: impl Into<Option<TvSeasonReviews<'a>>>) -> Self {
-        self.__unsafe_private_named.107 = value.into();
+        self._fields.107 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
     pub fn maybe_reviews(mut self, value: Option<TvSeasonReviews<'a>>) -> Self {
-        self.__unsafe_private_named.107 = value;
+        self._fields.107 = value;
         self
     }
 }
@@ -7980,12 +7983,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<TvSeasonSameAs<'a>>>) -> Self {
-        self.__unsafe_private_named.108 = value.into();
+        self._fields.108 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
     pub fn maybe_same_as(mut self, value: Option<TvSeasonSameAs<'a>>) -> Self {
-        self.__unsafe_private_named.108 = value;
+        self._fields.108 = value;
         self
     }
 }
@@ -7996,7 +7999,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonSchemaVersion<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.109 = value.into();
+        self._fields.109 = value.into();
         self
     }
     /// Set the `schemaVersion` field to an Option value (optional)
@@ -8004,7 +8007,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonSchemaVersion<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.109 = value;
+        self._fields.109 = value;
         self
     }
 }
@@ -8015,7 +8018,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonSdDatePublished<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.110 = value.into();
+        self._fields.110 = value.into();
         self
     }
     /// Set the `sdDatePublished` field to an Option value (optional)
@@ -8023,7 +8026,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonSdDatePublished<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.110 = value;
+        self._fields.110 = value;
         self
     }
 }
@@ -8034,12 +8037,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonSdLicense<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.111 = value.into();
+        self._fields.111 = value.into();
         self
     }
     /// Set the `sdLicense` field to an Option value (optional)
     pub fn maybe_sd_license(mut self, value: Option<TvSeasonSdLicense<'a>>) -> Self {
-        self.__unsafe_private_named.111 = value;
+        self._fields.111 = value;
         self
     }
 }
@@ -8050,12 +8053,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonSdPublisher<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.112 = value.into();
+        self._fields.112 = value.into();
         self
     }
     /// Set the `sdPublisher` field to an Option value (optional)
     pub fn maybe_sd_publisher(mut self, value: Option<TvSeasonSdPublisher<'a>>) -> Self {
-        self.__unsafe_private_named.112 = value;
+        self._fields.112 = value;
         self
     }
 }
@@ -8066,7 +8069,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonSeasonNumber<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.113 = value.into();
+        self._fields.113 = value.into();
         self
     }
     /// Set the `seasonNumber` field to an Option value (optional)
@@ -8074,7 +8077,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonSeasonNumber<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.113 = value;
+        self._fields.113 = value;
         self
     }
 }
@@ -8082,12 +8085,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<TvSeasonSize<'a>>>) -> Self {
-        self.__unsafe_private_named.114 = value.into();
+        self._fields.114 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
     pub fn maybe_size(mut self, value: Option<TvSeasonSize<'a>>) -> Self {
-        self.__unsafe_private_named.114 = value;
+        self._fields.114 = value;
         self
     }
 }
@@ -8098,7 +8101,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonSourceOrganization<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.115 = value.into();
+        self._fields.115 = value.into();
         self
     }
     /// Set the `sourceOrganization` field to an Option value (optional)
@@ -8106,7 +8109,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonSourceOrganization<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.115 = value;
+        self._fields.115 = value;
         self
     }
 }
@@ -8114,12 +8117,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `spatial` field (optional)
     pub fn spatial(mut self, value: impl Into<Option<TvSeasonSpatial<'a>>>) -> Self {
-        self.__unsafe_private_named.116 = value.into();
+        self._fields.116 = value.into();
         self
     }
     /// Set the `spatial` field to an Option value (optional)
     pub fn maybe_spatial(mut self, value: Option<TvSeasonSpatial<'a>>) -> Self {
-        self.__unsafe_private_named.116 = value;
+        self._fields.116 = value;
         self
     }
 }
@@ -8130,7 +8133,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonSpatialCoverage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.117 = value.into();
+        self._fields.117 = value.into();
         self
     }
     /// Set the `spatialCoverage` field to an Option value (optional)
@@ -8138,7 +8141,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonSpatialCoverage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.117 = value;
+        self._fields.117 = value;
         self
     }
 }
@@ -8146,12 +8149,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `sponsor` field (optional)
     pub fn sponsor(mut self, value: impl Into<Option<TvSeasonSponsor<'a>>>) -> Self {
-        self.__unsafe_private_named.118 = value.into();
+        self._fields.118 = value.into();
         self
     }
     /// Set the `sponsor` field to an Option value (optional)
     pub fn maybe_sponsor(mut self, value: Option<TvSeasonSponsor<'a>>) -> Self {
-        self.__unsafe_private_named.118 = value;
+        self._fields.118 = value;
         self
     }
 }
@@ -8162,12 +8165,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonStartDate<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.119 = value.into();
+        self._fields.119 = value.into();
         self
     }
     /// Set the `startDate` field to an Option value (optional)
     pub fn maybe_start_date(mut self, value: Option<TvSeasonStartDate<'a>>) -> Self {
-        self.__unsafe_private_named.119 = value;
+        self._fields.119 = value;
         self
     }
 }
@@ -8178,12 +8181,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonSubjectOf<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.120 = value.into();
+        self._fields.120 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
     pub fn maybe_subject_of(mut self, value: Option<TvSeasonSubjectOf<'a>>) -> Self {
-        self.__unsafe_private_named.120 = value;
+        self._fields.120 = value;
         self
     }
 }
@@ -8191,12 +8194,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `teaches` field (optional)
     pub fn teaches(mut self, value: impl Into<Option<TvSeasonTeaches<'a>>>) -> Self {
-        self.__unsafe_private_named.121 = value.into();
+        self._fields.121 = value.into();
         self
     }
     /// Set the `teaches` field to an Option value (optional)
     pub fn maybe_teaches(mut self, value: Option<TvSeasonTeaches<'a>>) -> Self {
-        self.__unsafe_private_named.121 = value;
+        self._fields.121 = value;
         self
     }
 }
@@ -8204,12 +8207,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `temporal` field (optional)
     pub fn temporal(mut self, value: impl Into<Option<TvSeasonTemporal<'a>>>) -> Self {
-        self.__unsafe_private_named.122 = value.into();
+        self._fields.122 = value.into();
         self
     }
     /// Set the `temporal` field to an Option value (optional)
     pub fn maybe_temporal(mut self, value: Option<TvSeasonTemporal<'a>>) -> Self {
-        self.__unsafe_private_named.122 = value;
+        self._fields.122 = value;
         self
     }
 }
@@ -8220,7 +8223,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonTemporalCoverage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.123 = value.into();
+        self._fields.123 = value.into();
         self
     }
     /// Set the `temporalCoverage` field to an Option value (optional)
@@ -8228,7 +8231,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonTemporalCoverage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.123 = value;
+        self._fields.123 = value;
         self
     }
 }
@@ -8236,12 +8239,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<TvSeasonText<'a>>>) -> Self {
-        self.__unsafe_private_named.124 = value.into();
+        self._fields.124 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
     pub fn maybe_text(mut self, value: Option<TvSeasonText<'a>>) -> Self {
-        self.__unsafe_private_named.124 = value;
+        self._fields.124 = value;
         self
     }
 }
@@ -8249,12 +8252,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `thumbnail` field (optional)
     pub fn thumbnail(mut self, value: impl Into<Option<TvSeasonThumbnail<'a>>>) -> Self {
-        self.__unsafe_private_named.125 = value.into();
+        self._fields.125 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
     pub fn maybe_thumbnail(mut self, value: Option<TvSeasonThumbnail<'a>>) -> Self {
-        self.__unsafe_private_named.125 = value;
+        self._fields.125 = value;
         self
     }
 }
@@ -8265,7 +8268,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonThumbnailUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.126 = value.into();
+        self._fields.126 = value.into();
         self
     }
     /// Set the `thumbnailUrl` field to an Option value (optional)
@@ -8273,7 +8276,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonThumbnailUrl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.126 = value;
+        self._fields.126 = value;
         self
     }
 }
@@ -8284,7 +8287,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonTimeRequired<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.127 = value.into();
+        self._fields.127 = value.into();
         self
     }
     /// Set the `timeRequired` field to an Option value (optional)
@@ -8292,7 +8295,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonTimeRequired<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.127 = value;
+        self._fields.127 = value;
         self
     }
 }
@@ -8303,12 +8306,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonTitleEidr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.128 = value.into();
+        self._fields.128 = value.into();
         self
     }
     /// Set the `titleEIDR` field to an Option value (optional)
     pub fn maybe_title_eidr(mut self, value: Option<TvSeasonTitleEidr<'a>>) -> Self {
-        self.__unsafe_private_named.128 = value;
+        self._fields.128 = value;
         self
     }
 }
@@ -8316,12 +8319,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `trailer` field (optional)
     pub fn trailer(mut self, value: impl Into<Option<TvSeasonTrailer<'a>>>) -> Self {
-        self.__unsafe_private_named.129 = value.into();
+        self._fields.129 = value.into();
         self
     }
     /// Set the `trailer` field to an Option value (optional)
     pub fn maybe_trailer(mut self, value: Option<TvSeasonTrailer<'a>>) -> Self {
-        self.__unsafe_private_named.129 = value;
+        self._fields.129 = value;
         self
     }
 }
@@ -8332,7 +8335,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonTranslationOfWork<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.130 = value.into();
+        self._fields.130 = value.into();
         self
     }
     /// Set the `translationOfWork` field to an Option value (optional)
@@ -8340,7 +8343,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonTranslationOfWork<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.130 = value;
+        self._fields.130 = value;
         self
     }
 }
@@ -8351,12 +8354,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonTranslator<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.131 = value.into();
+        self._fields.131 = value.into();
         self
     }
     /// Set the `translator` field to an Option value (optional)
     pub fn maybe_translator(mut self, value: Option<TvSeasonTranslator<'a>>) -> Self {
-        self.__unsafe_private_named.131 = value;
+        self._fields.131 = value;
         self
     }
 }
@@ -8367,7 +8370,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonTypicalAgeRange<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.132 = value.into();
+        self._fields.132 = value.into();
         self
     }
     /// Set the `typicalAgeRange` field to an Option value (optional)
@@ -8375,7 +8378,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonTypicalAgeRange<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.132 = value;
+        self._fields.132 = value;
         self
     }
 }
@@ -8383,12 +8386,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<TvSeasonUrl<'a>>>) -> Self {
-        self.__unsafe_private_named.133 = value.into();
+        self._fields.133 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<TvSeasonUrl<'a>>) -> Self {
-        self.__unsafe_private_named.133 = value;
+        self._fields.133 = value;
         self
     }
 }
@@ -8399,12 +8402,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonUsageInfo<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.134 = value.into();
+        self._fields.134 = value.into();
         self
     }
     /// Set the `usageInfo` field to an Option value (optional)
     pub fn maybe_usage_info(mut self, value: Option<TvSeasonUsageInfo<'a>>) -> Self {
-        self.__unsafe_private_named.134 = value;
+        self._fields.134 = value;
         self
     }
 }
@@ -8412,12 +8415,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `version` field (optional)
     pub fn version(mut self, value: impl Into<Option<TvSeasonVersion<'a>>>) -> Self {
-        self.__unsafe_private_named.135 = value.into();
+        self._fields.135 = value.into();
         self
     }
     /// Set the `version` field to an Option value (optional)
     pub fn maybe_version(mut self, value: Option<TvSeasonVersion<'a>>) -> Self {
-        self.__unsafe_private_named.135 = value;
+        self._fields.135 = value;
         self
     }
 }
@@ -8425,12 +8428,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
 impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
     /// Set the `video` field (optional)
     pub fn video(mut self, value: impl Into<Option<TvSeasonVideo<'a>>>) -> Self {
-        self.__unsafe_private_named.136 = value.into();
+        self._fields.136 = value.into();
         self
     }
     /// Set the `video` field to an Option value (optional)
     pub fn maybe_video(mut self, value: Option<TvSeasonVideo<'a>>) -> Self {
-        self.__unsafe_private_named.136 = value;
+        self._fields.136 = value;
         self
     }
 }
@@ -8441,12 +8444,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonWordCount<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.137 = value.into();
+        self._fields.137 = value.into();
         self
     }
     /// Set the `wordCount` field to an Option value (optional)
     pub fn maybe_word_count(mut self, value: Option<TvSeasonWordCount<'a>>) -> Self {
-        self.__unsafe_private_named.137 = value;
+        self._fields.137 = value;
         self
     }
 }
@@ -8457,12 +8460,12 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonWorkExample<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.138 = value.into();
+        self._fields.138 = value.into();
         self
     }
     /// Set the `workExample` field to an Option value (optional)
     pub fn maybe_work_example(mut self, value: Option<TvSeasonWorkExample<'a>>) -> Self {
-        self.__unsafe_private_named.138 = value;
+        self._fields.138 = value;
         self
     }
 }
@@ -8473,7 +8476,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TvSeasonWorkTranslation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.139 = value.into();
+        self._fields.139 = value.into();
         self
     }
     /// Set the `workTranslation` field to an Option value (optional)
@@ -8481,7 +8484,7 @@ impl<'a, S: tv_season_state::State> TvSeasonBuilder<'a, S> {
         mut self,
         value: Option<TvSeasonWorkTranslation<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.139 = value;
+        self._fields.139 = value;
         self
     }
 }
@@ -8493,146 +8496,146 @@ where
     /// Build the final struct
     pub fn build(self) -> TvSeason<'a> {
         TvSeason {
-            about: self.__unsafe_private_named.0,
-            r#abstract: self.__unsafe_private_named.1,
-            access_mode: self.__unsafe_private_named.2,
-            access_mode_sufficient: self.__unsafe_private_named.3,
-            accessibility_api: self.__unsafe_private_named.4,
-            accessibility_control: self.__unsafe_private_named.5,
-            accessibility_feature: self.__unsafe_private_named.6,
-            accessibility_hazard: self.__unsafe_private_named.7,
-            accessibility_summary: self.__unsafe_private_named.8,
-            accountable_person: self.__unsafe_private_named.9,
-            acquire_license_page: self.__unsafe_private_named.10,
-            actor: self.__unsafe_private_named.11,
-            additional_type: self.__unsafe_private_named.12,
-            aggregate_rating: self.__unsafe_private_named.13,
-            alternate_name: self.__unsafe_private_named.14,
-            alternative_headline: self.__unsafe_private_named.15,
-            archived_at: self.__unsafe_private_named.16,
-            assesses: self.__unsafe_private_named.17,
-            associated_media: self.__unsafe_private_named.18,
-            audience: self.__unsafe_private_named.19,
-            audio: self.__unsafe_private_named.20,
-            author: self.__unsafe_private_named.21,
-            award: self.__unsafe_private_named.22,
-            awards: self.__unsafe_private_named.23,
-            character: self.__unsafe_private_named.24,
-            citation: self.__unsafe_private_named.25,
-            comment: self.__unsafe_private_named.26,
-            comment_count: self.__unsafe_private_named.27,
-            conditions_of_access: self.__unsafe_private_named.28,
-            content_location: self.__unsafe_private_named.29,
-            content_rating: self.__unsafe_private_named.30,
-            content_reference_time: self.__unsafe_private_named.31,
-            contributor: self.__unsafe_private_named.32,
-            copyright_holder: self.__unsafe_private_named.33,
-            copyright_notice: self.__unsafe_private_named.34,
-            copyright_year: self.__unsafe_private_named.35,
-            correction: self.__unsafe_private_named.36,
-            country_of_origin: self.__unsafe_private_named.37,
-            creative_work_status: self.__unsafe_private_named.38,
-            creator: self.__unsafe_private_named.39,
-            credit_text: self.__unsafe_private_named.40,
-            date_created: self.__unsafe_private_named.41,
-            date_modified: self.__unsafe_private_named.42,
-            date_published: self.__unsafe_private_named.43,
-            description: self.__unsafe_private_named.44,
-            digital_source_type: self.__unsafe_private_named.45,
-            director: self.__unsafe_private_named.46,
-            disambiguating_description: self.__unsafe_private_named.47,
-            discussion_url: self.__unsafe_private_named.48,
-            edit_eidr: self.__unsafe_private_named.49,
-            editor: self.__unsafe_private_named.50,
-            educational_alignment: self.__unsafe_private_named.51,
-            educational_level: self.__unsafe_private_named.52,
-            educational_use: self.__unsafe_private_named.53,
-            encoding: self.__unsafe_private_named.54,
-            encoding_format: self.__unsafe_private_named.55,
-            encodings: self.__unsafe_private_named.56,
-            end_date: self.__unsafe_private_named.57,
-            episode: self.__unsafe_private_named.58,
-            episodes: self.__unsafe_private_named.59,
-            example_of_work: self.__unsafe_private_named.60,
-            expires: self.__unsafe_private_named.61,
-            file_format: self.__unsafe_private_named.62,
-            funder: self.__unsafe_private_named.63,
-            funding: self.__unsafe_private_named.64,
-            genre: self.__unsafe_private_named.65,
-            has_part: self.__unsafe_private_named.66,
-            headline: self.__unsafe_private_named.67,
-            identifier: self.__unsafe_private_named.68,
-            image: self.__unsafe_private_named.69,
-            in_language: self.__unsafe_private_named.70,
-            interaction_statistic: self.__unsafe_private_named.71,
-            interactivity_type: self.__unsafe_private_named.72,
-            interpreted_as_claim: self.__unsafe_private_named.73,
-            is_accessible_for_free: self.__unsafe_private_named.74,
-            is_based_on: self.__unsafe_private_named.75,
-            is_based_on_url: self.__unsafe_private_named.76,
-            is_family_friendly: self.__unsafe_private_named.77,
-            is_part_of: self.__unsafe_private_named.78,
-            keywords: self.__unsafe_private_named.79,
-            learning_resource_type: self.__unsafe_private_named.80,
-            license: self.__unsafe_private_named.81,
-            location_created: self.__unsafe_private_named.82,
-            main_entity: self.__unsafe_private_named.83,
-            main_entity_of_page: self.__unsafe_private_named.84,
-            maintainer: self.__unsafe_private_named.85,
-            material: self.__unsafe_private_named.86,
-            material_extent: self.__unsafe_private_named.87,
-            mentions: self.__unsafe_private_named.88,
-            name: self.__unsafe_private_named.89,
-            number_of_episodes: self.__unsafe_private_named.90,
-            offers: self.__unsafe_private_named.91,
-            part_of_series: self.__unsafe_private_named.92,
-            part_of_tv_series: self.__unsafe_private_named.93,
-            pattern: self.__unsafe_private_named.94,
-            position: self.__unsafe_private_named.95,
-            potential_action: self.__unsafe_private_named.96,
-            producer: self.__unsafe_private_named.97,
-            production_company: self.__unsafe_private_named.98,
-            provider: self.__unsafe_private_named.99,
-            publication: self.__unsafe_private_named.100,
-            publisher: self.__unsafe_private_named.101,
-            publisher_imprint: self.__unsafe_private_named.102,
-            publishing_principles: self.__unsafe_private_named.103,
-            recorded_at: self.__unsafe_private_named.104,
-            released_event: self.__unsafe_private_named.105,
-            review: self.__unsafe_private_named.106,
-            reviews: self.__unsafe_private_named.107,
-            same_as: self.__unsafe_private_named.108,
-            schema_version: self.__unsafe_private_named.109,
-            sd_date_published: self.__unsafe_private_named.110,
-            sd_license: self.__unsafe_private_named.111,
-            sd_publisher: self.__unsafe_private_named.112,
-            season_number: self.__unsafe_private_named.113,
-            size: self.__unsafe_private_named.114,
-            source_organization: self.__unsafe_private_named.115,
-            spatial: self.__unsafe_private_named.116,
-            spatial_coverage: self.__unsafe_private_named.117,
-            sponsor: self.__unsafe_private_named.118,
-            start_date: self.__unsafe_private_named.119,
-            subject_of: self.__unsafe_private_named.120,
-            teaches: self.__unsafe_private_named.121,
-            temporal: self.__unsafe_private_named.122,
-            temporal_coverage: self.__unsafe_private_named.123,
-            text: self.__unsafe_private_named.124,
-            thumbnail: self.__unsafe_private_named.125,
-            thumbnail_url: self.__unsafe_private_named.126,
-            time_required: self.__unsafe_private_named.127,
-            title_eidr: self.__unsafe_private_named.128,
-            trailer: self.__unsafe_private_named.129,
-            translation_of_work: self.__unsafe_private_named.130,
-            translator: self.__unsafe_private_named.131,
-            typical_age_range: self.__unsafe_private_named.132,
-            url: self.__unsafe_private_named.133,
-            usage_info: self.__unsafe_private_named.134,
-            version: self.__unsafe_private_named.135,
-            video: self.__unsafe_private_named.136,
-            word_count: self.__unsafe_private_named.137,
-            work_example: self.__unsafe_private_named.138,
-            work_translation: self.__unsafe_private_named.139,
+            about: self._fields.0,
+            r#abstract: self._fields.1,
+            access_mode: self._fields.2,
+            access_mode_sufficient: self._fields.3,
+            accessibility_api: self._fields.4,
+            accessibility_control: self._fields.5,
+            accessibility_feature: self._fields.6,
+            accessibility_hazard: self._fields.7,
+            accessibility_summary: self._fields.8,
+            accountable_person: self._fields.9,
+            acquire_license_page: self._fields.10,
+            actor: self._fields.11,
+            additional_type: self._fields.12,
+            aggregate_rating: self._fields.13,
+            alternate_name: self._fields.14,
+            alternative_headline: self._fields.15,
+            archived_at: self._fields.16,
+            assesses: self._fields.17,
+            associated_media: self._fields.18,
+            audience: self._fields.19,
+            audio: self._fields.20,
+            author: self._fields.21,
+            award: self._fields.22,
+            awards: self._fields.23,
+            character: self._fields.24,
+            citation: self._fields.25,
+            comment: self._fields.26,
+            comment_count: self._fields.27,
+            conditions_of_access: self._fields.28,
+            content_location: self._fields.29,
+            content_rating: self._fields.30,
+            content_reference_time: self._fields.31,
+            contributor: self._fields.32,
+            copyright_holder: self._fields.33,
+            copyright_notice: self._fields.34,
+            copyright_year: self._fields.35,
+            correction: self._fields.36,
+            country_of_origin: self._fields.37,
+            creative_work_status: self._fields.38,
+            creator: self._fields.39,
+            credit_text: self._fields.40,
+            date_created: self._fields.41,
+            date_modified: self._fields.42,
+            date_published: self._fields.43,
+            description: self._fields.44,
+            digital_source_type: self._fields.45,
+            director: self._fields.46,
+            disambiguating_description: self._fields.47,
+            discussion_url: self._fields.48,
+            edit_eidr: self._fields.49,
+            editor: self._fields.50,
+            educational_alignment: self._fields.51,
+            educational_level: self._fields.52,
+            educational_use: self._fields.53,
+            encoding: self._fields.54,
+            encoding_format: self._fields.55,
+            encodings: self._fields.56,
+            end_date: self._fields.57,
+            episode: self._fields.58,
+            episodes: self._fields.59,
+            example_of_work: self._fields.60,
+            expires: self._fields.61,
+            file_format: self._fields.62,
+            funder: self._fields.63,
+            funding: self._fields.64,
+            genre: self._fields.65,
+            has_part: self._fields.66,
+            headline: self._fields.67,
+            identifier: self._fields.68,
+            image: self._fields.69,
+            in_language: self._fields.70,
+            interaction_statistic: self._fields.71,
+            interactivity_type: self._fields.72,
+            interpreted_as_claim: self._fields.73,
+            is_accessible_for_free: self._fields.74,
+            is_based_on: self._fields.75,
+            is_based_on_url: self._fields.76,
+            is_family_friendly: self._fields.77,
+            is_part_of: self._fields.78,
+            keywords: self._fields.79,
+            learning_resource_type: self._fields.80,
+            license: self._fields.81,
+            location_created: self._fields.82,
+            main_entity: self._fields.83,
+            main_entity_of_page: self._fields.84,
+            maintainer: self._fields.85,
+            material: self._fields.86,
+            material_extent: self._fields.87,
+            mentions: self._fields.88,
+            name: self._fields.89,
+            number_of_episodes: self._fields.90,
+            offers: self._fields.91,
+            part_of_series: self._fields.92,
+            part_of_tv_series: self._fields.93,
+            pattern: self._fields.94,
+            position: self._fields.95,
+            potential_action: self._fields.96,
+            producer: self._fields.97,
+            production_company: self._fields.98,
+            provider: self._fields.99,
+            publication: self._fields.100,
+            publisher: self._fields.101,
+            publisher_imprint: self._fields.102,
+            publishing_principles: self._fields.103,
+            recorded_at: self._fields.104,
+            released_event: self._fields.105,
+            review: self._fields.106,
+            reviews: self._fields.107,
+            same_as: self._fields.108,
+            schema_version: self._fields.109,
+            sd_date_published: self._fields.110,
+            sd_license: self._fields.111,
+            sd_publisher: self._fields.112,
+            season_number: self._fields.113,
+            size: self._fields.114,
+            source_organization: self._fields.115,
+            spatial: self._fields.116,
+            spatial_coverage: self._fields.117,
+            sponsor: self._fields.118,
+            start_date: self._fields.119,
+            subject_of: self._fields.120,
+            teaches: self._fields.121,
+            temporal: self._fields.122,
+            temporal_coverage: self._fields.123,
+            text: self._fields.124,
+            thumbnail: self._fields.125,
+            thumbnail_url: self._fields.126,
+            time_required: self._fields.127,
+            title_eidr: self._fields.128,
+            trailer: self._fields.129,
+            translation_of_work: self._fields.130,
+            translator: self._fields.131,
+            typical_age_range: self._fields.132,
+            url: self._fields.133,
+            usage_info: self._fields.134,
+            version: self._fields.135,
+            video: self._fields.136,
+            word_count: self._fields.137,
+            work_example: self._fields.138,
+            work_translation: self._fields.139,
             extra_data: Default::default(),
         }
     }
@@ -8642,146 +8645,146 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> TvSeason<'a> {
         TvSeason {
-            about: self.__unsafe_private_named.0,
-            r#abstract: self.__unsafe_private_named.1,
-            access_mode: self.__unsafe_private_named.2,
-            access_mode_sufficient: self.__unsafe_private_named.3,
-            accessibility_api: self.__unsafe_private_named.4,
-            accessibility_control: self.__unsafe_private_named.5,
-            accessibility_feature: self.__unsafe_private_named.6,
-            accessibility_hazard: self.__unsafe_private_named.7,
-            accessibility_summary: self.__unsafe_private_named.8,
-            accountable_person: self.__unsafe_private_named.9,
-            acquire_license_page: self.__unsafe_private_named.10,
-            actor: self.__unsafe_private_named.11,
-            additional_type: self.__unsafe_private_named.12,
-            aggregate_rating: self.__unsafe_private_named.13,
-            alternate_name: self.__unsafe_private_named.14,
-            alternative_headline: self.__unsafe_private_named.15,
-            archived_at: self.__unsafe_private_named.16,
-            assesses: self.__unsafe_private_named.17,
-            associated_media: self.__unsafe_private_named.18,
-            audience: self.__unsafe_private_named.19,
-            audio: self.__unsafe_private_named.20,
-            author: self.__unsafe_private_named.21,
-            award: self.__unsafe_private_named.22,
-            awards: self.__unsafe_private_named.23,
-            character: self.__unsafe_private_named.24,
-            citation: self.__unsafe_private_named.25,
-            comment: self.__unsafe_private_named.26,
-            comment_count: self.__unsafe_private_named.27,
-            conditions_of_access: self.__unsafe_private_named.28,
-            content_location: self.__unsafe_private_named.29,
-            content_rating: self.__unsafe_private_named.30,
-            content_reference_time: self.__unsafe_private_named.31,
-            contributor: self.__unsafe_private_named.32,
-            copyright_holder: self.__unsafe_private_named.33,
-            copyright_notice: self.__unsafe_private_named.34,
-            copyright_year: self.__unsafe_private_named.35,
-            correction: self.__unsafe_private_named.36,
-            country_of_origin: self.__unsafe_private_named.37,
-            creative_work_status: self.__unsafe_private_named.38,
-            creator: self.__unsafe_private_named.39,
-            credit_text: self.__unsafe_private_named.40,
-            date_created: self.__unsafe_private_named.41,
-            date_modified: self.__unsafe_private_named.42,
-            date_published: self.__unsafe_private_named.43,
-            description: self.__unsafe_private_named.44,
-            digital_source_type: self.__unsafe_private_named.45,
-            director: self.__unsafe_private_named.46,
-            disambiguating_description: self.__unsafe_private_named.47,
-            discussion_url: self.__unsafe_private_named.48,
-            edit_eidr: self.__unsafe_private_named.49,
-            editor: self.__unsafe_private_named.50,
-            educational_alignment: self.__unsafe_private_named.51,
-            educational_level: self.__unsafe_private_named.52,
-            educational_use: self.__unsafe_private_named.53,
-            encoding: self.__unsafe_private_named.54,
-            encoding_format: self.__unsafe_private_named.55,
-            encodings: self.__unsafe_private_named.56,
-            end_date: self.__unsafe_private_named.57,
-            episode: self.__unsafe_private_named.58,
-            episodes: self.__unsafe_private_named.59,
-            example_of_work: self.__unsafe_private_named.60,
-            expires: self.__unsafe_private_named.61,
-            file_format: self.__unsafe_private_named.62,
-            funder: self.__unsafe_private_named.63,
-            funding: self.__unsafe_private_named.64,
-            genre: self.__unsafe_private_named.65,
-            has_part: self.__unsafe_private_named.66,
-            headline: self.__unsafe_private_named.67,
-            identifier: self.__unsafe_private_named.68,
-            image: self.__unsafe_private_named.69,
-            in_language: self.__unsafe_private_named.70,
-            interaction_statistic: self.__unsafe_private_named.71,
-            interactivity_type: self.__unsafe_private_named.72,
-            interpreted_as_claim: self.__unsafe_private_named.73,
-            is_accessible_for_free: self.__unsafe_private_named.74,
-            is_based_on: self.__unsafe_private_named.75,
-            is_based_on_url: self.__unsafe_private_named.76,
-            is_family_friendly: self.__unsafe_private_named.77,
-            is_part_of: self.__unsafe_private_named.78,
-            keywords: self.__unsafe_private_named.79,
-            learning_resource_type: self.__unsafe_private_named.80,
-            license: self.__unsafe_private_named.81,
-            location_created: self.__unsafe_private_named.82,
-            main_entity: self.__unsafe_private_named.83,
-            main_entity_of_page: self.__unsafe_private_named.84,
-            maintainer: self.__unsafe_private_named.85,
-            material: self.__unsafe_private_named.86,
-            material_extent: self.__unsafe_private_named.87,
-            mentions: self.__unsafe_private_named.88,
-            name: self.__unsafe_private_named.89,
-            number_of_episodes: self.__unsafe_private_named.90,
-            offers: self.__unsafe_private_named.91,
-            part_of_series: self.__unsafe_private_named.92,
-            part_of_tv_series: self.__unsafe_private_named.93,
-            pattern: self.__unsafe_private_named.94,
-            position: self.__unsafe_private_named.95,
-            potential_action: self.__unsafe_private_named.96,
-            producer: self.__unsafe_private_named.97,
-            production_company: self.__unsafe_private_named.98,
-            provider: self.__unsafe_private_named.99,
-            publication: self.__unsafe_private_named.100,
-            publisher: self.__unsafe_private_named.101,
-            publisher_imprint: self.__unsafe_private_named.102,
-            publishing_principles: self.__unsafe_private_named.103,
-            recorded_at: self.__unsafe_private_named.104,
-            released_event: self.__unsafe_private_named.105,
-            review: self.__unsafe_private_named.106,
-            reviews: self.__unsafe_private_named.107,
-            same_as: self.__unsafe_private_named.108,
-            schema_version: self.__unsafe_private_named.109,
-            sd_date_published: self.__unsafe_private_named.110,
-            sd_license: self.__unsafe_private_named.111,
-            sd_publisher: self.__unsafe_private_named.112,
-            season_number: self.__unsafe_private_named.113,
-            size: self.__unsafe_private_named.114,
-            source_organization: self.__unsafe_private_named.115,
-            spatial: self.__unsafe_private_named.116,
-            spatial_coverage: self.__unsafe_private_named.117,
-            sponsor: self.__unsafe_private_named.118,
-            start_date: self.__unsafe_private_named.119,
-            subject_of: self.__unsafe_private_named.120,
-            teaches: self.__unsafe_private_named.121,
-            temporal: self.__unsafe_private_named.122,
-            temporal_coverage: self.__unsafe_private_named.123,
-            text: self.__unsafe_private_named.124,
-            thumbnail: self.__unsafe_private_named.125,
-            thumbnail_url: self.__unsafe_private_named.126,
-            time_required: self.__unsafe_private_named.127,
-            title_eidr: self.__unsafe_private_named.128,
-            trailer: self.__unsafe_private_named.129,
-            translation_of_work: self.__unsafe_private_named.130,
-            translator: self.__unsafe_private_named.131,
-            typical_age_range: self.__unsafe_private_named.132,
-            url: self.__unsafe_private_named.133,
-            usage_info: self.__unsafe_private_named.134,
-            version: self.__unsafe_private_named.135,
-            video: self.__unsafe_private_named.136,
-            word_count: self.__unsafe_private_named.137,
-            work_example: self.__unsafe_private_named.138,
-            work_translation: self.__unsafe_private_named.139,
+            about: self._fields.0,
+            r#abstract: self._fields.1,
+            access_mode: self._fields.2,
+            access_mode_sufficient: self._fields.3,
+            accessibility_api: self._fields.4,
+            accessibility_control: self._fields.5,
+            accessibility_feature: self._fields.6,
+            accessibility_hazard: self._fields.7,
+            accessibility_summary: self._fields.8,
+            accountable_person: self._fields.9,
+            acquire_license_page: self._fields.10,
+            actor: self._fields.11,
+            additional_type: self._fields.12,
+            aggregate_rating: self._fields.13,
+            alternate_name: self._fields.14,
+            alternative_headline: self._fields.15,
+            archived_at: self._fields.16,
+            assesses: self._fields.17,
+            associated_media: self._fields.18,
+            audience: self._fields.19,
+            audio: self._fields.20,
+            author: self._fields.21,
+            award: self._fields.22,
+            awards: self._fields.23,
+            character: self._fields.24,
+            citation: self._fields.25,
+            comment: self._fields.26,
+            comment_count: self._fields.27,
+            conditions_of_access: self._fields.28,
+            content_location: self._fields.29,
+            content_rating: self._fields.30,
+            content_reference_time: self._fields.31,
+            contributor: self._fields.32,
+            copyright_holder: self._fields.33,
+            copyright_notice: self._fields.34,
+            copyright_year: self._fields.35,
+            correction: self._fields.36,
+            country_of_origin: self._fields.37,
+            creative_work_status: self._fields.38,
+            creator: self._fields.39,
+            credit_text: self._fields.40,
+            date_created: self._fields.41,
+            date_modified: self._fields.42,
+            date_published: self._fields.43,
+            description: self._fields.44,
+            digital_source_type: self._fields.45,
+            director: self._fields.46,
+            disambiguating_description: self._fields.47,
+            discussion_url: self._fields.48,
+            edit_eidr: self._fields.49,
+            editor: self._fields.50,
+            educational_alignment: self._fields.51,
+            educational_level: self._fields.52,
+            educational_use: self._fields.53,
+            encoding: self._fields.54,
+            encoding_format: self._fields.55,
+            encodings: self._fields.56,
+            end_date: self._fields.57,
+            episode: self._fields.58,
+            episodes: self._fields.59,
+            example_of_work: self._fields.60,
+            expires: self._fields.61,
+            file_format: self._fields.62,
+            funder: self._fields.63,
+            funding: self._fields.64,
+            genre: self._fields.65,
+            has_part: self._fields.66,
+            headline: self._fields.67,
+            identifier: self._fields.68,
+            image: self._fields.69,
+            in_language: self._fields.70,
+            interaction_statistic: self._fields.71,
+            interactivity_type: self._fields.72,
+            interpreted_as_claim: self._fields.73,
+            is_accessible_for_free: self._fields.74,
+            is_based_on: self._fields.75,
+            is_based_on_url: self._fields.76,
+            is_family_friendly: self._fields.77,
+            is_part_of: self._fields.78,
+            keywords: self._fields.79,
+            learning_resource_type: self._fields.80,
+            license: self._fields.81,
+            location_created: self._fields.82,
+            main_entity: self._fields.83,
+            main_entity_of_page: self._fields.84,
+            maintainer: self._fields.85,
+            material: self._fields.86,
+            material_extent: self._fields.87,
+            mentions: self._fields.88,
+            name: self._fields.89,
+            number_of_episodes: self._fields.90,
+            offers: self._fields.91,
+            part_of_series: self._fields.92,
+            part_of_tv_series: self._fields.93,
+            pattern: self._fields.94,
+            position: self._fields.95,
+            potential_action: self._fields.96,
+            producer: self._fields.97,
+            production_company: self._fields.98,
+            provider: self._fields.99,
+            publication: self._fields.100,
+            publisher: self._fields.101,
+            publisher_imprint: self._fields.102,
+            publishing_principles: self._fields.103,
+            recorded_at: self._fields.104,
+            released_event: self._fields.105,
+            review: self._fields.106,
+            reviews: self._fields.107,
+            same_as: self._fields.108,
+            schema_version: self._fields.109,
+            sd_date_published: self._fields.110,
+            sd_license: self._fields.111,
+            sd_publisher: self._fields.112,
+            season_number: self._fields.113,
+            size: self._fields.114,
+            source_organization: self._fields.115,
+            spatial: self._fields.116,
+            spatial_coverage: self._fields.117,
+            sponsor: self._fields.118,
+            start_date: self._fields.119,
+            subject_of: self._fields.120,
+            teaches: self._fields.121,
+            temporal: self._fields.122,
+            temporal_coverage: self._fields.123,
+            text: self._fields.124,
+            thumbnail: self._fields.125,
+            thumbnail_url: self._fields.126,
+            time_required: self._fields.127,
+            title_eidr: self._fields.128,
+            trailer: self._fields.129,
+            translation_of_work: self._fields.130,
+            translator: self._fields.131,
+            typical_age_range: self._fields.132,
+            url: self._fields.133,
+            usage_info: self._fields.134,
+            version: self._fields.135,
+            video: self._fields.136,
+            word_count: self._fields.137,
+            work_example: self._fields.138,
+            work_translation: self._fields.139,
             extra_data: Some(extra_data),
         }
     }

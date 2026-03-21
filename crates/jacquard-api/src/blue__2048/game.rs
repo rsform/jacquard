@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -134,112 +137,112 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CurrentScore;
-        type Completed;
         type Won;
+        type Completed;
+        type CurrentScore;
+        type CreatedAt;
         type SeededRecording;
         type SyncStatus;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CurrentScore = Unset;
-        type Completed = Unset;
         type Won = Unset;
+        type Completed = Unset;
+        type CurrentScore = Unset;
+        type CreatedAt = Unset;
         type SeededRecording = Unset;
         type SyncStatus = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `current_score` field to Set
-    pub struct SetCurrentScore<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCurrentScore<S> {}
-    impl<S: State> State for SetCurrentScore<S> {
-        type CurrentScore = Set<members::current_score>;
-        type Completed = S::Completed;
-        type Won = S::Won;
-        type SeededRecording = S::SeededRecording;
-        type SyncStatus = S::SyncStatus;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `completed` field to Set
-    pub struct SetCompleted<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCompleted<S> {}
-    impl<S: State> State for SetCompleted<S> {
-        type CurrentScore = S::CurrentScore;
-        type Completed = Set<members::completed>;
-        type Won = S::Won;
-        type SeededRecording = S::SeededRecording;
-        type SyncStatus = S::SyncStatus;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `won` field to Set
     pub struct SetWon<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWon<S> {}
     impl<S: State> State for SetWon<S> {
-        type CurrentScore = S::CurrentScore;
-        type Completed = S::Completed;
         type Won = Set<members::won>;
+        type Completed = S::Completed;
+        type CurrentScore = S::CurrentScore;
+        type CreatedAt = S::CreatedAt;
         type SeededRecording = S::SeededRecording;
         type SyncStatus = S::SyncStatus;
-        type CreatedAt = S::CreatedAt;
     }
-    ///State transition - sets the `seeded_recording` field to Set
-    pub struct SetSeededRecording<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeededRecording<S> {}
-    impl<S: State> State for SetSeededRecording<S> {
-        type CurrentScore = S::CurrentScore;
-        type Completed = S::Completed;
+    ///State transition - sets the `completed` field to Set
+    pub struct SetCompleted<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCompleted<S> {}
+    impl<S: State> State for SetCompleted<S> {
         type Won = S::Won;
-        type SeededRecording = Set<members::seeded_recording>;
-        type SyncStatus = S::SyncStatus;
+        type Completed = Set<members::completed>;
+        type CurrentScore = S::CurrentScore;
         type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `sync_status` field to Set
-    pub struct SetSyncStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSyncStatus<S> {}
-    impl<S: State> State for SetSyncStatus<S> {
-        type CurrentScore = S::CurrentScore;
-        type Completed = S::Completed;
-        type Won = S::Won;
         type SeededRecording = S::SeededRecording;
-        type SyncStatus = Set<members::sync_status>;
+        type SyncStatus = S::SyncStatus;
+    }
+    ///State transition - sets the `current_score` field to Set
+    pub struct SetCurrentScore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCurrentScore<S> {}
+    impl<S: State> State for SetCurrentScore<S> {
+        type Won = S::Won;
+        type Completed = S::Completed;
+        type CurrentScore = Set<members::current_score>;
         type CreatedAt = S::CreatedAt;
+        type SeededRecording = S::SeededRecording;
+        type SyncStatus = S::SyncStatus;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type CurrentScore = S::CurrentScore;
-        type Completed = S::Completed;
         type Won = S::Won;
+        type Completed = S::Completed;
+        type CurrentScore = S::CurrentScore;
+        type CreatedAt = Set<members::created_at>;
         type SeededRecording = S::SeededRecording;
         type SyncStatus = S::SyncStatus;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `seeded_recording` field to Set
+    pub struct SetSeededRecording<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSeededRecording<S> {}
+    impl<S: State> State for SetSeededRecording<S> {
+        type Won = S::Won;
+        type Completed = S::Completed;
+        type CurrentScore = S::CurrentScore;
+        type CreatedAt = S::CreatedAt;
+        type SeededRecording = Set<members::seeded_recording>;
+        type SyncStatus = S::SyncStatus;
+    }
+    ///State transition - sets the `sync_status` field to Set
+    pub struct SetSyncStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSyncStatus<S> {}
+    impl<S: State> State for SetSyncStatus<S> {
+        type Won = S::Won;
+        type Completed = S::Completed;
+        type CurrentScore = S::CurrentScore;
+        type CreatedAt = S::CreatedAt;
+        type SeededRecording = S::SeededRecording;
+        type SyncStatus = Set<members::sync_status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `current_score` field
-        pub struct current_score(());
-        ///Marker type for the `completed` field
-        pub struct completed(());
         ///Marker type for the `won` field
         pub struct won(());
+        ///Marker type for the `completed` field
+        pub struct completed(());
+        ///Marker type for the `current_score` field
+        pub struct current_score(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `seeded_recording` field
         pub struct seeded_recording(());
         ///Marker type for the `sync_status` field
         pub struct sync_status(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GameBuilder<'a, S: game_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<bool>,
         Option<Datetime>,
         Option<i64>,
@@ -247,7 +250,7 @@ pub struct GameBuilder<'a, S: game_state::State> {
         Option<SyncStatus<'a>>,
         Option<bool>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Game<'a> {
@@ -261,9 +264,9 @@ impl<'a> GameBuilder<'a, game_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -278,11 +281,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> GameBuilder<'a, game_state::SetCompleted<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -297,11 +300,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> GameBuilder<'a, game_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -316,11 +319,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> GameBuilder<'a, game_state::SetCurrentScore<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         GameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -335,11 +338,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GameBuilder<'a, game_state::SetSeededRecording<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         GameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -354,11 +357,11 @@ where
         mut self,
         value: impl Into<SyncStatus<'a>>,
     ) -> GameBuilder<'a, game_state::SetSyncStatus<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         GameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -373,11 +376,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> GameBuilder<'a, game_state::SetWon<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         GameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -385,22 +388,22 @@ where
 impl<'a, S> GameBuilder<'a, S>
 where
     S: game_state::State,
-    S::CurrentScore: game_state::IsSet,
-    S::Completed: game_state::IsSet,
     S::Won: game_state::IsSet,
+    S::Completed: game_state::IsSet,
+    S::CurrentScore: game_state::IsSet,
+    S::CreatedAt: game_state::IsSet,
     S::SeededRecording: game_state::IsSet,
     S::SyncStatus: game_state::IsSet,
-    S::CreatedAt: game_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Game<'a> {
         Game {
-            completed: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            current_score: self.__unsafe_private_named.2.unwrap(),
-            seeded_recording: self.__unsafe_private_named.3.unwrap(),
-            sync_status: self.__unsafe_private_named.4.unwrap(),
-            won: self.__unsafe_private_named.5.unwrap(),
+            completed: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            current_score: self._fields.2.unwrap(),
+            seeded_recording: self._fields.3.unwrap(),
+            sync_status: self._fields.4.unwrap(),
+            won: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -413,12 +416,12 @@ where
         >,
     ) -> Game<'a> {
         Game {
-            completed: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            current_score: self.__unsafe_private_named.2.unwrap(),
-            seeded_recording: self.__unsafe_private_named.3.unwrap(),
-            sync_status: self.__unsafe_private_named.4.unwrap(),
-            won: self.__unsafe_private_named.5.unwrap(),
+            completed: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            current_score: self._fields.2.unwrap(),
+            seeded_recording: self._fields.3.unwrap(),
+            sync_status: self._fields.4.unwrap(),
+            won: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

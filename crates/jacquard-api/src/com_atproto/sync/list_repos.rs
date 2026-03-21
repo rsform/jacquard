@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -238,9 +241,9 @@ pub mod list_repos_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListReposBuilder<'a, S: list_repos_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ListRepos<'a> {
@@ -254,9 +257,9 @@ impl<'a> ListReposBuilder<'a, list_repos_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListReposBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -264,12 +267,12 @@ impl<'a> ListReposBuilder<'a, list_repos_state::Empty> {
 impl<'a, S: list_repos_state::State> ListReposBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -277,12 +280,12 @@ impl<'a, S: list_repos_state::State> ListReposBuilder<'a, S> {
 impl<'a, S: list_repos_state::State> ListReposBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -294,8 +297,8 @@ where
     /// Build the final struct
     pub fn build(self) -> ListRepos<'a> {
         ListRepos {
-            cursor: self.__unsafe_private_named.0,
-            limit: self.__unsafe_private_named.1,
+            cursor: self._fields.0,
+            limit: self._fields.1,
         }
     }
 }
@@ -310,65 +313,65 @@ pub mod repo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Head;
         type Rev;
         type Did;
+        type Head;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Head = Unset;
         type Rev = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `head` field to Set
-    pub struct SetHead<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHead<S> {}
-    impl<S: State> State for SetHead<S> {
-        type Head = Set<members::head>;
-        type Rev = S::Rev;
-        type Did = S::Did;
+        type Head = Unset;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
-        type Head = S::Head;
         type Rev = Set<members::rev>;
         type Did = S::Did;
+        type Head = S::Head;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Head = S::Head;
         type Rev = S::Rev;
         type Did = Set<members::did>;
+        type Head = S::Head;
+    }
+    ///State transition - sets the `head` field to Set
+    pub struct SetHead<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHead<S> {}
+    impl<S: State> State for SetHead<S> {
+        type Rev = S::Rev;
+        type Did = S::Did;
+        type Head = Set<members::head>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `head` field
-        pub struct head(());
         ///Marker type for the `rev` field
         pub struct rev(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `head` field
+        pub struct head(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RepoBuilder<'a, S: repo_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<bool>,
         Option<Did<'a>>,
         Option<Cid<'a>>,
         Option<Tid>,
         Option<RepoStatus<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Repo<'a> {
@@ -382,9 +385,9 @@ impl<'a> RepoBuilder<'a, repo_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RepoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -392,12 +395,12 @@ impl<'a> RepoBuilder<'a, repo_state::Empty> {
 impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     /// Set the `active` field (optional)
     pub fn active(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `active` field to an Option value (optional)
     pub fn maybe_active(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -412,11 +415,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> RepoBuilder<'a, repo_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RepoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -431,11 +434,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> RepoBuilder<'a, repo_state::SetHead<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RepoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -450,11 +453,11 @@ where
         mut self,
         value: impl Into<Tid>,
     ) -> RepoBuilder<'a, repo_state::SetRev<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         RepoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -462,12 +465,12 @@ where
 impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<RepoStatus<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<RepoStatus<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -475,18 +478,18 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
 impl<'a, S> RepoBuilder<'a, S>
 where
     S: repo_state::State,
-    S::Head: repo_state::IsSet,
     S::Rev: repo_state::IsSet,
     S::Did: repo_state::IsSet,
+    S::Head: repo_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Repo<'a> {
         Repo {
-            active: self.__unsafe_private_named.0,
-            did: self.__unsafe_private_named.1.unwrap(),
-            head: self.__unsafe_private_named.2.unwrap(),
-            rev: self.__unsafe_private_named.3.unwrap(),
-            status: self.__unsafe_private_named.4,
+            active: self._fields.0,
+            did: self._fields.1.unwrap(),
+            head: self._fields.2.unwrap(),
+            rev: self._fields.3.unwrap(),
+            status: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -499,11 +502,11 @@ where
         >,
     ) -> Repo<'a> {
         Repo {
-            active: self.__unsafe_private_named.0,
-            did: self.__unsafe_private_named.1.unwrap(),
-            head: self.__unsafe_private_named.2.unwrap(),
-            rev: self.__unsafe_private_named.3.unwrap(),
-            status: self.__unsafe_private_named.4,
+            active: self._fields.0,
+            did: self._fields.1.unwrap(),
+            head: self._fields.2.unwrap(),
+            rev: self._fields.3.unwrap(),
+            status: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -139,79 +142,74 @@ pub mod board_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Title;
-        type CreatedAt;
-        type Description;
         type Nsfw;
+        type Description;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Title = Unset;
-        type CreatedAt = Unset;
-        type Description = Unset;
         type Nsfw = Unset;
+        type Description = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
+        type Nsfw = S::Nsfw;
         type Description = S::Description;
-        type Nsfw = S::Nsfw;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
-        type Description = S::Description;
-        type Nsfw = S::Nsfw;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Title = S::Title;
         type CreatedAt = S::CreatedAt;
-        type Description = Set<members::description>;
-        type Nsfw = S::Nsfw;
     }
     ///State transition - sets the `nsfw` field to Set
     pub struct SetNsfw<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNsfw<S> {}
     impl<S: State> State for SetNsfw<S> {
         type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
         type Nsfw = Set<members::nsfw>;
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Title = S::Title;
+        type Nsfw = S::Nsfw;
+        type Description = Set<members::description>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Nsfw = S::Nsfw;
+        type Description = S::Description;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `description` field
-        pub struct description(());
         ///Marker type for the `nsfw` field
         pub struct nsfw(());
+        ///Marker type for the `description` field
+        pub struct description(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BoardBuilder<'a, S: board_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-        Option<bool>,
-        Option<CowStr<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<CowStr<'a>>, Option<bool>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Board<'a> {
@@ -225,9 +223,9 @@ impl<'a> BoardBuilder<'a, board_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BoardBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -242,11 +240,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> BoardBuilder<'a, board_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BoardBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -261,11 +259,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BoardBuilder<'a, board_state::SetDescription<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         BoardBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -280,11 +278,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> BoardBuilder<'a, board_state::SetNsfw<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         BoardBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -299,11 +297,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BoardBuilder<'a, board_state::SetTitle<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         BoardBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -312,17 +310,17 @@ impl<'a, S> BoardBuilder<'a, S>
 where
     S: board_state::State,
     S::Title: board_state::IsSet,
-    S::CreatedAt: board_state::IsSet,
-    S::Description: board_state::IsSet,
     S::Nsfw: board_state::IsSet,
+    S::Description: board_state::IsSet,
+    S::CreatedAt: board_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Board<'a> {
         Board {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1.unwrap(),
-            nsfw: self.__unsafe_private_named.2.unwrap(),
-            title: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1.unwrap(),
+            nsfw: self._fields.2.unwrap(),
+            title: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -335,10 +333,10 @@ where
         >,
     ) -> Board<'a> {
         Board {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1.unwrap(),
-            nsfw: self.__unsafe_private_named.2.unwrap(),
-            title: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1.unwrap(),
+            nsfw: self._fields.2.unwrap(),
+            title: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

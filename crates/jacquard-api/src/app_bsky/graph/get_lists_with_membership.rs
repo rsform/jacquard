@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -138,9 +141,9 @@ pub mod list_with_membership_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListWithMembershipBuilder<'a, S: list_with_membership_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<ListView<'a>>, Option<ListItemView<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<ListView<'a>>, Option<ListItemView<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ListWithMembership<'a> {
@@ -154,9 +157,9 @@ impl<'a> ListWithMembershipBuilder<'a, list_with_membership_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListWithMembershipBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -171,11 +174,11 @@ where
         mut self,
         value: impl Into<ListView<'a>>,
     ) -> ListWithMembershipBuilder<'a, list_with_membership_state::SetList<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ListWithMembershipBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -183,12 +186,12 @@ where
 impl<'a, S: list_with_membership_state::State> ListWithMembershipBuilder<'a, S> {
     /// Set the `listItem` field (optional)
     pub fn list_item(mut self, value: impl Into<Option<ListItemView<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `listItem` field to an Option value (optional)
     pub fn maybe_list_item(mut self, value: Option<ListItemView<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -201,8 +204,8 @@ where
     /// Build the final struct
     pub fn build(self) -> ListWithMembership<'a> {
         ListWithMembership {
-            list: self.__unsafe_private_named.0.unwrap(),
-            list_item: self.__unsafe_private_named.1,
+            list: self._fields.0.unwrap(),
+            list_item: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -215,8 +218,8 @@ where
         >,
     ) -> ListWithMembership<'a> {
         ListWithMembership {
-            list: self.__unsafe_private_named.0.unwrap(),
-            list_item: self.__unsafe_private_named.1,
+            list: self._fields.0.unwrap(),
+            list_item: self._fields.1,
             extra_data: Some(extra_data),
         }
     }
@@ -359,14 +362,14 @@ pub mod get_lists_with_membership_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetListsWithMembershipBuilder<'a, S: get_lists_with_membership_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AtIdentifier<'a>>,
         Option<CowStr<'a>>,
         Option<i64>,
         Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetListsWithMembership<'a> {
@@ -383,9 +386,9 @@ impl<'a> GetListsWithMembershipBuilder<'a, get_lists_with_membership_state::Empt
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetListsWithMembershipBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -403,11 +406,11 @@ where
         'a,
         get_lists_with_membership_state::SetActor<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetListsWithMembershipBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -418,12 +421,12 @@ impl<
 > GetListsWithMembershipBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -434,12 +437,12 @@ impl<
 > GetListsWithMembershipBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -450,12 +453,12 @@ impl<
 > GetListsWithMembershipBuilder<'a, S> {
     /// Set the `purposes` field (optional)
     pub fn purposes(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `purposes` field to an Option value (optional)
     pub fn maybe_purposes(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -468,10 +471,10 @@ where
     /// Build the final struct
     pub fn build(self) -> GetListsWithMembership<'a> {
         GetListsWithMembership {
-            actor: self.__unsafe_private_named.0.unwrap(),
-            cursor: self.__unsafe_private_named.1,
-            limit: self.__unsafe_private_named.2,
-            purposes: self.__unsafe_private_named.3,
+            actor: self._fields.0.unwrap(),
+            cursor: self._fields.1,
+            limit: self._fields.2,
+            purposes: self._fields.3,
         }
     }
 }

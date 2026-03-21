@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -264,15 +267,15 @@ pub mod create_post_state {
 
 /// Builder for constructing an instance of this type
 pub struct CreatePostBuilder<'a, S: create_post_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<bool>,
         Option<CowStr<'a>>,
         Option<Vec<create_post::ThreadPostInput<'a>>>,
         Option<Datetime>,
         Option<Vec<CreatePostThreadgateRulesItem<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CreatePost<'a> {
@@ -286,9 +289,9 @@ impl<'a> CreatePostBuilder<'a, create_post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreatePostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -296,12 +299,12 @@ impl<'a> CreatePostBuilder<'a, create_post_state::Empty> {
 impl<'a, S: create_post_state::State> CreatePostBuilder<'a, S> {
     /// Set the `disableQuotePosts` field (optional)
     pub fn disable_quote_posts(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `disableQuotePosts` field to an Option value (optional)
     pub fn maybe_disable_quote_posts(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -309,12 +312,12 @@ impl<'a, S: create_post_state::State> CreatePostBuilder<'a, S> {
 impl<'a, S: create_post_state::State> CreatePostBuilder<'a, S> {
     /// Set the `parentPostId` field (optional)
     pub fn parent_post_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `parentPostId` field to an Option value (optional)
     pub fn maybe_parent_post_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -329,11 +332,11 @@ where
         mut self,
         value: impl Into<Vec<create_post::ThreadPostInput<'a>>>,
     ) -> CreatePostBuilder<'a, create_post_state::SetPosts<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CreatePostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -348,11 +351,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CreatePostBuilder<'a, create_post_state::SetScheduledAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         CreatePostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -363,7 +366,7 @@ impl<'a, S: create_post_state::State> CreatePostBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<CreatePostThreadgateRulesItem<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `threadgateRules` field to an Option value (optional)
@@ -371,7 +374,7 @@ impl<'a, S: create_post_state::State> CreatePostBuilder<'a, S> {
         mut self,
         value: Option<Vec<CreatePostThreadgateRulesItem<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -385,11 +388,11 @@ where
     /// Build the final struct
     pub fn build(self) -> CreatePost<'a> {
         CreatePost {
-            disable_quote_posts: self.__unsafe_private_named.0,
-            parent_post_id: self.__unsafe_private_named.1,
-            posts: self.__unsafe_private_named.2.unwrap(),
-            scheduled_at: self.__unsafe_private_named.3.unwrap(),
-            threadgate_rules: self.__unsafe_private_named.4,
+            disable_quote_posts: self._fields.0,
+            parent_post_id: self._fields.1,
+            posts: self._fields.2.unwrap(),
+            scheduled_at: self._fields.3.unwrap(),
+            threadgate_rules: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -402,11 +405,11 @@ where
         >,
     ) -> CreatePost<'a> {
         CreatePost {
-            disable_quote_posts: self.__unsafe_private_named.0,
-            parent_post_id: self.__unsafe_private_named.1,
-            posts: self.__unsafe_private_named.2.unwrap(),
-            scheduled_at: self.__unsafe_private_named.3.unwrap(),
-            threadgate_rules: self.__unsafe_private_named.4,
+            disable_quote_posts: self._fields.0,
+            parent_post_id: self._fields.1,
+            posts: self._fields.2.unwrap(),
+            scheduled_at: self._fields.3.unwrap(),
+            threadgate_rules: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

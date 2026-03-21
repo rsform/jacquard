@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -457,9 +460,9 @@ pub mod aspect_ratio_state {
 
 /// Builder for constructing an instance of this type
 pub struct AspectRatioBuilder<'a, S: aspect_ratio_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> AspectRatio<'a> {
@@ -473,9 +476,9 @@ impl<'a> AspectRatioBuilder<'a, aspect_ratio_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AspectRatioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -490,11 +493,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetHeight<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AspectRatioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -509,11 +512,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetWidth<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AspectRatioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -527,8 +530,8 @@ where
     /// Build the final struct
     pub fn build(self) -> AspectRatio<'a> {
         AspectRatio {
-            height: self.__unsafe_private_named.0.unwrap(),
-            width: self.__unsafe_private_named.1.unwrap(),
+            height: self._fields.0.unwrap(),
+            width: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -541,8 +544,8 @@ where
         >,
     ) -> AspectRatio<'a> {
         AspectRatio {
-            height: self.__unsafe_private_named.0.unwrap(),
-            width: self.__unsafe_private_named.1.unwrap(),
+            height: self._fields.0.unwrap(),
+            width: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -833,9 +836,9 @@ pub mod embed_block_state {
 
 /// Builder for constructing an instance of this type
 pub struct EmbedBlockBuilder<'a, S: embed_block_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<UriValue<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<UriValue<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> EmbedBlock<'a> {
@@ -849,9 +852,9 @@ impl<'a> EmbedBlockBuilder<'a, embed_block_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EmbedBlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -866,11 +869,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> EmbedBlockBuilder<'a, embed_block_state::SetUrl<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         EmbedBlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -883,7 +886,7 @@ where
     /// Build the final struct
     pub fn build(self) -> EmbedBlock<'a> {
         EmbedBlock {
-            url: self.__unsafe_private_named.0.unwrap(),
+            url: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -896,7 +899,7 @@ where
         >,
     ) -> EmbedBlock<'a> {
         EmbedBlock {
-            url: self.__unsafe_private_named.0.unwrap(),
+            url: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -912,50 +915,50 @@ pub mod image_block_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blob;
         type MimeType;
+        type Blob;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blob = Unset;
         type MimeType = Unset;
-    }
-    ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlob<S> {}
-    impl<S: State> State for SetBlob<S> {
-        type Blob = Set<members::blob>;
-        type MimeType = S::MimeType;
+        type Blob = Unset;
     }
     ///State transition - sets the `mime_type` field to Set
     pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMimeType<S> {}
     impl<S: State> State for SetMimeType<S> {
-        type Blob = S::Blob;
         type MimeType = Set<members::mime_type>;
+        type Blob = S::Blob;
+    }
+    ///State transition - sets the `blob` field to Set
+    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlob<S> {}
+    impl<S: State> State for SetBlob<S> {
+        type MimeType = S::MimeType;
+        type Blob = Set<members::blob>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blob` field
-        pub struct blob(());
         ///Marker type for the `mime_type` field
         pub struct mime_type(());
+        ///Marker type for the `blob` field
+        pub struct blob(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ImageBlockBuilder<'a, S: image_block_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<post::AspectRatio<'a>>,
         Option<BlobRef<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ImageBlock<'a> {
@@ -969,9 +972,9 @@ impl<'a> ImageBlockBuilder<'a, image_block_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ImageBlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -979,12 +982,12 @@ impl<'a> ImageBlockBuilder<'a, image_block_state::Empty> {
 impl<'a, S: image_block_state::State> ImageBlockBuilder<'a, S> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `alt` field to an Option value (optional)
     pub fn maybe_alt(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -995,12 +998,12 @@ impl<'a, S: image_block_state::State> ImageBlockBuilder<'a, S> {
         mut self,
         value: impl Into<Option<post::AspectRatio<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
     pub fn maybe_aspect_ratio(mut self, value: Option<post::AspectRatio<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1015,11 +1018,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> ImageBlockBuilder<'a, image_block_state::SetBlob<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ImageBlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1034,11 +1037,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ImageBlockBuilder<'a, image_block_state::SetMimeType<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ImageBlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1046,16 +1049,16 @@ where
 impl<'a, S> ImageBlockBuilder<'a, S>
 where
     S: image_block_state::State,
-    S::Blob: image_block_state::IsSet,
     S::MimeType: image_block_state::IsSet,
+    S::Blob: image_block_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ImageBlock<'a> {
         ImageBlock {
-            alt: self.__unsafe_private_named.0,
-            aspect_ratio: self.__unsafe_private_named.1,
-            blob: self.__unsafe_private_named.2.unwrap(),
-            mime_type: self.__unsafe_private_named.3.unwrap(),
+            alt: self._fields.0,
+            aspect_ratio: self._fields.1,
+            blob: self._fields.2.unwrap(),
+            mime_type: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1068,10 +1071,10 @@ where
         >,
     ) -> ImageBlock<'a> {
         ImageBlock {
-            alt: self.__unsafe_private_named.0,
-            aspect_ratio: self.__unsafe_private_named.1,
-            blob: self.__unsafe_private_named.2.unwrap(),
-            mime_type: self.__unsafe_private_named.3.unwrap(),
+            alt: self._fields.0,
+            aspect_ratio: self._fields.1,
+            blob: self._fields.2.unwrap(),
+            mime_type: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1123,14 +1126,14 @@ pub mod post_state {
 
 /// Builder for constructing an instance of this type
 pub struct PostBuilder<'a, S: post_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<PostContentItem<'a>>>,
         Option<Datetime>,
         Option<Vec<Language>>,
         Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Post<'a> {
@@ -1144,9 +1147,9 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1161,11 +1164,11 @@ where
         mut self,
         value: impl Into<Vec<PostContentItem<'a>>>,
     ) -> PostBuilder<'a, post_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1180,11 +1183,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PostBuilder<'a, post_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1192,12 +1195,12 @@ where
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `langs` field (optional)
     pub fn langs(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `langs` field to an Option value (optional)
     pub fn maybe_langs(mut self, value: Option<Vec<Language>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1205,12 +1208,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1224,10 +1227,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
         Post {
-            content: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            langs: self.__unsafe_private_named.2,
-            tags: self.__unsafe_private_named.3,
+            content: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            langs: self._fields.2,
+            tags: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -1240,10 +1243,10 @@ where
         >,
     ) -> Post<'a> {
         Post {
-            content: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            langs: self.__unsafe_private_named.2,
-            tags: self.__unsafe_private_named.3,
+            content: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            langs: self._fields.2,
+            tags: self._fields.3,
             extra_data: Some(extra_data),
         }
     }

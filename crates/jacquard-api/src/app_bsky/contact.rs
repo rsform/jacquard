@@ -14,7 +14,11 @@ pub mod send_notification;
 pub mod start_phone_verification;
 pub mod verify_phone;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -187,9 +191,9 @@ pub mod match_and_contact_index_state {
 
 /// Builder for constructing an instance of this type
 pub struct MatchAndContactIndexBuilder<'a, S: match_and_contact_index_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<ProfileView<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<ProfileView<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> MatchAndContactIndex<'a> {
@@ -206,9 +210,9 @@ impl<'a> MatchAndContactIndexBuilder<'a, match_and_contact_index_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MatchAndContactIndexBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -226,11 +230,11 @@ where
         'a,
         match_and_contact_index_state::SetContactIndex<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MatchAndContactIndexBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -245,11 +249,11 @@ where
         mut self,
         value: impl Into<ProfileView<'a>>,
     ) -> MatchAndContactIndexBuilder<'a, match_and_contact_index_state::SetMatch<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MatchAndContactIndexBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -263,8 +267,8 @@ where
     /// Build the final struct
     pub fn build(self) -> MatchAndContactIndex<'a> {
         MatchAndContactIndex {
-            contact_index: self.__unsafe_private_named.0.unwrap(),
-            r#match: self.__unsafe_private_named.1.unwrap(),
+            contact_index: self._fields.0.unwrap(),
+            r#match: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -277,8 +281,8 @@ where
         >,
     ) -> MatchAndContactIndex<'a> {
         MatchAndContactIndex {
-            contact_index: self.__unsafe_private_named.0.unwrap(),
-            r#match: self.__unsafe_private_named.1.unwrap(),
+            contact_index: self._fields.0.unwrap(),
+            r#match: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -464,9 +468,9 @@ pub mod notification_state {
 
 /// Builder for constructing an instance of this type
 pub struct NotificationBuilder<'a, S: notification_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>, Option<Did<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<Did<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Notification<'a> {
@@ -480,9 +484,9 @@ impl<'a> NotificationBuilder<'a, notification_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -497,11 +501,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> NotificationBuilder<'a, notification_state::SetFrom<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         NotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -516,11 +520,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> NotificationBuilder<'a, notification_state::SetTo<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         NotificationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -534,8 +538,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Notification<'a> {
         Notification {
-            from: self.__unsafe_private_named.0.unwrap(),
-            to: self.__unsafe_private_named.1.unwrap(),
+            from: self._fields.0.unwrap(),
+            to: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -548,8 +552,8 @@ where
         >,
     ) -> Notification<'a> {
         Notification {
-            from: self.__unsafe_private_named.0.unwrap(),
-            to: self.__unsafe_private_named.1.unwrap(),
+            from: self._fields.0.unwrap(),
+            to: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -565,45 +569,45 @@ pub mod sync_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SyncedAt;
         type MatchesCount;
+        type SyncedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SyncedAt = Unset;
         type MatchesCount = Unset;
-    }
-    ///State transition - sets the `synced_at` field to Set
-    pub struct SetSyncedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSyncedAt<S> {}
-    impl<S: State> State for SetSyncedAt<S> {
-        type SyncedAt = Set<members::synced_at>;
-        type MatchesCount = S::MatchesCount;
+        type SyncedAt = Unset;
     }
     ///State transition - sets the `matches_count` field to Set
     pub struct SetMatchesCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMatchesCount<S> {}
     impl<S: State> State for SetMatchesCount<S> {
-        type SyncedAt = S::SyncedAt;
         type MatchesCount = Set<members::matches_count>;
+        type SyncedAt = S::SyncedAt;
+    }
+    ///State transition - sets the `synced_at` field to Set
+    pub struct SetSyncedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSyncedAt<S> {}
+    impl<S: State> State for SetSyncedAt<S> {
+        type MatchesCount = S::MatchesCount;
+        type SyncedAt = Set<members::synced_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `synced_at` field
-        pub struct synced_at(());
         ///Marker type for the `matches_count` field
         pub struct matches_count(());
+        ///Marker type for the `synced_at` field
+        pub struct synced_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SyncStatusBuilder<'a, S: sync_status_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<Datetime>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SyncStatus<'a> {
@@ -617,9 +621,9 @@ impl<'a> SyncStatusBuilder<'a, sync_status_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SyncStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -634,11 +638,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SyncStatusBuilder<'a, sync_status_state::SetMatchesCount<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SyncStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -653,11 +657,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SyncStatusBuilder<'a, sync_status_state::SetSyncedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SyncStatusBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -665,14 +669,14 @@ where
 impl<'a, S> SyncStatusBuilder<'a, S>
 where
     S: sync_status_state::State,
-    S::SyncedAt: sync_status_state::IsSet,
     S::MatchesCount: sync_status_state::IsSet,
+    S::SyncedAt: sync_status_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SyncStatus<'a> {
         SyncStatus {
-            matches_count: self.__unsafe_private_named.0.unwrap(),
-            synced_at: self.__unsafe_private_named.1.unwrap(),
+            matches_count: self._fields.0.unwrap(),
+            synced_at: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -685,8 +689,8 @@ where
         >,
     ) -> SyncStatus<'a> {
         SyncStatus {
-            matches_count: self.__unsafe_private_named.0.unwrap(),
-            synced_at: self.__unsafe_private_named.1.unwrap(),
+            matches_count: self._fields.0.unwrap(),
+            synced_at: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

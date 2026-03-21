@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -263,8 +266,8 @@ pub mod programme_state {
 
 /// Builder for constructing an instance of this type
 pub struct ProgrammeBuilder<'a, S: programme_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<Credit<'a>>>,
         Option<Vec<ProgrammeDeliveryItem<'a>>>,
         Option<CowStr<'a>>,
@@ -277,7 +280,7 @@ pub struct ProgrammeBuilder<'a, S: programme_state::State> {
         Option<CowStr<'a>>,
         Option<Language>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Programme<'a> {
@@ -291,21 +294,9 @@ impl<'a> ProgrammeBuilder<'a, programme_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProgrammeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -313,12 +304,12 @@ impl<'a> ProgrammeBuilder<'a, programme_state::Empty> {
 impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
     /// Set the `credits` field (optional)
     pub fn credits(mut self, value: impl Into<Option<Vec<Credit<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `credits` field to an Option value (optional)
     pub fn maybe_credits(mut self, value: Option<Vec<Credit<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -329,7 +320,7 @@ impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<ProgrammeDeliveryItem<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `delivery` field to an Option value (optional)
@@ -337,7 +328,7 @@ impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
         mut self,
         value: Option<Vec<ProgrammeDeliveryItem<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -345,12 +336,12 @@ impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
 impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -358,12 +349,12 @@ impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
 impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
     /// Set the `genres` field (optional)
     pub fn genres(mut self, value: impl Into<Option<Vec<Genre<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `genres` field to an Option value (optional)
     pub fn maybe_genres(mut self, value: Option<Vec<Genre<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -371,12 +362,12 @@ impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
 impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
     /// Set the `icon` field (optional)
     pub fn icon(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `icon` field to an Option value (optional)
     pub fn maybe_icon(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -391,11 +382,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ProgrammeBuilder<'a, programme_state::SetIonosphere<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ProgrammeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -403,12 +394,12 @@ where
 impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
     pub fn maybe_keywords(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -423,11 +414,11 @@ where
         mut self,
         value: impl Into<Language>,
     ) -> ProgrammeBuilder<'a, programme_state::SetLanguage<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         ProgrammeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -435,12 +426,12 @@ where
 impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
     /// Set the `memberOf` field (optional)
     pub fn member_of(mut self, value: impl Into<Option<Vec<Membership<'a>>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `memberOf` field to an Option value (optional)
     pub fn maybe_member_of(mut self, value: Option<Vec<Membership<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -455,11 +446,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ProgrammeBuilder<'a, programme_state::SetName<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         ProgrammeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -467,12 +458,12 @@ where
 impl<'a, S: programme_state::State> ProgrammeBuilder<'a, S> {
     /// Set the `presentationLanguage` field (optional)
     pub fn presentation_language(mut self, value: impl Into<Option<Language>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `presentationLanguage` field to an Option value (optional)
     pub fn maybe_presentation_language(mut self, value: Option<Language>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -487,17 +478,17 @@ where
     /// Build the final struct
     pub fn build(self) -> Programme<'a> {
         Programme {
-            credits: self.__unsafe_private_named.0,
-            delivery: self.__unsafe_private_named.1,
-            description: self.__unsafe_private_named.2,
-            genres: self.__unsafe_private_named.3,
-            icon: self.__unsafe_private_named.4,
-            ionosphere: self.__unsafe_private_named.5.unwrap(),
-            keywords: self.__unsafe_private_named.6,
-            language: self.__unsafe_private_named.7.unwrap(),
-            member_of: self.__unsafe_private_named.8,
-            name: self.__unsafe_private_named.9.unwrap(),
-            presentation_language: self.__unsafe_private_named.10,
+            credits: self._fields.0,
+            delivery: self._fields.1,
+            description: self._fields.2,
+            genres: self._fields.3,
+            icon: self._fields.4,
+            ionosphere: self._fields.5.unwrap(),
+            keywords: self._fields.6,
+            language: self._fields.7.unwrap(),
+            member_of: self._fields.8,
+            name: self._fields.9.unwrap(),
+            presentation_language: self._fields.10,
             extra_data: Default::default(),
         }
     }
@@ -510,17 +501,17 @@ where
         >,
     ) -> Programme<'a> {
         Programme {
-            credits: self.__unsafe_private_named.0,
-            delivery: self.__unsafe_private_named.1,
-            description: self.__unsafe_private_named.2,
-            genres: self.__unsafe_private_named.3,
-            icon: self.__unsafe_private_named.4,
-            ionosphere: self.__unsafe_private_named.5.unwrap(),
-            keywords: self.__unsafe_private_named.6,
-            language: self.__unsafe_private_named.7.unwrap(),
-            member_of: self.__unsafe_private_named.8,
-            name: self.__unsafe_private_named.9.unwrap(),
-            presentation_language: self.__unsafe_private_named.10,
+            credits: self._fields.0,
+            delivery: self._fields.1,
+            description: self._fields.2,
+            genres: self._fields.3,
+            icon: self._fields.4,
+            ionosphere: self._fields.5.unwrap(),
+            keywords: self._fields.6,
+            language: self._fields.7.unwrap(),
+            member_of: self._fields.8,
+            name: self._fields.9.unwrap(),
+            presentation_language: self._fields.10,
             extra_data: Some(extra_data),
         }
     }

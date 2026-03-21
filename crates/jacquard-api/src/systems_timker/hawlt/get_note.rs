@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Cid, RecordKey, Rkey};
@@ -105,9 +108,9 @@ pub mod get_note_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetNoteBuilder<'a, S: get_note_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtIdentifier<'a>>, Option<RecordKey<Rkey<'a>>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtIdentifier<'a>>, Option<RecordKey<Rkey<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetNote<'a> {
@@ -121,9 +124,9 @@ impl<'a> GetNoteBuilder<'a, get_note_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetNoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -138,11 +141,11 @@ where
         mut self,
         value: impl Into<AtIdentifier<'a>>,
     ) -> GetNoteBuilder<'a, get_note_state::SetRepo<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetNoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -157,11 +160,11 @@ where
         mut self,
         value: impl Into<RecordKey<Rkey<'a>>>,
     ) -> GetNoteBuilder<'a, get_note_state::SetRkey<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GetNoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -175,8 +178,8 @@ where
     /// Build the final struct
     pub fn build(self) -> GetNote<'a> {
         GetNote {
-            repo: self.__unsafe_private_named.0.unwrap(),
-            rkey: self.__unsafe_private_named.1.unwrap(),
+            repo: self._fields.0.unwrap(),
+            rkey: self._fields.1.unwrap(),
         }
     }
 }

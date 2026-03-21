@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -300,14 +303,14 @@ pub mod postgate_state {
 
 /// Builder for constructing an instance of this type
 pub struct PostgateBuilder<'a, S: postgate_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Vec<AtUri<'a>>>,
         Option<Vec<postgate::DisableRule<'a>>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Postgate<'a> {
@@ -321,9 +324,9 @@ impl<'a> PostgateBuilder<'a, postgate_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PostgateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -338,11 +341,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PostgateBuilder<'a, postgate_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PostgateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -353,7 +356,7 @@ impl<'a, S: postgate_state::State> PostgateBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<AtUri<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `detachedEmbeddingUris` field to an Option value (optional)
@@ -361,7 +364,7 @@ impl<'a, S: postgate_state::State> PostgateBuilder<'a, S> {
         mut self,
         value: Option<Vec<AtUri<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -372,7 +375,7 @@ impl<'a, S: postgate_state::State> PostgateBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<postgate::DisableRule<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `embeddingRules` field to an Option value (optional)
@@ -380,7 +383,7 @@ impl<'a, S: postgate_state::State> PostgateBuilder<'a, S> {
         mut self,
         value: Option<Vec<postgate::DisableRule<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -395,11 +398,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> PostgateBuilder<'a, postgate_state::SetPost<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         PostgateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -413,10 +416,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Postgate<'a> {
         Postgate {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            detached_embedding_uris: self.__unsafe_private_named.1,
-            embedding_rules: self.__unsafe_private_named.2,
-            post: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            detached_embedding_uris: self._fields.1,
+            embedding_rules: self._fields.2,
+            post: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -429,10 +432,10 @@ where
         >,
     ) -> Postgate<'a> {
         Postgate {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            detached_embedding_uris: self.__unsafe_private_named.1,
-            embedding_rules: self.__unsafe_private_named.2,
-            post: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            detached_embedding_uris: self._fields.1,
+            embedding_rules: self._fields.2,
+            post: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

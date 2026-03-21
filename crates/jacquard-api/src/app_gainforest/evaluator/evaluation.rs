@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -218,44 +221,44 @@ pub mod evaluation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EvaluationType;
         type CreatedAt;
+        type EvaluationType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EvaluationType = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `evaluation_type` field to Set
-    pub struct SetEvaluationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvaluationType<S> {}
-    impl<S: State> State for SetEvaluationType<S> {
-        type EvaluationType = Set<members::evaluation_type>;
-        type CreatedAt = S::CreatedAt;
+        type EvaluationType = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type EvaluationType = S::EvaluationType;
         type CreatedAt = Set<members::created_at>;
+        type EvaluationType = S::EvaluationType;
+    }
+    ///State transition - sets the `evaluation_type` field to Set
+    pub struct SetEvaluationType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEvaluationType<S> {}
+    impl<S: State> State for SetEvaluationType<S> {
+        type CreatedAt = S::CreatedAt;
+        type EvaluationType = Set<members::evaluation_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `evaluation_type` field
-        pub struct evaluation_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `evaluation_type` field
+        pub struct evaluation_type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EvaluationBuilder<'a, S: evaluation_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<i64>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -267,7 +270,7 @@ pub struct EvaluationBuilder<'a, S: evaluation_state::State> {
         Option<Vec<SubjectRef<'a>>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Evaluation<'a> {
@@ -281,20 +284,9 @@ impl<'a> EvaluationBuilder<'a, evaluation_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EvaluationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -302,12 +294,12 @@ impl<'a> EvaluationBuilder<'a, evaluation_state::Empty> {
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `confidence` field (optional)
     pub fn confidence(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `confidence` field to an Option value (optional)
     pub fn maybe_confidence(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -322,11 +314,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> EvaluationBuilder<'a, evaluation_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         EvaluationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -334,12 +326,12 @@ where
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `dynamicProperties` field (optional)
     pub fn dynamic_properties(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `dynamicProperties` field to an Option value (optional)
     pub fn maybe_dynamic_properties(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -354,11 +346,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EvaluationBuilder<'a, evaluation_state::SetEvaluationType<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         EvaluationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -366,12 +358,12 @@ where
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `method` field (optional)
     pub fn method(mut self, value: impl Into<Option<MethodInfo<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `method` field to an Option value (optional)
     pub fn maybe_method(mut self, value: Option<MethodInfo<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -379,12 +371,12 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `neg` field (optional)
     pub fn neg(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `neg` field to an Option value (optional)
     pub fn maybe_neg(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -392,12 +384,12 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `result` field (optional)
     pub fn result(mut self, value: impl Into<Option<EvaluationResult<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `result` field to an Option value (optional)
     pub fn maybe_result(mut self, value: Option<EvaluationResult<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -405,12 +397,12 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<SubjectRef<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
     pub fn maybe_subject(mut self, value: Option<SubjectRef<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -418,12 +410,12 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `subjects` field (optional)
     pub fn subjects(mut self, value: impl Into<Option<Vec<SubjectRef<'a>>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `subjects` field to an Option value (optional)
     pub fn maybe_subjects(mut self, value: Option<Vec<SubjectRef<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -431,12 +423,12 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `supersedes` field (optional)
     pub fn supersedes(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `supersedes` field to an Option value (optional)
     pub fn maybe_supersedes(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -444,22 +436,22 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
 impl<'a, S> EvaluationBuilder<'a, S>
 where
     S: evaluation_state::State,
-    S::EvaluationType: evaluation_state::IsSet,
     S::CreatedAt: evaluation_state::IsSet,
+    S::EvaluationType: evaluation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Evaluation<'a> {
         Evaluation {
-            confidence: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            dynamic_properties: self.__unsafe_private_named.2,
-            evaluation_type: self.__unsafe_private_named.3.unwrap(),
-            method: self.__unsafe_private_named.4,
-            neg: self.__unsafe_private_named.5,
-            result: self.__unsafe_private_named.6,
-            subject: self.__unsafe_private_named.7,
-            subjects: self.__unsafe_private_named.8,
-            supersedes: self.__unsafe_private_named.9,
+            confidence: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            dynamic_properties: self._fields.2,
+            evaluation_type: self._fields.3.unwrap(),
+            method: self._fields.4,
+            neg: self._fields.5,
+            result: self._fields.6,
+            subject: self._fields.7,
+            subjects: self._fields.8,
+            supersedes: self._fields.9,
             extra_data: Default::default(),
         }
     }
@@ -472,16 +464,16 @@ where
         >,
     ) -> Evaluation<'a> {
         Evaluation {
-            confidence: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            dynamic_properties: self.__unsafe_private_named.2,
-            evaluation_type: self.__unsafe_private_named.3.unwrap(),
-            method: self.__unsafe_private_named.4,
-            neg: self.__unsafe_private_named.5,
-            result: self.__unsafe_private_named.6,
-            subject: self.__unsafe_private_named.7,
-            subjects: self.__unsafe_private_named.8,
-            supersedes: self.__unsafe_private_named.9,
+            confidence: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            dynamic_properties: self._fields.2,
+            evaluation_type: self._fields.3.unwrap(),
+            method: self._fields.4,
+            neg: self._fields.5,
+            result: self._fields.6,
+            subject: self._fields.7,
+            subjects: self._fields.8,
+            supersedes: self._fields.9,
             extra_data: Some(extra_data),
         }
     }

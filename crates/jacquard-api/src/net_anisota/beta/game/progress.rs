@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -342,8 +345,8 @@ pub mod progress_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type XpToNextLevel;
         type TotalXp;
+        type XpToNextLevel;
         type Level;
         type CreatedAt;
         type ProgressPercentage;
@@ -352,28 +355,28 @@ pub mod progress_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type XpToNextLevel = Unset;
         type TotalXp = Unset;
+        type XpToNextLevel = Unset;
         type Level = Unset;
         type CreatedAt = Unset;
         type ProgressPercentage = Unset;
-    }
-    ///State transition - sets the `xp_to_next_level` field to Set
-    pub struct SetXpToNextLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetXpToNextLevel<S> {}
-    impl<S: State> State for SetXpToNextLevel<S> {
-        type XpToNextLevel = Set<members::xp_to_next_level>;
-        type TotalXp = S::TotalXp;
-        type Level = S::Level;
-        type CreatedAt = S::CreatedAt;
-        type ProgressPercentage = S::ProgressPercentage;
     }
     ///State transition - sets the `total_xp` field to Set
     pub struct SetTotalXp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotalXp<S> {}
     impl<S: State> State for SetTotalXp<S> {
-        type XpToNextLevel = S::XpToNextLevel;
         type TotalXp = Set<members::total_xp>;
+        type XpToNextLevel = S::XpToNextLevel;
+        type Level = S::Level;
+        type CreatedAt = S::CreatedAt;
+        type ProgressPercentage = S::ProgressPercentage;
+    }
+    ///State transition - sets the `xp_to_next_level` field to Set
+    pub struct SetXpToNextLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetXpToNextLevel<S> {}
+    impl<S: State> State for SetXpToNextLevel<S> {
+        type TotalXp = S::TotalXp;
+        type XpToNextLevel = Set<members::xp_to_next_level>;
         type Level = S::Level;
         type CreatedAt = S::CreatedAt;
         type ProgressPercentage = S::ProgressPercentage;
@@ -382,8 +385,8 @@ pub mod progress_state {
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
-        type XpToNextLevel = S::XpToNextLevel;
         type TotalXp = S::TotalXp;
+        type XpToNextLevel = S::XpToNextLevel;
         type Level = Set<members::level>;
         type CreatedAt = S::CreatedAt;
         type ProgressPercentage = S::ProgressPercentage;
@@ -392,8 +395,8 @@ pub mod progress_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type XpToNextLevel = S::XpToNextLevel;
         type TotalXp = S::TotalXp;
+        type XpToNextLevel = S::XpToNextLevel;
         type Level = S::Level;
         type CreatedAt = Set<members::created_at>;
         type ProgressPercentage = S::ProgressPercentage;
@@ -402,8 +405,8 @@ pub mod progress_state {
     pub struct SetProgressPercentage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetProgressPercentage<S> {}
     impl<S: State> State for SetProgressPercentage<S> {
-        type XpToNextLevel = S::XpToNextLevel;
         type TotalXp = S::TotalXp;
+        type XpToNextLevel = S::XpToNextLevel;
         type Level = S::Level;
         type CreatedAt = S::CreatedAt;
         type ProgressPercentage = Set<members::progress_percentage>;
@@ -411,10 +414,10 @@ pub mod progress_state {
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `xp_to_next_level` field
-        pub struct xp_to_next_level(());
         ///Marker type for the `total_xp` field
         pub struct total_xp(());
+        ///Marker type for the `xp_to_next_level` field
+        pub struct xp_to_next_level(());
         ///Marker type for the `level` field
         pub struct level(());
         ///Marker type for the `created_at` field
@@ -426,8 +429,8 @@ pub mod progress_state {
 
 /// Builder for constructing an instance of this type
 pub struct ProgressBuilder<'a, S: progress_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -444,7 +447,7 @@ pub struct ProgressBuilder<'a, S: progress_state::State> {
         Option<i64>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Progress<'a> {
@@ -458,8 +461,8 @@ impl<'a> ProgressBuilder<'a, progress_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProgressBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -476,7 +479,7 @@ impl<'a> ProgressBuilder<'a, progress_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -484,12 +487,12 @@ impl<'a> ProgressBuilder<'a, progress_state::Empty> {
 impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
     /// Set the `cardUri` field (optional)
     pub fn card_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cardUri` field to an Option value (optional)
     pub fn maybe_card_uri(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -504,11 +507,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ProgressBuilder<'a, progress_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ProgressBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -516,12 +519,12 @@ where
 impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
     /// Set the `currentStamina` field (optional)
     pub fn current_stamina(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `currentStamina` field to an Option value (optional)
     pub fn maybe_current_stamina(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -536,11 +539,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ProgressBuilder<'a, progress_state::SetLevel<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ProgressBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -548,12 +551,12 @@ where
 impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<progress::Metadata<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
     pub fn maybe_metadata(mut self, value: Option<progress::Metadata<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -561,12 +564,12 @@ impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
 impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
     /// Set the `previousLevel` field (optional)
     pub fn previous_level(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `previousLevel` field to an Option value (optional)
     pub fn maybe_previous_level(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -581,11 +584,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ProgressBuilder<'a, progress_state::SetProgressPercentage<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         ProgressBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -596,12 +599,12 @@ impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `relatedLogUris` field to an Option value (optional)
     pub fn maybe_related_log_uris(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -609,12 +612,12 @@ impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
 impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
     /// Set the `sessionId` field (optional)
     pub fn session_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `sessionId` field to an Option value (optional)
     pub fn maybe_session_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -622,12 +625,12 @@ impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
 impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
     /// Set the `sessionUri` field (optional)
     pub fn session_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `sessionUri` field to an Option value (optional)
     pub fn maybe_session_uri(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -635,12 +638,12 @@ impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
 impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
     /// Set the `stats` field (optional)
     pub fn stats(mut self, value: impl Into<Option<progress::Stats<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `stats` field to an Option value (optional)
     pub fn maybe_stats(mut self, value: Option<progress::Stats<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -655,11 +658,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ProgressBuilder<'a, progress_state::SetTotalXp<S>> {
-        self.__unsafe_private_named.11 = Option::Some(value.into());
+        self._fields.11 = Option::Some(value.into());
         ProgressBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -667,12 +670,12 @@ where
 impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
     /// Set the `triggerSource` field (optional)
     pub fn trigger_source(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `triggerSource` field to an Option value (optional)
     pub fn maybe_trigger_source(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -680,12 +683,12 @@ impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
 impl<'a, S: progress_state::State> ProgressBuilder<'a, S> {
     /// Set the `xpGainedSinceLastSave` field (optional)
     pub fn xp_gained_since_last_save(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `xpGainedSinceLastSave` field to an Option value (optional)
     pub fn maybe_xp_gained_since_last_save(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -700,11 +703,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ProgressBuilder<'a, progress_state::SetXpToNextLevel<S>> {
-        self.__unsafe_private_named.14 = Option::Some(value.into());
+        self._fields.14 = Option::Some(value.into());
         ProgressBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -712,8 +715,8 @@ where
 impl<'a, S> ProgressBuilder<'a, S>
 where
     S: progress_state::State,
-    S::XpToNextLevel: progress_state::IsSet,
     S::TotalXp: progress_state::IsSet,
+    S::XpToNextLevel: progress_state::IsSet,
     S::Level: progress_state::IsSet,
     S::CreatedAt: progress_state::IsSet,
     S::ProgressPercentage: progress_state::IsSet,
@@ -721,21 +724,21 @@ where
     /// Build the final struct
     pub fn build(self) -> Progress<'a> {
         Progress {
-            card_uri: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            current_stamina: self.__unsafe_private_named.2,
-            level: self.__unsafe_private_named.3.unwrap(),
-            metadata: self.__unsafe_private_named.4,
-            previous_level: self.__unsafe_private_named.5,
-            progress_percentage: self.__unsafe_private_named.6.unwrap(),
-            related_log_uris: self.__unsafe_private_named.7,
-            session_id: self.__unsafe_private_named.8,
-            session_uri: self.__unsafe_private_named.9,
-            stats: self.__unsafe_private_named.10,
-            total_xp: self.__unsafe_private_named.11.unwrap(),
-            trigger_source: self.__unsafe_private_named.12,
-            xp_gained_since_last_save: self.__unsafe_private_named.13,
-            xp_to_next_level: self.__unsafe_private_named.14.unwrap(),
+            card_uri: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            current_stamina: self._fields.2,
+            level: self._fields.3.unwrap(),
+            metadata: self._fields.4,
+            previous_level: self._fields.5,
+            progress_percentage: self._fields.6.unwrap(),
+            related_log_uris: self._fields.7,
+            session_id: self._fields.8,
+            session_uri: self._fields.9,
+            stats: self._fields.10,
+            total_xp: self._fields.11.unwrap(),
+            trigger_source: self._fields.12,
+            xp_gained_since_last_save: self._fields.13,
+            xp_to_next_level: self._fields.14.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -748,21 +751,21 @@ where
         >,
     ) -> Progress<'a> {
         Progress {
-            card_uri: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            current_stamina: self.__unsafe_private_named.2,
-            level: self.__unsafe_private_named.3.unwrap(),
-            metadata: self.__unsafe_private_named.4,
-            previous_level: self.__unsafe_private_named.5,
-            progress_percentage: self.__unsafe_private_named.6.unwrap(),
-            related_log_uris: self.__unsafe_private_named.7,
-            session_id: self.__unsafe_private_named.8,
-            session_uri: self.__unsafe_private_named.9,
-            stats: self.__unsafe_private_named.10,
-            total_xp: self.__unsafe_private_named.11.unwrap(),
-            trigger_source: self.__unsafe_private_named.12,
-            xp_gained_since_last_save: self.__unsafe_private_named.13,
-            xp_to_next_level: self.__unsafe_private_named.14.unwrap(),
+            card_uri: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            current_stamina: self._fields.2,
+            level: self._fields.3.unwrap(),
+            metadata: self._fields.4,
+            previous_level: self._fields.5,
+            progress_percentage: self._fields.6.unwrap(),
+            related_log_uris: self._fields.7,
+            session_id: self._fields.8,
+            session_uri: self._fields.9,
+            stats: self._fields.10,
+            total_xp: self._fields.11.unwrap(),
+            trigger_source: self._fields.12,
+            xp_gained_since_last_save: self._fields.13,
+            xp_to_next_level: self._fields.14.unwrap(),
             extra_data: Some(extra_data),
         }
     }

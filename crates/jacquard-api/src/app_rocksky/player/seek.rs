@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_derive::IntoStatic;
@@ -85,9 +86,9 @@ pub mod seek_params_state {
 
 /// Builder for constructing an instance of this type
 pub struct SeekParamsBuilder<'a, S: seek_params_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SeekParams<'a> {
@@ -101,9 +102,9 @@ impl<'a> SeekParamsBuilder<'a, seek_params_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SeekParamsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -111,12 +112,12 @@ impl<'a> SeekParamsBuilder<'a, seek_params_state::Empty> {
 impl<'a, S: seek_params_state::State> SeekParamsBuilder<'a, S> {
     /// Set the `playerId` field (optional)
     pub fn player_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `playerId` field to an Option value (optional)
     pub fn maybe_player_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -131,11 +132,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SeekParamsBuilder<'a, seek_params_state::SetPosition<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SeekParamsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -148,8 +149,8 @@ where
     /// Build the final struct
     pub fn build(self) -> SeekParams<'a> {
         SeekParams {
-            player_id: self.__unsafe_private_named.0,
-            position: self.__unsafe_private_named.1.unwrap(),
+            player_id: self._fields.0,
+            position: self._fields.1.unwrap(),
         }
     }
 }

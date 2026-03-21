@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -156,9 +159,9 @@ pub mod tabs_state {
 
 /// Builder for constructing an instance of this type
 pub struct TabsBuilder<'a, S: tabs_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<tabs::Tab<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<tabs::Tab<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Tabs<'a> {
@@ -172,9 +175,9 @@ impl<'a> TabsBuilder<'a, tabs_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TabsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -189,11 +192,11 @@ where
         mut self,
         value: impl Into<Vec<tabs::Tab<'a>>>,
     ) -> TabsBuilder<'a, tabs_state::SetItems<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TabsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -206,7 +209,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Tabs<'a> {
         Tabs {
-            items: self.__unsafe_private_named.0.unwrap(),
+            items: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -219,7 +222,7 @@ where
         >,
     ) -> Tabs<'a> {
         Tabs {
-            items: self.__unsafe_private_named.0.unwrap(),
+            items: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -235,63 +238,59 @@ pub mod tab_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Label;
-        type Key;
         type Content;
+        type Key;
+        type Label;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Label = Unset;
-        type Key = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `label` field to Set
-    pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLabel<S> {}
-    impl<S: State> State for SetLabel<S> {
-        type Label = Set<members::label>;
-        type Key = S::Key;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Label = S::Label;
-        type Key = Set<members::key>;
-        type Content = S::Content;
+        type Key = Unset;
+        type Label = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Label = S::Label;
-        type Key = S::Key;
         type Content = Set<members::content>;
+        type Key = S::Key;
+        type Label = S::Label;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Content = S::Content;
+        type Key = Set<members::key>;
+        type Label = S::Label;
+    }
+    ///State transition - sets the `label` field to Set
+    pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLabel<S> {}
+    impl<S: State> State for SetLabel<S> {
+        type Content = S::Content;
+        type Key = S::Key;
+        type Label = Set<members::label>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `label` field
-        pub struct label(());
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `key` field
+        pub struct key(());
+        ///Marker type for the `label` field
+        pub struct label(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TabBuilder<'a, S: tab_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Element<'a>>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Element<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Tab<'a> {
@@ -305,9 +304,9 @@ impl<'a> TabBuilder<'a, tab_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TabBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -322,11 +321,11 @@ where
         mut self,
         value: impl Into<Element<'a>>,
     ) -> TabBuilder<'a, tab_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TabBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -341,11 +340,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TabBuilder<'a, tab_state::SetKey<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TabBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -360,11 +359,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TabBuilder<'a, tab_state::SetLabel<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         TabBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -372,16 +371,16 @@ where
 impl<'a, S> TabBuilder<'a, S>
 where
     S: tab_state::State,
-    S::Label: tab_state::IsSet,
-    S::Key: tab_state::IsSet,
     S::Content: tab_state::IsSet,
+    S::Key: tab_state::IsSet,
+    S::Label: tab_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tab<'a> {
         Tab {
-            content: self.__unsafe_private_named.0.unwrap(),
-            key: self.__unsafe_private_named.1.unwrap(),
-            label: self.__unsafe_private_named.2.unwrap(),
+            content: self._fields.0.unwrap(),
+            key: self._fields.1.unwrap(),
+            label: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -394,9 +393,9 @@ where
         >,
     ) -> Tab<'a> {
         Tab {
-            content: self.__unsafe_private_named.0.unwrap(),
-            key: self.__unsafe_private_named.1.unwrap(),
-            label: self.__unsafe_private_named.2.unwrap(),
+            content: self._fields.0.unwrap(),
+            key: self._fields.1.unwrap(),
+            label: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

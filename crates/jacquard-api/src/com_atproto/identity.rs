@@ -15,7 +15,11 @@ pub mod sign_plc_operation;
 pub mod submit_plc_operation;
 pub mod update_handle;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -70,58 +74,58 @@ pub mod identity_info_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Handle;
-        type Did;
         type DidDoc;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Handle = Unset;
-        type Did = Unset;
         type DidDoc = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHandle<S> {}
     impl<S: State> State for SetHandle<S> {
         type Handle = Set<members::handle>;
+        type DidDoc = S::DidDoc;
         type Did = S::Did;
-        type DidDoc = S::DidDoc;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Handle = S::Handle;
-        type Did = Set<members::did>;
-        type DidDoc = S::DidDoc;
     }
     ///State transition - sets the `did_doc` field to Set
     pub struct SetDidDoc<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDidDoc<S> {}
     impl<S: State> State for SetDidDoc<S> {
         type Handle = S::Handle;
-        type Did = S::Did;
         type DidDoc = Set<members::did_doc>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Handle = S::Handle;
+        type DidDoc = S::DidDoc;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `handle` field
         pub struct handle(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `did_doc` field
         pub struct did_doc(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct IdentityInfoBuilder<'a, S: identity_info_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>, Option<Data<'a>>, Option<Handle<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<Data<'a>>, Option<Handle<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> IdentityInfo<'a> {
@@ -135,9 +139,9 @@ impl<'a> IdentityInfoBuilder<'a, identity_info_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         IdentityInfoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -152,11 +156,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> IdentityInfoBuilder<'a, identity_info_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         IdentityInfoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -171,11 +175,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> IdentityInfoBuilder<'a, identity_info_state::SetDidDoc<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         IdentityInfoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -190,11 +194,11 @@ where
         mut self,
         value: impl Into<Handle<'a>>,
     ) -> IdentityInfoBuilder<'a, identity_info_state::SetHandle<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         IdentityInfoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -203,15 +207,15 @@ impl<'a, S> IdentityInfoBuilder<'a, S>
 where
     S: identity_info_state::State,
     S::Handle: identity_info_state::IsSet,
-    S::Did: identity_info_state::IsSet,
     S::DidDoc: identity_info_state::IsSet,
+    S::Did: identity_info_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> IdentityInfo<'a> {
         IdentityInfo {
-            did: self.__unsafe_private_named.0.unwrap(),
-            did_doc: self.__unsafe_private_named.1.unwrap(),
-            handle: self.__unsafe_private_named.2.unwrap(),
+            did: self._fields.0.unwrap(),
+            did_doc: self._fields.1.unwrap(),
+            handle: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -221,9 +225,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> IdentityInfo<'a> {
         IdentityInfo {
-            did: self.__unsafe_private_named.0.unwrap(),
-            did_doc: self.__unsafe_private_named.1.unwrap(),
-            handle: self.__unsafe_private_named.2.unwrap(),
+            did: self._fields.0.unwrap(),
+            did_doc: self._fields.1.unwrap(),
+            handle: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

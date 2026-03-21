@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -118,9 +121,9 @@ pub mod lock_state {
 
 /// Builder for constructing an instance of this type
 pub struct LockBuilder<'a, S: lock_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Lock<'a> {
@@ -134,9 +137,9 @@ impl<'a> LockBuilder<'a, lock_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -144,12 +147,12 @@ impl<'a> LockBuilder<'a, lock_state::Empty> {
 impl<'a, S: lock_state::State> LockBuilder<'a, S> {
     /// Set the `lock` field (optional)
     pub fn lock(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `lock` field to an Option value (optional)
     pub fn maybe_lock(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -161,7 +164,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Lock<'a> {
         Lock {
-            lock: self.__unsafe_private_named.0,
+            lock: self._fields.0,
             extra_data: Default::default(),
         }
     }
@@ -174,7 +177,7 @@ where
         >,
     ) -> Lock<'a> {
         Lock {
-            lock: self.__unsafe_private_named.0,
+            lock: self._fields.0,
             extra_data: Some(extra_data),
         }
     }

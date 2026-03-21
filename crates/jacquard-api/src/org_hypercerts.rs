@@ -12,7 +12,11 @@ pub mod funding;
 pub mod helper;
 pub mod workscope;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -434,9 +438,9 @@ pub mod large_blob_state {
 
 /// Builder for constructing an instance of this type
 pub struct LargeBlobBuilder<'a, S: large_blob_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<BlobRef<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<BlobRef<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LargeBlob<'a> {
@@ -450,9 +454,9 @@ impl<'a> LargeBlobBuilder<'a, large_blob_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LargeBlobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -467,11 +471,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> LargeBlobBuilder<'a, large_blob_state::SetBlob<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LargeBlobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -484,7 +488,7 @@ where
     /// Build the final struct
     pub fn build(self) -> LargeBlob<'a> {
         LargeBlob {
-            blob: self.__unsafe_private_named.0.unwrap(),
+            blob: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -497,7 +501,7 @@ where
         >,
     ) -> LargeBlob<'a> {
         LargeBlob {
-            blob: self.__unsafe_private_named.0.unwrap(),
+            blob: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -673,9 +677,9 @@ pub mod large_image_state {
 
 /// Builder for constructing an instance of this type
 pub struct LargeImageBuilder<'a, S: large_image_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<BlobRef<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<BlobRef<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LargeImage<'a> {
@@ -689,9 +693,9 @@ impl<'a> LargeImageBuilder<'a, large_image_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LargeImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -706,11 +710,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> LargeImageBuilder<'a, large_image_state::SetImage<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LargeImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -723,7 +727,7 @@ where
     /// Build the final struct
     pub fn build(self) -> LargeImage<'a> {
         LargeImage {
-            image: self.__unsafe_private_named.0.unwrap(),
+            image: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -736,7 +740,7 @@ where
         >,
     ) -> LargeImage<'a> {
         LargeImage {
-            image: self.__unsafe_private_named.0.unwrap(),
+            image: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -776,9 +780,9 @@ pub mod small_blob_state {
 
 /// Builder for constructing an instance of this type
 pub struct SmallBlobBuilder<'a, S: small_blob_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<BlobRef<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<BlobRef<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SmallBlob<'a> {
@@ -792,9 +796,9 @@ impl<'a> SmallBlobBuilder<'a, small_blob_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SmallBlobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -809,11 +813,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> SmallBlobBuilder<'a, small_blob_state::SetBlob<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SmallBlobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -826,7 +830,7 @@ where
     /// Build the final struct
     pub fn build(self) -> SmallBlob<'a> {
         SmallBlob {
-            blob: self.__unsafe_private_named.0.unwrap(),
+            blob: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -839,7 +843,7 @@ where
         >,
     ) -> SmallBlob<'a> {
         SmallBlob {
-            blob: self.__unsafe_private_named.0.unwrap(),
+            blob: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -879,9 +883,9 @@ pub mod small_image_state {
 
 /// Builder for constructing an instance of this type
 pub struct SmallImageBuilder<'a, S: small_image_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<BlobRef<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<BlobRef<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SmallImage<'a> {
@@ -895,9 +899,9 @@ impl<'a> SmallImageBuilder<'a, small_image_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SmallImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -912,11 +916,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> SmallImageBuilder<'a, small_image_state::SetImage<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SmallImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -929,7 +933,7 @@ where
     /// Build the final struct
     pub fn build(self) -> SmallImage<'a> {
         SmallImage {
-            image: self.__unsafe_private_named.0.unwrap(),
+            image: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -942,7 +946,7 @@ where
         >,
     ) -> SmallImage<'a> {
         SmallImage {
-            image: self.__unsafe_private_named.0.unwrap(),
+            image: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -982,9 +986,9 @@ pub mod small_video_state {
 
 /// Builder for constructing an instance of this type
 pub struct SmallVideoBuilder<'a, S: small_video_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<BlobRef<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<BlobRef<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SmallVideo<'a> {
@@ -998,9 +1002,9 @@ impl<'a> SmallVideoBuilder<'a, small_video_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SmallVideoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1015,11 +1019,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> SmallVideoBuilder<'a, small_video_state::SetVideo<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SmallVideoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1032,7 +1036,7 @@ where
     /// Build the final struct
     pub fn build(self) -> SmallVideo<'a> {
         SmallVideo {
-            video: self.__unsafe_private_named.0.unwrap(),
+            video: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1045,7 +1049,7 @@ where
         >,
     ) -> SmallVideo<'a> {
         SmallVideo {
-            video: self.__unsafe_private_named.0.unwrap(),
+            video: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1085,9 +1089,9 @@ pub mod uri_state {
 
 /// Builder for constructing an instance of this type
 pub struct UriBuilder<'a, S: uri_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<UriValue<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<UriValue<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Uri<'a> {
@@ -1101,9 +1105,9 @@ impl<'a> UriBuilder<'a, uri_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UriBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1118,11 +1122,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> UriBuilder<'a, uri_state::SetUri<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         UriBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1135,7 +1139,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Uri<'a> {
         Uri {
-            uri: self.__unsafe_private_named.0.unwrap(),
+            uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1148,7 +1152,7 @@ where
         >,
     ) -> Uri<'a> {
         Uri {
-            uri: self.__unsafe_private_named.0.unwrap(),
+            uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

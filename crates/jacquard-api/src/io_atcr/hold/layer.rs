@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -143,112 +146,112 @@ pub mod layer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Manifest;
-        type MediaType;
+        type Digest;
         type Size;
         type UserDid;
-        type Digest;
         type CreatedAt;
+        type MediaType;
+        type Manifest;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Manifest = Unset;
-        type MediaType = Unset;
+        type Digest = Unset;
         type Size = Unset;
         type UserDid = Unset;
-        type Digest = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `manifest` field to Set
-    pub struct SetManifest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetManifest<S> {}
-    impl<S: State> State for SetManifest<S> {
-        type Manifest = Set<members::manifest>;
-        type MediaType = S::MediaType;
-        type Size = S::Size;
-        type UserDid = S::UserDid;
-        type Digest = S::Digest;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `media_type` field to Set
-    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMediaType<S> {}
-    impl<S: State> State for SetMediaType<S> {
-        type Manifest = S::Manifest;
-        type MediaType = Set<members::media_type>;
-        type Size = S::Size;
-        type UserDid = S::UserDid;
-        type Digest = S::Digest;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Manifest = S::Manifest;
-        type MediaType = S::MediaType;
-        type Size = Set<members::size>;
-        type UserDid = S::UserDid;
-        type Digest = S::Digest;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserDid<S> {}
-    impl<S: State> State for SetUserDid<S> {
-        type Manifest = S::Manifest;
-        type MediaType = S::MediaType;
-        type Size = S::Size;
-        type UserDid = Set<members::user_did>;
-        type Digest = S::Digest;
-        type CreatedAt = S::CreatedAt;
+        type MediaType = Unset;
+        type Manifest = Unset;
     }
     ///State transition - sets the `digest` field to Set
     pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDigest<S> {}
     impl<S: State> State for SetDigest<S> {
-        type Manifest = S::Manifest;
-        type MediaType = S::MediaType;
+        type Digest = Set<members::digest>;
         type Size = S::Size;
         type UserDid = S::UserDid;
-        type Digest = Set<members::digest>;
         type CreatedAt = S::CreatedAt;
+        type MediaType = S::MediaType;
+        type Manifest = S::Manifest;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSize<S> {}
+    impl<S: State> State for SetSize<S> {
+        type Digest = S::Digest;
+        type Size = Set<members::size>;
+        type UserDid = S::UserDid;
+        type CreatedAt = S::CreatedAt;
+        type MediaType = S::MediaType;
+        type Manifest = S::Manifest;
+    }
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUserDid<S> {}
+    impl<S: State> State for SetUserDid<S> {
+        type Digest = S::Digest;
+        type Size = S::Size;
+        type UserDid = Set<members::user_did>;
+        type CreatedAt = S::CreatedAt;
+        type MediaType = S::MediaType;
+        type Manifest = S::Manifest;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Manifest = S::Manifest;
-        type MediaType = S::MediaType;
+        type Digest = S::Digest;
         type Size = S::Size;
         type UserDid = S::UserDid;
-        type Digest = S::Digest;
         type CreatedAt = Set<members::created_at>;
+        type MediaType = S::MediaType;
+        type Manifest = S::Manifest;
+    }
+    ///State transition - sets the `media_type` field to Set
+    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMediaType<S> {}
+    impl<S: State> State for SetMediaType<S> {
+        type Digest = S::Digest;
+        type Size = S::Size;
+        type UserDid = S::UserDid;
+        type CreatedAt = S::CreatedAt;
+        type MediaType = Set<members::media_type>;
+        type Manifest = S::Manifest;
+    }
+    ///State transition - sets the `manifest` field to Set
+    pub struct SetManifest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetManifest<S> {}
+    impl<S: State> State for SetManifest<S> {
+        type Digest = S::Digest;
+        type Size = S::Size;
+        type UserDid = S::UserDid;
+        type CreatedAt = S::CreatedAt;
+        type MediaType = S::MediaType;
+        type Manifest = Set<members::manifest>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `manifest` field
-        pub struct manifest(());
-        ///Marker type for the `media_type` field
-        pub struct media_type(());
+        ///Marker type for the `digest` field
+        pub struct digest(());
         ///Marker type for the `size` field
         pub struct size(());
         ///Marker type for the `user_did` field
         pub struct user_did(());
-        ///Marker type for the `digest` field
-        pub struct digest(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `media_type` field
+        pub struct media_type(());
+        ///Marker type for the `manifest` field
+        pub struct manifest(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LayerBuilder<'a, S: layer_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<AtUri<'a>>,
@@ -256,7 +259,7 @@ pub struct LayerBuilder<'a, S: layer_state::State> {
         Option<i64>,
         Option<Did<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Layer<'a> {
@@ -270,9 +273,9 @@ impl<'a> LayerBuilder<'a, layer_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LayerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -287,11 +290,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LayerBuilder<'a, layer_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LayerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -306,11 +309,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LayerBuilder<'a, layer_state::SetDigest<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LayerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -325,11 +328,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> LayerBuilder<'a, layer_state::SetManifest<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LayerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -344,11 +347,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LayerBuilder<'a, layer_state::SetMediaType<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         LayerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -363,11 +366,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> LayerBuilder<'a, layer_state::SetSize<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         LayerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -382,11 +385,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> LayerBuilder<'a, layer_state::SetUserDid<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         LayerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -394,22 +397,22 @@ where
 impl<'a, S> LayerBuilder<'a, S>
 where
     S: layer_state::State,
-    S::Manifest: layer_state::IsSet,
-    S::MediaType: layer_state::IsSet,
+    S::Digest: layer_state::IsSet,
     S::Size: layer_state::IsSet,
     S::UserDid: layer_state::IsSet,
-    S::Digest: layer_state::IsSet,
     S::CreatedAt: layer_state::IsSet,
+    S::MediaType: layer_state::IsSet,
+    S::Manifest: layer_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Layer<'a> {
         Layer {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            digest: self.__unsafe_private_named.1.unwrap(),
-            manifest: self.__unsafe_private_named.2.unwrap(),
-            media_type: self.__unsafe_private_named.3.unwrap(),
-            size: self.__unsafe_private_named.4.unwrap(),
-            user_did: self.__unsafe_private_named.5.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            digest: self._fields.1.unwrap(),
+            manifest: self._fields.2.unwrap(),
+            media_type: self._fields.3.unwrap(),
+            size: self._fields.4.unwrap(),
+            user_did: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -422,12 +425,12 @@ where
         >,
     ) -> Layer<'a> {
         Layer {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            digest: self.__unsafe_private_named.1.unwrap(),
-            manifest: self.__unsafe_private_named.2.unwrap(),
-            media_type: self.__unsafe_private_named.3.unwrap(),
-            size: self.__unsafe_private_named.4.unwrap(),
-            user_did: self.__unsafe_private_named.5.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            digest: self._fields.1.unwrap(),
+            manifest: self._fields.2.unwrap(),
+            media_type: self._fields.3.unwrap(),
+            size: self._fields.4.unwrap(),
+            user_did: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

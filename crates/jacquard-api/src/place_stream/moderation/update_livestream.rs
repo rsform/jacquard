@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::{Did, AtUri, Cid};
@@ -146,45 +149,45 @@ pub mod update_livestream_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LivestreamUri;
         type Streamer;
+        type LivestreamUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LivestreamUri = Unset;
         type Streamer = Unset;
-    }
-    ///State transition - sets the `livestream_uri` field to Set
-    pub struct SetLivestreamUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLivestreamUri<S> {}
-    impl<S: State> State for SetLivestreamUri<S> {
-        type LivestreamUri = Set<members::livestream_uri>;
-        type Streamer = S::Streamer;
+        type LivestreamUri = Unset;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStreamer<S> {}
     impl<S: State> State for SetStreamer<S> {
-        type LivestreamUri = S::LivestreamUri;
         type Streamer = Set<members::streamer>;
+        type LivestreamUri = S::LivestreamUri;
+    }
+    ///State transition - sets the `livestream_uri` field to Set
+    pub struct SetLivestreamUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLivestreamUri<S> {}
+    impl<S: State> State for SetLivestreamUri<S> {
+        type Streamer = S::Streamer;
+        type LivestreamUri = Set<members::livestream_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `livestream_uri` field
-        pub struct livestream_uri(());
         ///Marker type for the `streamer` field
         pub struct streamer(());
+        ///Marker type for the `livestream_uri` field
+        pub struct livestream_uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct UpdateLivestreamBuilder<'a, S: update_livestream_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>, Option<Did<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>, Option<Did<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateLivestream<'a> {
@@ -198,9 +201,9 @@ impl<'a> UpdateLivestreamBuilder<'a, update_livestream_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateLivestreamBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -215,11 +218,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> UpdateLivestreamBuilder<'a, update_livestream_state::SetLivestreamUri<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         UpdateLivestreamBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -234,11 +237,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> UpdateLivestreamBuilder<'a, update_livestream_state::SetStreamer<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         UpdateLivestreamBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -246,12 +249,12 @@ where
 impl<'a, S: update_livestream_state::State> UpdateLivestreamBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -259,15 +262,15 @@ impl<'a, S: update_livestream_state::State> UpdateLivestreamBuilder<'a, S> {
 impl<'a, S> UpdateLivestreamBuilder<'a, S>
 where
     S: update_livestream_state::State,
-    S::LivestreamUri: update_livestream_state::IsSet,
     S::Streamer: update_livestream_state::IsSet,
+    S::LivestreamUri: update_livestream_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpdateLivestream<'a> {
         UpdateLivestream {
-            livestream_uri: self.__unsafe_private_named.0.unwrap(),
-            streamer: self.__unsafe_private_named.1.unwrap(),
-            title: self.__unsafe_private_named.2,
+            livestream_uri: self._fields.0.unwrap(),
+            streamer: self._fields.1.unwrap(),
+            title: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -280,9 +283,9 @@ where
         >,
     ) -> UpdateLivestream<'a> {
         UpdateLivestream {
-            livestream_uri: self.__unsafe_private_named.0.unwrap(),
-            streamer: self.__unsafe_private_named.1.unwrap(),
-            title: self.__unsafe_private_named.2,
+            livestream_uri: self._fields.0.unwrap(),
+            streamer: self._fields.1.unwrap(),
+            title: self._fields.2,
             extra_data: Some(extra_data),
         }
     }

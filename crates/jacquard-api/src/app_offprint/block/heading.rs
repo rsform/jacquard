@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -84,50 +87,50 @@ pub mod heading_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Plaintext;
         type Level;
+        type Plaintext;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Plaintext = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `plaintext` field to Set
-    pub struct SetPlaintext<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlaintext<S> {}
-    impl<S: State> State for SetPlaintext<S> {
-        type Plaintext = Set<members::plaintext>;
-        type Level = S::Level;
+        type Plaintext = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
-        type Plaintext = S::Plaintext;
         type Level = Set<members::level>;
+        type Plaintext = S::Plaintext;
+    }
+    ///State transition - sets the `plaintext` field to Set
+    pub struct SetPlaintext<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlaintext<S> {}
+    impl<S: State> State for SetPlaintext<S> {
+        type Level = S::Level;
+        type Plaintext = Set<members::plaintext>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `plaintext` field
-        pub struct plaintext(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `plaintext` field
+        pub struct plaintext(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct HeadingBuilder<'a, S: heading_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<Data<'a>>>,
         Option<i64>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Heading<'a> {
@@ -141,9 +144,9 @@ impl<'a> HeadingBuilder<'a, heading_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         HeadingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -151,12 +154,12 @@ impl<'a> HeadingBuilder<'a, heading_state::Empty> {
 impl<'a, S: heading_state::State> HeadingBuilder<'a, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Data<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
     pub fn maybe_facets(mut self, value: Option<Vec<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -171,11 +174,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> HeadingBuilder<'a, heading_state::SetLevel<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         HeadingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -190,11 +193,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> HeadingBuilder<'a, heading_state::SetPlaintext<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         HeadingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -202,12 +205,12 @@ where
 impl<'a, S: heading_state::State> HeadingBuilder<'a, S> {
     /// Set the `textAlign` field (optional)
     pub fn text_align(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `textAlign` field to an Option value (optional)
     pub fn maybe_text_align(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -215,16 +218,16 @@ impl<'a, S: heading_state::State> HeadingBuilder<'a, S> {
 impl<'a, S> HeadingBuilder<'a, S>
 where
     S: heading_state::State,
-    S::Plaintext: heading_state::IsSet,
     S::Level: heading_state::IsSet,
+    S::Plaintext: heading_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Heading<'a> {
         Heading {
-            facets: self.__unsafe_private_named.0,
-            level: self.__unsafe_private_named.1.unwrap(),
-            plaintext: self.__unsafe_private_named.2.unwrap(),
-            text_align: self.__unsafe_private_named.3,
+            facets: self._fields.0,
+            level: self._fields.1.unwrap(),
+            plaintext: self._fields.2.unwrap(),
+            text_align: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -234,10 +237,10 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Heading<'a> {
         Heading {
-            facets: self.__unsafe_private_named.0,
-            level: self.__unsafe_private_named.1.unwrap(),
-            plaintext: self.__unsafe_private_named.2.unwrap(),
-            text_align: self.__unsafe_private_named.3,
+            facets: self._fields.0,
+            level: self._fields.1.unwrap(),
+            plaintext: self._fields.2.unwrap(),
+            text_align: self._fields.3,
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::Did;
@@ -107,15 +110,15 @@ pub mod list_games_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListGamesBuilder<'a, S: list_games_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Did<'a>>,
         Option<i64>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ListGames<'a> {
@@ -129,9 +132,9 @@ impl<'a> ListGamesBuilder<'a, list_games_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListGamesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -139,12 +142,12 @@ impl<'a> ListGamesBuilder<'a, list_games_state::Empty> {
 impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -152,12 +155,12 @@ impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
 impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
     /// Set the `did` field (optional)
     pub fn did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `did` field to an Option value (optional)
     pub fn maybe_did(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -165,12 +168,12 @@ impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
 impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -178,12 +181,12 @@ impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
 impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
     /// Set the `sort` field (optional)
     pub fn sort(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
     pub fn maybe_sort(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -191,12 +194,12 @@ impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
 impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
     /// Set the `sortDirection` field (optional)
     pub fn sort_direction(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `sortDirection` field to an Option value (optional)
     pub fn maybe_sort_direction(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -208,11 +211,11 @@ where
     /// Build the final struct
     pub fn build(self) -> ListGames<'a> {
         ListGames {
-            cursor: self.__unsafe_private_named.0,
-            did: self.__unsafe_private_named.1,
-            limit: self.__unsafe_private_named.2,
-            sort: self.__unsafe_private_named.3,
-            sort_direction: self.__unsafe_private_named.4,
+            cursor: self._fields.0,
+            did: self._fields.1,
+            limit: self._fields.2,
+            sort: self._fields.3,
+            sort_direction: self._fields.4,
         }
     }
 }

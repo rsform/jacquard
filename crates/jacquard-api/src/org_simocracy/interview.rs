@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -221,80 +224,80 @@ pub mod interview_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type OpenAnswers;
         type YesNoAnswers;
+        type CreatedAt;
         type Sim;
+        type OpenAnswers;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type OpenAnswers = Unset;
         type YesNoAnswers = Unset;
+        type CreatedAt = Unset;
         type Sim = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type OpenAnswers = S::OpenAnswers;
-        type YesNoAnswers = S::YesNoAnswers;
-        type Sim = S::Sim;
-    }
-    ///State transition - sets the `open_answers` field to Set
-    pub struct SetOpenAnswers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOpenAnswers<S> {}
-    impl<S: State> State for SetOpenAnswers<S> {
-        type CreatedAt = S::CreatedAt;
-        type OpenAnswers = Set<members::open_answers>;
-        type YesNoAnswers = S::YesNoAnswers;
-        type Sim = S::Sim;
+        type OpenAnswers = Unset;
     }
     ///State transition - sets the `yes_no_answers` field to Set
     pub struct SetYesNoAnswers<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetYesNoAnswers<S> {}
     impl<S: State> State for SetYesNoAnswers<S> {
-        type CreatedAt = S::CreatedAt;
-        type OpenAnswers = S::OpenAnswers;
         type YesNoAnswers = Set<members::yes_no_answers>;
+        type CreatedAt = S::CreatedAt;
         type Sim = S::Sim;
+        type OpenAnswers = S::OpenAnswers;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type YesNoAnswers = S::YesNoAnswers;
+        type CreatedAt = Set<members::created_at>;
+        type Sim = S::Sim;
+        type OpenAnswers = S::OpenAnswers;
     }
     ///State transition - sets the `sim` field to Set
     pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSim<S> {}
     impl<S: State> State for SetSim<S> {
-        type CreatedAt = S::CreatedAt;
-        type OpenAnswers = S::OpenAnswers;
         type YesNoAnswers = S::YesNoAnswers;
+        type CreatedAt = S::CreatedAt;
         type Sim = Set<members::sim>;
+        type OpenAnswers = S::OpenAnswers;
+    }
+    ///State transition - sets the `open_answers` field to Set
+    pub struct SetOpenAnswers<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOpenAnswers<S> {}
+    impl<S: State> State for SetOpenAnswers<S> {
+        type YesNoAnswers = S::YesNoAnswers;
+        type CreatedAt = S::CreatedAt;
+        type Sim = S::Sim;
+        type OpenAnswers = Set<members::open_answers>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `open_answers` field
-        pub struct open_answers(());
         ///Marker type for the `yes_no_answers` field
         pub struct yes_no_answers(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `sim` field
         pub struct sim(());
+        ///Marker type for the `open_answers` field
+        pub struct open_answers(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct InterviewBuilder<'a, S: interview_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Vec<interview::OpenAnswer<'a>>>,
         Option<StrongRef<'a>>,
         Option<Vec<interview::ValueResponse<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Interview<'a> {
@@ -308,9 +311,9 @@ impl<'a> InterviewBuilder<'a, interview_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         InterviewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -325,11 +328,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> InterviewBuilder<'a, interview_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         InterviewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -344,11 +347,11 @@ where
         mut self,
         value: impl Into<Vec<interview::OpenAnswer<'a>>>,
     ) -> InterviewBuilder<'a, interview_state::SetOpenAnswers<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         InterviewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -363,11 +366,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> InterviewBuilder<'a, interview_state::SetSim<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         InterviewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -382,11 +385,11 @@ where
         mut self,
         value: impl Into<Vec<interview::ValueResponse<'a>>>,
     ) -> InterviewBuilder<'a, interview_state::SetYesNoAnswers<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         InterviewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -394,18 +397,18 @@ where
 impl<'a, S> InterviewBuilder<'a, S>
 where
     S: interview_state::State,
-    S::CreatedAt: interview_state::IsSet,
-    S::OpenAnswers: interview_state::IsSet,
     S::YesNoAnswers: interview_state::IsSet,
+    S::CreatedAt: interview_state::IsSet,
     S::Sim: interview_state::IsSet,
+    S::OpenAnswers: interview_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Interview<'a> {
         Interview {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            open_answers: self.__unsafe_private_named.1.unwrap(),
-            sim: self.__unsafe_private_named.2.unwrap(),
-            yes_no_answers: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            open_answers: self._fields.1.unwrap(),
+            sim: self._fields.2.unwrap(),
+            yes_no_answers: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -418,10 +421,10 @@ where
         >,
     ) -> Interview<'a> {
         Interview {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            open_answers: self.__unsafe_private_named.1.unwrap(),
-            sim: self.__unsafe_private_named.2.unwrap(),
-            yes_no_answers: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            open_answers: self._fields.1.unwrap(),
+            sim: self._fields.2.unwrap(),
+            yes_no_answers: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -641,9 +644,9 @@ pub mod value_response_state {
 
 /// Builder for constructing an instance of this type
 pub struct ValueResponseBuilder<'a, S: value_response_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ValueResponse<'a> {
@@ -657,9 +660,9 @@ impl<'a> ValueResponseBuilder<'a, value_response_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ValueResponseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -674,11 +677,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ValueResponseBuilder<'a, value_response_state::SetAnswer<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ValueResponseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -693,11 +696,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ValueResponseBuilder<'a, value_response_state::SetStatement<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ValueResponseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -711,8 +714,8 @@ where
     /// Build the final struct
     pub fn build(self) -> ValueResponse<'a> {
         ValueResponse {
-            answer: self.__unsafe_private_named.0.unwrap(),
-            statement: self.__unsafe_private_named.1.unwrap(),
+            answer: self._fields.0.unwrap(),
+            statement: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -725,8 +728,8 @@ where
         >,
     ) -> ValueResponse<'a> {
         ValueResponse {
-            answer: self.__unsafe_private_named.0.unwrap(),
-            statement: self.__unsafe_private_named.1.unwrap(),
+            answer: self._fields.0.unwrap(),
+            statement: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

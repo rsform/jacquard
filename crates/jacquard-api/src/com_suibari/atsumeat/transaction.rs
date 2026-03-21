@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -264,44 +267,44 @@ pub mod transaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type CreatedAt;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type CreatedAt = S::CreatedAt;
+        type Status = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Status = S::Status;
         type CreatedAt = Set<members::created_at>;
+        type Status = S::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStatus<S> {}
+    impl<S: State> State for SetStatus<S> {
+        type CreatedAt = S::CreatedAt;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TransactionBuilder<'a, S: transaction_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<bool>,
         Option<CowStr<'a>>,
@@ -312,7 +315,7 @@ pub struct TransactionBuilder<'a, S: transaction_state::State> {
         Option<Vec<UriValue<'a>>>,
         Option<Vec<UriValue<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Transaction<'a> {
@@ -326,19 +329,9 @@ impl<'a> TransactionBuilder<'a, transaction_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TransactionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -353,11 +346,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> TransactionBuilder<'a, transaction_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TransactionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -365,12 +358,12 @@ where
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `isEasyExchange` field (optional)
     pub fn is_easy_exchange(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `isEasyExchange` field to an Option value (optional)
     pub fn maybe_is_easy_exchange(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -378,12 +371,12 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
     pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -391,12 +384,12 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `partner` field (optional)
     pub fn partner(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `partner` field to an Option value (optional)
     pub fn maybe_partner(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -404,12 +397,12 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `refPartner` field (optional)
     pub fn ref_partner(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `refPartner` field to an Option value (optional)
     pub fn maybe_ref_partner(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -417,12 +410,12 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `refTransaction` field (optional)
     pub fn ref_transaction(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `refTransaction` field to an Option value (optional)
     pub fn maybe_ref_transaction(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -437,11 +430,11 @@ where
         mut self,
         value: impl Into<TransactionStatus<'a>>,
     ) -> TransactionBuilder<'a, transaction_state::SetStatus<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         TransactionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -449,12 +442,12 @@ where
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `stickerIn` field (optional)
     pub fn sticker_in(mut self, value: impl Into<Option<Vec<UriValue<'a>>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `stickerIn` field to an Option value (optional)
     pub fn maybe_sticker_in(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -462,12 +455,12 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `stickerOut` field (optional)
     pub fn sticker_out(mut self, value: impl Into<Option<Vec<UriValue<'a>>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `stickerOut` field to an Option value (optional)
     pub fn maybe_sticker_out(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -475,21 +468,21 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 impl<'a, S> TransactionBuilder<'a, S>
 where
     S: transaction_state::State,
-    S::Status: transaction_state::IsSet,
     S::CreatedAt: transaction_state::IsSet,
+    S::Status: transaction_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Transaction<'a> {
         Transaction {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            is_easy_exchange: self.__unsafe_private_named.1,
-            message: self.__unsafe_private_named.2,
-            partner: self.__unsafe_private_named.3,
-            ref_partner: self.__unsafe_private_named.4,
-            ref_transaction: self.__unsafe_private_named.5,
-            status: self.__unsafe_private_named.6.unwrap(),
-            sticker_in: self.__unsafe_private_named.7,
-            sticker_out: self.__unsafe_private_named.8,
+            created_at: self._fields.0.unwrap(),
+            is_easy_exchange: self._fields.1,
+            message: self._fields.2,
+            partner: self._fields.3,
+            ref_partner: self._fields.4,
+            ref_transaction: self._fields.5,
+            status: self._fields.6.unwrap(),
+            sticker_in: self._fields.7,
+            sticker_out: self._fields.8,
             extra_data: Default::default(),
         }
     }
@@ -502,15 +495,15 @@ where
         >,
     ) -> Transaction<'a> {
         Transaction {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            is_easy_exchange: self.__unsafe_private_named.1,
-            message: self.__unsafe_private_named.2,
-            partner: self.__unsafe_private_named.3,
-            ref_partner: self.__unsafe_private_named.4,
-            ref_transaction: self.__unsafe_private_named.5,
-            status: self.__unsafe_private_named.6.unwrap(),
-            sticker_in: self.__unsafe_private_named.7,
-            sticker_out: self.__unsafe_private_named.8,
+            created_at: self._fields.0.unwrap(),
+            is_easy_exchange: self._fields.1,
+            message: self._fields.2,
+            partner: self._fields.3,
+            ref_partner: self._fields.4,
+            ref_transaction: self._fields.5,
+            status: self._fields.6.unwrap(),
+            sticker_in: self._fields.7,
+            sticker_out: self._fields.8,
             extra_data: Some(extra_data),
         }
     }

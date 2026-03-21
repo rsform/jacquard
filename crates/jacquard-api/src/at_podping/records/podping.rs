@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -128,91 +131,91 @@ pub mod podping_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Timestamp;
-        type Version;
         type Iris;
         type Medium;
         type Reason;
+        type Version;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Timestamp = Unset;
-        type Version = Unset;
         type Iris = Unset;
         type Medium = Unset;
         type Reason = Unset;
+        type Version = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTimestamp<S> {}
     impl<S: State> State for SetTimestamp<S> {
         type Timestamp = Set<members::timestamp>;
+        type Iris = S::Iris;
+        type Medium = S::Medium;
+        type Reason = S::Reason;
         type Version = S::Version;
-        type Iris = S::Iris;
-        type Medium = S::Medium;
-        type Reason = S::Reason;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersion<S> {}
-    impl<S: State> State for SetVersion<S> {
-        type Timestamp = S::Timestamp;
-        type Version = Set<members::version>;
-        type Iris = S::Iris;
-        type Medium = S::Medium;
-        type Reason = S::Reason;
     }
     ///State transition - sets the `iris` field to Set
     pub struct SetIris<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIris<S> {}
     impl<S: State> State for SetIris<S> {
         type Timestamp = S::Timestamp;
-        type Version = S::Version;
         type Iris = Set<members::iris>;
         type Medium = S::Medium;
         type Reason = S::Reason;
+        type Version = S::Version;
     }
     ///State transition - sets the `medium` field to Set
     pub struct SetMedium<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMedium<S> {}
     impl<S: State> State for SetMedium<S> {
         type Timestamp = S::Timestamp;
-        type Version = S::Version;
         type Iris = S::Iris;
         type Medium = Set<members::medium>;
         type Reason = S::Reason;
+        type Version = S::Version;
     }
     ///State transition - sets the `reason` field to Set
     pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReason<S> {}
     impl<S: State> State for SetReason<S> {
         type Timestamp = S::Timestamp;
-        type Version = S::Version;
         type Iris = S::Iris;
         type Medium = S::Medium;
         type Reason = Set<members::reason>;
+        type Version = S::Version;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVersion<S> {}
+    impl<S: State> State for SetVersion<S> {
+        type Timestamp = S::Timestamp;
+        type Iris = S::Iris;
+        type Medium = S::Medium;
+        type Reason = S::Reason;
+        type Version = Set<members::version>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
-        ///Marker type for the `version` field
-        pub struct version(());
         ///Marker type for the `iris` field
         pub struct iris(());
         ///Marker type for the `medium` field
         pub struct medium(());
         ///Marker type for the `reason` field
         pub struct reason(());
+        ///Marker type for the `version` field
+        pub struct version(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PodpingBuilder<'a, S: podping_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<UriValue<'a>>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
@@ -221,7 +224,7 @@ pub struct PodpingBuilder<'a, S: podping_state::State> {
         Option<Datetime>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Podping<'a> {
@@ -235,9 +238,9 @@ impl<'a> PodpingBuilder<'a, podping_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PodpingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -252,11 +255,11 @@ where
         mut self,
         value: impl Into<Vec<UriValue<'a>>>,
     ) -> PodpingBuilder<'a, podping_state::SetIris<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PodpingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -271,11 +274,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PodpingBuilder<'a, podping_state::SetMedium<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PodpingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -290,11 +293,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PodpingBuilder<'a, podping_state::SetReason<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PodpingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -302,12 +305,12 @@ where
 impl<'a, S: podping_state::State> PodpingBuilder<'a, S> {
     /// Set the `sessionId` field (optional)
     pub fn session_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `sessionId` field to an Option value (optional)
     pub fn maybe_session_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -315,12 +318,12 @@ impl<'a, S: podping_state::State> PodpingBuilder<'a, S> {
 impl<'a, S: podping_state::State> PodpingBuilder<'a, S> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
     pub fn maybe_source(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -335,11 +338,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PodpingBuilder<'a, podping_state::SetTimestamp<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         PodpingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -354,11 +357,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PodpingBuilder<'a, podping_state::SetVersion<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         PodpingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -367,21 +370,21 @@ impl<'a, S> PodpingBuilder<'a, S>
 where
     S: podping_state::State,
     S::Timestamp: podping_state::IsSet,
-    S::Version: podping_state::IsSet,
     S::Iris: podping_state::IsSet,
     S::Medium: podping_state::IsSet,
     S::Reason: podping_state::IsSet,
+    S::Version: podping_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Podping<'a> {
         Podping {
-            iris: self.__unsafe_private_named.0.unwrap(),
-            medium: self.__unsafe_private_named.1.unwrap(),
-            reason: self.__unsafe_private_named.2.unwrap(),
-            session_id: self.__unsafe_private_named.3,
-            source: self.__unsafe_private_named.4,
-            timestamp: self.__unsafe_private_named.5.unwrap(),
-            version: self.__unsafe_private_named.6.unwrap(),
+            iris: self._fields.0.unwrap(),
+            medium: self._fields.1.unwrap(),
+            reason: self._fields.2.unwrap(),
+            session_id: self._fields.3,
+            source: self._fields.4,
+            timestamp: self._fields.5.unwrap(),
+            version: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -394,13 +397,13 @@ where
         >,
     ) -> Podping<'a> {
         Podping {
-            iris: self.__unsafe_private_named.0.unwrap(),
-            medium: self.__unsafe_private_named.1.unwrap(),
-            reason: self.__unsafe_private_named.2.unwrap(),
-            session_id: self.__unsafe_private_named.3,
-            source: self.__unsafe_private_named.4,
-            timestamp: self.__unsafe_private_named.5.unwrap(),
-            version: self.__unsafe_private_named.6.unwrap(),
+            iris: self._fields.0.unwrap(),
+            medium: self._fields.1.unwrap(),
+            reason: self._fields.2.unwrap(),
+            session_id: self._fields.3,
+            source: self._fields.4,
+            timestamp: self._fields.5.unwrap(),
+            version: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

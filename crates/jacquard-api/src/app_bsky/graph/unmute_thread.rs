@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::string::AtUri;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -81,9 +84,9 @@ pub mod unmute_thread_state {
 
 /// Builder for constructing an instance of this type
 pub struct UnmuteThreadBuilder<'a, S: unmute_thread_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> UnmuteThread<'a> {
@@ -97,9 +100,9 @@ impl<'a> UnmuteThreadBuilder<'a, unmute_thread_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UnmuteThreadBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -114,11 +117,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> UnmuteThreadBuilder<'a, unmute_thread_state::SetRoot<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         UnmuteThreadBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -131,7 +134,7 @@ where
     /// Build the final struct
     pub fn build(self) -> UnmuteThread<'a> {
         UnmuteThread {
-            root: self.__unsafe_private_named.0.unwrap(),
+            root: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -144,7 +147,7 @@ where
         >,
     ) -> UnmuteThread<'a> {
         UnmuteThread {
-            root: self.__unsafe_private_named.0.unwrap(),
+            root: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

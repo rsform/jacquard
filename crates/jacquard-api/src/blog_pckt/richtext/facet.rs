@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -380,9 +383,9 @@ pub mod at_mention_state {
 
 /// Builder for constructing an instance of this type
 pub struct AtMentionBuilder<'a, S: at_mention_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<UriValue<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<UriValue<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> AtMention<'a> {
@@ -396,9 +399,9 @@ impl<'a> AtMentionBuilder<'a, at_mention_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AtMentionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -413,11 +416,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> AtMentionBuilder<'a, at_mention_state::SetAtUri<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AtMentionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -430,7 +433,7 @@ where
     /// Build the final struct
     pub fn build(self) -> AtMention<'a> {
         AtMention {
-            at_uri: self.__unsafe_private_named.0.unwrap(),
+            at_uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -443,7 +446,7 @@ where
         >,
     ) -> AtMention<'a> {
         AtMention {
-            at_uri: self.__unsafe_private_named.0.unwrap(),
+            at_uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -721,45 +724,45 @@ pub mod byte_slice_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ByteEnd;
         type ByteStart;
+        type ByteEnd;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ByteEnd = Unset;
         type ByteStart = Unset;
-    }
-    ///State transition - sets the `byte_end` field to Set
-    pub struct SetByteEnd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetByteEnd<S> {}
-    impl<S: State> State for SetByteEnd<S> {
-        type ByteEnd = Set<members::byte_end>;
-        type ByteStart = S::ByteStart;
+        type ByteEnd = Unset;
     }
     ///State transition - sets the `byte_start` field to Set
     pub struct SetByteStart<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetByteStart<S> {}
     impl<S: State> State for SetByteStart<S> {
-        type ByteEnd = S::ByteEnd;
         type ByteStart = Set<members::byte_start>;
+        type ByteEnd = S::ByteEnd;
+    }
+    ///State transition - sets the `byte_end` field to Set
+    pub struct SetByteEnd<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetByteEnd<S> {}
+    impl<S: State> State for SetByteEnd<S> {
+        type ByteStart = S::ByteStart;
+        type ByteEnd = Set<members::byte_end>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `byte_end` field
-        pub struct byte_end(());
         ///Marker type for the `byte_start` field
         pub struct byte_start(());
+        ///Marker type for the `byte_end` field
+        pub struct byte_end(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ByteSliceBuilder<'a, S: byte_slice_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ByteSlice<'a> {
@@ -773,9 +776,9 @@ impl<'a> ByteSliceBuilder<'a, byte_slice_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ByteSliceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -790,11 +793,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ByteSliceBuilder<'a, byte_slice_state::SetByteEnd<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ByteSliceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -809,11 +812,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ByteSliceBuilder<'a, byte_slice_state::SetByteStart<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ByteSliceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -821,14 +824,14 @@ where
 impl<'a, S> ByteSliceBuilder<'a, S>
 where
     S: byte_slice_state::State,
-    S::ByteEnd: byte_slice_state::IsSet,
     S::ByteStart: byte_slice_state::IsSet,
+    S::ByteEnd: byte_slice_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ByteSlice<'a> {
         ByteSlice {
-            byte_end: self.__unsafe_private_named.0.unwrap(),
-            byte_start: self.__unsafe_private_named.1.unwrap(),
+            byte_end: self._fields.0.unwrap(),
+            byte_start: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -841,8 +844,8 @@ where
         >,
     ) -> ByteSlice<'a> {
         ByteSlice {
-            byte_end: self.__unsafe_private_named.0.unwrap(),
-            byte_start: self.__unsafe_private_named.1.unwrap(),
+            byte_end: self._fields.0.unwrap(),
+            byte_start: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -882,9 +885,9 @@ pub mod did_mention_state {
 
 /// Builder for constructing an instance of this type
 pub struct DidMentionBuilder<'a, S: did_mention_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DidMention<'a> {
@@ -898,9 +901,9 @@ impl<'a> DidMentionBuilder<'a, did_mention_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DidMentionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -915,11 +918,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> DidMentionBuilder<'a, did_mention_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DidMentionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -932,7 +935,7 @@ where
     /// Build the final struct
     pub fn build(self) -> DidMention<'a> {
         DidMention {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -945,7 +948,7 @@ where
         >,
     ) -> DidMention<'a> {
         DidMention {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -997,12 +1000,9 @@ pub mod facet_state {
 
 /// Builder for constructing an instance of this type
 pub struct FacetBuilder<'a, S: facet_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Vec<FacetFeaturesItem<'a>>>,
-        Option<facet::ByteSlice<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<FacetFeaturesItem<'a>>>, Option<facet::ByteSlice<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Facet<'a> {
@@ -1016,9 +1016,9 @@ impl<'a> FacetBuilder<'a, facet_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FacetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1033,11 +1033,11 @@ where
         mut self,
         value: impl Into<Vec<FacetFeaturesItem<'a>>>,
     ) -> FacetBuilder<'a, facet_state::SetFeatures<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         FacetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1052,11 +1052,11 @@ where
         mut self,
         value: impl Into<facet::ByteSlice<'a>>,
     ) -> FacetBuilder<'a, facet_state::SetIndex<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         FacetBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1070,8 +1070,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Facet<'a> {
         Facet {
-            features: self.__unsafe_private_named.0.unwrap(),
-            index: self.__unsafe_private_named.1.unwrap(),
+            features: self._fields.0.unwrap(),
+            index: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1084,8 +1084,8 @@ where
         >,
     ) -> Facet<'a> {
         Facet {
-            features: self.__unsafe_private_named.0.unwrap(),
-            index: self.__unsafe_private_named.1.unwrap(),
+            features: self._fields.0.unwrap(),
+            index: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

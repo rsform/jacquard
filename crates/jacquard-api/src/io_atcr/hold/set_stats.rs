@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::{Did, Datetime};
@@ -128,44 +131,44 @@ pub mod set_stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type OwnerDid;
         type Repository;
+        type OwnerDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type OwnerDid = Unset;
         type Repository = Unset;
-    }
-    ///State transition - sets the `owner_did` field to Set
-    pub struct SetOwnerDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOwnerDid<S> {}
-    impl<S: State> State for SetOwnerDid<S> {
-        type OwnerDid = Set<members::owner_did>;
-        type Repository = S::Repository;
+        type OwnerDid = Unset;
     }
     ///State transition - sets the `repository` field to Set
     pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepository<S> {}
     impl<S: State> State for SetRepository<S> {
-        type OwnerDid = S::OwnerDid;
         type Repository = Set<members::repository>;
+        type OwnerDid = S::OwnerDid;
+    }
+    ///State transition - sets the `owner_did` field to Set
+    pub struct SetOwnerDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOwnerDid<S> {}
+    impl<S: State> State for SetOwnerDid<S> {
+        type Repository = S::Repository;
+        type OwnerDid = Set<members::owner_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `owner_did` field
-        pub struct owner_did(());
         ///Marker type for the `repository` field
         pub struct repository(());
+        ///Marker type for the `owner_did` field
+        pub struct owner_did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SetStatsBuilder<'a, S: set_stats_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Datetime>,
         Option<Did<'a>>,
@@ -173,7 +176,7 @@ pub struct SetStatsBuilder<'a, S: set_stats_state::State> {
         Option<i64>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SetStats<'a> {
@@ -187,9 +190,9 @@ impl<'a> SetStatsBuilder<'a, set_stats_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SetStatsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -197,12 +200,12 @@ impl<'a> SetStatsBuilder<'a, set_stats_state::Empty> {
 impl<'a, S: set_stats_state::State> SetStatsBuilder<'a, S> {
     /// Set the `lastPull` field (optional)
     pub fn last_pull(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `lastPull` field to an Option value (optional)
     pub fn maybe_last_pull(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -210,12 +213,12 @@ impl<'a, S: set_stats_state::State> SetStatsBuilder<'a, S> {
 impl<'a, S: set_stats_state::State> SetStatsBuilder<'a, S> {
     /// Set the `lastPush` field (optional)
     pub fn last_push(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `lastPush` field to an Option value (optional)
     pub fn maybe_last_push(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -230,11 +233,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> SetStatsBuilder<'a, set_stats_state::SetOwnerDid<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SetStatsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -242,12 +245,12 @@ where
 impl<'a, S: set_stats_state::State> SetStatsBuilder<'a, S> {
     /// Set the `pullCount` field (optional)
     pub fn pull_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `pullCount` field to an Option value (optional)
     pub fn maybe_pull_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -255,12 +258,12 @@ impl<'a, S: set_stats_state::State> SetStatsBuilder<'a, S> {
 impl<'a, S: set_stats_state::State> SetStatsBuilder<'a, S> {
     /// Set the `pushCount` field (optional)
     pub fn push_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `pushCount` field to an Option value (optional)
     pub fn maybe_push_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -275,11 +278,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SetStatsBuilder<'a, set_stats_state::SetRepository<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         SetStatsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -287,18 +290,18 @@ where
 impl<'a, S> SetStatsBuilder<'a, S>
 where
     S: set_stats_state::State,
-    S::OwnerDid: set_stats_state::IsSet,
     S::Repository: set_stats_state::IsSet,
+    S::OwnerDid: set_stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SetStats<'a> {
         SetStats {
-            last_pull: self.__unsafe_private_named.0,
-            last_push: self.__unsafe_private_named.1,
-            owner_did: self.__unsafe_private_named.2.unwrap(),
-            pull_count: self.__unsafe_private_named.3,
-            push_count: self.__unsafe_private_named.4,
-            repository: self.__unsafe_private_named.5.unwrap(),
+            last_pull: self._fields.0,
+            last_push: self._fields.1,
+            owner_did: self._fields.2.unwrap(),
+            pull_count: self._fields.3,
+            push_count: self._fields.4,
+            repository: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -311,12 +314,12 @@ where
         >,
     ) -> SetStats<'a> {
         SetStats {
-            last_pull: self.__unsafe_private_named.0,
-            last_push: self.__unsafe_private_named.1,
-            owner_did: self.__unsafe_private_named.2.unwrap(),
-            pull_count: self.__unsafe_private_named.3,
-            push_count: self.__unsafe_private_named.4,
-            repository: self.__unsafe_private_named.5.unwrap(),
+            last_pull: self._fields.0,
+            last_push: self._fields.1,
+            owner_did: self._fields.2.unwrap(),
+            pull_count: self._fields.3,
+            push_count: self._fields.4,
+            repository: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

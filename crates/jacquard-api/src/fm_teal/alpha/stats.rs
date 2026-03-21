@@ -11,7 +11,11 @@ pub mod get_top_releases;
 pub mod get_user_top_artists;
 pub mod get_user_top_releases;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -124,59 +128,59 @@ pub mod artist_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Mbid;
         type Name;
         type PlayCount;
-        type Mbid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Mbid = Unset;
         type Name = Unset;
         type PlayCount = Unset;
-        type Mbid = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type PlayCount = S::PlayCount;
-        type Mbid = S::Mbid;
-    }
-    ///State transition - sets the `play_count` field to Set
-    pub struct SetPlayCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlayCount<S> {}
-    impl<S: State> State for SetPlayCount<S> {
-        type Name = S::Name;
-        type PlayCount = Set<members::play_count>;
-        type Mbid = S::Mbid;
     }
     ///State transition - sets the `mbid` field to Set
     pub struct SetMbid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMbid<S> {}
     impl<S: State> State for SetMbid<S> {
+        type Mbid = Set<members::mbid>;
         type Name = S::Name;
         type PlayCount = S::PlayCount;
-        type Mbid = Set<members::mbid>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Mbid = S::Mbid;
+        type Name = Set<members::name>;
+        type PlayCount = S::PlayCount;
+    }
+    ///State transition - sets the `play_count` field to Set
+    pub struct SetPlayCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlayCount<S> {}
+    impl<S: State> State for SetPlayCount<S> {
+        type Mbid = S::Mbid;
+        type Name = S::Name;
+        type PlayCount = Set<members::play_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `mbid` field
+        pub struct mbid(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `play_count` field
         pub struct play_count(());
-        ///Marker type for the `mbid` field
-        pub struct mbid(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ArtistViewBuilder<'a, S: artist_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ArtistView<'a> {
@@ -190,9 +194,9 @@ impl<'a> ArtistViewBuilder<'a, artist_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ArtistViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -207,11 +211,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ArtistViewBuilder<'a, artist_view_state::SetMbid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ArtistViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -226,11 +230,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ArtistViewBuilder<'a, artist_view_state::SetName<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ArtistViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -245,11 +249,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ArtistViewBuilder<'a, artist_view_state::SetPlayCount<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ArtistViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -257,16 +261,16 @@ where
 impl<'a, S> ArtistViewBuilder<'a, S>
 where
     S: artist_view_state::State,
+    S::Mbid: artist_view_state::IsSet,
     S::Name: artist_view_state::IsSet,
     S::PlayCount: artist_view_state::IsSet,
-    S::Mbid: artist_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ArtistView<'a> {
         ArtistView {
-            mbid: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1.unwrap(),
-            play_count: self.__unsafe_private_named.2.unwrap(),
+            mbid: self._fields.0.unwrap(),
+            name: self._fields.1.unwrap(),
+            play_count: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -279,9 +283,9 @@ where
         >,
     ) -> ArtistView<'a> {
         ArtistView {
-            mbid: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1.unwrap(),
-            play_count: self.__unsafe_private_named.2.unwrap(),
+            mbid: self._fields.0.unwrap(),
+            name: self._fields.1.unwrap(),
+            play_count: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -482,9 +486,9 @@ pub mod recording_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct RecordingViewBuilder<'a, S: recording_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RecordingView<'a> {
@@ -498,9 +502,9 @@ impl<'a> RecordingViewBuilder<'a, recording_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RecordingViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -515,11 +519,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RecordingViewBuilder<'a, recording_view_state::SetMbid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RecordingViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -534,11 +538,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RecordingViewBuilder<'a, recording_view_state::SetName<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RecordingViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -553,11 +557,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> RecordingViewBuilder<'a, recording_view_state::SetPlayCount<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RecordingViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -572,9 +576,9 @@ where
     /// Build the final struct
     pub fn build(self) -> RecordingView<'a> {
         RecordingView {
-            mbid: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1.unwrap(),
-            play_count: self.__unsafe_private_named.2.unwrap(),
+            mbid: self._fields.0.unwrap(),
+            name: self._fields.1.unwrap(),
+            play_count: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -587,9 +591,9 @@ where
         >,
     ) -> RecordingView<'a> {
         RecordingView {
-            mbid: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1.unwrap(),
-            play_count: self.__unsafe_private_named.2.unwrap(),
+            mbid: self._fields.0.unwrap(),
+            name: self._fields.1.unwrap(),
+            play_count: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -605,49 +609,49 @@ pub mod release_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Mbid;
         type PlayCount;
+        type Mbid;
         type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Mbid = Unset;
         type PlayCount = Unset;
+        type Mbid = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `mbid` field to Set
-    pub struct SetMbid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMbid<S> {}
-    impl<S: State> State for SetMbid<S> {
-        type Mbid = Set<members::mbid>;
-        type PlayCount = S::PlayCount;
-        type Name = S::Name;
     }
     ///State transition - sets the `play_count` field to Set
     pub struct SetPlayCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlayCount<S> {}
     impl<S: State> State for SetPlayCount<S> {
-        type Mbid = S::Mbid;
         type PlayCount = Set<members::play_count>;
+        type Mbid = S::Mbid;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `mbid` field to Set
+    pub struct SetMbid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMbid<S> {}
+    impl<S: State> State for SetMbid<S> {
+        type PlayCount = S::PlayCount;
+        type Mbid = Set<members::mbid>;
         type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Mbid = S::Mbid;
         type PlayCount = S::PlayCount;
+        type Mbid = S::Mbid;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `mbid` field
-        pub struct mbid(());
         ///Marker type for the `play_count` field
         pub struct play_count(());
+        ///Marker type for the `mbid` field
+        pub struct mbid(());
         ///Marker type for the `name` field
         pub struct name(());
     }
@@ -655,9 +659,9 @@ pub mod release_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct ReleaseViewBuilder<'a, S: release_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ReleaseView<'a> {
@@ -671,9 +675,9 @@ impl<'a> ReleaseViewBuilder<'a, release_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ReleaseViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -688,11 +692,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ReleaseViewBuilder<'a, release_view_state::SetMbid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ReleaseViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -707,11 +711,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ReleaseViewBuilder<'a, release_view_state::SetName<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ReleaseViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -726,11 +730,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ReleaseViewBuilder<'a, release_view_state::SetPlayCount<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ReleaseViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -738,16 +742,16 @@ where
 impl<'a, S> ReleaseViewBuilder<'a, S>
 where
     S: release_view_state::State,
-    S::Mbid: release_view_state::IsSet,
     S::PlayCount: release_view_state::IsSet,
+    S::Mbid: release_view_state::IsSet,
     S::Name: release_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReleaseView<'a> {
         ReleaseView {
-            mbid: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1.unwrap(),
-            play_count: self.__unsafe_private_named.2.unwrap(),
+            mbid: self._fields.0.unwrap(),
+            name: self._fields.1.unwrap(),
+            play_count: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -760,9 +764,9 @@ where
         >,
     ) -> ReleaseView<'a> {
         ReleaseView {
-            mbid: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1.unwrap(),
-            play_count: self.__unsafe_private_named.2.unwrap(),
+            mbid: self._fields.0.unwrap(),
+            name: self._fields.1.unwrap(),
+            play_count: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -159,65 +162,65 @@ pub mod fragrance_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type House;
         type CreatedAt;
+        type House;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type House = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type House = S::House;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `house` field to Set
-    pub struct SetHouse<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHouse<S> {}
-    impl<S: State> State for SetHouse<S> {
-        type Name = S::Name;
-        type House = Set<members::house>;
-        type CreatedAt = S::CreatedAt;
+        type House = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type House = S::House;
         type CreatedAt = Set<members::created_at>;
+        type House = S::House;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `house` field to Set
+    pub struct SetHouse<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHouse<S> {}
+    impl<S: State> State for SetHouse<S> {
+        type CreatedAt = S::CreatedAt;
+        type House = Set<members::house>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type House = S::House;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `house` field
-        pub struct house(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `house` field
+        pub struct house(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FragranceBuilder<'a, S: fragrance_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<AtUri<'a>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Fragrance<'a> {
@@ -231,9 +234,9 @@ impl<'a> FragranceBuilder<'a, fragrance_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FragranceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -248,11 +251,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> FragranceBuilder<'a, fragrance_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         FragranceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -267,11 +270,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> FragranceBuilder<'a, fragrance_state::SetHouse<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         FragranceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -286,11 +289,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> FragranceBuilder<'a, fragrance_state::SetName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         FragranceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -298,12 +301,12 @@ where
 impl<'a, S: fragrance_state::State> FragranceBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -311,12 +314,12 @@ impl<'a, S: fragrance_state::State> FragranceBuilder<'a, S> {
 impl<'a, S: fragrance_state::State> FragranceBuilder<'a, S> {
     /// Set the `year` field (optional)
     pub fn year(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `year` field to an Option value (optional)
     pub fn maybe_year(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -324,18 +327,18 @@ impl<'a, S: fragrance_state::State> FragranceBuilder<'a, S> {
 impl<'a, S> FragranceBuilder<'a, S>
 where
     S: fragrance_state::State,
-    S::Name: fragrance_state::IsSet,
-    S::House: fragrance_state::IsSet,
     S::CreatedAt: fragrance_state::IsSet,
+    S::House: fragrance_state::IsSet,
+    S::Name: fragrance_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Fragrance<'a> {
         Fragrance {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            house: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
-            updated_at: self.__unsafe_private_named.3,
-            year: self.__unsafe_private_named.4,
+            created_at: self._fields.0.unwrap(),
+            house: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
+            updated_at: self._fields.3,
+            year: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -348,11 +351,11 @@ where
         >,
     ) -> Fragrance<'a> {
         Fragrance {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            house: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
-            updated_at: self.__unsafe_private_named.3,
-            year: self.__unsafe_private_named.4,
+            created_at: self._fields.0.unwrap(),
+            house: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
+            updated_at: self._fields.3,
+            year: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

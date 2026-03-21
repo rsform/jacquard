@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -115,45 +118,45 @@ pub mod supporter_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type Name;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Name = S::Name;
+        type Type = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Type = S::Type;
         type Name = Set<members::name>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Name = S::Name;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SupporterBuilder<'a, S: supporter_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Supporter<'a> {
@@ -167,9 +170,9 @@ impl<'a> SupporterBuilder<'a, supporter_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SupporterBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -184,11 +187,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SupporterBuilder<'a, supporter_state::SetName<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SupporterBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -196,12 +199,12 @@ where
 impl<'a, S: supporter_state::State> SupporterBuilder<'a, S> {
     /// Set the `tier` field (optional)
     pub fn tier(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `tier` field to an Option value (optional)
     pub fn maybe_tier(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -216,11 +219,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SupporterBuilder<'a, supporter_state::SetType<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SupporterBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -228,15 +231,15 @@ where
 impl<'a, S> SupporterBuilder<'a, S>
 where
     S: supporter_state::State,
-    S::Type: supporter_state::IsSet,
     S::Name: supporter_state::IsSet,
+    S::Type: supporter_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Supporter<'a> {
         Supporter {
-            name: self.__unsafe_private_named.0.unwrap(),
-            tier: self.__unsafe_private_named.1,
-            r#type: self.__unsafe_private_named.2.unwrap(),
+            name: self._fields.0.unwrap(),
+            tier: self._fields.1,
+            r#type: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -249,9 +252,9 @@ where
         >,
     ) -> Supporter<'a> {
         Supporter {
-            name: self.__unsafe_private_named.0.unwrap(),
-            tier: self.__unsafe_private_named.1,
-            r#type: self.__unsafe_private_named.2.unwrap(),
+            name: self._fields.0.unwrap(),
+            tier: self._fields.1,
+            r#type: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

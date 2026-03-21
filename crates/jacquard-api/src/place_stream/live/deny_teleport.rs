@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::AtUri;
@@ -139,9 +142,9 @@ pub mod deny_teleport_state {
 
 /// Builder for constructing an instance of this type
 pub struct DenyTeleportBuilder<'a, S: deny_teleport_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DenyTeleport<'a> {
@@ -155,9 +158,9 @@ impl<'a> DenyTeleportBuilder<'a, deny_teleport_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DenyTeleportBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -172,11 +175,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> DenyTeleportBuilder<'a, deny_teleport_state::SetUri<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DenyTeleportBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -189,7 +192,7 @@ where
     /// Build the final struct
     pub fn build(self) -> DenyTeleport<'a> {
         DenyTeleport {
-            uri: self.__unsafe_private_named.0.unwrap(),
+            uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -202,7 +205,7 @@ where
         >,
     ) -> DenyTeleport<'a> {
         DenyTeleport {
-            uri: self.__unsafe_private_named.0.unwrap(),
+            uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -138,44 +141,44 @@ pub mod platform_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type CreatedAt = Set<members::created_at>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type CreatedAt = S::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PlatformBuilder<'a, S: platform_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<PlatformCategory<'a>>,
@@ -188,7 +191,7 @@ pub struct PlatformBuilder<'a, S: platform_state::State> {
         Option<Vec<PlatformVersion<'a>>>,
         Option<Vec<Website<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Platform<'a> {
@@ -202,21 +205,9 @@ impl<'a> PlatformBuilder<'a, platform_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PlatformBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -224,12 +215,12 @@ impl<'a> PlatformBuilder<'a, platform_state::Empty> {
 impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `abbreviation` field (optional)
     pub fn abbreviation(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `abbreviation` field to an Option value (optional)
     pub fn maybe_abbreviation(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -237,12 +228,12 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
 impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `alternativeName` field (optional)
     pub fn alternative_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `alternativeName` field to an Option value (optional)
     pub fn maybe_alternative_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -250,12 +241,12 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
 impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<PlatformCategory<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
     pub fn maybe_category(mut self, value: Option<PlatformCategory<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -270,11 +261,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PlatformBuilder<'a, platform_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         PlatformBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -282,12 +273,12 @@ where
 impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -295,12 +286,12 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
 impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `family` field (optional)
     pub fn family(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `family` field to an Option value (optional)
     pub fn maybe_family(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -308,12 +299,12 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
 impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `generation` field (optional)
     pub fn generation(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `generation` field to an Option value (optional)
     pub fn maybe_generation(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -321,12 +312,12 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
 impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `media` field (optional)
     pub fn media(mut self, value: impl Into<Option<Vec<MediaItem<'a>>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `media` field to an Option value (optional)
     pub fn maybe_media(mut self, value: Option<Vec<MediaItem<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -341,11 +332,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PlatformBuilder<'a, platform_state::SetName<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         PlatformBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -356,12 +347,12 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<PlatformVersion<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `versions` field to an Option value (optional)
     pub fn maybe_versions(mut self, value: Option<Vec<PlatformVersion<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -369,12 +360,12 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
 impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     /// Set the `websites` field (optional)
     pub fn websites(mut self, value: impl Into<Option<Vec<Website<'a>>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `websites` field to an Option value (optional)
     pub fn maybe_websites(mut self, value: Option<Vec<Website<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -382,23 +373,23 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
 impl<'a, S> PlatformBuilder<'a, S>
 where
     S: platform_state::State,
-    S::Name: platform_state::IsSet,
     S::CreatedAt: platform_state::IsSet,
+    S::Name: platform_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Platform<'a> {
         Platform {
-            abbreviation: self.__unsafe_private_named.0,
-            alternative_name: self.__unsafe_private_named.1,
-            category: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            description: self.__unsafe_private_named.4,
-            family: self.__unsafe_private_named.5,
-            generation: self.__unsafe_private_named.6,
-            media: self.__unsafe_private_named.7,
-            name: self.__unsafe_private_named.8.unwrap(),
-            versions: self.__unsafe_private_named.9,
-            websites: self.__unsafe_private_named.10,
+            abbreviation: self._fields.0,
+            alternative_name: self._fields.1,
+            category: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            description: self._fields.4,
+            family: self._fields.5,
+            generation: self._fields.6,
+            media: self._fields.7,
+            name: self._fields.8.unwrap(),
+            versions: self._fields.9,
+            websites: self._fields.10,
             extra_data: Default::default(),
         }
     }
@@ -411,17 +402,17 @@ where
         >,
     ) -> Platform<'a> {
         Platform {
-            abbreviation: self.__unsafe_private_named.0,
-            alternative_name: self.__unsafe_private_named.1,
-            category: self.__unsafe_private_named.2,
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            description: self.__unsafe_private_named.4,
-            family: self.__unsafe_private_named.5,
-            generation: self.__unsafe_private_named.6,
-            media: self.__unsafe_private_named.7,
-            name: self.__unsafe_private_named.8.unwrap(),
-            versions: self.__unsafe_private_named.9,
-            websites: self.__unsafe_private_named.10,
+            abbreviation: self._fields.0,
+            alternative_name: self._fields.1,
+            category: self._fields.2,
+            created_at: self._fields.3.unwrap(),
+            description: self._fields.4,
+            family: self._fields.5,
+            generation: self._fields.6,
+            media: self._fields.7,
+            name: self._fields.8.unwrap(),
+            versions: self._fields.9,
+            websites: self._fields.10,
             extra_data: Some(extra_data),
         }
     }

@@ -7,7 +7,11 @@
 
 pub mod activity;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -319,49 +323,49 @@ pub mod split_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Duration;
         type Order;
+        type Duration;
         type Distance;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Duration = Unset;
         type Order = Unset;
+        type Duration = Unset;
         type Distance = Unset;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
-        type Duration = Set<members::duration>;
-        type Order = S::Order;
-        type Distance = S::Distance;
     }
     ///State transition - sets the `order` field to Set
     pub struct SetOrder<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOrder<S> {}
     impl<S: State> State for SetOrder<S> {
-        type Duration = S::Duration;
         type Order = Set<members::order>;
+        type Duration = S::Duration;
+        type Distance = S::Distance;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDuration<S> {}
+    impl<S: State> State for SetDuration<S> {
+        type Order = S::Order;
+        type Duration = Set<members::duration>;
         type Distance = S::Distance;
     }
     ///State transition - sets the `distance` field to Set
     pub struct SetDistance<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDistance<S> {}
     impl<S: State> State for SetDistance<S> {
-        type Duration = S::Duration;
         type Order = S::Order;
+        type Duration = S::Duration;
         type Distance = Set<members::distance>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `duration` field
-        pub struct duration(());
         ///Marker type for the `order` field
         pub struct order(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
         ///Marker type for the `distance` field
         pub struct distance(());
     }
@@ -369,9 +373,9 @@ pub mod split_state {
 
 /// Builder for constructing an instance of this type
 pub struct SplitBuilder<'a, S: split_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Split<'a> {
@@ -385,9 +389,9 @@ impl<'a> SplitBuilder<'a, split_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SplitBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -402,11 +406,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SplitBuilder<'a, split_state::SetDistance<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SplitBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -421,11 +425,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SplitBuilder<'a, split_state::SetDuration<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SplitBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -440,11 +444,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SplitBuilder<'a, split_state::SetOrder<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SplitBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -452,16 +456,16 @@ where
 impl<'a, S> SplitBuilder<'a, S>
 where
     S: split_state::State,
-    S::Duration: split_state::IsSet,
     S::Order: split_state::IsSet,
+    S::Duration: split_state::IsSet,
     S::Distance: split_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Split<'a> {
         Split {
-            distance: self.__unsafe_private_named.0.unwrap(),
-            duration: self.__unsafe_private_named.1.unwrap(),
-            order: self.__unsafe_private_named.2.unwrap(),
+            distance: self._fields.0.unwrap(),
+            duration: self._fields.1.unwrap(),
+            order: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -474,9 +478,9 @@ where
         >,
     ) -> Split<'a> {
         Split {
-            distance: self.__unsafe_private_named.0.unwrap(),
-            duration: self.__unsafe_private_named.1.unwrap(),
-            order: self.__unsafe_private_named.2.unwrap(),
+            distance: self._fields.0.unwrap(),
+            duration: self._fields.1.unwrap(),
+            order: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -320,14 +323,14 @@ pub mod last_commit_state {
 
 /// Builder for constructing an instance of this type
 pub struct LastCommitBuilder<'a, S: last_commit_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<blob::Signature<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LastCommit<'a> {
@@ -341,9 +344,9 @@ impl<'a> LastCommitBuilder<'a, last_commit_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LastCommitBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -351,12 +354,12 @@ impl<'a> LastCommitBuilder<'a, last_commit_state::Empty> {
 impl<'a, S: last_commit_state::State> LastCommitBuilder<'a, S> {
     /// Set the `author` field (optional)
     pub fn author(mut self, value: impl Into<Option<blob::Signature<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
     pub fn maybe_author(mut self, value: Option<blob::Signature<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -371,11 +374,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LastCommitBuilder<'a, last_commit_state::SetHash<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LastCommitBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -390,11 +393,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LastCommitBuilder<'a, last_commit_state::SetMessage<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LastCommitBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -409,11 +412,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LastCommitBuilder<'a, last_commit_state::SetWhen<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         LastCommitBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -428,10 +431,10 @@ where
     /// Build the final struct
     pub fn build(self) -> LastCommit<'a> {
         LastCommit {
-            author: self.__unsafe_private_named.0,
-            hash: self.__unsafe_private_named.1.unwrap(),
-            message: self.__unsafe_private_named.2.unwrap(),
-            when: self.__unsafe_private_named.3.unwrap(),
+            author: self._fields.0,
+            hash: self._fields.1.unwrap(),
+            message: self._fields.2.unwrap(),
+            when: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -444,10 +447,10 @@ where
         >,
     ) -> LastCommit<'a> {
         LastCommit {
-            author: self.__unsafe_private_named.0,
-            hash: self.__unsafe_private_named.1.unwrap(),
-            message: self.__unsafe_private_named.2.unwrap(),
-            when: self.__unsafe_private_named.3.unwrap(),
+            author: self._fields.0,
+            hash: self._fields.1.unwrap(),
+            message: self._fields.2.unwrap(),
+            when: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -667,63 +670,58 @@ pub mod blob_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Repo;
-        type Path;
         type Ref;
+        type Path;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Repo = Unset;
-        type Path = Unset;
         type Ref = Unset;
+        type Path = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
         type Repo = Set<members::repo>;
+        type Ref = S::Ref;
         type Path = S::Path;
-        type Ref = S::Ref;
-    }
-    ///State transition - sets the `path` field to Set
-    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPath<S> {}
-    impl<S: State> State for SetPath<S> {
-        type Repo = S::Repo;
-        type Path = Set<members::path>;
-        type Ref = S::Ref;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRef<S> {}
     impl<S: State> State for SetRef<S> {
         type Repo = S::Repo;
-        type Path = S::Path;
         type Ref = Set<members::r#ref>;
+        type Path = S::Path;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPath<S> {}
+    impl<S: State> State for SetPath<S> {
+        type Repo = S::Repo;
+        type Ref = S::Ref;
+        type Path = Set<members::path>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `path` field
-        pub struct path(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `path` field
+        pub struct path(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BlobBuilder<'a, S: blob_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<CowStr<'a>>,
-        Option<bool>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<bool>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Blob<'a> {
@@ -737,9 +735,9 @@ impl<'a> BlobBuilder<'a, blob_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BlobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -754,11 +752,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BlobBuilder<'a, blob_state::SetPath<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BlobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -766,12 +764,12 @@ where
 impl<'a, S: blob_state::State> BlobBuilder<'a, S> {
     /// Set the `raw` field (optional)
     pub fn raw(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `raw` field to an Option value (optional)
     pub fn maybe_raw(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -786,11 +784,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BlobBuilder<'a, blob_state::SetRef<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         BlobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -805,11 +803,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BlobBuilder<'a, blob_state::SetRepo<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         BlobBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -818,16 +816,16 @@ impl<'a, S> BlobBuilder<'a, S>
 where
     S: blob_state::State,
     S::Repo: blob_state::IsSet,
-    S::Path: blob_state::IsSet,
     S::Ref: blob_state::IsSet,
+    S::Path: blob_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Blob<'a> {
         Blob {
-            path: self.__unsafe_private_named.0.unwrap(),
-            raw: self.__unsafe_private_named.1,
-            r#ref: self.__unsafe_private_named.2.unwrap(),
-            repo: self.__unsafe_private_named.3.unwrap(),
+            path: self._fields.0.unwrap(),
+            raw: self._fields.1,
+            r#ref: self._fields.2.unwrap(),
+            repo: self._fields.3.unwrap(),
         }
     }
 }
@@ -842,59 +840,59 @@ pub mod signature_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type When;
         type Email;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type When = Unset;
         type Email = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type When = S::When;
-        type Email = S::Email;
+        type Name = Unset;
     }
     ///State transition - sets the `when` field to Set
     pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWhen<S> {}
     impl<S: State> State for SetWhen<S> {
-        type Name = S::Name;
         type When = Set<members::when>;
         type Email = S::Email;
+        type Name = S::Name;
     }
     ///State transition - sets the `email` field to Set
     pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEmail<S> {}
     impl<S: State> State for SetEmail<S> {
-        type Name = S::Name;
         type When = S::When;
         type Email = Set<members::email>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type When = S::When;
+        type Email = S::Email;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `when` field
         pub struct when(());
         ///Marker type for the `email` field
         pub struct email(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SignatureBuilder<'a, S: signature_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Signature<'a> {
@@ -908,9 +906,9 @@ impl<'a> SignatureBuilder<'a, signature_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SignatureBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -925,11 +923,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SignatureBuilder<'a, signature_state::SetEmail<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SignatureBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -944,11 +942,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SignatureBuilder<'a, signature_state::SetName<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SignatureBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -963,11 +961,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SignatureBuilder<'a, signature_state::SetWhen<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SignatureBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -975,16 +973,16 @@ where
 impl<'a, S> SignatureBuilder<'a, S>
 where
     S: signature_state::State,
-    S::Name: signature_state::IsSet,
     S::When: signature_state::IsSet,
     S::Email: signature_state::IsSet,
+    S::Name: signature_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Signature<'a> {
         Signature {
-            email: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1.unwrap(),
-            when: self.__unsafe_private_named.2.unwrap(),
+            email: self._fields.0.unwrap(),
+            name: self._fields.1.unwrap(),
+            when: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -997,9 +995,9 @@ where
         >,
     ) -> Signature<'a> {
         Signature {
-            email: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1.unwrap(),
-            when: self.__unsafe_private_named.2.unwrap(),
+            email: self._fields.0.unwrap(),
+            name: self._fields.1.unwrap(),
+            when: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

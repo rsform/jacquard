@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -158,14 +161,14 @@ pub mod link_attrs_state {
 
 /// Builder for constructing an instance of this type
 pub struct LinkAttrsBuilder<'a, S: link_attrs_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<UriValue<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LinkAttrs<'a> {
@@ -179,9 +182,9 @@ impl<'a> LinkAttrsBuilder<'a, link_attrs_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LinkAttrsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -196,11 +199,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> LinkAttrsBuilder<'a, link_attrs_state::SetHref<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LinkAttrsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -208,12 +211,12 @@ where
 impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
     /// Set the `rel` field (optional)
     pub fn rel(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `rel` field to an Option value (optional)
     pub fn maybe_rel(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -221,12 +224,12 @@ impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
 impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
     /// Set the `target` field (optional)
     pub fn target(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `target` field to an Option value (optional)
     pub fn maybe_target(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -234,12 +237,12 @@ impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
 impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -252,10 +255,10 @@ where
     /// Build the final struct
     pub fn build(self) -> LinkAttrs<'a> {
         LinkAttrs {
-            href: self.__unsafe_private_named.0.unwrap(),
-            rel: self.__unsafe_private_named.1,
-            target: self.__unsafe_private_named.2,
-            title: self.__unsafe_private_named.3,
+            href: self._fields.0.unwrap(),
+            rel: self._fields.1,
+            target: self._fields.2,
+            title: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -268,10 +271,10 @@ where
         >,
     ) -> LinkAttrs<'a> {
         LinkAttrs {
-            href: self.__unsafe_private_named.0.unwrap(),
-            rel: self.__unsafe_private_named.1,
-            target: self.__unsafe_private_named.2,
-            title: self.__unsafe_private_named.3,
+            href: self._fields.0.unwrap(),
+            rel: self._fields.1,
+            target: self._fields.2,
+            title: self._fields.3,
             extra_data: Some(extra_data),
         }
     }
@@ -406,9 +409,9 @@ pub mod link_state {
 
 /// Builder for constructing an instance of this type
 pub struct LinkBuilder<'a, S: link_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<link::LinkAttrs<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<link::LinkAttrs<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Link<'a> {
@@ -422,9 +425,9 @@ impl<'a> LinkBuilder<'a, link_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LinkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -439,11 +442,11 @@ where
         mut self,
         value: impl Into<link::LinkAttrs<'a>>,
     ) -> LinkBuilder<'a, link_state::SetAttrs<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LinkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -456,7 +459,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Link<'a> {
         Link {
-            attrs: self.__unsafe_private_named.0.unwrap(),
+            attrs: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -469,7 +472,7 @@ where
         >,
     ) -> Link<'a> {
         Link {
-            attrs: self.__unsafe_private_named.0.unwrap(),
+            attrs: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

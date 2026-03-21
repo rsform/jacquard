@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_derive::IntoStatic;
@@ -56,58 +57,58 @@ pub mod at_proto_callback_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type State;
-        type Iss;
         type Code;
+        type Iss;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type State = Unset;
-        type Iss = Unset;
         type Code = Unset;
+        type Iss = Unset;
     }
     ///State transition - sets the `state` field to Set
     pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetState<S> {}
     impl<S: State> State for SetState<S> {
         type State = Set<members::state>;
+        type Code = S::Code;
         type Iss = S::Iss;
-        type Code = S::Code;
-    }
-    ///State transition - sets the `iss` field to Set
-    pub struct SetIss<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIss<S> {}
-    impl<S: State> State for SetIss<S> {
-        type State = S::State;
-        type Iss = Set<members::iss>;
-        type Code = S::Code;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCode<S> {}
     impl<S: State> State for SetCode<S> {
         type State = S::State;
-        type Iss = S::Iss;
         type Code = Set<members::code>;
+        type Iss = S::Iss;
+    }
+    ///State transition - sets the `iss` field to Set
+    pub struct SetIss<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIss<S> {}
+    impl<S: State> State for SetIss<S> {
+        type State = S::State;
+        type Code = S::Code;
+        type Iss = Set<members::iss>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `state` field
         pub struct state(());
-        ///Marker type for the `iss` field
-        pub struct iss(());
         ///Marker type for the `code` field
         pub struct code(());
+        ///Marker type for the `iss` field
+        pub struct iss(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AtProtoCallbackBuilder<'a, S: at_proto_callback_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> AtProtoCallback<'a> {
@@ -121,9 +122,9 @@ impl<'a> AtProtoCallbackBuilder<'a, at_proto_callback_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AtProtoCallbackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -138,11 +139,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AtProtoCallbackBuilder<'a, at_proto_callback_state::SetCode<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AtProtoCallbackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -157,11 +158,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AtProtoCallbackBuilder<'a, at_proto_callback_state::SetIss<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AtProtoCallbackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -176,11 +177,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AtProtoCallbackBuilder<'a, at_proto_callback_state::SetState<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         AtProtoCallbackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -189,15 +190,15 @@ impl<'a, S> AtProtoCallbackBuilder<'a, S>
 where
     S: at_proto_callback_state::State,
     S::State: at_proto_callback_state::IsSet,
-    S::Iss: at_proto_callback_state::IsSet,
     S::Code: at_proto_callback_state::IsSet,
+    S::Iss: at_proto_callback_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AtProtoCallback<'a> {
         AtProtoCallback {
-            code: self.__unsafe_private_named.0.unwrap(),
-            iss: self.__unsafe_private_named.1.unwrap(),
-            state: self.__unsafe_private_named.2.unwrap(),
+            code: self._fields.0.unwrap(),
+            iss: self._fields.1.unwrap(),
+            state: self._fields.2.unwrap(),
         }
     }
 }

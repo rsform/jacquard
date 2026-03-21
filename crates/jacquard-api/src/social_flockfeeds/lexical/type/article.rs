@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -5641,8 +5644,8 @@ pub mod article_state {
 
 /// Builder for constructing an instance of this type
 pub struct ArticleBuilder<'a, S: article_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ArticleAbout<'a>>,
         Option<ArticleAbstract<'a>>,
         Option<ArticleAccessMode<'a>>,
@@ -5778,7 +5781,7 @@ pub struct ArticleBuilder<'a, S: article_state::State> {
         Option<ArticleWorkExample<'a>>,
         Option<ArticleWorkTranslation<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Article<'a> {
@@ -5792,8 +5795,8 @@ impl<'a> ArticleBuilder<'a, article_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ArticleBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -5929,7 +5932,7 @@ impl<'a> ArticleBuilder<'a, article_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -5937,12 +5940,12 @@ impl<'a> ArticleBuilder<'a, article_state::Empty> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `about` field (optional)
     pub fn about(mut self, value: impl Into<Option<ArticleAbout<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `about` field to an Option value (optional)
     pub fn maybe_about(mut self, value: Option<ArticleAbout<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -5950,12 +5953,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `abstract` field (optional)
     pub fn r#abstract(mut self, value: impl Into<Option<ArticleAbstract<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `abstract` field to an Option value (optional)
     pub fn maybe_abstract(mut self, value: Option<ArticleAbstract<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -5966,12 +5969,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleAccessMode<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `accessMode` field to an Option value (optional)
     pub fn maybe_access_mode(mut self, value: Option<ArticleAccessMode<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -5982,7 +5985,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleAccessModeSufficient<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `accessModeSufficient` field to an Option value (optional)
@@ -5990,7 +5993,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleAccessModeSufficient<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -6001,7 +6004,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleAccessibilityApi<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `accessibilityAPI` field to an Option value (optional)
@@ -6009,7 +6012,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleAccessibilityApi<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -6020,7 +6023,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleAccessibilityControl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `accessibilityControl` field to an Option value (optional)
@@ -6028,7 +6031,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleAccessibilityControl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -6039,7 +6042,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleAccessibilityFeature<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `accessibilityFeature` field to an Option value (optional)
@@ -6047,7 +6050,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleAccessibilityFeature<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -6058,7 +6061,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleAccessibilityHazard<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `accessibilityHazard` field to an Option value (optional)
@@ -6066,7 +6069,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleAccessibilityHazard<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -6077,7 +6080,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleAccessibilitySummary<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `accessibilitySummary` field to an Option value (optional)
@@ -6085,7 +6088,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleAccessibilitySummary<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -6096,7 +6099,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleAccountablePerson<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `accountablePerson` field to an Option value (optional)
@@ -6104,7 +6107,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleAccountablePerson<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -6115,7 +6118,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleAcquireLicensePage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `acquireLicensePage` field to an Option value (optional)
@@ -6123,7 +6126,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleAcquireLicensePage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -6134,7 +6137,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleAdditionalType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
@@ -6142,7 +6145,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleAdditionalType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -6153,7 +6156,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleAggregateRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
@@ -6161,7 +6164,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleAggregateRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -6172,7 +6175,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleAlternateName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
@@ -6180,7 +6183,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleAlternateName<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -6191,7 +6194,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleAlternativeHeadline<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `alternativeHeadline` field to an Option value (optional)
@@ -6199,7 +6202,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleAlternativeHeadline<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -6210,12 +6213,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleArchivedAt<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `archivedAt` field to an Option value (optional)
     pub fn maybe_archived_at(mut self, value: Option<ArticleArchivedAt<'a>>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -6226,12 +6229,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleArticleBody<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `articleBody` field to an Option value (optional)
     pub fn maybe_article_body(mut self, value: Option<ArticleArticleBody<'a>>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -6242,7 +6245,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleArticleSection<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `articleSection` field to an Option value (optional)
@@ -6250,7 +6253,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleArticleSection<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -6258,12 +6261,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `assesses` field (optional)
     pub fn assesses(mut self, value: impl Into<Option<ArticleAssesses<'a>>>) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `assesses` field to an Option value (optional)
     pub fn maybe_assesses(mut self, value: Option<ArticleAssesses<'a>>) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -6274,7 +6277,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleAssociatedMedia<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `associatedMedia` field to an Option value (optional)
@@ -6282,7 +6285,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleAssociatedMedia<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -6290,12 +6293,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `audience` field (optional)
     pub fn audience(mut self, value: impl Into<Option<ArticleAudience<'a>>>) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `audience` field to an Option value (optional)
     pub fn maybe_audience(mut self, value: Option<ArticleAudience<'a>>) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -6303,12 +6306,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `audio` field (optional)
     pub fn audio(mut self, value: impl Into<Option<ArticleAudio<'a>>>) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `audio` field to an Option value (optional)
     pub fn maybe_audio(mut self, value: Option<ArticleAudio<'a>>) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -6316,12 +6319,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `author` field (optional)
     pub fn author(mut self, value: impl Into<Option<ArticleAuthor<'a>>>) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
     pub fn maybe_author(mut self, value: Option<ArticleAuthor<'a>>) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -6329,12 +6332,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<ArticleAward<'a>>>) -> Self {
-        self.__unsafe_private_named.23 = value.into();
+        self._fields.23 = value.into();
         self
     }
     /// Set the `award` field to an Option value (optional)
     pub fn maybe_award(mut self, value: Option<ArticleAward<'a>>) -> Self {
-        self.__unsafe_private_named.23 = value;
+        self._fields.23 = value;
         self
     }
 }
@@ -6342,12 +6345,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<ArticleAwards<'a>>>) -> Self {
-        self.__unsafe_private_named.24 = value.into();
+        self._fields.24 = value.into();
         self
     }
     /// Set the `awards` field to an Option value (optional)
     pub fn maybe_awards(mut self, value: Option<ArticleAwards<'a>>) -> Self {
-        self.__unsafe_private_named.24 = value;
+        self._fields.24 = value;
         self
     }
 }
@@ -6355,12 +6358,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `backstory` field (optional)
     pub fn backstory(mut self, value: impl Into<Option<ArticleBackstory<'a>>>) -> Self {
-        self.__unsafe_private_named.25 = value.into();
+        self._fields.25 = value.into();
         self
     }
     /// Set the `backstory` field to an Option value (optional)
     pub fn maybe_backstory(mut self, value: Option<ArticleBackstory<'a>>) -> Self {
-        self.__unsafe_private_named.25 = value;
+        self._fields.25 = value;
         self
     }
 }
@@ -6368,12 +6371,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `character` field (optional)
     pub fn character(mut self, value: impl Into<Option<ArticleCharacter<'a>>>) -> Self {
-        self.__unsafe_private_named.26 = value.into();
+        self._fields.26 = value.into();
         self
     }
     /// Set the `character` field to an Option value (optional)
     pub fn maybe_character(mut self, value: Option<ArticleCharacter<'a>>) -> Self {
-        self.__unsafe_private_named.26 = value;
+        self._fields.26 = value;
         self
     }
 }
@@ -6381,12 +6384,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `citation` field (optional)
     pub fn citation(mut self, value: impl Into<Option<ArticleCitation<'a>>>) -> Self {
-        self.__unsafe_private_named.27 = value.into();
+        self._fields.27 = value.into();
         self
     }
     /// Set the `citation` field to an Option value (optional)
     pub fn maybe_citation(mut self, value: Option<ArticleCitation<'a>>) -> Self {
-        self.__unsafe_private_named.27 = value;
+        self._fields.27 = value;
         self
     }
 }
@@ -6394,12 +6397,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<ArticleComment<'a>>>) -> Self {
-        self.__unsafe_private_named.28 = value.into();
+        self._fields.28 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
     pub fn maybe_comment(mut self, value: Option<ArticleComment<'a>>) -> Self {
-        self.__unsafe_private_named.28 = value;
+        self._fields.28 = value;
         self
     }
 }
@@ -6410,7 +6413,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleCommentCount<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.29 = value.into();
+        self._fields.29 = value.into();
         self
     }
     /// Set the `commentCount` field to an Option value (optional)
@@ -6418,7 +6421,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleCommentCount<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.29 = value;
+        self._fields.29 = value;
         self
     }
 }
@@ -6429,7 +6432,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleConditionsOfAccess<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.30 = value.into();
+        self._fields.30 = value.into();
         self
     }
     /// Set the `conditionsOfAccess` field to an Option value (optional)
@@ -6437,7 +6440,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleConditionsOfAccess<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.30 = value;
+        self._fields.30 = value;
         self
     }
 }
@@ -6448,7 +6451,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleContentLocation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value.into();
+        self._fields.31 = value.into();
         self
     }
     /// Set the `contentLocation` field to an Option value (optional)
@@ -6456,7 +6459,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleContentLocation<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.31 = value;
+        self._fields.31 = value;
         self
     }
 }
@@ -6467,7 +6470,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleContentRating<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value.into();
+        self._fields.32 = value.into();
         self
     }
     /// Set the `contentRating` field to an Option value (optional)
@@ -6475,7 +6478,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleContentRating<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.32 = value;
+        self._fields.32 = value;
         self
     }
 }
@@ -6486,7 +6489,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleContentReferenceTime<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value.into();
+        self._fields.33 = value.into();
         self
     }
     /// Set the `contentReferenceTime` field to an Option value (optional)
@@ -6494,7 +6497,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleContentReferenceTime<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.33 = value;
+        self._fields.33 = value;
         self
     }
 }
@@ -6505,12 +6508,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleContributor<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.34 = value.into();
+        self._fields.34 = value.into();
         self
     }
     /// Set the `contributor` field to an Option value (optional)
     pub fn maybe_contributor(mut self, value: Option<ArticleContributor<'a>>) -> Self {
-        self.__unsafe_private_named.34 = value;
+        self._fields.34 = value;
         self
     }
 }
@@ -6521,7 +6524,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleCopyrightHolder<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value.into();
+        self._fields.35 = value.into();
         self
     }
     /// Set the `copyrightHolder` field to an Option value (optional)
@@ -6529,7 +6532,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleCopyrightHolder<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.35 = value;
+        self._fields.35 = value;
         self
     }
 }
@@ -6540,7 +6543,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleCopyrightNotice<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value.into();
+        self._fields.36 = value.into();
         self
     }
     /// Set the `copyrightNotice` field to an Option value (optional)
@@ -6548,7 +6551,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleCopyrightNotice<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.36 = value;
+        self._fields.36 = value;
         self
     }
 }
@@ -6559,7 +6562,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleCopyrightYear<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.37 = value.into();
+        self._fields.37 = value.into();
         self
     }
     /// Set the `copyrightYear` field to an Option value (optional)
@@ -6567,7 +6570,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleCopyrightYear<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.37 = value;
+        self._fields.37 = value;
         self
     }
 }
@@ -6578,12 +6581,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleCorrection<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.38 = value.into();
+        self._fields.38 = value.into();
         self
     }
     /// Set the `correction` field to an Option value (optional)
     pub fn maybe_correction(mut self, value: Option<ArticleCorrection<'a>>) -> Self {
-        self.__unsafe_private_named.38 = value;
+        self._fields.38 = value;
         self
     }
 }
@@ -6594,7 +6597,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleCountryOfOrigin<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value.into();
+        self._fields.39 = value.into();
         self
     }
     /// Set the `countryOfOrigin` field to an Option value (optional)
@@ -6602,7 +6605,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleCountryOfOrigin<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.39 = value;
+        self._fields.39 = value;
         self
     }
 }
@@ -6613,7 +6616,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleCreativeWorkStatus<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.40 = value.into();
+        self._fields.40 = value.into();
         self
     }
     /// Set the `creativeWorkStatus` field to an Option value (optional)
@@ -6621,7 +6624,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleCreativeWorkStatus<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.40 = value;
+        self._fields.40 = value;
         self
     }
 }
@@ -6629,12 +6632,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `creator` field (optional)
     pub fn creator(mut self, value: impl Into<Option<ArticleCreator<'a>>>) -> Self {
-        self.__unsafe_private_named.41 = value.into();
+        self._fields.41 = value.into();
         self
     }
     /// Set the `creator` field to an Option value (optional)
     pub fn maybe_creator(mut self, value: Option<ArticleCreator<'a>>) -> Self {
-        self.__unsafe_private_named.41 = value;
+        self._fields.41 = value;
         self
     }
 }
@@ -6645,12 +6648,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleCreditText<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.42 = value.into();
+        self._fields.42 = value.into();
         self
     }
     /// Set the `creditText` field to an Option value (optional)
     pub fn maybe_credit_text(mut self, value: Option<ArticleCreditText<'a>>) -> Self {
-        self.__unsafe_private_named.42 = value;
+        self._fields.42 = value;
         self
     }
 }
@@ -6661,12 +6664,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleDateCreated<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.43 = value.into();
+        self._fields.43 = value.into();
         self
     }
     /// Set the `dateCreated` field to an Option value (optional)
     pub fn maybe_date_created(mut self, value: Option<ArticleDateCreated<'a>>) -> Self {
-        self.__unsafe_private_named.43 = value;
+        self._fields.43 = value;
         self
     }
 }
@@ -6677,7 +6680,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleDateModified<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.44 = value.into();
+        self._fields.44 = value.into();
         self
     }
     /// Set the `dateModified` field to an Option value (optional)
@@ -6685,7 +6688,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleDateModified<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.44 = value;
+        self._fields.44 = value;
         self
     }
 }
@@ -6696,7 +6699,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleDatePublished<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value.into();
+        self._fields.45 = value.into();
         self
     }
     /// Set the `datePublished` field to an Option value (optional)
@@ -6704,7 +6707,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleDatePublished<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.45 = value;
+        self._fields.45 = value;
         self
     }
 }
@@ -6715,12 +6718,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.46 = value.into();
+        self._fields.46 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<ArticleDescription<'a>>) -> Self {
-        self.__unsafe_private_named.46 = value;
+        self._fields.46 = value;
         self
     }
 }
@@ -6731,7 +6734,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleDigitalSourceType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.47 = value.into();
+        self._fields.47 = value.into();
         self
     }
     /// Set the `digitalSourceType` field to an Option value (optional)
@@ -6739,7 +6742,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleDigitalSourceType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.47 = value;
+        self._fields.47 = value;
         self
     }
 }
@@ -6750,7 +6753,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleDisambiguatingDescription<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value.into();
+        self._fields.48 = value.into();
         self
     }
     /// Set the `disambiguatingDescription` field to an Option value (optional)
@@ -6758,7 +6761,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleDisambiguatingDescription<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.48 = value;
+        self._fields.48 = value;
         self
     }
 }
@@ -6769,7 +6772,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleDiscussionUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.49 = value.into();
+        self._fields.49 = value.into();
         self
     }
     /// Set the `discussionUrl` field to an Option value (optional)
@@ -6777,7 +6780,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleDiscussionUrl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.49 = value;
+        self._fields.49 = value;
         self
     }
 }
@@ -6785,12 +6788,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `editEIDR` field (optional)
     pub fn edit_eidr(mut self, value: impl Into<Option<ArticleEditEidr<'a>>>) -> Self {
-        self.__unsafe_private_named.50 = value.into();
+        self._fields.50 = value.into();
         self
     }
     /// Set the `editEIDR` field to an Option value (optional)
     pub fn maybe_edit_eidr(mut self, value: Option<ArticleEditEidr<'a>>) -> Self {
-        self.__unsafe_private_named.50 = value;
+        self._fields.50 = value;
         self
     }
 }
@@ -6798,12 +6801,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `editor` field (optional)
     pub fn editor(mut self, value: impl Into<Option<ArticleEditor<'a>>>) -> Self {
-        self.__unsafe_private_named.51 = value.into();
+        self._fields.51 = value.into();
         self
     }
     /// Set the `editor` field to an Option value (optional)
     pub fn maybe_editor(mut self, value: Option<ArticleEditor<'a>>) -> Self {
-        self.__unsafe_private_named.51 = value;
+        self._fields.51 = value;
         self
     }
 }
@@ -6814,7 +6817,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleEducationalAlignment<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.52 = value.into();
+        self._fields.52 = value.into();
         self
     }
     /// Set the `educationalAlignment` field to an Option value (optional)
@@ -6822,7 +6825,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleEducationalAlignment<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.52 = value;
+        self._fields.52 = value;
         self
     }
 }
@@ -6833,7 +6836,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleEducationalLevel<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.53 = value.into();
+        self._fields.53 = value.into();
         self
     }
     /// Set the `educationalLevel` field to an Option value (optional)
@@ -6841,7 +6844,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleEducationalLevel<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.53 = value;
+        self._fields.53 = value;
         self
     }
 }
@@ -6852,7 +6855,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleEducationalUse<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.54 = value.into();
+        self._fields.54 = value.into();
         self
     }
     /// Set the `educationalUse` field to an Option value (optional)
@@ -6860,7 +6863,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleEducationalUse<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.54 = value;
+        self._fields.54 = value;
         self
     }
 }
@@ -6868,12 +6871,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `encoding` field (optional)
     pub fn encoding(mut self, value: impl Into<Option<ArticleEncoding<'a>>>) -> Self {
-        self.__unsafe_private_named.55 = value.into();
+        self._fields.55 = value.into();
         self
     }
     /// Set the `encoding` field to an Option value (optional)
     pub fn maybe_encoding(mut self, value: Option<ArticleEncoding<'a>>) -> Self {
-        self.__unsafe_private_named.55 = value;
+        self._fields.55 = value;
         self
     }
 }
@@ -6884,7 +6887,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleEncodingFormat<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value.into();
+        self._fields.56 = value.into();
         self
     }
     /// Set the `encodingFormat` field to an Option value (optional)
@@ -6892,7 +6895,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleEncodingFormat<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.56 = value;
+        self._fields.56 = value;
         self
     }
 }
@@ -6900,12 +6903,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `encodings` field (optional)
     pub fn encodings(mut self, value: impl Into<Option<ArticleEncodings<'a>>>) -> Self {
-        self.__unsafe_private_named.57 = value.into();
+        self._fields.57 = value.into();
         self
     }
     /// Set the `encodings` field to an Option value (optional)
     pub fn maybe_encodings(mut self, value: Option<ArticleEncodings<'a>>) -> Self {
-        self.__unsafe_private_named.57 = value;
+        self._fields.57 = value;
         self
     }
 }
@@ -6916,7 +6919,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleExampleOfWork<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.58 = value.into();
+        self._fields.58 = value.into();
         self
     }
     /// Set the `exampleOfWork` field to an Option value (optional)
@@ -6924,7 +6927,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleExampleOfWork<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.58 = value;
+        self._fields.58 = value;
         self
     }
 }
@@ -6932,12 +6935,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `expires` field (optional)
     pub fn expires(mut self, value: impl Into<Option<ArticleExpires<'a>>>) -> Self {
-        self.__unsafe_private_named.59 = value.into();
+        self._fields.59 = value.into();
         self
     }
     /// Set the `expires` field to an Option value (optional)
     pub fn maybe_expires(mut self, value: Option<ArticleExpires<'a>>) -> Self {
-        self.__unsafe_private_named.59 = value;
+        self._fields.59 = value;
         self
     }
 }
@@ -6948,12 +6951,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleFileFormat<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.60 = value.into();
+        self._fields.60 = value.into();
         self
     }
     /// Set the `fileFormat` field to an Option value (optional)
     pub fn maybe_file_format(mut self, value: Option<ArticleFileFormat<'a>>) -> Self {
-        self.__unsafe_private_named.60 = value;
+        self._fields.60 = value;
         self
     }
 }
@@ -6961,12 +6964,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `funder` field (optional)
     pub fn funder(mut self, value: impl Into<Option<ArticleFunder<'a>>>) -> Self {
-        self.__unsafe_private_named.61 = value.into();
+        self._fields.61 = value.into();
         self
     }
     /// Set the `funder` field to an Option value (optional)
     pub fn maybe_funder(mut self, value: Option<ArticleFunder<'a>>) -> Self {
-        self.__unsafe_private_named.61 = value;
+        self._fields.61 = value;
         self
     }
 }
@@ -6974,12 +6977,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<ArticleFunding<'a>>>) -> Self {
-        self.__unsafe_private_named.62 = value.into();
+        self._fields.62 = value.into();
         self
     }
     /// Set the `funding` field to an Option value (optional)
     pub fn maybe_funding(mut self, value: Option<ArticleFunding<'a>>) -> Self {
-        self.__unsafe_private_named.62 = value;
+        self._fields.62 = value;
         self
     }
 }
@@ -6987,12 +6990,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<ArticleGenre<'a>>>) -> Self {
-        self.__unsafe_private_named.63 = value.into();
+        self._fields.63 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
     pub fn maybe_genre(mut self, value: Option<ArticleGenre<'a>>) -> Self {
-        self.__unsafe_private_named.63 = value;
+        self._fields.63 = value;
         self
     }
 }
@@ -7000,12 +7003,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `hasPart` field (optional)
     pub fn has_part(mut self, value: impl Into<Option<ArticleHasPart<'a>>>) -> Self {
-        self.__unsafe_private_named.64 = value.into();
+        self._fields.64 = value.into();
         self
     }
     /// Set the `hasPart` field to an Option value (optional)
     pub fn maybe_has_part(mut self, value: Option<ArticleHasPart<'a>>) -> Self {
-        self.__unsafe_private_named.64 = value;
+        self._fields.64 = value;
         self
     }
 }
@@ -7013,12 +7016,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `headline` field (optional)
     pub fn headline(mut self, value: impl Into<Option<ArticleHeadline<'a>>>) -> Self {
-        self.__unsafe_private_named.65 = value.into();
+        self._fields.65 = value.into();
         self
     }
     /// Set the `headline` field to an Option value (optional)
     pub fn maybe_headline(mut self, value: Option<ArticleHeadline<'a>>) -> Self {
-        self.__unsafe_private_named.65 = value;
+        self._fields.65 = value;
         self
     }
 }
@@ -7029,12 +7032,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleIdentifier<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.66 = value.into();
+        self._fields.66 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
     pub fn maybe_identifier(mut self, value: Option<ArticleIdentifier<'a>>) -> Self {
-        self.__unsafe_private_named.66 = value;
+        self._fields.66 = value;
         self
     }
 }
@@ -7042,12 +7045,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<ArticleImage<'a>>>) -> Self {
-        self.__unsafe_private_named.67 = value.into();
+        self._fields.67 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<ArticleImage<'a>>) -> Self {
-        self.__unsafe_private_named.67 = value;
+        self._fields.67 = value;
         self
     }
 }
@@ -7058,12 +7061,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleInLanguage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.68 = value.into();
+        self._fields.68 = value.into();
         self
     }
     /// Set the `inLanguage` field to an Option value (optional)
     pub fn maybe_in_language(mut self, value: Option<ArticleInLanguage<'a>>) -> Self {
-        self.__unsafe_private_named.68 = value;
+        self._fields.68 = value;
         self
     }
 }
@@ -7074,7 +7077,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleInteractionStatistic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.69 = value.into();
+        self._fields.69 = value.into();
         self
     }
     /// Set the `interactionStatistic` field to an Option value (optional)
@@ -7082,7 +7085,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleInteractionStatistic<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.69 = value;
+        self._fields.69 = value;
         self
     }
 }
@@ -7093,7 +7096,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleInteractivityType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.70 = value.into();
+        self._fields.70 = value.into();
         self
     }
     /// Set the `interactivityType` field to an Option value (optional)
@@ -7101,7 +7104,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleInteractivityType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.70 = value;
+        self._fields.70 = value;
         self
     }
 }
@@ -7112,7 +7115,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleInterpretedAsClaim<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.71 = value.into();
+        self._fields.71 = value.into();
         self
     }
     /// Set the `interpretedAsClaim` field to an Option value (optional)
@@ -7120,7 +7123,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleInterpretedAsClaim<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.71 = value;
+        self._fields.71 = value;
         self
     }
 }
@@ -7131,7 +7134,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleIsAccessibleForFree<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.72 = value.into();
+        self._fields.72 = value.into();
         self
     }
     /// Set the `isAccessibleForFree` field to an Option value (optional)
@@ -7139,7 +7142,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleIsAccessibleForFree<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.72 = value;
+        self._fields.72 = value;
         self
     }
 }
@@ -7150,12 +7153,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleIsBasedOn<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.73 = value.into();
+        self._fields.73 = value.into();
         self
     }
     /// Set the `isBasedOn` field to an Option value (optional)
     pub fn maybe_is_based_on(mut self, value: Option<ArticleIsBasedOn<'a>>) -> Self {
-        self.__unsafe_private_named.73 = value;
+        self._fields.73 = value;
         self
     }
 }
@@ -7166,7 +7169,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleIsBasedOnUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.74 = value.into();
+        self._fields.74 = value.into();
         self
     }
     /// Set the `isBasedOnUrl` field to an Option value (optional)
@@ -7174,7 +7177,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleIsBasedOnUrl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.74 = value;
+        self._fields.74 = value;
         self
     }
 }
@@ -7185,7 +7188,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleIsFamilyFriendly<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.75 = value.into();
+        self._fields.75 = value.into();
         self
     }
     /// Set the `isFamilyFriendly` field to an Option value (optional)
@@ -7193,7 +7196,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleIsFamilyFriendly<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.75 = value;
+        self._fields.75 = value;
         self
     }
 }
@@ -7201,12 +7204,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `isPartOf` field (optional)
     pub fn is_part_of(mut self, value: impl Into<Option<ArticleIsPartOf<'a>>>) -> Self {
-        self.__unsafe_private_named.76 = value.into();
+        self._fields.76 = value.into();
         self
     }
     /// Set the `isPartOf` field to an Option value (optional)
     pub fn maybe_is_part_of(mut self, value: Option<ArticleIsPartOf<'a>>) -> Self {
-        self.__unsafe_private_named.76 = value;
+        self._fields.76 = value;
         self
     }
 }
@@ -7214,12 +7217,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<ArticleKeywords<'a>>>) -> Self {
-        self.__unsafe_private_named.77 = value.into();
+        self._fields.77 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
     pub fn maybe_keywords(mut self, value: Option<ArticleKeywords<'a>>) -> Self {
-        self.__unsafe_private_named.77 = value;
+        self._fields.77 = value;
         self
     }
 }
@@ -7230,7 +7233,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleLearningResourceType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.78 = value.into();
+        self._fields.78 = value.into();
         self
     }
     /// Set the `learningResourceType` field to an Option value (optional)
@@ -7238,7 +7241,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleLearningResourceType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.78 = value;
+        self._fields.78 = value;
         self
     }
 }
@@ -7246,12 +7249,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `license` field (optional)
     pub fn license(mut self, value: impl Into<Option<ArticleLicense<'a>>>) -> Self {
-        self.__unsafe_private_named.79 = value.into();
+        self._fields.79 = value.into();
         self
     }
     /// Set the `license` field to an Option value (optional)
     pub fn maybe_license(mut self, value: Option<ArticleLicense<'a>>) -> Self {
-        self.__unsafe_private_named.79 = value;
+        self._fields.79 = value;
         self
     }
 }
@@ -7262,7 +7265,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleLocationCreated<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.80 = value.into();
+        self._fields.80 = value.into();
         self
     }
     /// Set the `locationCreated` field to an Option value (optional)
@@ -7270,7 +7273,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleLocationCreated<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.80 = value;
+        self._fields.80 = value;
         self
     }
 }
@@ -7281,12 +7284,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleMainEntity<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.81 = value.into();
+        self._fields.81 = value.into();
         self
     }
     /// Set the `mainEntity` field to an Option value (optional)
     pub fn maybe_main_entity(mut self, value: Option<ArticleMainEntity<'a>>) -> Self {
-        self.__unsafe_private_named.81 = value;
+        self._fields.81 = value;
         self
     }
 }
@@ -7297,7 +7300,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleMainEntityOfPage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.82 = value.into();
+        self._fields.82 = value.into();
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
@@ -7305,7 +7308,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleMainEntityOfPage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.82 = value;
+        self._fields.82 = value;
         self
     }
 }
@@ -7316,12 +7319,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleMaintainer<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.83 = value.into();
+        self._fields.83 = value.into();
         self
     }
     /// Set the `maintainer` field to an Option value (optional)
     pub fn maybe_maintainer(mut self, value: Option<ArticleMaintainer<'a>>) -> Self {
-        self.__unsafe_private_named.83 = value;
+        self._fields.83 = value;
         self
     }
 }
@@ -7329,12 +7332,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `material` field (optional)
     pub fn material(mut self, value: impl Into<Option<ArticleMaterial<'a>>>) -> Self {
-        self.__unsafe_private_named.84 = value.into();
+        self._fields.84 = value.into();
         self
     }
     /// Set the `material` field to an Option value (optional)
     pub fn maybe_material(mut self, value: Option<ArticleMaterial<'a>>) -> Self {
-        self.__unsafe_private_named.84 = value;
+        self._fields.84 = value;
         self
     }
 }
@@ -7345,7 +7348,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleMaterialExtent<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.85 = value.into();
+        self._fields.85 = value.into();
         self
     }
     /// Set the `materialExtent` field to an Option value (optional)
@@ -7353,7 +7356,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleMaterialExtent<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.85 = value;
+        self._fields.85 = value;
         self
     }
 }
@@ -7361,12 +7364,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `mentions` field (optional)
     pub fn mentions(mut self, value: impl Into<Option<ArticleMentions<'a>>>) -> Self {
-        self.__unsafe_private_named.86 = value.into();
+        self._fields.86 = value.into();
         self
     }
     /// Set the `mentions` field to an Option value (optional)
     pub fn maybe_mentions(mut self, value: Option<ArticleMentions<'a>>) -> Self {
-        self.__unsafe_private_named.86 = value;
+        self._fields.86 = value;
         self
     }
 }
@@ -7374,12 +7377,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<ArticleName<'a>>>) -> Self {
-        self.__unsafe_private_named.87 = value.into();
+        self._fields.87 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<ArticleName<'a>>) -> Self {
-        self.__unsafe_private_named.87 = value;
+        self._fields.87 = value;
         self
     }
 }
@@ -7387,12 +7390,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `offers` field (optional)
     pub fn offers(mut self, value: impl Into<Option<ArticleOffers<'a>>>) -> Self {
-        self.__unsafe_private_named.88 = value.into();
+        self._fields.88 = value.into();
         self
     }
     /// Set the `offers` field to an Option value (optional)
     pub fn maybe_offers(mut self, value: Option<ArticleOffers<'a>>) -> Self {
-        self.__unsafe_private_named.88 = value;
+        self._fields.88 = value;
         self
     }
 }
@@ -7400,12 +7403,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `pageEnd` field (optional)
     pub fn page_end(mut self, value: impl Into<Option<ArticlePageEnd<'a>>>) -> Self {
-        self.__unsafe_private_named.89 = value.into();
+        self._fields.89 = value.into();
         self
     }
     /// Set the `pageEnd` field to an Option value (optional)
     pub fn maybe_page_end(mut self, value: Option<ArticlePageEnd<'a>>) -> Self {
-        self.__unsafe_private_named.89 = value;
+        self._fields.89 = value;
         self
     }
 }
@@ -7413,12 +7416,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `pageStart` field (optional)
     pub fn page_start(mut self, value: impl Into<Option<ArticlePageStart<'a>>>) -> Self {
-        self.__unsafe_private_named.90 = value.into();
+        self._fields.90 = value.into();
         self
     }
     /// Set the `pageStart` field to an Option value (optional)
     pub fn maybe_page_start(mut self, value: Option<ArticlePageStart<'a>>) -> Self {
-        self.__unsafe_private_named.90 = value;
+        self._fields.90 = value;
         self
     }
 }
@@ -7429,12 +7432,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticlePagination<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.91 = value.into();
+        self._fields.91 = value.into();
         self
     }
     /// Set the `pagination` field to an Option value (optional)
     pub fn maybe_pagination(mut self, value: Option<ArticlePagination<'a>>) -> Self {
-        self.__unsafe_private_named.91 = value;
+        self._fields.91 = value;
         self
     }
 }
@@ -7442,12 +7445,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `pattern` field (optional)
     pub fn pattern(mut self, value: impl Into<Option<ArticlePattern<'a>>>) -> Self {
-        self.__unsafe_private_named.92 = value.into();
+        self._fields.92 = value.into();
         self
     }
     /// Set the `pattern` field to an Option value (optional)
     pub fn maybe_pattern(mut self, value: Option<ArticlePattern<'a>>) -> Self {
-        self.__unsafe_private_named.92 = value;
+        self._fields.92 = value;
         self
     }
 }
@@ -7455,12 +7458,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `position` field (optional)
     pub fn position(mut self, value: impl Into<Option<ArticlePosition<'a>>>) -> Self {
-        self.__unsafe_private_named.93 = value.into();
+        self._fields.93 = value.into();
         self
     }
     /// Set the `position` field to an Option value (optional)
     pub fn maybe_position(mut self, value: Option<ArticlePosition<'a>>) -> Self {
-        self.__unsafe_private_named.93 = value;
+        self._fields.93 = value;
         self
     }
 }
@@ -7471,7 +7474,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticlePotentialAction<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.94 = value.into();
+        self._fields.94 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
@@ -7479,7 +7482,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticlePotentialAction<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.94 = value;
+        self._fields.94 = value;
         self
     }
 }
@@ -7487,12 +7490,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `producer` field (optional)
     pub fn producer(mut self, value: impl Into<Option<ArticleProducer<'a>>>) -> Self {
-        self.__unsafe_private_named.95 = value.into();
+        self._fields.95 = value.into();
         self
     }
     /// Set the `producer` field to an Option value (optional)
     pub fn maybe_producer(mut self, value: Option<ArticleProducer<'a>>) -> Self {
-        self.__unsafe_private_named.95 = value;
+        self._fields.95 = value;
         self
     }
 }
@@ -7500,12 +7503,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `provider` field (optional)
     pub fn provider(mut self, value: impl Into<Option<ArticleProvider<'a>>>) -> Self {
-        self.__unsafe_private_named.96 = value.into();
+        self._fields.96 = value.into();
         self
     }
     /// Set the `provider` field to an Option value (optional)
     pub fn maybe_provider(mut self, value: Option<ArticleProvider<'a>>) -> Self {
-        self.__unsafe_private_named.96 = value;
+        self._fields.96 = value;
         self
     }
 }
@@ -7516,12 +7519,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticlePublication<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.97 = value.into();
+        self._fields.97 = value.into();
         self
     }
     /// Set the `publication` field to an Option value (optional)
     pub fn maybe_publication(mut self, value: Option<ArticlePublication<'a>>) -> Self {
-        self.__unsafe_private_named.97 = value;
+        self._fields.97 = value;
         self
     }
 }
@@ -7529,12 +7532,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `publisher` field (optional)
     pub fn publisher(mut self, value: impl Into<Option<ArticlePublisher<'a>>>) -> Self {
-        self.__unsafe_private_named.98 = value.into();
+        self._fields.98 = value.into();
         self
     }
     /// Set the `publisher` field to an Option value (optional)
     pub fn maybe_publisher(mut self, value: Option<ArticlePublisher<'a>>) -> Self {
-        self.__unsafe_private_named.98 = value;
+        self._fields.98 = value;
         self
     }
 }
@@ -7545,7 +7548,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticlePublisherImprint<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.99 = value.into();
+        self._fields.99 = value.into();
         self
     }
     /// Set the `publisherImprint` field to an Option value (optional)
@@ -7553,7 +7556,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticlePublisherImprint<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.99 = value;
+        self._fields.99 = value;
         self
     }
 }
@@ -7564,7 +7567,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticlePublishingPrinciples<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.100 = value.into();
+        self._fields.100 = value.into();
         self
     }
     /// Set the `publishingPrinciples` field to an Option value (optional)
@@ -7572,7 +7575,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticlePublishingPrinciples<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.100 = value;
+        self._fields.100 = value;
         self
     }
 }
@@ -7583,12 +7586,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleRecordedAt<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.101 = value.into();
+        self._fields.101 = value.into();
         self
     }
     /// Set the `recordedAt` field to an Option value (optional)
     pub fn maybe_recorded_at(mut self, value: Option<ArticleRecordedAt<'a>>) -> Self {
-        self.__unsafe_private_named.101 = value;
+        self._fields.101 = value;
         self
     }
 }
@@ -7599,7 +7602,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleReleasedEvent<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.102 = value.into();
+        self._fields.102 = value.into();
         self
     }
     /// Set the `releasedEvent` field to an Option value (optional)
@@ -7607,7 +7610,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleReleasedEvent<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.102 = value;
+        self._fields.102 = value;
         self
     }
 }
@@ -7615,12 +7618,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<ArticleReview<'a>>>) -> Self {
-        self.__unsafe_private_named.103 = value.into();
+        self._fields.103 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
     pub fn maybe_review(mut self, value: Option<ArticleReview<'a>>) -> Self {
-        self.__unsafe_private_named.103 = value;
+        self._fields.103 = value;
         self
     }
 }
@@ -7628,12 +7631,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `reviews` field (optional)
     pub fn reviews(mut self, value: impl Into<Option<ArticleReviews<'a>>>) -> Self {
-        self.__unsafe_private_named.104 = value.into();
+        self._fields.104 = value.into();
         self
     }
     /// Set the `reviews` field to an Option value (optional)
     pub fn maybe_reviews(mut self, value: Option<ArticleReviews<'a>>) -> Self {
-        self.__unsafe_private_named.104 = value;
+        self._fields.104 = value;
         self
     }
 }
@@ -7641,12 +7644,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<ArticleSameAs<'a>>>) -> Self {
-        self.__unsafe_private_named.105 = value.into();
+        self._fields.105 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
     pub fn maybe_same_as(mut self, value: Option<ArticleSameAs<'a>>) -> Self {
-        self.__unsafe_private_named.105 = value;
+        self._fields.105 = value;
         self
     }
 }
@@ -7657,7 +7660,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleSchemaVersion<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.106 = value.into();
+        self._fields.106 = value.into();
         self
     }
     /// Set the `schemaVersion` field to an Option value (optional)
@@ -7665,7 +7668,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleSchemaVersion<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.106 = value;
+        self._fields.106 = value;
         self
     }
 }
@@ -7676,7 +7679,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleSdDatePublished<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.107 = value.into();
+        self._fields.107 = value.into();
         self
     }
     /// Set the `sdDatePublished` field to an Option value (optional)
@@ -7684,7 +7687,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleSdDatePublished<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.107 = value;
+        self._fields.107 = value;
         self
     }
 }
@@ -7692,12 +7695,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `sdLicense` field (optional)
     pub fn sd_license(mut self, value: impl Into<Option<ArticleSdLicense<'a>>>) -> Self {
-        self.__unsafe_private_named.108 = value.into();
+        self._fields.108 = value.into();
         self
     }
     /// Set the `sdLicense` field to an Option value (optional)
     pub fn maybe_sd_license(mut self, value: Option<ArticleSdLicense<'a>>) -> Self {
-        self.__unsafe_private_named.108 = value;
+        self._fields.108 = value;
         self
     }
 }
@@ -7708,12 +7711,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleSdPublisher<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.109 = value.into();
+        self._fields.109 = value.into();
         self
     }
     /// Set the `sdPublisher` field to an Option value (optional)
     pub fn maybe_sd_publisher(mut self, value: Option<ArticleSdPublisher<'a>>) -> Self {
-        self.__unsafe_private_named.109 = value;
+        self._fields.109 = value;
         self
     }
 }
@@ -7721,12 +7724,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<ArticleSize<'a>>>) -> Self {
-        self.__unsafe_private_named.110 = value.into();
+        self._fields.110 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
     pub fn maybe_size(mut self, value: Option<ArticleSize<'a>>) -> Self {
-        self.__unsafe_private_named.110 = value;
+        self._fields.110 = value;
         self
     }
 }
@@ -7737,7 +7740,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleSourceOrganization<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.111 = value.into();
+        self._fields.111 = value.into();
         self
     }
     /// Set the `sourceOrganization` field to an Option value (optional)
@@ -7745,7 +7748,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleSourceOrganization<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.111 = value;
+        self._fields.111 = value;
         self
     }
 }
@@ -7753,12 +7756,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `spatial` field (optional)
     pub fn spatial(mut self, value: impl Into<Option<ArticleSpatial<'a>>>) -> Self {
-        self.__unsafe_private_named.112 = value.into();
+        self._fields.112 = value.into();
         self
     }
     /// Set the `spatial` field to an Option value (optional)
     pub fn maybe_spatial(mut self, value: Option<ArticleSpatial<'a>>) -> Self {
-        self.__unsafe_private_named.112 = value;
+        self._fields.112 = value;
         self
     }
 }
@@ -7769,7 +7772,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleSpatialCoverage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.113 = value.into();
+        self._fields.113 = value.into();
         self
     }
     /// Set the `spatialCoverage` field to an Option value (optional)
@@ -7777,7 +7780,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleSpatialCoverage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.113 = value;
+        self._fields.113 = value;
         self
     }
 }
@@ -7785,12 +7788,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `speakable` field (optional)
     pub fn speakable(mut self, value: impl Into<Option<ArticleSpeakable<'a>>>) -> Self {
-        self.__unsafe_private_named.114 = value.into();
+        self._fields.114 = value.into();
         self
     }
     /// Set the `speakable` field to an Option value (optional)
     pub fn maybe_speakable(mut self, value: Option<ArticleSpeakable<'a>>) -> Self {
-        self.__unsafe_private_named.114 = value;
+        self._fields.114 = value;
         self
     }
 }
@@ -7798,12 +7801,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `sponsor` field (optional)
     pub fn sponsor(mut self, value: impl Into<Option<ArticleSponsor<'a>>>) -> Self {
-        self.__unsafe_private_named.115 = value.into();
+        self._fields.115 = value.into();
         self
     }
     /// Set the `sponsor` field to an Option value (optional)
     pub fn maybe_sponsor(mut self, value: Option<ArticleSponsor<'a>>) -> Self {
-        self.__unsafe_private_named.115 = value;
+        self._fields.115 = value;
         self
     }
 }
@@ -7811,12 +7814,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(mut self, value: impl Into<Option<ArticleSubjectOf<'a>>>) -> Self {
-        self.__unsafe_private_named.116 = value.into();
+        self._fields.116 = value.into();
         self
     }
     /// Set the `subjectOf` field to an Option value (optional)
     pub fn maybe_subject_of(mut self, value: Option<ArticleSubjectOf<'a>>) -> Self {
-        self.__unsafe_private_named.116 = value;
+        self._fields.116 = value;
         self
     }
 }
@@ -7824,12 +7827,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `teaches` field (optional)
     pub fn teaches(mut self, value: impl Into<Option<ArticleTeaches<'a>>>) -> Self {
-        self.__unsafe_private_named.117 = value.into();
+        self._fields.117 = value.into();
         self
     }
     /// Set the `teaches` field to an Option value (optional)
     pub fn maybe_teaches(mut self, value: Option<ArticleTeaches<'a>>) -> Self {
-        self.__unsafe_private_named.117 = value;
+        self._fields.117 = value;
         self
     }
 }
@@ -7837,12 +7840,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `temporal` field (optional)
     pub fn temporal(mut self, value: impl Into<Option<ArticleTemporal<'a>>>) -> Self {
-        self.__unsafe_private_named.118 = value.into();
+        self._fields.118 = value.into();
         self
     }
     /// Set the `temporal` field to an Option value (optional)
     pub fn maybe_temporal(mut self, value: Option<ArticleTemporal<'a>>) -> Self {
-        self.__unsafe_private_named.118 = value;
+        self._fields.118 = value;
         self
     }
 }
@@ -7853,7 +7856,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleTemporalCoverage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.119 = value.into();
+        self._fields.119 = value.into();
         self
     }
     /// Set the `temporalCoverage` field to an Option value (optional)
@@ -7861,7 +7864,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleTemporalCoverage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.119 = value;
+        self._fields.119 = value;
         self
     }
 }
@@ -7869,12 +7872,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<ArticleText<'a>>>) -> Self {
-        self.__unsafe_private_named.120 = value.into();
+        self._fields.120 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
     pub fn maybe_text(mut self, value: Option<ArticleText<'a>>) -> Self {
-        self.__unsafe_private_named.120 = value;
+        self._fields.120 = value;
         self
     }
 }
@@ -7882,12 +7885,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `thumbnail` field (optional)
     pub fn thumbnail(mut self, value: impl Into<Option<ArticleThumbnail<'a>>>) -> Self {
-        self.__unsafe_private_named.121 = value.into();
+        self._fields.121 = value.into();
         self
     }
     /// Set the `thumbnail` field to an Option value (optional)
     pub fn maybe_thumbnail(mut self, value: Option<ArticleThumbnail<'a>>) -> Self {
-        self.__unsafe_private_named.121 = value;
+        self._fields.121 = value;
         self
     }
 }
@@ -7898,7 +7901,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleThumbnailUrl<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.122 = value.into();
+        self._fields.122 = value.into();
         self
     }
     /// Set the `thumbnailUrl` field to an Option value (optional)
@@ -7906,7 +7909,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleThumbnailUrl<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.122 = value;
+        self._fields.122 = value;
         self
     }
 }
@@ -7917,7 +7920,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleTimeRequired<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.123 = value.into();
+        self._fields.123 = value.into();
         self
     }
     /// Set the `timeRequired` field to an Option value (optional)
@@ -7925,7 +7928,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleTimeRequired<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.123 = value;
+        self._fields.123 = value;
         self
     }
 }
@@ -7936,7 +7939,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleTranslationOfWork<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.124 = value.into();
+        self._fields.124 = value.into();
         self
     }
     /// Set the `translationOfWork` field to an Option value (optional)
@@ -7944,7 +7947,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleTranslationOfWork<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.124 = value;
+        self._fields.124 = value;
         self
     }
 }
@@ -7955,12 +7958,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleTranslator<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.125 = value.into();
+        self._fields.125 = value.into();
         self
     }
     /// Set the `translator` field to an Option value (optional)
     pub fn maybe_translator(mut self, value: Option<ArticleTranslator<'a>>) -> Self {
-        self.__unsafe_private_named.125 = value;
+        self._fields.125 = value;
         self
     }
 }
@@ -7971,7 +7974,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleTypicalAgeRange<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.126 = value.into();
+        self._fields.126 = value.into();
         self
     }
     /// Set the `typicalAgeRange` field to an Option value (optional)
@@ -7979,7 +7982,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleTypicalAgeRange<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.126 = value;
+        self._fields.126 = value;
         self
     }
 }
@@ -7987,12 +7990,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<ArticleUrl<'a>>>) -> Self {
-        self.__unsafe_private_named.127 = value.into();
+        self._fields.127 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<ArticleUrl<'a>>) -> Self {
-        self.__unsafe_private_named.127 = value;
+        self._fields.127 = value;
         self
     }
 }
@@ -8000,12 +8003,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `usageInfo` field (optional)
     pub fn usage_info(mut self, value: impl Into<Option<ArticleUsageInfo<'a>>>) -> Self {
-        self.__unsafe_private_named.128 = value.into();
+        self._fields.128 = value.into();
         self
     }
     /// Set the `usageInfo` field to an Option value (optional)
     pub fn maybe_usage_info(mut self, value: Option<ArticleUsageInfo<'a>>) -> Self {
-        self.__unsafe_private_named.128 = value;
+        self._fields.128 = value;
         self
     }
 }
@@ -8013,12 +8016,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `version` field (optional)
     pub fn version(mut self, value: impl Into<Option<ArticleVersion<'a>>>) -> Self {
-        self.__unsafe_private_named.129 = value.into();
+        self._fields.129 = value.into();
         self
     }
     /// Set the `version` field to an Option value (optional)
     pub fn maybe_version(mut self, value: Option<ArticleVersion<'a>>) -> Self {
-        self.__unsafe_private_named.129 = value;
+        self._fields.129 = value;
         self
     }
 }
@@ -8026,12 +8029,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `video` field (optional)
     pub fn video(mut self, value: impl Into<Option<ArticleVideo<'a>>>) -> Self {
-        self.__unsafe_private_named.130 = value.into();
+        self._fields.130 = value.into();
         self
     }
     /// Set the `video` field to an Option value (optional)
     pub fn maybe_video(mut self, value: Option<ArticleVideo<'a>>) -> Self {
-        self.__unsafe_private_named.130 = value;
+        self._fields.130 = value;
         self
     }
 }
@@ -8039,12 +8042,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
 impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
     /// Set the `wordCount` field (optional)
     pub fn word_count(mut self, value: impl Into<Option<ArticleWordCount<'a>>>) -> Self {
-        self.__unsafe_private_named.131 = value.into();
+        self._fields.131 = value.into();
         self
     }
     /// Set the `wordCount` field to an Option value (optional)
     pub fn maybe_word_count(mut self, value: Option<ArticleWordCount<'a>>) -> Self {
-        self.__unsafe_private_named.131 = value;
+        self._fields.131 = value;
         self
     }
 }
@@ -8055,12 +8058,12 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleWorkExample<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.132 = value.into();
+        self._fields.132 = value.into();
         self
     }
     /// Set the `workExample` field to an Option value (optional)
     pub fn maybe_work_example(mut self, value: Option<ArticleWorkExample<'a>>) -> Self {
-        self.__unsafe_private_named.132 = value;
+        self._fields.132 = value;
         self
     }
 }
@@ -8071,7 +8074,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ArticleWorkTranslation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.133 = value.into();
+        self._fields.133 = value.into();
         self
     }
     /// Set the `workTranslation` field to an Option value (optional)
@@ -8079,7 +8082,7 @@ impl<'a, S: article_state::State> ArticleBuilder<'a, S> {
         mut self,
         value: Option<ArticleWorkTranslation<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.133 = value;
+        self._fields.133 = value;
         self
     }
 }
@@ -8091,140 +8094,140 @@ where
     /// Build the final struct
     pub fn build(self) -> Article<'a> {
         Article {
-            about: self.__unsafe_private_named.0,
-            r#abstract: self.__unsafe_private_named.1,
-            access_mode: self.__unsafe_private_named.2,
-            access_mode_sufficient: self.__unsafe_private_named.3,
-            accessibility_api: self.__unsafe_private_named.4,
-            accessibility_control: self.__unsafe_private_named.5,
-            accessibility_feature: self.__unsafe_private_named.6,
-            accessibility_hazard: self.__unsafe_private_named.7,
-            accessibility_summary: self.__unsafe_private_named.8,
-            accountable_person: self.__unsafe_private_named.9,
-            acquire_license_page: self.__unsafe_private_named.10,
-            additional_type: self.__unsafe_private_named.11,
-            aggregate_rating: self.__unsafe_private_named.12,
-            alternate_name: self.__unsafe_private_named.13,
-            alternative_headline: self.__unsafe_private_named.14,
-            archived_at: self.__unsafe_private_named.15,
-            article_body: self.__unsafe_private_named.16,
-            article_section: self.__unsafe_private_named.17,
-            assesses: self.__unsafe_private_named.18,
-            associated_media: self.__unsafe_private_named.19,
-            audience: self.__unsafe_private_named.20,
-            audio: self.__unsafe_private_named.21,
-            author: self.__unsafe_private_named.22,
-            award: self.__unsafe_private_named.23,
-            awards: self.__unsafe_private_named.24,
-            backstory: self.__unsafe_private_named.25,
-            character: self.__unsafe_private_named.26,
-            citation: self.__unsafe_private_named.27,
-            comment: self.__unsafe_private_named.28,
-            comment_count: self.__unsafe_private_named.29,
-            conditions_of_access: self.__unsafe_private_named.30,
-            content_location: self.__unsafe_private_named.31,
-            content_rating: self.__unsafe_private_named.32,
-            content_reference_time: self.__unsafe_private_named.33,
-            contributor: self.__unsafe_private_named.34,
-            copyright_holder: self.__unsafe_private_named.35,
-            copyright_notice: self.__unsafe_private_named.36,
-            copyright_year: self.__unsafe_private_named.37,
-            correction: self.__unsafe_private_named.38,
-            country_of_origin: self.__unsafe_private_named.39,
-            creative_work_status: self.__unsafe_private_named.40,
-            creator: self.__unsafe_private_named.41,
-            credit_text: self.__unsafe_private_named.42,
-            date_created: self.__unsafe_private_named.43,
-            date_modified: self.__unsafe_private_named.44,
-            date_published: self.__unsafe_private_named.45,
-            description: self.__unsafe_private_named.46,
-            digital_source_type: self.__unsafe_private_named.47,
-            disambiguating_description: self.__unsafe_private_named.48,
-            discussion_url: self.__unsafe_private_named.49,
-            edit_eidr: self.__unsafe_private_named.50,
-            editor: self.__unsafe_private_named.51,
-            educational_alignment: self.__unsafe_private_named.52,
-            educational_level: self.__unsafe_private_named.53,
-            educational_use: self.__unsafe_private_named.54,
-            encoding: self.__unsafe_private_named.55,
-            encoding_format: self.__unsafe_private_named.56,
-            encodings: self.__unsafe_private_named.57,
-            example_of_work: self.__unsafe_private_named.58,
-            expires: self.__unsafe_private_named.59,
-            file_format: self.__unsafe_private_named.60,
-            funder: self.__unsafe_private_named.61,
-            funding: self.__unsafe_private_named.62,
-            genre: self.__unsafe_private_named.63,
-            has_part: self.__unsafe_private_named.64,
-            headline: self.__unsafe_private_named.65,
-            identifier: self.__unsafe_private_named.66,
-            image: self.__unsafe_private_named.67,
-            in_language: self.__unsafe_private_named.68,
-            interaction_statistic: self.__unsafe_private_named.69,
-            interactivity_type: self.__unsafe_private_named.70,
-            interpreted_as_claim: self.__unsafe_private_named.71,
-            is_accessible_for_free: self.__unsafe_private_named.72,
-            is_based_on: self.__unsafe_private_named.73,
-            is_based_on_url: self.__unsafe_private_named.74,
-            is_family_friendly: self.__unsafe_private_named.75,
-            is_part_of: self.__unsafe_private_named.76,
-            keywords: self.__unsafe_private_named.77,
-            learning_resource_type: self.__unsafe_private_named.78,
-            license: self.__unsafe_private_named.79,
-            location_created: self.__unsafe_private_named.80,
-            main_entity: self.__unsafe_private_named.81,
-            main_entity_of_page: self.__unsafe_private_named.82,
-            maintainer: self.__unsafe_private_named.83,
-            material: self.__unsafe_private_named.84,
-            material_extent: self.__unsafe_private_named.85,
-            mentions: self.__unsafe_private_named.86,
-            name: self.__unsafe_private_named.87,
-            offers: self.__unsafe_private_named.88,
-            page_end: self.__unsafe_private_named.89,
-            page_start: self.__unsafe_private_named.90,
-            pagination: self.__unsafe_private_named.91,
-            pattern: self.__unsafe_private_named.92,
-            position: self.__unsafe_private_named.93,
-            potential_action: self.__unsafe_private_named.94,
-            producer: self.__unsafe_private_named.95,
-            provider: self.__unsafe_private_named.96,
-            publication: self.__unsafe_private_named.97,
-            publisher: self.__unsafe_private_named.98,
-            publisher_imprint: self.__unsafe_private_named.99,
-            publishing_principles: self.__unsafe_private_named.100,
-            recorded_at: self.__unsafe_private_named.101,
-            released_event: self.__unsafe_private_named.102,
-            review: self.__unsafe_private_named.103,
-            reviews: self.__unsafe_private_named.104,
-            same_as: self.__unsafe_private_named.105,
-            schema_version: self.__unsafe_private_named.106,
-            sd_date_published: self.__unsafe_private_named.107,
-            sd_license: self.__unsafe_private_named.108,
-            sd_publisher: self.__unsafe_private_named.109,
-            size: self.__unsafe_private_named.110,
-            source_organization: self.__unsafe_private_named.111,
-            spatial: self.__unsafe_private_named.112,
-            spatial_coverage: self.__unsafe_private_named.113,
-            speakable: self.__unsafe_private_named.114,
-            sponsor: self.__unsafe_private_named.115,
-            subject_of: self.__unsafe_private_named.116,
-            teaches: self.__unsafe_private_named.117,
-            temporal: self.__unsafe_private_named.118,
-            temporal_coverage: self.__unsafe_private_named.119,
-            text: self.__unsafe_private_named.120,
-            thumbnail: self.__unsafe_private_named.121,
-            thumbnail_url: self.__unsafe_private_named.122,
-            time_required: self.__unsafe_private_named.123,
-            translation_of_work: self.__unsafe_private_named.124,
-            translator: self.__unsafe_private_named.125,
-            typical_age_range: self.__unsafe_private_named.126,
-            url: self.__unsafe_private_named.127,
-            usage_info: self.__unsafe_private_named.128,
-            version: self.__unsafe_private_named.129,
-            video: self.__unsafe_private_named.130,
-            word_count: self.__unsafe_private_named.131,
-            work_example: self.__unsafe_private_named.132,
-            work_translation: self.__unsafe_private_named.133,
+            about: self._fields.0,
+            r#abstract: self._fields.1,
+            access_mode: self._fields.2,
+            access_mode_sufficient: self._fields.3,
+            accessibility_api: self._fields.4,
+            accessibility_control: self._fields.5,
+            accessibility_feature: self._fields.6,
+            accessibility_hazard: self._fields.7,
+            accessibility_summary: self._fields.8,
+            accountable_person: self._fields.9,
+            acquire_license_page: self._fields.10,
+            additional_type: self._fields.11,
+            aggregate_rating: self._fields.12,
+            alternate_name: self._fields.13,
+            alternative_headline: self._fields.14,
+            archived_at: self._fields.15,
+            article_body: self._fields.16,
+            article_section: self._fields.17,
+            assesses: self._fields.18,
+            associated_media: self._fields.19,
+            audience: self._fields.20,
+            audio: self._fields.21,
+            author: self._fields.22,
+            award: self._fields.23,
+            awards: self._fields.24,
+            backstory: self._fields.25,
+            character: self._fields.26,
+            citation: self._fields.27,
+            comment: self._fields.28,
+            comment_count: self._fields.29,
+            conditions_of_access: self._fields.30,
+            content_location: self._fields.31,
+            content_rating: self._fields.32,
+            content_reference_time: self._fields.33,
+            contributor: self._fields.34,
+            copyright_holder: self._fields.35,
+            copyright_notice: self._fields.36,
+            copyright_year: self._fields.37,
+            correction: self._fields.38,
+            country_of_origin: self._fields.39,
+            creative_work_status: self._fields.40,
+            creator: self._fields.41,
+            credit_text: self._fields.42,
+            date_created: self._fields.43,
+            date_modified: self._fields.44,
+            date_published: self._fields.45,
+            description: self._fields.46,
+            digital_source_type: self._fields.47,
+            disambiguating_description: self._fields.48,
+            discussion_url: self._fields.49,
+            edit_eidr: self._fields.50,
+            editor: self._fields.51,
+            educational_alignment: self._fields.52,
+            educational_level: self._fields.53,
+            educational_use: self._fields.54,
+            encoding: self._fields.55,
+            encoding_format: self._fields.56,
+            encodings: self._fields.57,
+            example_of_work: self._fields.58,
+            expires: self._fields.59,
+            file_format: self._fields.60,
+            funder: self._fields.61,
+            funding: self._fields.62,
+            genre: self._fields.63,
+            has_part: self._fields.64,
+            headline: self._fields.65,
+            identifier: self._fields.66,
+            image: self._fields.67,
+            in_language: self._fields.68,
+            interaction_statistic: self._fields.69,
+            interactivity_type: self._fields.70,
+            interpreted_as_claim: self._fields.71,
+            is_accessible_for_free: self._fields.72,
+            is_based_on: self._fields.73,
+            is_based_on_url: self._fields.74,
+            is_family_friendly: self._fields.75,
+            is_part_of: self._fields.76,
+            keywords: self._fields.77,
+            learning_resource_type: self._fields.78,
+            license: self._fields.79,
+            location_created: self._fields.80,
+            main_entity: self._fields.81,
+            main_entity_of_page: self._fields.82,
+            maintainer: self._fields.83,
+            material: self._fields.84,
+            material_extent: self._fields.85,
+            mentions: self._fields.86,
+            name: self._fields.87,
+            offers: self._fields.88,
+            page_end: self._fields.89,
+            page_start: self._fields.90,
+            pagination: self._fields.91,
+            pattern: self._fields.92,
+            position: self._fields.93,
+            potential_action: self._fields.94,
+            producer: self._fields.95,
+            provider: self._fields.96,
+            publication: self._fields.97,
+            publisher: self._fields.98,
+            publisher_imprint: self._fields.99,
+            publishing_principles: self._fields.100,
+            recorded_at: self._fields.101,
+            released_event: self._fields.102,
+            review: self._fields.103,
+            reviews: self._fields.104,
+            same_as: self._fields.105,
+            schema_version: self._fields.106,
+            sd_date_published: self._fields.107,
+            sd_license: self._fields.108,
+            sd_publisher: self._fields.109,
+            size: self._fields.110,
+            source_organization: self._fields.111,
+            spatial: self._fields.112,
+            spatial_coverage: self._fields.113,
+            speakable: self._fields.114,
+            sponsor: self._fields.115,
+            subject_of: self._fields.116,
+            teaches: self._fields.117,
+            temporal: self._fields.118,
+            temporal_coverage: self._fields.119,
+            text: self._fields.120,
+            thumbnail: self._fields.121,
+            thumbnail_url: self._fields.122,
+            time_required: self._fields.123,
+            translation_of_work: self._fields.124,
+            translator: self._fields.125,
+            typical_age_range: self._fields.126,
+            url: self._fields.127,
+            usage_info: self._fields.128,
+            version: self._fields.129,
+            video: self._fields.130,
+            word_count: self._fields.131,
+            work_example: self._fields.132,
+            work_translation: self._fields.133,
             extra_data: Default::default(),
         }
     }
@@ -8234,140 +8237,140 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Article<'a> {
         Article {
-            about: self.__unsafe_private_named.0,
-            r#abstract: self.__unsafe_private_named.1,
-            access_mode: self.__unsafe_private_named.2,
-            access_mode_sufficient: self.__unsafe_private_named.3,
-            accessibility_api: self.__unsafe_private_named.4,
-            accessibility_control: self.__unsafe_private_named.5,
-            accessibility_feature: self.__unsafe_private_named.6,
-            accessibility_hazard: self.__unsafe_private_named.7,
-            accessibility_summary: self.__unsafe_private_named.8,
-            accountable_person: self.__unsafe_private_named.9,
-            acquire_license_page: self.__unsafe_private_named.10,
-            additional_type: self.__unsafe_private_named.11,
-            aggregate_rating: self.__unsafe_private_named.12,
-            alternate_name: self.__unsafe_private_named.13,
-            alternative_headline: self.__unsafe_private_named.14,
-            archived_at: self.__unsafe_private_named.15,
-            article_body: self.__unsafe_private_named.16,
-            article_section: self.__unsafe_private_named.17,
-            assesses: self.__unsafe_private_named.18,
-            associated_media: self.__unsafe_private_named.19,
-            audience: self.__unsafe_private_named.20,
-            audio: self.__unsafe_private_named.21,
-            author: self.__unsafe_private_named.22,
-            award: self.__unsafe_private_named.23,
-            awards: self.__unsafe_private_named.24,
-            backstory: self.__unsafe_private_named.25,
-            character: self.__unsafe_private_named.26,
-            citation: self.__unsafe_private_named.27,
-            comment: self.__unsafe_private_named.28,
-            comment_count: self.__unsafe_private_named.29,
-            conditions_of_access: self.__unsafe_private_named.30,
-            content_location: self.__unsafe_private_named.31,
-            content_rating: self.__unsafe_private_named.32,
-            content_reference_time: self.__unsafe_private_named.33,
-            contributor: self.__unsafe_private_named.34,
-            copyright_holder: self.__unsafe_private_named.35,
-            copyright_notice: self.__unsafe_private_named.36,
-            copyright_year: self.__unsafe_private_named.37,
-            correction: self.__unsafe_private_named.38,
-            country_of_origin: self.__unsafe_private_named.39,
-            creative_work_status: self.__unsafe_private_named.40,
-            creator: self.__unsafe_private_named.41,
-            credit_text: self.__unsafe_private_named.42,
-            date_created: self.__unsafe_private_named.43,
-            date_modified: self.__unsafe_private_named.44,
-            date_published: self.__unsafe_private_named.45,
-            description: self.__unsafe_private_named.46,
-            digital_source_type: self.__unsafe_private_named.47,
-            disambiguating_description: self.__unsafe_private_named.48,
-            discussion_url: self.__unsafe_private_named.49,
-            edit_eidr: self.__unsafe_private_named.50,
-            editor: self.__unsafe_private_named.51,
-            educational_alignment: self.__unsafe_private_named.52,
-            educational_level: self.__unsafe_private_named.53,
-            educational_use: self.__unsafe_private_named.54,
-            encoding: self.__unsafe_private_named.55,
-            encoding_format: self.__unsafe_private_named.56,
-            encodings: self.__unsafe_private_named.57,
-            example_of_work: self.__unsafe_private_named.58,
-            expires: self.__unsafe_private_named.59,
-            file_format: self.__unsafe_private_named.60,
-            funder: self.__unsafe_private_named.61,
-            funding: self.__unsafe_private_named.62,
-            genre: self.__unsafe_private_named.63,
-            has_part: self.__unsafe_private_named.64,
-            headline: self.__unsafe_private_named.65,
-            identifier: self.__unsafe_private_named.66,
-            image: self.__unsafe_private_named.67,
-            in_language: self.__unsafe_private_named.68,
-            interaction_statistic: self.__unsafe_private_named.69,
-            interactivity_type: self.__unsafe_private_named.70,
-            interpreted_as_claim: self.__unsafe_private_named.71,
-            is_accessible_for_free: self.__unsafe_private_named.72,
-            is_based_on: self.__unsafe_private_named.73,
-            is_based_on_url: self.__unsafe_private_named.74,
-            is_family_friendly: self.__unsafe_private_named.75,
-            is_part_of: self.__unsafe_private_named.76,
-            keywords: self.__unsafe_private_named.77,
-            learning_resource_type: self.__unsafe_private_named.78,
-            license: self.__unsafe_private_named.79,
-            location_created: self.__unsafe_private_named.80,
-            main_entity: self.__unsafe_private_named.81,
-            main_entity_of_page: self.__unsafe_private_named.82,
-            maintainer: self.__unsafe_private_named.83,
-            material: self.__unsafe_private_named.84,
-            material_extent: self.__unsafe_private_named.85,
-            mentions: self.__unsafe_private_named.86,
-            name: self.__unsafe_private_named.87,
-            offers: self.__unsafe_private_named.88,
-            page_end: self.__unsafe_private_named.89,
-            page_start: self.__unsafe_private_named.90,
-            pagination: self.__unsafe_private_named.91,
-            pattern: self.__unsafe_private_named.92,
-            position: self.__unsafe_private_named.93,
-            potential_action: self.__unsafe_private_named.94,
-            producer: self.__unsafe_private_named.95,
-            provider: self.__unsafe_private_named.96,
-            publication: self.__unsafe_private_named.97,
-            publisher: self.__unsafe_private_named.98,
-            publisher_imprint: self.__unsafe_private_named.99,
-            publishing_principles: self.__unsafe_private_named.100,
-            recorded_at: self.__unsafe_private_named.101,
-            released_event: self.__unsafe_private_named.102,
-            review: self.__unsafe_private_named.103,
-            reviews: self.__unsafe_private_named.104,
-            same_as: self.__unsafe_private_named.105,
-            schema_version: self.__unsafe_private_named.106,
-            sd_date_published: self.__unsafe_private_named.107,
-            sd_license: self.__unsafe_private_named.108,
-            sd_publisher: self.__unsafe_private_named.109,
-            size: self.__unsafe_private_named.110,
-            source_organization: self.__unsafe_private_named.111,
-            spatial: self.__unsafe_private_named.112,
-            spatial_coverage: self.__unsafe_private_named.113,
-            speakable: self.__unsafe_private_named.114,
-            sponsor: self.__unsafe_private_named.115,
-            subject_of: self.__unsafe_private_named.116,
-            teaches: self.__unsafe_private_named.117,
-            temporal: self.__unsafe_private_named.118,
-            temporal_coverage: self.__unsafe_private_named.119,
-            text: self.__unsafe_private_named.120,
-            thumbnail: self.__unsafe_private_named.121,
-            thumbnail_url: self.__unsafe_private_named.122,
-            time_required: self.__unsafe_private_named.123,
-            translation_of_work: self.__unsafe_private_named.124,
-            translator: self.__unsafe_private_named.125,
-            typical_age_range: self.__unsafe_private_named.126,
-            url: self.__unsafe_private_named.127,
-            usage_info: self.__unsafe_private_named.128,
-            version: self.__unsafe_private_named.129,
-            video: self.__unsafe_private_named.130,
-            word_count: self.__unsafe_private_named.131,
-            work_example: self.__unsafe_private_named.132,
-            work_translation: self.__unsafe_private_named.133,
+            about: self._fields.0,
+            r#abstract: self._fields.1,
+            access_mode: self._fields.2,
+            access_mode_sufficient: self._fields.3,
+            accessibility_api: self._fields.4,
+            accessibility_control: self._fields.5,
+            accessibility_feature: self._fields.6,
+            accessibility_hazard: self._fields.7,
+            accessibility_summary: self._fields.8,
+            accountable_person: self._fields.9,
+            acquire_license_page: self._fields.10,
+            additional_type: self._fields.11,
+            aggregate_rating: self._fields.12,
+            alternate_name: self._fields.13,
+            alternative_headline: self._fields.14,
+            archived_at: self._fields.15,
+            article_body: self._fields.16,
+            article_section: self._fields.17,
+            assesses: self._fields.18,
+            associated_media: self._fields.19,
+            audience: self._fields.20,
+            audio: self._fields.21,
+            author: self._fields.22,
+            award: self._fields.23,
+            awards: self._fields.24,
+            backstory: self._fields.25,
+            character: self._fields.26,
+            citation: self._fields.27,
+            comment: self._fields.28,
+            comment_count: self._fields.29,
+            conditions_of_access: self._fields.30,
+            content_location: self._fields.31,
+            content_rating: self._fields.32,
+            content_reference_time: self._fields.33,
+            contributor: self._fields.34,
+            copyright_holder: self._fields.35,
+            copyright_notice: self._fields.36,
+            copyright_year: self._fields.37,
+            correction: self._fields.38,
+            country_of_origin: self._fields.39,
+            creative_work_status: self._fields.40,
+            creator: self._fields.41,
+            credit_text: self._fields.42,
+            date_created: self._fields.43,
+            date_modified: self._fields.44,
+            date_published: self._fields.45,
+            description: self._fields.46,
+            digital_source_type: self._fields.47,
+            disambiguating_description: self._fields.48,
+            discussion_url: self._fields.49,
+            edit_eidr: self._fields.50,
+            editor: self._fields.51,
+            educational_alignment: self._fields.52,
+            educational_level: self._fields.53,
+            educational_use: self._fields.54,
+            encoding: self._fields.55,
+            encoding_format: self._fields.56,
+            encodings: self._fields.57,
+            example_of_work: self._fields.58,
+            expires: self._fields.59,
+            file_format: self._fields.60,
+            funder: self._fields.61,
+            funding: self._fields.62,
+            genre: self._fields.63,
+            has_part: self._fields.64,
+            headline: self._fields.65,
+            identifier: self._fields.66,
+            image: self._fields.67,
+            in_language: self._fields.68,
+            interaction_statistic: self._fields.69,
+            interactivity_type: self._fields.70,
+            interpreted_as_claim: self._fields.71,
+            is_accessible_for_free: self._fields.72,
+            is_based_on: self._fields.73,
+            is_based_on_url: self._fields.74,
+            is_family_friendly: self._fields.75,
+            is_part_of: self._fields.76,
+            keywords: self._fields.77,
+            learning_resource_type: self._fields.78,
+            license: self._fields.79,
+            location_created: self._fields.80,
+            main_entity: self._fields.81,
+            main_entity_of_page: self._fields.82,
+            maintainer: self._fields.83,
+            material: self._fields.84,
+            material_extent: self._fields.85,
+            mentions: self._fields.86,
+            name: self._fields.87,
+            offers: self._fields.88,
+            page_end: self._fields.89,
+            page_start: self._fields.90,
+            pagination: self._fields.91,
+            pattern: self._fields.92,
+            position: self._fields.93,
+            potential_action: self._fields.94,
+            producer: self._fields.95,
+            provider: self._fields.96,
+            publication: self._fields.97,
+            publisher: self._fields.98,
+            publisher_imprint: self._fields.99,
+            publishing_principles: self._fields.100,
+            recorded_at: self._fields.101,
+            released_event: self._fields.102,
+            review: self._fields.103,
+            reviews: self._fields.104,
+            same_as: self._fields.105,
+            schema_version: self._fields.106,
+            sd_date_published: self._fields.107,
+            sd_license: self._fields.108,
+            sd_publisher: self._fields.109,
+            size: self._fields.110,
+            source_organization: self._fields.111,
+            spatial: self._fields.112,
+            spatial_coverage: self._fields.113,
+            speakable: self._fields.114,
+            sponsor: self._fields.115,
+            subject_of: self._fields.116,
+            teaches: self._fields.117,
+            temporal: self._fields.118,
+            temporal_coverage: self._fields.119,
+            text: self._fields.120,
+            thumbnail: self._fields.121,
+            thumbnail_url: self._fields.122,
+            time_required: self._fields.123,
+            translation_of_work: self._fields.124,
+            translator: self._fields.125,
+            typical_age_range: self._fields.126,
+            url: self._fields.127,
+            usage_info: self._fields.128,
+            version: self._fields.129,
+            video: self._fields.130,
+            word_count: self._fields.131,
+            work_example: self._fields.132,
+            work_translation: self._fields.133,
             extra_data: Some(extra_data),
         }
     }

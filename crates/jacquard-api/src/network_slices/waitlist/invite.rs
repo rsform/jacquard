@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -116,49 +119,49 @@ pub mod invite_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Slice;
+        type Did;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Slice = Unset;
+        type Did = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Slice = S::Slice;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `slice` field to Set
     pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSlice<S> {}
     impl<S: State> State for SetSlice<S> {
-        type Did = S::Did;
         type Slice = Set<members::slice>;
+        type Did = S::Did;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Slice = S::Slice;
+        type Did = Set<members::did>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Did = S::Did;
         type Slice = S::Slice;
+        type Did = S::Did;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `slice` field
         pub struct slice(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -166,14 +169,9 @@ pub mod invite_state {
 
 /// Builder for constructing an instance of this type
 pub struct InviteBuilder<'a, S: invite_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Datetime>,
-        Option<Did<'a>>,
-        Option<Datetime>,
-        Option<AtUri<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<Did<'a>>, Option<Datetime>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Invite<'a> {
@@ -187,9 +185,9 @@ impl<'a> InviteBuilder<'a, invite_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         InviteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -204,11 +202,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> InviteBuilder<'a, invite_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         InviteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -223,11 +221,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> InviteBuilder<'a, invite_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         InviteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -235,12 +233,12 @@ where
 impl<'a, S: invite_state::State> InviteBuilder<'a, S> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `expiresAt` field to an Option value (optional)
     pub fn maybe_expires_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -255,11 +253,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> InviteBuilder<'a, invite_state::SetSlice<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         InviteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -267,17 +265,17 @@ where
 impl<'a, S> InviteBuilder<'a, S>
 where
     S: invite_state::State,
-    S::Did: invite_state::IsSet,
     S::Slice: invite_state::IsSet,
+    S::Did: invite_state::IsSet,
     S::CreatedAt: invite_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Invite<'a> {
         Invite {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            expires_at: self.__unsafe_private_named.2,
-            slice: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            expires_at: self._fields.2,
+            slice: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -290,10 +288,10 @@ where
         >,
     ) -> Invite<'a> {
         Invite {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            expires_at: self.__unsafe_private_named.2,
-            slice: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            expires_at: self._fields.2,
+            slice: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

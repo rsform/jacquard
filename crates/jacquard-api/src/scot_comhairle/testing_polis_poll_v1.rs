@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -138,50 +141,50 @@ pub mod testing_polis_poll_v1_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Topic;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Topic = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Topic = S::Topic;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `topic` field to Set
     pub struct SetTopic<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTopic<S> {}
     impl<S: State> State for SetTopic<S> {
-        type CreatedAt = S::CreatedAt;
         type Topic = Set<members::topic>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Topic = S::Topic;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `topic` field
         pub struct topic(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TestingPolisPollV1Builder<'a, S: testing_polis_poll_v1_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TestingPolisPollV1<'a> {
@@ -195,9 +198,9 @@ impl<'a> TestingPolisPollV1Builder<'a, testing_polis_poll_v1_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TestingPolisPollV1Builder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -205,12 +208,12 @@ impl<'a> TestingPolisPollV1Builder<'a, testing_polis_poll_v1_state::Empty> {
 impl<'a, S: testing_polis_poll_v1_state::State> TestingPolisPollV1Builder<'a, S> {
     /// Set the `closedAt` field (optional)
     pub fn closed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `closedAt` field to an Option value (optional)
     pub fn maybe_closed_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -225,11 +228,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> TestingPolisPollV1Builder<'a, testing_polis_poll_v1_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TestingPolisPollV1Builder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -237,12 +240,12 @@ where
 impl<'a, S: testing_polis_poll_v1_state::State> TestingPolisPollV1Builder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -257,11 +260,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TestingPolisPollV1Builder<'a, testing_polis_poll_v1_state::SetTopic<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         TestingPolisPollV1Builder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -269,16 +272,16 @@ where
 impl<'a, S> TestingPolisPollV1Builder<'a, S>
 where
     S: testing_polis_poll_v1_state::State,
-    S::CreatedAt: testing_polis_poll_v1_state::IsSet,
     S::Topic: testing_polis_poll_v1_state::IsSet,
+    S::CreatedAt: testing_polis_poll_v1_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TestingPolisPollV1<'a> {
         TestingPolisPollV1 {
-            closed_at: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            topic: self.__unsafe_private_named.3.unwrap(),
+            closed_at: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            topic: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -291,10 +294,10 @@ where
         >,
     ) -> TestingPolisPollV1<'a> {
         TestingPolisPollV1 {
-            closed_at: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            topic: self.__unsafe_private_named.3.unwrap(),
+            closed_at: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            topic: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

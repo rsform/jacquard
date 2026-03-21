@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -118,63 +121,58 @@ pub mod linked_account_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Link;
-        type Name;
         type Icon;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Link = Unset;
-        type Name = Unset;
         type Icon = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `link` field to Set
     pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLink<S> {}
     impl<S: State> State for SetLink<S> {
         type Link = Set<members::link>;
+        type Icon = S::Icon;
         type Name = S::Name;
-        type Icon = S::Icon;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Link = S::Link;
-        type Name = Set<members::name>;
-        type Icon = S::Icon;
     }
     ///State transition - sets the `icon` field to Set
     pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIcon<S> {}
     impl<S: State> State for SetIcon<S> {
         type Link = S::Link;
-        type Name = S::Name;
         type Icon = Set<members::icon>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Link = S::Link;
+        type Icon = S::Icon;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `link` field
         pub struct link(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `icon` field
         pub struct icon(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LinkedAccountBuilder<'a, S: linked_account_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-        Option<CowStr<'a>>,
-        Option<i64>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<UriValue<'a>>, Option<CowStr<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LinkedAccount<'a> {
@@ -188,9 +186,9 @@ impl<'a> LinkedAccountBuilder<'a, linked_account_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LinkedAccountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -205,11 +203,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LinkedAccountBuilder<'a, linked_account_state::SetIcon<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LinkedAccountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -224,11 +222,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> LinkedAccountBuilder<'a, linked_account_state::SetLink<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LinkedAccountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -243,11 +241,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LinkedAccountBuilder<'a, linked_account_state::SetName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LinkedAccountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -255,12 +253,12 @@ where
 impl<'a, S: linked_account_state::State> LinkedAccountBuilder<'a, S> {
     /// Set the `order` field (optional)
     pub fn order(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `order` field to an Option value (optional)
     pub fn maybe_order(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -269,16 +267,16 @@ impl<'a, S> LinkedAccountBuilder<'a, S>
 where
     S: linked_account_state::State,
     S::Link: linked_account_state::IsSet,
-    S::Name: linked_account_state::IsSet,
     S::Icon: linked_account_state::IsSet,
+    S::Name: linked_account_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LinkedAccount<'a> {
         LinkedAccount {
-            icon: self.__unsafe_private_named.0.unwrap(),
-            link: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
-            order: self.__unsafe_private_named.3,
+            icon: self._fields.0.unwrap(),
+            link: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
+            order: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -291,10 +289,10 @@ where
         >,
     ) -> LinkedAccount<'a> {
         LinkedAccount {
-            icon: self.__unsafe_private_named.0.unwrap(),
-            link: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
-            order: self.__unsafe_private_named.3,
+            icon: self._fields.0.unwrap(),
+            link: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
+            order: self._fields.3,
             extra_data: Some(extra_data),
         }
     }

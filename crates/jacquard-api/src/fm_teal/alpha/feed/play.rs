@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -313,8 +316,8 @@ pub mod play_state {
 
 /// Builder for constructing an instance of this type
 pub struct PlayBuilder<'a, S: play_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<CowStr<'a>>>,
         Option<Vec<CowStr<'a>>>,
         Option<Vec<Artist<'a>>>,
@@ -332,7 +335,7 @@ pub struct PlayBuilder<'a, S: play_state::State> {
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Play<'a> {
@@ -346,8 +349,8 @@ impl<'a> PlayBuilder<'a, play_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PlayBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -365,7 +368,7 @@ impl<'a> PlayBuilder<'a, play_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -373,12 +376,12 @@ impl<'a> PlayBuilder<'a, play_state::Empty> {
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `artistMbIds` field (optional)
     pub fn artist_mb_ids(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `artistMbIds` field to an Option value (optional)
     pub fn maybe_artist_mb_ids(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -386,12 +389,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `artistNames` field (optional)
     pub fn artist_names(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `artistNames` field to an Option value (optional)
     pub fn maybe_artist_names(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -399,12 +402,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `artists` field (optional)
     pub fn artists(mut self, value: impl Into<Option<Vec<Artist<'a>>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `artists` field to an Option value (optional)
     pub fn maybe_artists(mut self, value: Option<Vec<Artist<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -412,12 +415,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `duration` field (optional)
     pub fn duration(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `duration` field to an Option value (optional)
     pub fn maybe_duration(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -425,12 +428,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `isrc` field (optional)
     pub fn isrc(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `isrc` field to an Option value (optional)
     pub fn maybe_isrc(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -441,12 +444,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `musicServiceBaseDomain` field to an Option value (optional)
     pub fn maybe_music_service_base_domain(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -454,12 +457,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `originUrl` field (optional)
     pub fn origin_url(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `originUrl` field to an Option value (optional)
     pub fn maybe_origin_url(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -467,12 +470,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `playedTime` field (optional)
     pub fn played_time(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `playedTime` field to an Option value (optional)
     pub fn maybe_played_time(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -480,12 +483,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `recordingMbId` field (optional)
     pub fn recording_mb_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `recordingMbId` field to an Option value (optional)
     pub fn maybe_recording_mb_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -493,12 +496,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `releaseDiscriminant` field (optional)
     pub fn release_discriminant(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `releaseDiscriminant` field to an Option value (optional)
     pub fn maybe_release_discriminant(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -506,12 +509,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `releaseMbId` field (optional)
     pub fn release_mb_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `releaseMbId` field to an Option value (optional)
     pub fn maybe_release_mb_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -519,12 +522,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `releaseName` field (optional)
     pub fn release_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `releaseName` field to an Option value (optional)
     pub fn maybe_release_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -535,12 +538,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `submissionClientAgent` field to an Option value (optional)
     pub fn maybe_submission_client_agent(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -548,12 +551,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `trackDiscriminant` field (optional)
     pub fn track_discriminant(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `trackDiscriminant` field to an Option value (optional)
     pub fn maybe_track_discriminant(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -561,12 +564,12 @@ impl<'a, S: play_state::State> PlayBuilder<'a, S> {
 impl<'a, S: play_state::State> PlayBuilder<'a, S> {
     /// Set the `trackMbId` field (optional)
     pub fn track_mb_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `trackMbId` field to an Option value (optional)
     pub fn maybe_track_mb_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -581,11 +584,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PlayBuilder<'a, play_state::SetTrackName<S>> {
-        self.__unsafe_private_named.15 = Option::Some(value.into());
+        self._fields.15 = Option::Some(value.into());
         PlayBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -598,22 +601,22 @@ where
     /// Build the final struct
     pub fn build(self) -> Play<'a> {
         Play {
-            artist_mb_ids: self.__unsafe_private_named.0,
-            artist_names: self.__unsafe_private_named.1,
-            artists: self.__unsafe_private_named.2,
-            duration: self.__unsafe_private_named.3,
-            isrc: self.__unsafe_private_named.4,
-            music_service_base_domain: self.__unsafe_private_named.5,
-            origin_url: self.__unsafe_private_named.6,
-            played_time: self.__unsafe_private_named.7,
-            recording_mb_id: self.__unsafe_private_named.8,
-            release_discriminant: self.__unsafe_private_named.9,
-            release_mb_id: self.__unsafe_private_named.10,
-            release_name: self.__unsafe_private_named.11,
-            submission_client_agent: self.__unsafe_private_named.12,
-            track_discriminant: self.__unsafe_private_named.13,
-            track_mb_id: self.__unsafe_private_named.14,
-            track_name: self.__unsafe_private_named.15.unwrap(),
+            artist_mb_ids: self._fields.0,
+            artist_names: self._fields.1,
+            artists: self._fields.2,
+            duration: self._fields.3,
+            isrc: self._fields.4,
+            music_service_base_domain: self._fields.5,
+            origin_url: self._fields.6,
+            played_time: self._fields.7,
+            recording_mb_id: self._fields.8,
+            release_discriminant: self._fields.9,
+            release_mb_id: self._fields.10,
+            release_name: self._fields.11,
+            submission_client_agent: self._fields.12,
+            track_discriminant: self._fields.13,
+            track_mb_id: self._fields.14,
+            track_name: self._fields.15.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -626,22 +629,22 @@ where
         >,
     ) -> Play<'a> {
         Play {
-            artist_mb_ids: self.__unsafe_private_named.0,
-            artist_names: self.__unsafe_private_named.1,
-            artists: self.__unsafe_private_named.2,
-            duration: self.__unsafe_private_named.3,
-            isrc: self.__unsafe_private_named.4,
-            music_service_base_domain: self.__unsafe_private_named.5,
-            origin_url: self.__unsafe_private_named.6,
-            played_time: self.__unsafe_private_named.7,
-            recording_mb_id: self.__unsafe_private_named.8,
-            release_discriminant: self.__unsafe_private_named.9,
-            release_mb_id: self.__unsafe_private_named.10,
-            release_name: self.__unsafe_private_named.11,
-            submission_client_agent: self.__unsafe_private_named.12,
-            track_discriminant: self.__unsafe_private_named.13,
-            track_mb_id: self.__unsafe_private_named.14,
-            track_name: self.__unsafe_private_named.15.unwrap(),
+            artist_mb_ids: self._fields.0,
+            artist_names: self._fields.1,
+            artists: self._fields.2,
+            duration: self._fields.3,
+            isrc: self._fields.4,
+            music_service_base_domain: self._fields.5,
+            origin_url: self._fields.6,
+            played_time: self._fields.7,
+            recording_mb_id: self._fields.8,
+            release_discriminant: self._fields.9,
+            release_mb_id: self._fields.10,
+            release_name: self._fields.11,
+            submission_client_agent: self._fields.12,
+            track_discriminant: self._fields.13,
+            track_mb_id: self._fields.14,
+            track_name: self._fields.15.unwrap(),
             extra_data: Some(extra_data),
         }
     }

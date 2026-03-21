@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -252,92 +255,92 @@ pub mod completion_details_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Year;
-        type UpdatedAt;
-        type GoalId;
         type Day;
+        type GoalId;
+        type UpdatedAt;
         type Month;
+        type Year;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Year = Unset;
-        type UpdatedAt = Unset;
-        type GoalId = Unset;
         type Day = Unset;
+        type GoalId = Unset;
+        type UpdatedAt = Unset;
         type Month = Unset;
-    }
-    ///State transition - sets the `year` field to Set
-    pub struct SetYear<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetYear<S> {}
-    impl<S: State> State for SetYear<S> {
-        type Year = Set<members::year>;
-        type UpdatedAt = S::UpdatedAt;
-        type GoalId = S::GoalId;
-        type Day = S::Day;
-        type Month = S::Month;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type Year = S::Year;
-        type UpdatedAt = Set<members::updated_at>;
-        type GoalId = S::GoalId;
-        type Day = S::Day;
-        type Month = S::Month;
-    }
-    ///State transition - sets the `goal_id` field to Set
-    pub struct SetGoalId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGoalId<S> {}
-    impl<S: State> State for SetGoalId<S> {
-        type Year = S::Year;
-        type UpdatedAt = S::UpdatedAt;
-        type GoalId = Set<members::goal_id>;
-        type Day = S::Day;
-        type Month = S::Month;
+        type Year = Unset;
     }
     ///State transition - sets the `day` field to Set
     pub struct SetDay<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDay<S> {}
     impl<S: State> State for SetDay<S> {
-        type Year = S::Year;
-        type UpdatedAt = S::UpdatedAt;
-        type GoalId = S::GoalId;
         type Day = Set<members::day>;
+        type GoalId = S::GoalId;
+        type UpdatedAt = S::UpdatedAt;
         type Month = S::Month;
+        type Year = S::Year;
+    }
+    ///State transition - sets the `goal_id` field to Set
+    pub struct SetGoalId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGoalId<S> {}
+    impl<S: State> State for SetGoalId<S> {
+        type Day = S::Day;
+        type GoalId = Set<members::goal_id>;
+        type UpdatedAt = S::UpdatedAt;
+        type Month = S::Month;
+        type Year = S::Year;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
+    impl<S: State> State for SetUpdatedAt<S> {
+        type Day = S::Day;
+        type GoalId = S::GoalId;
+        type UpdatedAt = Set<members::updated_at>;
+        type Month = S::Month;
+        type Year = S::Year;
     }
     ///State transition - sets the `month` field to Set
     pub struct SetMonth<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMonth<S> {}
     impl<S: State> State for SetMonth<S> {
-        type Year = S::Year;
-        type UpdatedAt = S::UpdatedAt;
-        type GoalId = S::GoalId;
         type Day = S::Day;
+        type GoalId = S::GoalId;
+        type UpdatedAt = S::UpdatedAt;
         type Month = Set<members::month>;
+        type Year = S::Year;
+    }
+    ///State transition - sets the `year` field to Set
+    pub struct SetYear<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetYear<S> {}
+    impl<S: State> State for SetYear<S> {
+        type Day = S::Day;
+        type GoalId = S::GoalId;
+        type UpdatedAt = S::UpdatedAt;
+        type Month = S::Month;
+        type Year = Set<members::year>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `year` field
-        pub struct year(());
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
-        ///Marker type for the `goal_id` field
-        pub struct goal_id(());
         ///Marker type for the `day` field
         pub struct day(());
+        ///Marker type for the `goal_id` field
+        pub struct goal_id(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
         ///Marker type for the `month` field
         pub struct month(());
+        ///Marker type for the `year` field
+        pub struct year(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CompletionDetailsBuilder<'a, S: completion_details_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<i64>,
         Option<CowStr<'a>>,
         Option<AtUri<'a>>,
@@ -348,7 +351,7 @@ pub struct CompletionDetailsBuilder<'a, S: completion_details_state::State> {
         Option<Datetime>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CompletionDetails<'a> {
@@ -362,19 +365,9 @@ impl<'a> CompletionDetailsBuilder<'a, completion_details_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CompletionDetailsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -389,11 +382,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CompletionDetailsBuilder<'a, completion_details_state::SetDay<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CompletionDetailsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -408,11 +401,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CompletionDetailsBuilder<'a, completion_details_state::SetGoalId<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CompletionDetailsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -420,12 +413,12 @@ where
 impl<'a, S: completion_details_state::State> CompletionDetailsBuilder<'a, S> {
     /// Set the `goalUri` field (optional)
     pub fn goal_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `goalUri` field to an Option value (optional)
     pub fn maybe_goal_uri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -440,11 +433,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CompletionDetailsBuilder<'a, completion_details_state::SetMonth<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         CompletionDetailsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -452,12 +445,12 @@ where
 impl<'a, S: completion_details_state::State> CompletionDetailsBuilder<'a, S> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
     pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -465,12 +458,12 @@ impl<'a, S: completion_details_state::State> CompletionDetailsBuilder<'a, S> {
 impl<'a, S: completion_details_state::State> CompletionDetailsBuilder<'a, S> {
     /// Set the `photoAlt` field (optional)
     pub fn photo_alt(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `photoAlt` field to an Option value (optional)
     pub fn maybe_photo_alt(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -478,12 +471,12 @@ impl<'a, S: completion_details_state::State> CompletionDetailsBuilder<'a, S> {
 impl<'a, S: completion_details_state::State> CompletionDetailsBuilder<'a, S> {
     /// Set the `photoBlob` field (optional)
     pub fn photo_blob(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `photoBlob` field to an Option value (optional)
     pub fn maybe_photo_blob(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -498,11 +491,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CompletionDetailsBuilder<'a, completion_details_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         CompletionDetailsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -517,11 +510,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CompletionDetailsBuilder<'a, completion_details_state::SetYear<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         CompletionDetailsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -529,24 +522,24 @@ where
 impl<'a, S> CompletionDetailsBuilder<'a, S>
 where
     S: completion_details_state::State,
-    S::Year: completion_details_state::IsSet,
-    S::UpdatedAt: completion_details_state::IsSet,
-    S::GoalId: completion_details_state::IsSet,
     S::Day: completion_details_state::IsSet,
+    S::GoalId: completion_details_state::IsSet,
+    S::UpdatedAt: completion_details_state::IsSet,
     S::Month: completion_details_state::IsSet,
+    S::Year: completion_details_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CompletionDetails<'a> {
         CompletionDetails {
-            day: self.__unsafe_private_named.0.unwrap(),
-            goal_id: self.__unsafe_private_named.1.unwrap(),
-            goal_uri: self.__unsafe_private_named.2,
-            month: self.__unsafe_private_named.3.unwrap(),
-            notes: self.__unsafe_private_named.4,
-            photo_alt: self.__unsafe_private_named.5,
-            photo_blob: self.__unsafe_private_named.6,
-            updated_at: self.__unsafe_private_named.7.unwrap(),
-            year: self.__unsafe_private_named.8.unwrap(),
+            day: self._fields.0.unwrap(),
+            goal_id: self._fields.1.unwrap(),
+            goal_uri: self._fields.2,
+            month: self._fields.3.unwrap(),
+            notes: self._fields.4,
+            photo_alt: self._fields.5,
+            photo_blob: self._fields.6,
+            updated_at: self._fields.7.unwrap(),
+            year: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -559,15 +552,15 @@ where
         >,
     ) -> CompletionDetails<'a> {
         CompletionDetails {
-            day: self.__unsafe_private_named.0.unwrap(),
-            goal_id: self.__unsafe_private_named.1.unwrap(),
-            goal_uri: self.__unsafe_private_named.2,
-            month: self.__unsafe_private_named.3.unwrap(),
-            notes: self.__unsafe_private_named.4,
-            photo_alt: self.__unsafe_private_named.5,
-            photo_blob: self.__unsafe_private_named.6,
-            updated_at: self.__unsafe_private_named.7.unwrap(),
-            year: self.__unsafe_private_named.8.unwrap(),
+            day: self._fields.0.unwrap(),
+            goal_id: self._fields.1.unwrap(),
+            goal_uri: self._fields.2,
+            month: self._fields.3.unwrap(),
+            notes: self._fields.4,
+            photo_alt: self._fields.5,
+            photo_blob: self._fields.6,
+            updated_at: self._fields.7.unwrap(),
+            year: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }

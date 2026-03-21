@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::string::Datetime;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -82,13 +85,8 @@ pub mod get_top_artists_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetTopArtistsBuilder<S: get_top_artists_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Datetime>,
-        Option<i64>,
-        Option<i64>,
-        Option<Datetime>,
-    ),
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<i64>, Option<i64>, Option<Datetime>),
 }
 
 impl GetTopArtists {
@@ -102,8 +100,8 @@ impl GetTopArtistsBuilder<get_top_artists_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetTopArtistsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
+            _state: PhantomData,
+            _fields: (None, None, None, None),
         }
     }
 }
@@ -111,12 +109,12 @@ impl GetTopArtistsBuilder<get_top_artists_state::Empty> {
 impl<S: get_top_artists_state::State> GetTopArtistsBuilder<S> {
     /// Set the `endDate` field (optional)
     pub fn end_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `endDate` field to an Option value (optional)
     pub fn maybe_end_date(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -124,12 +122,12 @@ impl<S: get_top_artists_state::State> GetTopArtistsBuilder<S> {
 impl<S: get_top_artists_state::State> GetTopArtistsBuilder<S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -137,12 +135,12 @@ impl<S: get_top_artists_state::State> GetTopArtistsBuilder<S> {
 impl<S: get_top_artists_state::State> GetTopArtistsBuilder<S> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `offset` field to an Option value (optional)
     pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -150,12 +148,12 @@ impl<S: get_top_artists_state::State> GetTopArtistsBuilder<S> {
 impl<S: get_top_artists_state::State> GetTopArtistsBuilder<S> {
     /// Set the `startDate` field (optional)
     pub fn start_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `startDate` field to an Option value (optional)
     pub fn maybe_start_date(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -167,10 +165,10 @@ where
     /// Build the final struct
     pub fn build(self) -> GetTopArtists {
         GetTopArtists {
-            end_date: self.__unsafe_private_named.0,
-            limit: self.__unsafe_private_named.1,
-            offset: self.__unsafe_private_named.2,
-            start_date: self.__unsafe_private_named.3,
+            end_date: self._fields.0,
+            limit: self._fields.1,
+            offset: self._fields.2,
+            start_date: self._fields.3,
         }
     }
 }

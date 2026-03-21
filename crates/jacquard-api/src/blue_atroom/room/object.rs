@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -342,8 +345,8 @@ pub mod object_state {
     pub trait State: sealed::Sealed {
         type Scale;
         type Name;
-        type Model;
         type CreatedAt;
+        type Model;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -351,8 +354,8 @@ pub mod object_state {
     impl State for Empty {
         type Scale = Unset;
         type Name = Unset;
-        type Model = Unset;
         type CreatedAt = Unset;
+        type Model = Unset;
     }
     ///State transition - sets the `scale` field to Set
     pub struct SetScale<S: State = Empty>(PhantomData<fn() -> S>);
@@ -360,8 +363,8 @@ pub mod object_state {
     impl<S: State> State for SetScale<S> {
         type Scale = Set<members::scale>;
         type Name = S::Name;
-        type Model = S::Model;
         type CreatedAt = S::CreatedAt;
+        type Model = S::Model;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
@@ -369,17 +372,8 @@ pub mod object_state {
     impl<S: State> State for SetName<S> {
         type Scale = S::Scale;
         type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
         type Model = S::Model;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `model` field to Set
-    pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetModel<S> {}
-    impl<S: State> State for SetModel<S> {
-        type Scale = S::Scale;
-        type Name = S::Name;
-        type Model = Set<members::model>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
@@ -387,8 +381,17 @@ pub mod object_state {
     impl<S: State> State for SetCreatedAt<S> {
         type Scale = S::Scale;
         type Name = S::Name;
-        type Model = S::Model;
         type CreatedAt = Set<members::created_at>;
+        type Model = S::Model;
+    }
+    ///State transition - sets the `model` field to Set
+    pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetModel<S> {}
+    impl<S: State> State for SetModel<S> {
+        type Scale = S::Scale;
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Model = Set<members::model>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -397,24 +400,24 @@ pub mod object_state {
         pub struct scale(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `model` field
-        pub struct model(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `model` field
+        pub struct model(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ObjectBuilder<'a, S: object_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<BlobRef<'a>>,
         Option<CowStr<'a>>,
         Option<Vec<object::LocalizedName<'a>>>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Object<'a> {
@@ -428,9 +431,9 @@ impl<'a> ObjectBuilder<'a, object_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ObjectBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -445,11 +448,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ObjectBuilder<'a, object_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ObjectBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -464,11 +467,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> ObjectBuilder<'a, object_state::SetModel<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ObjectBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -483,11 +486,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ObjectBuilder<'a, object_state::SetName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ObjectBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -498,7 +501,7 @@ impl<'a, S: object_state::State> ObjectBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<object::LocalizedName<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `nameLangs` field to an Option value (optional)
@@ -506,7 +509,7 @@ impl<'a, S: object_state::State> ObjectBuilder<'a, S> {
         mut self,
         value: Option<Vec<object::LocalizedName<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -521,11 +524,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ObjectBuilder<'a, object_state::SetScale<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ObjectBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -535,17 +538,17 @@ where
     S: object_state::State,
     S::Scale: object_state::IsSet,
     S::Name: object_state::IsSet,
-    S::Model: object_state::IsSet,
     S::CreatedAt: object_state::IsSet,
+    S::Model: object_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Object<'a> {
         Object {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            model: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
-            name_langs: self.__unsafe_private_named.3,
-            scale: self.__unsafe_private_named.4.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            model: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
+            name_langs: self._fields.3,
+            scale: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -558,11 +561,11 @@ where
         >,
     ) -> Object<'a> {
         Object {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            model: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
-            name_langs: self.__unsafe_private_named.3,
-            scale: self.__unsafe_private_named.4.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            model: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
+            name_langs: self._fields.3,
+            scale: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

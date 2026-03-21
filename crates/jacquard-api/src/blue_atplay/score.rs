@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::deps::bytes::Bytes;
@@ -73,45 +76,45 @@ pub mod attestation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
         type Signature;
+        type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
         type Signature = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Key = Set<members::key>;
-        type Signature = S::Signature;
+        type Key = Unset;
     }
     ///State transition - sets the `signature` field to Set
     pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSignature<S> {}
     impl<S: State> State for SetSignature<S> {
-        type Key = S::Key;
         type Signature = Set<members::signature>;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Signature = S::Signature;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `signature` field
         pub struct signature(());
+        ///Marker type for the `key` field
+        pub struct key(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AttestationBuilder<'a, S: attestation_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Datetime>, Option<CowStr<'a>>, Option<Bytes>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<CowStr<'a>>, Option<Bytes>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Attestation<'a> {
@@ -125,9 +128,9 @@ impl<'a> AttestationBuilder<'a, attestation_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AttestationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -135,12 +138,12 @@ impl<'a> AttestationBuilder<'a, attestation_state::Empty> {
 impl<'a, S: attestation_state::State> AttestationBuilder<'a, S> {
     /// Set the `attestedAt` field (optional)
     pub fn attested_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `attestedAt` field to an Option value (optional)
     pub fn maybe_attested_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -155,11 +158,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AttestationBuilder<'a, attestation_state::SetKey<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AttestationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -174,11 +177,11 @@ where
         mut self,
         value: impl Into<Bytes>,
     ) -> AttestationBuilder<'a, attestation_state::SetSignature<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         AttestationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -186,15 +189,15 @@ where
 impl<'a, S> AttestationBuilder<'a, S>
 where
     S: attestation_state::State,
-    S::Key: attestation_state::IsSet,
     S::Signature: attestation_state::IsSet,
+    S::Key: attestation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Attestation<'a> {
         Attestation {
-            attested_at: self.__unsafe_private_named.0,
-            key: self.__unsafe_private_named.1.unwrap(),
-            signature: self.__unsafe_private_named.2.unwrap(),
+            attested_at: self._fields.0,
+            key: self._fields.1.unwrap(),
+            signature: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -207,9 +210,9 @@ where
         >,
     ) -> Attestation<'a> {
         Attestation {
-            attested_at: self.__unsafe_private_named.0,
-            key: self.__unsafe_private_named.1.unwrap(),
-            signature: self.__unsafe_private_named.2.unwrap(),
+            attested_at: self._fields.0,
+            key: self._fields.1.unwrap(),
+            signature: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

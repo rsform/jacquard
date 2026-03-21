@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -282,112 +285,112 @@ pub mod plan_assignment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type ActivatedAt;
-        type ExpiresAt;
         type Status;
+        type Id;
         type PlanId;
         type Plan;
+        type ActivatedAt;
+        type ExpiresAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type ActivatedAt = Unset;
-        type ExpiresAt = Unset;
         type Status = Unset;
+        type Id = Unset;
         type PlanId = Unset;
         type Plan = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type ActivatedAt = S::ActivatedAt;
-        type ExpiresAt = S::ExpiresAt;
-        type Status = S::Status;
-        type PlanId = S::PlanId;
-        type Plan = S::Plan;
-    }
-    ///State transition - sets the `activated_at` field to Set
-    pub struct SetActivatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActivatedAt<S> {}
-    impl<S: State> State for SetActivatedAt<S> {
-        type Id = S::Id;
-        type ActivatedAt = Set<members::activated_at>;
-        type ExpiresAt = S::ExpiresAt;
-        type Status = S::Status;
-        type PlanId = S::PlanId;
-        type Plan = S::Plan;
-    }
-    ///State transition - sets the `expires_at` field to Set
-    pub struct SetExpiresAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExpiresAt<S> {}
-    impl<S: State> State for SetExpiresAt<S> {
-        type Id = S::Id;
-        type ActivatedAt = S::ActivatedAt;
-        type ExpiresAt = Set<members::expires_at>;
-        type Status = S::Status;
-        type PlanId = S::PlanId;
-        type Plan = S::Plan;
+        type ActivatedAt = Unset;
+        type ExpiresAt = Unset;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStatus<S> {}
     impl<S: State> State for SetStatus<S> {
-        type Id = S::Id;
-        type ActivatedAt = S::ActivatedAt;
-        type ExpiresAt = S::ExpiresAt;
         type Status = Set<members::status>;
+        type Id = S::Id;
         type PlanId = S::PlanId;
         type Plan = S::Plan;
+        type ActivatedAt = S::ActivatedAt;
+        type ExpiresAt = S::ExpiresAt;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Status = S::Status;
+        type Id = Set<members::id>;
+        type PlanId = S::PlanId;
+        type Plan = S::Plan;
+        type ActivatedAt = S::ActivatedAt;
+        type ExpiresAt = S::ExpiresAt;
     }
     ///State transition - sets the `plan_id` field to Set
     pub struct SetPlanId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlanId<S> {}
     impl<S: State> State for SetPlanId<S> {
-        type Id = S::Id;
-        type ActivatedAt = S::ActivatedAt;
-        type ExpiresAt = S::ExpiresAt;
         type Status = S::Status;
+        type Id = S::Id;
         type PlanId = Set<members::plan_id>;
         type Plan = S::Plan;
+        type ActivatedAt = S::ActivatedAt;
+        type ExpiresAt = S::ExpiresAt;
     }
     ///State transition - sets the `plan` field to Set
     pub struct SetPlan<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlan<S> {}
     impl<S: State> State for SetPlan<S> {
-        type Id = S::Id;
-        type ActivatedAt = S::ActivatedAt;
-        type ExpiresAt = S::ExpiresAt;
         type Status = S::Status;
+        type Id = S::Id;
         type PlanId = S::PlanId;
         type Plan = Set<members::plan>;
+        type ActivatedAt = S::ActivatedAt;
+        type ExpiresAt = S::ExpiresAt;
+    }
+    ///State transition - sets the `activated_at` field to Set
+    pub struct SetActivatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetActivatedAt<S> {}
+    impl<S: State> State for SetActivatedAt<S> {
+        type Status = S::Status;
+        type Id = S::Id;
+        type PlanId = S::PlanId;
+        type Plan = S::Plan;
+        type ActivatedAt = Set<members::activated_at>;
+        type ExpiresAt = S::ExpiresAt;
+    }
+    ///State transition - sets the `expires_at` field to Set
+    pub struct SetExpiresAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExpiresAt<S> {}
+    impl<S: State> State for SetExpiresAt<S> {
+        type Status = S::Status;
+        type Id = S::Id;
+        type PlanId = S::PlanId;
+        type Plan = S::Plan;
+        type ActivatedAt = S::ActivatedAt;
+        type ExpiresAt = Set<members::expires_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `activated_at` field
-        pub struct activated_at(());
-        ///Marker type for the `expires_at` field
-        pub struct expires_at(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `plan_id` field
         pub struct plan_id(());
         ///Marker type for the `plan` field
         pub struct plan(());
+        ///Marker type for the `activated_at` field
+        pub struct activated_at(());
+        ///Marker type for the `expires_at` field
+        pub struct expires_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PlanAssignmentBuilder<'a, S: plan_assignment_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -396,7 +399,7 @@ pub struct PlanAssignmentBuilder<'a, S: plan_assignment_state::State> {
         Option<CowStr<'a>>,
         Option<get_assignment::TicketInfo<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> PlanAssignment<'a> {
@@ -410,9 +413,9 @@ impl<'a> PlanAssignmentBuilder<'a, plan_assignment_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PlanAssignmentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -427,11 +430,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PlanAssignmentBuilder<'a, plan_assignment_state::SetActivatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PlanAssignmentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -446,11 +449,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PlanAssignmentBuilder<'a, plan_assignment_state::SetExpiresAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PlanAssignmentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -465,11 +468,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PlanAssignmentBuilder<'a, plan_assignment_state::SetId<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PlanAssignmentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -484,11 +487,11 @@ where
         mut self,
         value: impl Into<get_assignment::PlanInfo<'a>>,
     ) -> PlanAssignmentBuilder<'a, plan_assignment_state::SetPlan<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         PlanAssignmentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -503,11 +506,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PlanAssignmentBuilder<'a, plan_assignment_state::SetPlanId<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         PlanAssignmentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -522,11 +525,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PlanAssignmentBuilder<'a, plan_assignment_state::SetStatus<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         PlanAssignmentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -537,7 +540,7 @@ impl<'a, S: plan_assignment_state::State> PlanAssignmentBuilder<'a, S> {
         mut self,
         value: impl Into<Option<get_assignment::TicketInfo<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `ticket` field to an Option value (optional)
@@ -545,7 +548,7 @@ impl<'a, S: plan_assignment_state::State> PlanAssignmentBuilder<'a, S> {
         mut self,
         value: Option<get_assignment::TicketInfo<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -553,23 +556,23 @@ impl<'a, S: plan_assignment_state::State> PlanAssignmentBuilder<'a, S> {
 impl<'a, S> PlanAssignmentBuilder<'a, S>
 where
     S: plan_assignment_state::State,
-    S::Id: plan_assignment_state::IsSet,
-    S::ActivatedAt: plan_assignment_state::IsSet,
-    S::ExpiresAt: plan_assignment_state::IsSet,
     S::Status: plan_assignment_state::IsSet,
+    S::Id: plan_assignment_state::IsSet,
     S::PlanId: plan_assignment_state::IsSet,
     S::Plan: plan_assignment_state::IsSet,
+    S::ActivatedAt: plan_assignment_state::IsSet,
+    S::ExpiresAt: plan_assignment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PlanAssignment<'a> {
         PlanAssignment {
-            activated_at: self.__unsafe_private_named.0.unwrap(),
-            expires_at: self.__unsafe_private_named.1.unwrap(),
-            id: self.__unsafe_private_named.2.unwrap(),
-            plan: self.__unsafe_private_named.3.unwrap(),
-            plan_id: self.__unsafe_private_named.4.unwrap(),
-            status: self.__unsafe_private_named.5.unwrap(),
-            ticket: self.__unsafe_private_named.6,
+            activated_at: self._fields.0.unwrap(),
+            expires_at: self._fields.1.unwrap(),
+            id: self._fields.2.unwrap(),
+            plan: self._fields.3.unwrap(),
+            plan_id: self._fields.4.unwrap(),
+            status: self._fields.5.unwrap(),
+            ticket: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -582,13 +585,13 @@ where
         >,
     ) -> PlanAssignment<'a> {
         PlanAssignment {
-            activated_at: self.__unsafe_private_named.0.unwrap(),
-            expires_at: self.__unsafe_private_named.1.unwrap(),
-            id: self.__unsafe_private_named.2.unwrap(),
-            plan: self.__unsafe_private_named.3.unwrap(),
-            plan_id: self.__unsafe_private_named.4.unwrap(),
-            status: self.__unsafe_private_named.5.unwrap(),
-            ticket: self.__unsafe_private_named.6,
+            activated_at: self._fields.0.unwrap(),
+            expires_at: self._fields.1.unwrap(),
+            id: self._fields.2.unwrap(),
+            plan: self._fields.3.unwrap(),
+            plan_id: self._fields.4.unwrap(),
+            status: self._fields.5.unwrap(),
+            ticket: self._fields.6,
             extra_data: Some(extra_data),
         }
     }

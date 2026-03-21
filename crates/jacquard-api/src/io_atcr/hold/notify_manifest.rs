@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -830,8 +833,8 @@ pub mod notify_manifest_state {
 
 /// Builder for constructing an instance of this type
 pub struct NotifyManifestBuilder<'a, S: notify_manifest_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<notify_manifest::ManifestInfo<'a>>,
         Option<CowStr<'a>>,
         Option<NotifyManifestOperation<'a>>,
@@ -839,7 +842,7 @@ pub struct NotifyManifestBuilder<'a, S: notify_manifest_state::State> {
         Option<CowStr<'a>>,
         Option<Did<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> NotifyManifest<'a> {
@@ -853,9 +856,9 @@ impl<'a> NotifyManifestBuilder<'a, notify_manifest_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NotifyManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -870,11 +873,11 @@ where
         mut self,
         value: impl Into<notify_manifest::ManifestInfo<'a>>,
     ) -> NotifyManifestBuilder<'a, notify_manifest_state::SetManifest<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         NotifyManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -889,11 +892,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> NotifyManifestBuilder<'a, notify_manifest_state::SetManifestDigest<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         NotifyManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -904,7 +907,7 @@ impl<'a, S: notify_manifest_state::State> NotifyManifestBuilder<'a, S> {
         mut self,
         value: impl Into<Option<NotifyManifestOperation<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `operation` field to an Option value (optional)
@@ -912,7 +915,7 @@ impl<'a, S: notify_manifest_state::State> NotifyManifestBuilder<'a, S> {
         mut self,
         value: Option<NotifyManifestOperation<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -927,11 +930,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> NotifyManifestBuilder<'a, notify_manifest_state::SetRepository<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         NotifyManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -939,12 +942,12 @@ where
 impl<'a, S: notify_manifest_state::State> NotifyManifestBuilder<'a, S> {
     /// Set the `tag` field (optional)
     pub fn tag(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `tag` field to an Option value (optional)
     pub fn maybe_tag(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -959,11 +962,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> NotifyManifestBuilder<'a, notify_manifest_state::SetUserDid<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         NotifyManifestBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -979,12 +982,12 @@ where
     /// Build the final struct
     pub fn build(self) -> NotifyManifest<'a> {
         NotifyManifest {
-            manifest: self.__unsafe_private_named.0.unwrap(),
-            manifest_digest: self.__unsafe_private_named.1.unwrap(),
-            operation: self.__unsafe_private_named.2,
-            repository: self.__unsafe_private_named.3.unwrap(),
-            tag: self.__unsafe_private_named.4,
-            user_did: self.__unsafe_private_named.5.unwrap(),
+            manifest: self._fields.0.unwrap(),
+            manifest_digest: self._fields.1.unwrap(),
+            operation: self._fields.2,
+            repository: self._fields.3.unwrap(),
+            tag: self._fields.4,
+            user_did: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -997,12 +1000,12 @@ where
         >,
     ) -> NotifyManifest<'a> {
         NotifyManifest {
-            manifest: self.__unsafe_private_named.0.unwrap(),
-            manifest_digest: self.__unsafe_private_named.1.unwrap(),
-            operation: self.__unsafe_private_named.2,
-            repository: self.__unsafe_private_named.3.unwrap(),
-            tag: self.__unsafe_private_named.4,
-            user_did: self.__unsafe_private_named.5.unwrap(),
+            manifest: self._fields.0.unwrap(),
+            manifest_digest: self._fields.1.unwrap(),
+            operation: self._fields.2,
+            repository: self._fields.3.unwrap(),
+            tag: self._fields.4,
+            user_did: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

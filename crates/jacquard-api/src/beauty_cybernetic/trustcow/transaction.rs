@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -160,73 +163,73 @@ pub mod transaction_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ServiceProvider;
-        type ServiceConsumer;
         type CreatedAt;
         type TransactionId;
+        type ServiceConsumer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ServiceProvider = Unset;
-        type ServiceConsumer = Unset;
         type CreatedAt = Unset;
         type TransactionId = Unset;
+        type ServiceConsumer = Unset;
     }
     ///State transition - sets the `service_provider` field to Set
     pub struct SetServiceProvider<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetServiceProvider<S> {}
     impl<S: State> State for SetServiceProvider<S> {
         type ServiceProvider = Set<members::service_provider>;
+        type CreatedAt = S::CreatedAt;
+        type TransactionId = S::TransactionId;
         type ServiceConsumer = S::ServiceConsumer;
-        type CreatedAt = S::CreatedAt;
-        type TransactionId = S::TransactionId;
-    }
-    ///State transition - sets the `service_consumer` field to Set
-    pub struct SetServiceConsumer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServiceConsumer<S> {}
-    impl<S: State> State for SetServiceConsumer<S> {
-        type ServiceProvider = S::ServiceProvider;
-        type ServiceConsumer = Set<members::service_consumer>;
-        type CreatedAt = S::CreatedAt;
-        type TransactionId = S::TransactionId;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type ServiceProvider = S::ServiceProvider;
-        type ServiceConsumer = S::ServiceConsumer;
         type CreatedAt = Set<members::created_at>;
         type TransactionId = S::TransactionId;
+        type ServiceConsumer = S::ServiceConsumer;
     }
     ///State transition - sets the `transaction_id` field to Set
     pub struct SetTransactionId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTransactionId<S> {}
     impl<S: State> State for SetTransactionId<S> {
         type ServiceProvider = S::ServiceProvider;
-        type ServiceConsumer = S::ServiceConsumer;
         type CreatedAt = S::CreatedAt;
         type TransactionId = Set<members::transaction_id>;
+        type ServiceConsumer = S::ServiceConsumer;
+    }
+    ///State transition - sets the `service_consumer` field to Set
+    pub struct SetServiceConsumer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetServiceConsumer<S> {}
+    impl<S: State> State for SetServiceConsumer<S> {
+        type ServiceProvider = S::ServiceProvider;
+        type CreatedAt = S::CreatedAt;
+        type TransactionId = S::TransactionId;
+        type ServiceConsumer = Set<members::service_consumer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `service_provider` field
         pub struct service_provider(());
-        ///Marker type for the `service_consumer` field
-        pub struct service_consumer(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `transaction_id` field
         pub struct transaction_id(());
+        ///Marker type for the `service_consumer` field
+        pub struct service_consumer(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TransactionBuilder<'a, S: transaction_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -235,7 +238,7 @@ pub struct TransactionBuilder<'a, S: transaction_state::State> {
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Transaction<'a> {
@@ -249,9 +252,9 @@ impl<'a> TransactionBuilder<'a, transaction_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TransactionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -259,12 +262,12 @@ impl<'a> TransactionBuilder<'a, transaction_state::Empty> {
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `amount` field (optional)
     pub fn amount(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `amount` field to an Option value (optional)
     pub fn maybe_amount(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -279,11 +282,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> TransactionBuilder<'a, transaction_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TransactionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -291,12 +294,12 @@ where
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `currency` field (optional)
     pub fn currency(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `currency` field to an Option value (optional)
     pub fn maybe_currency(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -304,12 +307,12 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
 impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -324,11 +327,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TransactionBuilder<'a, transaction_state::SetServiceConsumer<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         TransactionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -343,11 +346,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TransactionBuilder<'a, transaction_state::SetServiceProvider<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         TransactionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -362,11 +365,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TransactionBuilder<'a, transaction_state::SetTransactionId<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         TransactionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -375,20 +378,20 @@ impl<'a, S> TransactionBuilder<'a, S>
 where
     S: transaction_state::State,
     S::ServiceProvider: transaction_state::IsSet,
-    S::ServiceConsumer: transaction_state::IsSet,
     S::CreatedAt: transaction_state::IsSet,
     S::TransactionId: transaction_state::IsSet,
+    S::ServiceConsumer: transaction_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Transaction<'a> {
         Transaction {
-            amount: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            currency: self.__unsafe_private_named.2,
-            description: self.__unsafe_private_named.3,
-            service_consumer: self.__unsafe_private_named.4.unwrap(),
-            service_provider: self.__unsafe_private_named.5.unwrap(),
-            transaction_id: self.__unsafe_private_named.6.unwrap(),
+            amount: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            currency: self._fields.2,
+            description: self._fields.3,
+            service_consumer: self._fields.4.unwrap(),
+            service_provider: self._fields.5.unwrap(),
+            transaction_id: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -401,13 +404,13 @@ where
         >,
     ) -> Transaction<'a> {
         Transaction {
-            amount: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            currency: self.__unsafe_private_named.2,
-            description: self.__unsafe_private_named.3,
-            service_consumer: self.__unsafe_private_named.4.unwrap(),
-            service_provider: self.__unsafe_private_named.5.unwrap(),
-            transaction_id: self.__unsafe_private_named.6.unwrap(),
+            amount: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            currency: self._fields.2,
+            description: self._fields.3,
+            service_consumer: self._fields.4.unwrap(),
+            service_provider: self._fields.5.unwrap(),
+            transaction_id: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

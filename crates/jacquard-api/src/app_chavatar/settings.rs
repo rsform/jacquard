@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -376,45 +379,45 @@ pub mod avatar_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Image;
         type Id;
+        type Image;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Image = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
-        type Image = Set<members::image>;
-        type Id = S::Id;
+        type Image = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Image = S::Image;
         type Id = Set<members::id>;
+        type Image = S::Image;
+    }
+    ///State transition - sets the `image` field to Set
+    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetImage<S> {}
+    impl<S: State> State for SetImage<S> {
+        type Id = S::Id;
+        type Image = Set<members::image>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `image` field
-        pub struct image(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `image` field
+        pub struct image(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AvatarItemBuilder<'a, S: avatar_item_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<StrongRef<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<StrongRef<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> AvatarItem<'a> {
@@ -428,9 +431,9 @@ impl<'a> AvatarItemBuilder<'a, avatar_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AvatarItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -445,11 +448,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AvatarItemBuilder<'a, avatar_item_state::SetId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AvatarItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -464,11 +467,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> AvatarItemBuilder<'a, avatar_item_state::SetImage<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AvatarItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -476,14 +479,14 @@ where
 impl<'a, S> AvatarItemBuilder<'a, S>
 where
     S: avatar_item_state::State,
-    S::Image: avatar_item_state::IsSet,
     S::Id: avatar_item_state::IsSet,
+    S::Image: avatar_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AvatarItem<'a> {
         AvatarItem {
-            id: self.__unsafe_private_named.0.unwrap(),
-            image: self.__unsafe_private_named.1.unwrap(),
+            id: self._fields.0.unwrap(),
+            image: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -496,8 +499,8 @@ where
         >,
     ) -> AvatarItem<'a> {
         AvatarItem {
-            id: self.__unsafe_private_named.0.unwrap(),
-            image: self.__unsafe_private_named.1.unwrap(),
+            id: self._fields.0.unwrap(),
+            image: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -612,80 +615,80 @@ pub mod settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Interval;
-        type Enabled;
         type Mode;
         type Avatars;
+        type Enabled;
+        type Interval;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Interval = Unset;
-        type Enabled = Unset;
         type Mode = Unset;
         type Avatars = Unset;
-    }
-    ///State transition - sets the `interval` field to Set
-    pub struct SetInterval<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInterval<S> {}
-    impl<S: State> State for SetInterval<S> {
-        type Interval = Set<members::interval>;
-        type Enabled = S::Enabled;
-        type Mode = S::Mode;
-        type Avatars = S::Avatars;
-    }
-    ///State transition - sets the `enabled` field to Set
-    pub struct SetEnabled<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEnabled<S> {}
-    impl<S: State> State for SetEnabled<S> {
-        type Interval = S::Interval;
-        type Enabled = Set<members::enabled>;
-        type Mode = S::Mode;
-        type Avatars = S::Avatars;
+        type Enabled = Unset;
+        type Interval = Unset;
     }
     ///State transition - sets the `mode` field to Set
     pub struct SetMode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMode<S> {}
     impl<S: State> State for SetMode<S> {
-        type Interval = S::Interval;
-        type Enabled = S::Enabled;
         type Mode = Set<members::mode>;
         type Avatars = S::Avatars;
+        type Enabled = S::Enabled;
+        type Interval = S::Interval;
     }
     ///State transition - sets the `avatars` field to Set
     pub struct SetAvatars<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAvatars<S> {}
     impl<S: State> State for SetAvatars<S> {
-        type Interval = S::Interval;
-        type Enabled = S::Enabled;
         type Mode = S::Mode;
         type Avatars = Set<members::avatars>;
+        type Enabled = S::Enabled;
+        type Interval = S::Interval;
+    }
+    ///State transition - sets the `enabled` field to Set
+    pub struct SetEnabled<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEnabled<S> {}
+    impl<S: State> State for SetEnabled<S> {
+        type Mode = S::Mode;
+        type Avatars = S::Avatars;
+        type Enabled = Set<members::enabled>;
+        type Interval = S::Interval;
+    }
+    ///State transition - sets the `interval` field to Set
+    pub struct SetInterval<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInterval<S> {}
+    impl<S: State> State for SetInterval<S> {
+        type Mode = S::Mode;
+        type Avatars = S::Avatars;
+        type Enabled = S::Enabled;
+        type Interval = Set<members::interval>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `interval` field
-        pub struct interval(());
-        ///Marker type for the `enabled` field
-        pub struct enabled(());
         ///Marker type for the `mode` field
         pub struct mode(());
         ///Marker type for the `avatars` field
         pub struct avatars(());
+        ///Marker type for the `enabled` field
+        pub struct enabled(());
+        ///Marker type for the `interval` field
+        pub struct interval(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SettingsBuilder<'a, S: settings_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<settings::AvatarItem<'a>>>,
         Option<bool>,
         Option<SettingsInterval<'a>>,
         Option<SettingsMode<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Settings<'a> {
@@ -699,9 +702,9 @@ impl<'a> SettingsBuilder<'a, settings_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SettingsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -716,11 +719,11 @@ where
         mut self,
         value: impl Into<Vec<settings::AvatarItem<'a>>>,
     ) -> SettingsBuilder<'a, settings_state::SetAvatars<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SettingsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -735,11 +738,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> SettingsBuilder<'a, settings_state::SetEnabled<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SettingsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -754,11 +757,11 @@ where
         mut self,
         value: impl Into<SettingsInterval<'a>>,
     ) -> SettingsBuilder<'a, settings_state::SetInterval<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SettingsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -773,11 +776,11 @@ where
         mut self,
         value: impl Into<SettingsMode<'a>>,
     ) -> SettingsBuilder<'a, settings_state::SetMode<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         SettingsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -785,18 +788,18 @@ where
 impl<'a, S> SettingsBuilder<'a, S>
 where
     S: settings_state::State,
-    S::Interval: settings_state::IsSet,
-    S::Enabled: settings_state::IsSet,
     S::Mode: settings_state::IsSet,
     S::Avatars: settings_state::IsSet,
+    S::Enabled: settings_state::IsSet,
+    S::Interval: settings_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Settings<'a> {
         Settings {
-            avatars: self.__unsafe_private_named.0.unwrap(),
-            enabled: self.__unsafe_private_named.1.unwrap(),
-            interval: self.__unsafe_private_named.2.unwrap(),
-            mode: self.__unsafe_private_named.3.unwrap(),
+            avatars: self._fields.0.unwrap(),
+            enabled: self._fields.1.unwrap(),
+            interval: self._fields.2.unwrap(),
+            mode: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -809,10 +812,10 @@ where
         >,
     ) -> Settings<'a> {
         Settings {
-            avatars: self.__unsafe_private_named.0.unwrap(),
-            enabled: self.__unsafe_private_named.1.unwrap(),
-            interval: self.__unsafe_private_named.2.unwrap(),
-            mode: self.__unsafe_private_named.3.unwrap(),
+            avatars: self._fields.0.unwrap(),
+            enabled: self._fields.1.unwrap(),
+            interval: self._fields.2.unwrap(),
+            mode: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -139,9 +142,9 @@ pub mod batch_item_state {
 
 /// Builder for constructing an instance of this type
 pub struct BatchItemBuilder<'a, S: batch_item_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<MessageInput<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<MessageInput<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> BatchItem<'a> {
@@ -155,9 +158,9 @@ impl<'a> BatchItemBuilder<'a, batch_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BatchItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -172,11 +175,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BatchItemBuilder<'a, batch_item_state::SetConvoId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BatchItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -191,11 +194,11 @@ where
         mut self,
         value: impl Into<MessageInput<'a>>,
     ) -> BatchItemBuilder<'a, batch_item_state::SetMessage<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         BatchItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -209,8 +212,8 @@ where
     /// Build the final struct
     pub fn build(self) -> BatchItem<'a> {
         BatchItem {
-            convo_id: self.__unsafe_private_named.0.unwrap(),
-            message: self.__unsafe_private_named.1.unwrap(),
+            convo_id: self._fields.0.unwrap(),
+            message: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -223,8 +226,8 @@ where
         >,
     ) -> BatchItem<'a> {
         BatchItem {
-            convo_id: self.__unsafe_private_named.0.unwrap(),
-            message: self.__unsafe_private_named.1.unwrap(),
+            convo_id: self._fields.0.unwrap(),
+            message: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -342,9 +345,9 @@ pub mod send_message_batch_state {
 
 /// Builder for constructing an instance of this type
 pub struct SendMessageBatchBuilder<'a, S: send_message_batch_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<send_message_batch::BatchItem<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<send_message_batch::BatchItem<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SendMessageBatch<'a> {
@@ -358,9 +361,9 @@ impl<'a> SendMessageBatchBuilder<'a, send_message_batch_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SendMessageBatchBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -375,11 +378,11 @@ where
         mut self,
         value: impl Into<Vec<send_message_batch::BatchItem<'a>>>,
     ) -> SendMessageBatchBuilder<'a, send_message_batch_state::SetItems<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SendMessageBatchBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -392,7 +395,7 @@ where
     /// Build the final struct
     pub fn build(self) -> SendMessageBatch<'a> {
         SendMessageBatch {
-            items: self.__unsafe_private_named.0.unwrap(),
+            items: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -405,7 +408,7 @@ where
         >,
     ) -> SendMessageBatch<'a> {
         SendMessageBatch {
-            items: self.__unsafe_private_named.0.unwrap(),
+            items: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

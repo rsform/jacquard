@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::Did;
@@ -107,59 +110,59 @@ pub mod delete_account_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Password;
         type Token;
         type Did;
-        type Password;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Password = Unset;
         type Token = Unset;
         type Did = Unset;
-        type Password = Unset;
-    }
-    ///State transition - sets the `token` field to Set
-    pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetToken<S> {}
-    impl<S: State> State for SetToken<S> {
-        type Token = Set<members::token>;
-        type Did = S::Did;
-        type Password = S::Password;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Token = S::Token;
-        type Did = Set<members::did>;
-        type Password = S::Password;
     }
     ///State transition - sets the `password` field to Set
     pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPassword<S> {}
     impl<S: State> State for SetPassword<S> {
+        type Password = Set<members::password>;
         type Token = S::Token;
         type Did = S::Did;
-        type Password = Set<members::password>;
+    }
+    ///State transition - sets the `token` field to Set
+    pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetToken<S> {}
+    impl<S: State> State for SetToken<S> {
+        type Password = S::Password;
+        type Token = Set<members::token>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Password = S::Password;
+        type Token = S::Token;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `password` field
+        pub struct password(());
         ///Marker type for the `token` field
         pub struct token(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `password` field
-        pub struct password(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DeleteAccountBuilder<'a, S: delete_account_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DeleteAccount<'a> {
@@ -173,9 +176,9 @@ impl<'a> DeleteAccountBuilder<'a, delete_account_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeleteAccountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -190,11 +193,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> DeleteAccountBuilder<'a, delete_account_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DeleteAccountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -209,11 +212,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DeleteAccountBuilder<'a, delete_account_state::SetPassword<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DeleteAccountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -228,11 +231,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DeleteAccountBuilder<'a, delete_account_state::SetToken<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         DeleteAccountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -240,16 +243,16 @@ where
 impl<'a, S> DeleteAccountBuilder<'a, S>
 where
     S: delete_account_state::State,
+    S::Password: delete_account_state::IsSet,
     S::Token: delete_account_state::IsSet,
     S::Did: delete_account_state::IsSet,
-    S::Password: delete_account_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeleteAccount<'a> {
         DeleteAccount {
-            did: self.__unsafe_private_named.0.unwrap(),
-            password: self.__unsafe_private_named.1.unwrap(),
-            token: self.__unsafe_private_named.2.unwrap(),
+            did: self._fields.0.unwrap(),
+            password: self._fields.1.unwrap(),
+            token: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -262,9 +265,9 @@ where
         >,
     ) -> DeleteAccount<'a> {
         DeleteAccount {
-            did: self.__unsafe_private_named.0.unwrap(),
-            password: self.__unsafe_private_named.1.unwrap(),
-            token: self.__unsafe_private_named.2.unwrap(),
+            did: self._fields.0.unwrap(),
+            password: self._fields.1.unwrap(),
+            token: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

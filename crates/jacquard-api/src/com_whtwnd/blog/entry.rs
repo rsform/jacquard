@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -193,8 +196,8 @@ pub mod entry_state {
 
 /// Builder for constructing an instance of this type
 pub struct EntryBuilder<'a, S: entry_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<BlobMetadata<'a>>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
@@ -205,7 +208,7 @@ pub struct EntryBuilder<'a, S: entry_state::State> {
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Entry<'a> {
@@ -219,19 +222,9 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -239,12 +232,12 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `blobs` field (optional)
     pub fn blobs(mut self, value: impl Into<Option<Vec<BlobMetadata<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `blobs` field to an Option value (optional)
     pub fn maybe_blobs(mut self, value: Option<Vec<BlobMetadata<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -259,11 +252,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EntryBuilder<'a, entry_state::SetContent<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -271,12 +264,12 @@ where
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -284,12 +277,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `isDraft` field (optional)
     pub fn is_draft(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `isDraft` field to an Option value (optional)
     pub fn maybe_is_draft(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -297,12 +290,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `ogp` field (optional)
     pub fn ogp(mut self, value: impl Into<Option<Ogp<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `ogp` field to an Option value (optional)
     pub fn maybe_ogp(mut self, value: Option<Ogp<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -310,12 +303,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `subtitle` field (optional)
     pub fn subtitle(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `subtitle` field to an Option value (optional)
     pub fn maybe_subtitle(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -323,12 +316,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `theme` field to an Option value (optional)
     pub fn maybe_theme(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -336,12 +329,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -349,12 +342,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `visibility` field (optional)
     pub fn visibility(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
     pub fn maybe_visibility(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -367,18 +360,15 @@ where
     /// Build the final struct
     pub fn build(self) -> Entry<'a> {
         Entry {
-            blobs: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2,
-            is_draft: self.__unsafe_private_named.3,
-            ogp: self.__unsafe_private_named.4,
-            subtitle: self.__unsafe_private_named.5,
-            theme: self.__unsafe_private_named.6,
-            title: self.__unsafe_private_named.7,
-            visibility: self
-                .__unsafe_private_named
-                .8
-                .or_else(|| Some(CowStr::from("public"))),
+            blobs: self._fields.0,
+            content: self._fields.1.unwrap(),
+            created_at: self._fields.2,
+            is_draft: self._fields.3,
+            ogp: self._fields.4,
+            subtitle: self._fields.5,
+            theme: self._fields.6,
+            title: self._fields.7,
+            visibility: self._fields.8.or_else(|| Some(CowStr::from("public"))),
             extra_data: Default::default(),
         }
     }
@@ -391,18 +381,15 @@ where
         >,
     ) -> Entry<'a> {
         Entry {
-            blobs: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2,
-            is_draft: self.__unsafe_private_named.3,
-            ogp: self.__unsafe_private_named.4,
-            subtitle: self.__unsafe_private_named.5,
-            theme: self.__unsafe_private_named.6,
-            title: self.__unsafe_private_named.7,
-            visibility: self
-                .__unsafe_private_named
-                .8
-                .or_else(|| Some(CowStr::from("public"))),
+            blobs: self._fields.0,
+            content: self._fields.1.unwrap(),
+            created_at: self._fields.2,
+            is_draft: self._fields.3,
+            ogp: self._fields.4,
+            subtitle: self._fields.5,
+            theme: self._fields.6,
+            title: self._fields.7,
+            visibility: self._fields.8.or_else(|| Some(CowStr::from("public"))),
             extra_data: Some(extra_data),
         }
     }

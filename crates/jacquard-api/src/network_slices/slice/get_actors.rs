@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -128,64 +131,59 @@ pub mod actor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
-        type SliceUri;
         type IndexedAt;
+        type SliceUri;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
-        type SliceUri = Unset;
         type IndexedAt = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type SliceUri = S::SliceUri;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `slice_uri` field to Set
-    pub struct SetSliceUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSliceUri<S> {}
-    impl<S: State> State for SetSliceUri<S> {
-        type Did = S::Did;
-        type SliceUri = Set<members::slice_uri>;
-        type IndexedAt = S::IndexedAt;
+        type SliceUri = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
-        type Did = S::Did;
-        type SliceUri = S::SliceUri;
         type IndexedAt = Set<members::indexed_at>;
+        type SliceUri = S::SliceUri;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `slice_uri` field to Set
+    pub struct SetSliceUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSliceUri<S> {}
+    impl<S: State> State for SetSliceUri<S> {
+        type IndexedAt = S::IndexedAt;
+        type SliceUri = Set<members::slice_uri>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type IndexedAt = S::IndexedAt;
+        type SliceUri = S::SliceUri;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `slice_uri` field
-        pub struct slice_uri(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `slice_uri` field
+        pub struct slice_uri(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ActorBuilder<'a, S: actor_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Did<'a>>,
-        Option<Handle<'a>>,
-        Option<Datetime>,
-        Option<CowStr<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<Handle<'a>>, Option<Datetime>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Actor<'a> {
@@ -199,9 +197,9 @@ impl<'a> ActorBuilder<'a, actor_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ActorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -216,11 +214,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> ActorBuilder<'a, actor_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ActorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -228,12 +226,12 @@ where
 impl<'a, S: actor_state::State> ActorBuilder<'a, S> {
     /// Set the `handle` field (optional)
     pub fn handle(mut self, value: impl Into<Option<Handle<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `handle` field to an Option value (optional)
     pub fn maybe_handle(mut self, value: Option<Handle<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -248,11 +246,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ActorBuilder<'a, actor_state::SetIndexedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ActorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -267,11 +265,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ActorBuilder<'a, actor_state::SetSliceUri<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ActorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -279,17 +277,17 @@ where
 impl<'a, S> ActorBuilder<'a, S>
 where
     S: actor_state::State,
-    S::Did: actor_state::IsSet,
-    S::SliceUri: actor_state::IsSet,
     S::IndexedAt: actor_state::IsSet,
+    S::SliceUri: actor_state::IsSet,
+    S::Did: actor_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Actor<'a> {
         Actor {
-            did: self.__unsafe_private_named.0.unwrap(),
-            handle: self.__unsafe_private_named.1,
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            slice_uri: self.__unsafe_private_named.3.unwrap(),
+            did: self._fields.0.unwrap(),
+            handle: self._fields.1,
+            indexed_at: self._fields.2.unwrap(),
+            slice_uri: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -299,10 +297,10 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Actor<'a> {
         Actor {
-            did: self.__unsafe_private_named.0.unwrap(),
-            handle: self.__unsafe_private_named.1,
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            slice_uri: self.__unsafe_private_named.3.unwrap(),
+            did: self._fields.0.unwrap(),
+            handle: self._fields.1,
+            indexed_at: self._fields.2.unwrap(),
+            slice_uri: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

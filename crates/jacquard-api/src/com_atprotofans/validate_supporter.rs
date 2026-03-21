@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::Did;
@@ -108,59 +111,59 @@ pub mod validate_supporter_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Subject;
         type Signer;
         type Supporter;
-        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Subject = Unset;
         type Signer = Unset;
         type Supporter = Unset;
-        type Subject = Unset;
-    }
-    ///State transition - sets the `signer` field to Set
-    pub struct SetSigner<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSigner<S> {}
-    impl<S: State> State for SetSigner<S> {
-        type Signer = Set<members::signer>;
-        type Supporter = S::Supporter;
-        type Subject = S::Subject;
-    }
-    ///State transition - sets the `supporter` field to Set
-    pub struct SetSupporter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSupporter<S> {}
-    impl<S: State> State for SetSupporter<S> {
-        type Signer = S::Signer;
-        type Supporter = Set<members::supporter>;
-        type Subject = S::Subject;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
+        type Subject = Set<members::subject>;
         type Signer = S::Signer;
         type Supporter = S::Supporter;
-        type Subject = Set<members::subject>;
+    }
+    ///State transition - sets the `signer` field to Set
+    pub struct SetSigner<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSigner<S> {}
+    impl<S: State> State for SetSigner<S> {
+        type Subject = S::Subject;
+        type Signer = Set<members::signer>;
+        type Supporter = S::Supporter;
+    }
+    ///State transition - sets the `supporter` field to Set
+    pub struct SetSupporter<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSupporter<S> {}
+    impl<S: State> State for SetSupporter<S> {
+        type Subject = S::Subject;
+        type Signer = S::Signer;
+        type Supporter = Set<members::supporter>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `signer` field
         pub struct signer(());
         ///Marker type for the `supporter` field
         pub struct supporter(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ValidateSupporterBuilder<'a, S: validate_supporter_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>, Option<Did<'a>>, Option<Did<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<Did<'a>>, Option<Did<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ValidateSupporter<'a> {
@@ -174,9 +177,9 @@ impl<'a> ValidateSupporterBuilder<'a, validate_supporter_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ValidateSupporterBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -191,11 +194,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> ValidateSupporterBuilder<'a, validate_supporter_state::SetSigner<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ValidateSupporterBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -210,11 +213,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> ValidateSupporterBuilder<'a, validate_supporter_state::SetSubject<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ValidateSupporterBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -229,11 +232,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> ValidateSupporterBuilder<'a, validate_supporter_state::SetSupporter<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ValidateSupporterBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -241,16 +244,16 @@ where
 impl<'a, S> ValidateSupporterBuilder<'a, S>
 where
     S: validate_supporter_state::State,
+    S::Subject: validate_supporter_state::IsSet,
     S::Signer: validate_supporter_state::IsSet,
     S::Supporter: validate_supporter_state::IsSet,
-    S::Subject: validate_supporter_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ValidateSupporter<'a> {
         ValidateSupporter {
-            signer: self.__unsafe_private_named.0.unwrap(),
-            subject: self.__unsafe_private_named.1.unwrap(),
-            supporter: self.__unsafe_private_named.2.unwrap(),
+            signer: self._fields.0.unwrap(),
+            subject: self._fields.1.unwrap(),
+            supporter: self._fields.2.unwrap(),
         }
     }
 }

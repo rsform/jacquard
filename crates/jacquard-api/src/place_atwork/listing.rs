@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -209,65 +212,65 @@ pub mod listing_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type NotAfter;
         type NotBefore;
         type Title;
-        type NotAfter;
         type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type NotAfter = Unset;
         type NotBefore = Unset;
         type Title = Unset;
-        type NotAfter = Unset;
         type Description = Unset;
+    }
+    ///State transition - sets the `not_after` field to Set
+    pub struct SetNotAfter<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNotAfter<S> {}
+    impl<S: State> State for SetNotAfter<S> {
+        type NotAfter = Set<members::not_after>;
+        type NotBefore = S::NotBefore;
+        type Title = S::Title;
+        type Description = S::Description;
     }
     ///State transition - sets the `not_before` field to Set
     pub struct SetNotBefore<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotBefore<S> {}
     impl<S: State> State for SetNotBefore<S> {
+        type NotAfter = S::NotAfter;
         type NotBefore = Set<members::not_before>;
         type Title = S::Title;
-        type NotAfter = S::NotAfter;
         type Description = S::Description;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
+        type NotAfter = S::NotAfter;
         type NotBefore = S::NotBefore;
         type Title = Set<members::title>;
-        type NotAfter = S::NotAfter;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `not_after` field to Set
-    pub struct SetNotAfter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotAfter<S> {}
-    impl<S: State> State for SetNotAfter<S> {
-        type NotBefore = S::NotBefore;
-        type Title = S::Title;
-        type NotAfter = Set<members::not_after>;
         type Description = S::Description;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
+        type NotAfter = S::NotAfter;
         type NotBefore = S::NotBefore;
         type Title = S::Title;
-        type NotAfter = S::NotAfter;
         type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `not_after` field
+        pub struct not_after(());
         ///Marker type for the `not_before` field
         pub struct not_before(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `not_after` field
-        pub struct not_after(());
         ///Marker type for the `description` field
         pub struct description(());
     }
@@ -275,8 +278,8 @@ pub mod listing_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListingBuilder<'a, S: listing_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<UriValue<'a>>,
         Option<BlobRef<'a>>,
         Option<CowStr<'a>>,
@@ -286,7 +289,7 @@ pub struct ListingBuilder<'a, S: listing_state::State> {
         Option<Datetime>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Listing<'a> {
@@ -300,9 +303,9 @@ impl<'a> ListingBuilder<'a, listing_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -310,12 +313,12 @@ impl<'a> ListingBuilder<'a, listing_state::Empty> {
 impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
     /// Set the `applyLink` field (optional)
     pub fn apply_link(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `applyLink` field to an Option value (optional)
     pub fn maybe_apply_link(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -323,12 +326,12 @@ impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
 impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
     /// Set the `banner` field (optional)
     pub fn banner(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `banner` field to an Option value (optional)
     pub fn maybe_banner(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -343,11 +346,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ListingBuilder<'a, listing_state::SetDescription<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ListingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -355,12 +358,12 @@ where
 impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
     pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -368,12 +371,12 @@ impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
 impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
     /// Set the `locations` field (optional)
     pub fn locations(mut self, value: impl Into<Option<Vec<Hthree<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `locations` field to an Option value (optional)
     pub fn maybe_locations(mut self, value: Option<Vec<Hthree<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -388,11 +391,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ListingBuilder<'a, listing_state::SetNotAfter<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ListingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -407,11 +410,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ListingBuilder<'a, listing_state::SetNotBefore<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         ListingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -426,11 +429,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ListingBuilder<'a, listing_state::SetTitle<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         ListingBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -438,22 +441,22 @@ where
 impl<'a, S> ListingBuilder<'a, S>
 where
     S: listing_state::State,
+    S::NotAfter: listing_state::IsSet,
     S::NotBefore: listing_state::IsSet,
     S::Title: listing_state::IsSet,
-    S::NotAfter: listing_state::IsSet,
     S::Description: listing_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Listing<'a> {
         Listing {
-            apply_link: self.__unsafe_private_named.0,
-            banner: self.__unsafe_private_named.1,
-            description: self.__unsafe_private_named.2.unwrap(),
-            facets: self.__unsafe_private_named.3,
-            locations: self.__unsafe_private_named.4,
-            not_after: self.__unsafe_private_named.5.unwrap(),
-            not_before: self.__unsafe_private_named.6.unwrap(),
-            title: self.__unsafe_private_named.7.unwrap(),
+            apply_link: self._fields.0,
+            banner: self._fields.1,
+            description: self._fields.2.unwrap(),
+            facets: self._fields.3,
+            locations: self._fields.4,
+            not_after: self._fields.5.unwrap(),
+            not_before: self._fields.6.unwrap(),
+            title: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -466,14 +469,14 @@ where
         >,
     ) -> Listing<'a> {
         Listing {
-            apply_link: self.__unsafe_private_named.0,
-            banner: self.__unsafe_private_named.1,
-            description: self.__unsafe_private_named.2.unwrap(),
-            facets: self.__unsafe_private_named.3,
-            locations: self.__unsafe_private_named.4,
-            not_after: self.__unsafe_private_named.5.unwrap(),
-            not_before: self.__unsafe_private_named.6.unwrap(),
-            title: self.__unsafe_private_named.7.unwrap(),
+            apply_link: self._fields.0,
+            banner: self._fields.1,
+            description: self._fields.2.unwrap(),
+            facets: self._fields.3,
+            locations: self._fields.4,
+            not_after: self._fields.5.unwrap(),
+            not_before: self._fields.6.unwrap(),
+            title: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }

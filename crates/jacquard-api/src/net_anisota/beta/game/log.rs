@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -1098,49 +1101,49 @@ pub mod log_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Timestamp;
         type EventType;
+        type Timestamp;
         type SessionId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Timestamp = Unset;
         type EventType = Unset;
+        type Timestamp = Unset;
         type SessionId = Unset;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Timestamp = Set<members::timestamp>;
-        type EventType = S::EventType;
-        type SessionId = S::SessionId;
     }
     ///State transition - sets the `event_type` field to Set
     pub struct SetEventType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEventType<S> {}
     impl<S: State> State for SetEventType<S> {
-        type Timestamp = S::Timestamp;
         type EventType = Set<members::event_type>;
+        type Timestamp = S::Timestamp;
+        type SessionId = S::SessionId;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
+    impl<S: State> State for SetTimestamp<S> {
+        type EventType = S::EventType;
+        type Timestamp = Set<members::timestamp>;
         type SessionId = S::SessionId;
     }
     ///State transition - sets the `session_id` field to Set
     pub struct SetSessionId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSessionId<S> {}
     impl<S: State> State for SetSessionId<S> {
-        type Timestamp = S::Timestamp;
         type EventType = S::EventType;
+        type Timestamp = S::Timestamp;
         type SessionId = Set<members::session_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
         ///Marker type for the `event_type` field
         pub struct event_type(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
         ///Marker type for the `session_id` field
         pub struct session_id(());
     }
@@ -1148,8 +1151,8 @@ pub mod log_state {
 
 /// Builder for constructing an instance of this type
 pub struct LogBuilder<'a, S: log_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<log::CollectionData<'a>>,
         Option<Datetime>,
         Option<log::DailyRewardsData<'a>>,
@@ -1165,7 +1168,7 @@ pub struct LogBuilder<'a, S: log_state::State> {
         Option<CowStr<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Log<'a> {
@@ -1179,8 +1182,8 @@ impl<'a> LogBuilder<'a, log_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LogBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -1196,7 +1199,7 @@ impl<'a> LogBuilder<'a, log_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1207,7 +1210,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
         mut self,
         value: impl Into<Option<log::CollectionData<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `collectionData` field to an Option value (optional)
@@ -1215,7 +1218,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
         mut self,
         value: Option<log::CollectionData<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1223,12 +1226,12 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
 impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1239,7 +1242,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
         mut self,
         value: impl Into<Option<log::DailyRewardsData<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `dailyRewardsData` field to an Option value (optional)
@@ -1247,7 +1250,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
         mut self,
         value: Option<log::DailyRewardsData<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1262,11 +1265,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LogBuilder<'a, log_state::SetEventType<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         LogBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1277,12 +1280,12 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
         mut self,
         value: impl Into<Option<log::FeedContext<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `feedContext` field to an Option value (optional)
     pub fn maybe_feed_context(mut self, value: Option<log::FeedContext<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1293,12 +1296,12 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
         mut self,
         value: impl Into<Option<log::GameCardData<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `gameCardData` field to an Option value (optional)
     pub fn maybe_game_card_data(mut self, value: Option<log::GameCardData<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1306,12 +1309,12 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
 impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `gameCardId` field (optional)
     pub fn game_card_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `gameCardId` field to an Option value (optional)
     pub fn maybe_game_card_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1322,7 +1325,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
         mut self,
         value: impl Into<Option<log::ItemUsageData<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `itemUsageData` field to an Option value (optional)
@@ -1330,7 +1333,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
         mut self,
         value: Option<log::ItemUsageData<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -1338,12 +1341,12 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
 impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<log::Metadata<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
     pub fn maybe_metadata(mut self, value: Option<log::Metadata<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -1351,12 +1354,12 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
 impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `parentLogUri` field (optional)
     pub fn parent_log_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `parentLogUri` field to an Option value (optional)
     pub fn maybe_parent_log_uri(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -1364,12 +1367,12 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
 impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `rootLogUri` field (optional)
     pub fn root_log_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `rootLogUri` field to an Option value (optional)
     pub fn maybe_root_log_uri(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -1384,11 +1387,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LogBuilder<'a, log_state::SetSessionId<S>> {
-        self.__unsafe_private_named.11 = Option::Some(value.into());
+        self._fields.11 = Option::Some(value.into());
         LogBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1396,12 +1399,12 @@ where
 impl<'a, S: log_state::State> LogBuilder<'a, S> {
     /// Set the `sessionUri` field (optional)
     pub fn session_uri(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `sessionUri` field to an Option value (optional)
     pub fn maybe_session_uri(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -1416,11 +1419,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LogBuilder<'a, log_state::SetTimestamp<S>> {
-        self.__unsafe_private_named.13 = Option::Some(value.into());
+        self._fields.13 = Option::Some(value.into());
         LogBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1428,27 +1431,27 @@ where
 impl<'a, S> LogBuilder<'a, S>
 where
     S: log_state::State,
-    S::Timestamp: log_state::IsSet,
     S::EventType: log_state::IsSet,
+    S::Timestamp: log_state::IsSet,
     S::SessionId: log_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Log<'a> {
         Log {
-            collection_data: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            daily_rewards_data: self.__unsafe_private_named.2,
-            event_type: self.__unsafe_private_named.3.unwrap(),
-            feed_context: self.__unsafe_private_named.4,
-            game_card_data: self.__unsafe_private_named.5,
-            game_card_id: self.__unsafe_private_named.6,
-            item_usage_data: self.__unsafe_private_named.7,
-            metadata: self.__unsafe_private_named.8,
-            parent_log_uri: self.__unsafe_private_named.9,
-            root_log_uri: self.__unsafe_private_named.10,
-            session_id: self.__unsafe_private_named.11.unwrap(),
-            session_uri: self.__unsafe_private_named.12,
-            timestamp: self.__unsafe_private_named.13.unwrap(),
+            collection_data: self._fields.0,
+            created_at: self._fields.1,
+            daily_rewards_data: self._fields.2,
+            event_type: self._fields.3.unwrap(),
+            feed_context: self._fields.4,
+            game_card_data: self._fields.5,
+            game_card_id: self._fields.6,
+            item_usage_data: self._fields.7,
+            metadata: self._fields.8,
+            parent_log_uri: self._fields.9,
+            root_log_uri: self._fields.10,
+            session_id: self._fields.11.unwrap(),
+            session_uri: self._fields.12,
+            timestamp: self._fields.13.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1458,20 +1461,20 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Log<'a> {
         Log {
-            collection_data: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            daily_rewards_data: self.__unsafe_private_named.2,
-            event_type: self.__unsafe_private_named.3.unwrap(),
-            feed_context: self.__unsafe_private_named.4,
-            game_card_data: self.__unsafe_private_named.5,
-            game_card_id: self.__unsafe_private_named.6,
-            item_usage_data: self.__unsafe_private_named.7,
-            metadata: self.__unsafe_private_named.8,
-            parent_log_uri: self.__unsafe_private_named.9,
-            root_log_uri: self.__unsafe_private_named.10,
-            session_id: self.__unsafe_private_named.11.unwrap(),
-            session_uri: self.__unsafe_private_named.12,
-            timestamp: self.__unsafe_private_named.13.unwrap(),
+            collection_data: self._fields.0,
+            created_at: self._fields.1,
+            daily_rewards_data: self._fields.2,
+            event_type: self._fields.3.unwrap(),
+            feed_context: self._fields.4,
+            game_card_data: self._fields.5,
+            game_card_id: self._fields.6,
+            item_usage_data: self._fields.7,
+            metadata: self._fields.8,
+            parent_log_uri: self._fields.9,
+            root_log_uri: self._fields.10,
+            session_id: self._fields.11.unwrap(),
+            session_uri: self._fields.12,
+            timestamp: self._fields.13.unwrap(),
             extra_data: Some(extra_data),
         }
     }

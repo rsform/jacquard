@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -357,92 +360,92 @@ pub mod minigame_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GameContext;
+        type RoundDuration;
         type PlayedAt;
         type FinalScore;
         type ShapesCollected;
-        type RoundDuration;
+        type GameContext;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GameContext = Unset;
+        type RoundDuration = Unset;
         type PlayedAt = Unset;
         type FinalScore = Unset;
         type ShapesCollected = Unset;
-        type RoundDuration = Unset;
-    }
-    ///State transition - sets the `game_context` field to Set
-    pub struct SetGameContext<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGameContext<S> {}
-    impl<S: State> State for SetGameContext<S> {
-        type GameContext = Set<members::game_context>;
-        type PlayedAt = S::PlayedAt;
-        type FinalScore = S::FinalScore;
-        type ShapesCollected = S::ShapesCollected;
-        type RoundDuration = S::RoundDuration;
-    }
-    ///State transition - sets the `played_at` field to Set
-    pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
-    impl<S: State> State for SetPlayedAt<S> {
-        type GameContext = S::GameContext;
-        type PlayedAt = Set<members::played_at>;
-        type FinalScore = S::FinalScore;
-        type ShapesCollected = S::ShapesCollected;
-        type RoundDuration = S::RoundDuration;
-    }
-    ///State transition - sets the `final_score` field to Set
-    pub struct SetFinalScore<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFinalScore<S> {}
-    impl<S: State> State for SetFinalScore<S> {
-        type GameContext = S::GameContext;
-        type PlayedAt = S::PlayedAt;
-        type FinalScore = Set<members::final_score>;
-        type ShapesCollected = S::ShapesCollected;
-        type RoundDuration = S::RoundDuration;
-    }
-    ///State transition - sets the `shapes_collected` field to Set
-    pub struct SetShapesCollected<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShapesCollected<S> {}
-    impl<S: State> State for SetShapesCollected<S> {
-        type GameContext = S::GameContext;
-        type PlayedAt = S::PlayedAt;
-        type FinalScore = S::FinalScore;
-        type ShapesCollected = Set<members::shapes_collected>;
-        type RoundDuration = S::RoundDuration;
+        type GameContext = Unset;
     }
     ///State transition - sets the `round_duration` field to Set
     pub struct SetRoundDuration<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRoundDuration<S> {}
     impl<S: State> State for SetRoundDuration<S> {
-        type GameContext = S::GameContext;
+        type RoundDuration = Set<members::round_duration>;
         type PlayedAt = S::PlayedAt;
         type FinalScore = S::FinalScore;
         type ShapesCollected = S::ShapesCollected;
-        type RoundDuration = Set<members::round_duration>;
+        type GameContext = S::GameContext;
+    }
+    ///State transition - sets the `played_at` field to Set
+    pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
+    impl<S: State> State for SetPlayedAt<S> {
+        type RoundDuration = S::RoundDuration;
+        type PlayedAt = Set<members::played_at>;
+        type FinalScore = S::FinalScore;
+        type ShapesCollected = S::ShapesCollected;
+        type GameContext = S::GameContext;
+    }
+    ///State transition - sets the `final_score` field to Set
+    pub struct SetFinalScore<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFinalScore<S> {}
+    impl<S: State> State for SetFinalScore<S> {
+        type RoundDuration = S::RoundDuration;
+        type PlayedAt = S::PlayedAt;
+        type FinalScore = Set<members::final_score>;
+        type ShapesCollected = S::ShapesCollected;
+        type GameContext = S::GameContext;
+    }
+    ///State transition - sets the `shapes_collected` field to Set
+    pub struct SetShapesCollected<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShapesCollected<S> {}
+    impl<S: State> State for SetShapesCollected<S> {
+        type RoundDuration = S::RoundDuration;
+        type PlayedAt = S::PlayedAt;
+        type FinalScore = S::FinalScore;
+        type ShapesCollected = Set<members::shapes_collected>;
+        type GameContext = S::GameContext;
+    }
+    ///State transition - sets the `game_context` field to Set
+    pub struct SetGameContext<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGameContext<S> {}
+    impl<S: State> State for SetGameContext<S> {
+        type RoundDuration = S::RoundDuration;
+        type PlayedAt = S::PlayedAt;
+        type FinalScore = S::FinalScore;
+        type ShapesCollected = S::ShapesCollected;
+        type GameContext = Set<members::game_context>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `game_context` field
-        pub struct game_context(());
+        ///Marker type for the `round_duration` field
+        pub struct round_duration(());
         ///Marker type for the `played_at` field
         pub struct played_at(());
         ///Marker type for the `final_score` field
         pub struct final_score(());
         ///Marker type for the `shapes_collected` field
         pub struct shapes_collected(());
-        ///Marker type for the `round_duration` field
-        pub struct round_duration(());
+        ///Marker type for the `game_context` field
+        pub struct game_context(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MinigameBuilder<'a, S: minigame_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<i64>,
@@ -461,7 +464,7 @@ pub struct MinigameBuilder<'a, S: minigame_state::State> {
         Option<i64>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Minigame<'a> {
@@ -475,8 +478,8 @@ impl<'a> MinigameBuilder<'a, minigame_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MinigameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -495,7 +498,7 @@ impl<'a> MinigameBuilder<'a, minigame_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -503,12 +506,12 @@ impl<'a> MinigameBuilder<'a, minigame_state::Empty> {
 impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     /// Set the `clientVersion` field (optional)
     pub fn client_version(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `clientVersion` field to an Option value (optional)
     pub fn maybe_client_version(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -516,12 +519,12 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
 impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -529,12 +532,12 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
 impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     /// Set the `earlyHarvests` field (optional)
     pub fn early_harvests(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `earlyHarvests` field to an Option value (optional)
     pub fn maybe_early_harvests(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -542,12 +545,12 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
 impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     /// Set the `efficiencyBonus` field (optional)
     pub fn efficiency_bonus(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `efficiencyBonus` field to an Option value (optional)
     pub fn maybe_efficiency_bonus(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -562,11 +565,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> MinigameBuilder<'a, minigame_state::SetFinalScore<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         MinigameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -581,11 +584,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> MinigameBuilder<'a, minigame_state::SetGameContext<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         MinigameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -593,12 +596,12 @@ where
 impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     /// Set the `lateHarvests` field (optional)
     pub fn late_harvests(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `lateHarvests` field to an Option value (optional)
     pub fn maybe_late_harvests(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -606,12 +609,12 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
 impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     /// Set the `peakHarvestRate` field (optional)
     pub fn peak_harvest_rate(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `peakHarvestRate` field to an Option value (optional)
     pub fn maybe_peak_harvest_rate(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -619,12 +622,12 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
 impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     /// Set the `peakRateBonus` field (optional)
     pub fn peak_rate_bonus(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `peakRateBonus` field to an Option value (optional)
     pub fn maybe_peak_rate_bonus(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -632,12 +635,12 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
 impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     /// Set the `perfectHarvests` field (optional)
     pub fn perfect_harvests(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `perfectHarvests` field to an Option value (optional)
     pub fn maybe_perfect_harvests(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -652,11 +655,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> MinigameBuilder<'a, minigame_state::SetPlayedAt<S>> {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         MinigameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -664,12 +667,12 @@ where
 impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     /// Set the `pointsPerSecond` field (optional)
     pub fn points_per_second(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `pointsPerSecond` field to an Option value (optional)
     pub fn maybe_points_per_second(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -680,7 +683,7 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
         mut self,
         value: impl Into<Option<minigame::RarityBreakdown<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `rarityBreakdown` field to an Option value (optional)
@@ -688,7 +691,7 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
         mut self,
         value: Option<minigame::RarityBreakdown<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -703,11 +706,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> MinigameBuilder<'a, minigame_state::SetRoundDuration<S>> {
-        self.__unsafe_private_named.13 = Option::Some(value.into());
+        self._fields.13 = Option::Some(value.into());
         MinigameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -722,11 +725,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> MinigameBuilder<'a, minigame_state::SetShapesCollected<S>> {
-        self.__unsafe_private_named.14 = Option::Some(value.into());
+        self._fields.14 = Option::Some(value.into());
         MinigameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -734,12 +737,12 @@ where
 impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     /// Set the `shapesMissed` field (optional)
     pub fn shapes_missed(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `shapesMissed` field to an Option value (optional)
     pub fn maybe_shapes_missed(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -747,12 +750,12 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
 impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     /// Set the `totalShapesSpawned` field (optional)
     pub fn total_shapes_spawned(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `totalShapesSpawned` field to an Option value (optional)
     pub fn maybe_total_shapes_spawned(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -760,32 +763,32 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
 impl<'a, S> MinigameBuilder<'a, S>
 where
     S: minigame_state::State,
-    S::GameContext: minigame_state::IsSet,
+    S::RoundDuration: minigame_state::IsSet,
     S::PlayedAt: minigame_state::IsSet,
     S::FinalScore: minigame_state::IsSet,
     S::ShapesCollected: minigame_state::IsSet,
-    S::RoundDuration: minigame_state::IsSet,
+    S::GameContext: minigame_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Minigame<'a> {
         Minigame {
-            client_version: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            early_harvests: self.__unsafe_private_named.2,
-            efficiency_bonus: self.__unsafe_private_named.3,
-            final_score: self.__unsafe_private_named.4.unwrap(),
-            game_context: self.__unsafe_private_named.5.unwrap(),
-            late_harvests: self.__unsafe_private_named.6,
-            peak_harvest_rate: self.__unsafe_private_named.7,
-            peak_rate_bonus: self.__unsafe_private_named.8,
-            perfect_harvests: self.__unsafe_private_named.9,
-            played_at: self.__unsafe_private_named.10.unwrap(),
-            points_per_second: self.__unsafe_private_named.11,
-            rarity_breakdown: self.__unsafe_private_named.12,
-            round_duration: self.__unsafe_private_named.13.unwrap(),
-            shapes_collected: self.__unsafe_private_named.14.unwrap(),
-            shapes_missed: self.__unsafe_private_named.15,
-            total_shapes_spawned: self.__unsafe_private_named.16,
+            client_version: self._fields.0,
+            created_at: self._fields.1,
+            early_harvests: self._fields.2,
+            efficiency_bonus: self._fields.3,
+            final_score: self._fields.4.unwrap(),
+            game_context: self._fields.5.unwrap(),
+            late_harvests: self._fields.6,
+            peak_harvest_rate: self._fields.7,
+            peak_rate_bonus: self._fields.8,
+            perfect_harvests: self._fields.9,
+            played_at: self._fields.10.unwrap(),
+            points_per_second: self._fields.11,
+            rarity_breakdown: self._fields.12,
+            round_duration: self._fields.13.unwrap(),
+            shapes_collected: self._fields.14.unwrap(),
+            shapes_missed: self._fields.15,
+            total_shapes_spawned: self._fields.16,
             extra_data: Default::default(),
         }
     }
@@ -798,23 +801,23 @@ where
         >,
     ) -> Minigame<'a> {
         Minigame {
-            client_version: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1,
-            early_harvests: self.__unsafe_private_named.2,
-            efficiency_bonus: self.__unsafe_private_named.3,
-            final_score: self.__unsafe_private_named.4.unwrap(),
-            game_context: self.__unsafe_private_named.5.unwrap(),
-            late_harvests: self.__unsafe_private_named.6,
-            peak_harvest_rate: self.__unsafe_private_named.7,
-            peak_rate_bonus: self.__unsafe_private_named.8,
-            perfect_harvests: self.__unsafe_private_named.9,
-            played_at: self.__unsafe_private_named.10.unwrap(),
-            points_per_second: self.__unsafe_private_named.11,
-            rarity_breakdown: self.__unsafe_private_named.12,
-            round_duration: self.__unsafe_private_named.13.unwrap(),
-            shapes_collected: self.__unsafe_private_named.14.unwrap(),
-            shapes_missed: self.__unsafe_private_named.15,
-            total_shapes_spawned: self.__unsafe_private_named.16,
+            client_version: self._fields.0,
+            created_at: self._fields.1,
+            early_harvests: self._fields.2,
+            efficiency_bonus: self._fields.3,
+            final_score: self._fields.4.unwrap(),
+            game_context: self._fields.5.unwrap(),
+            late_harvests: self._fields.6,
+            peak_harvest_rate: self._fields.7,
+            peak_rate_bonus: self._fields.8,
+            perfect_harvests: self._fields.9,
+            played_at: self._fields.10.unwrap(),
+            points_per_second: self._fields.11,
+            rarity_breakdown: self._fields.12,
+            round_duration: self._fields.13.unwrap(),
+            shapes_collected: self._fields.14.unwrap(),
+            shapes_missed: self._fields.15,
+            total_shapes_spawned: self._fields.16,
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -121,58 +124,58 @@ pub mod draft_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Cid;
         type CreatedAt;
         type Uri;
-        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Cid = Unset;
         type CreatedAt = Unset;
         type Uri = Unset;
-        type Cid = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type CreatedAt = S::CreatedAt;
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
+        type Cid = Set<members::cid>;
         type CreatedAt = S::CreatedAt;
         type Uri = S::Uri;
-        type Cid = Set<members::cid>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Cid = S::Cid;
+        type CreatedAt = Set<members::created_at>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Cid = S::Cid;
+        type CreatedAt = S::CreatedAt;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DraftViewBuilder<'a, S: draft_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Cid<'a>>,
         Option<Datetime>,
         Option<StrongRef<'a>>,
@@ -180,7 +183,7 @@ pub struct DraftViewBuilder<'a, S: draft_view_state::State> {
         Option<CowStr<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DraftView<'a> {
@@ -194,9 +197,9 @@ impl<'a> DraftViewBuilder<'a, draft_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DraftViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -211,11 +214,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> DraftViewBuilder<'a, draft_view_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DraftViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -230,11 +233,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> DraftViewBuilder<'a, draft_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DraftViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -242,12 +245,12 @@ where
 impl<'a, S: draft_view_state::State> DraftViewBuilder<'a, S> {
     /// Set the `editRoot` field (optional)
     pub fn edit_root(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `editRoot` field to an Option value (optional)
     pub fn maybe_edit_root(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -255,12 +258,12 @@ impl<'a, S: draft_view_state::State> DraftViewBuilder<'a, S> {
 impl<'a, S: draft_view_state::State> DraftViewBuilder<'a, S> {
     /// Set the `lastEditAt` field (optional)
     pub fn last_edit_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `lastEditAt` field to an Option value (optional)
     pub fn maybe_last_edit_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -268,12 +271,12 @@ impl<'a, S: draft_view_state::State> DraftViewBuilder<'a, S> {
 impl<'a, S: draft_view_state::State> DraftViewBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -288,11 +291,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> DraftViewBuilder<'a, draft_view_state::SetUri<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         DraftViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -300,19 +303,19 @@ where
 impl<'a, S> DraftViewBuilder<'a, S>
 where
     S: draft_view_state::State,
+    S::Cid: draft_view_state::IsSet,
     S::CreatedAt: draft_view_state::IsSet,
     S::Uri: draft_view_state::IsSet,
-    S::Cid: draft_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DraftView<'a> {
         DraftView {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            edit_root: self.__unsafe_private_named.2,
-            last_edit_at: self.__unsafe_private_named.3,
-            title: self.__unsafe_private_named.4,
-            uri: self.__unsafe_private_named.5.unwrap(),
+            cid: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            edit_root: self._fields.2,
+            last_edit_at: self._fields.3,
+            title: self._fields.4,
+            uri: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -325,12 +328,12 @@ where
         >,
     ) -> DraftView<'a> {
         DraftView {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            edit_root: self.__unsafe_private_named.2,
-            last_edit_at: self.__unsafe_private_named.3,
-            title: self.__unsafe_private_named.4,
-            uri: self.__unsafe_private_named.5.unwrap(),
+            cid: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            edit_root: self._fields.2,
+            last_edit_at: self._fields.3,
+            title: self._fields.4,
+            uri: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -495,9 +498,9 @@ pub mod list_drafts_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListDraftsBuilder<'a, S: list_drafts_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtIdentifier<'a>>, Option<CowStr<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ListDrafts<'a> {
@@ -511,9 +514,9 @@ impl<'a> ListDraftsBuilder<'a, list_drafts_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListDraftsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -528,11 +531,11 @@ where
         mut self,
         value: impl Into<AtIdentifier<'a>>,
     ) -> ListDraftsBuilder<'a, list_drafts_state::SetActor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ListDraftsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -540,12 +543,12 @@ where
 impl<'a, S: list_drafts_state::State> ListDraftsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -553,12 +556,12 @@ impl<'a, S: list_drafts_state::State> ListDraftsBuilder<'a, S> {
 impl<'a, S: list_drafts_state::State> ListDraftsBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -571,9 +574,9 @@ where
     /// Build the final struct
     pub fn build(self) -> ListDrafts<'a> {
         ListDrafts {
-            actor: self.__unsafe_private_named.0.unwrap(),
-            cursor: self.__unsafe_private_named.1,
-            limit: self.__unsafe_private_named.2,
+            actor: self._fields.0.unwrap(),
+            cursor: self._fields.1,
+            limit: self._fields.2,
         }
     }
 }

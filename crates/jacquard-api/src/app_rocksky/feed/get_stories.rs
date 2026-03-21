@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -73,8 +74,8 @@ pub mod get_stories_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetStoriesBuilder<S: get_stories_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>,),
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>,),
 }
 
 impl GetStories {
@@ -88,8 +89,8 @@ impl GetStoriesBuilder<get_stories_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetStoriesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
+            _state: PhantomData,
+            _fields: (None,),
         }
     }
 }
@@ -97,12 +98,12 @@ impl GetStoriesBuilder<get_stories_state::Empty> {
 impl<S: get_stories_state::State> GetStoriesBuilder<S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
     pub fn maybe_size(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -113,8 +114,6 @@ where
 {
     /// Build the final struct
     pub fn build(self) -> GetStories {
-        GetStories {
-            size: self.__unsafe_private_named.0,
-        }
+        GetStories { size: self._fields.0 }
     }
 }

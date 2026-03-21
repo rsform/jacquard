@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -148,13 +151,9 @@ pub mod get_sparklines_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetSparklinesBuilder<'a, S: get_sparklines_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<Vec<CowStr<'a>>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Vec<CowStr<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetSparklines<'a> {
@@ -168,9 +167,9 @@ impl<'a> GetSparklinesBuilder<'a, get_sparklines_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetSparklinesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -178,12 +177,12 @@ impl<'a> GetSparklinesBuilder<'a, get_sparklines_state::Empty> {
 impl<'a, S: get_sparklines_state::State> GetSparklinesBuilder<'a, S> {
     /// Set the `duration` field (optional)
     pub fn duration(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `duration` field to an Option value (optional)
     pub fn maybe_duration(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -191,12 +190,12 @@ impl<'a, S: get_sparklines_state::State> GetSparklinesBuilder<'a, S> {
 impl<'a, S: get_sparklines_state::State> GetSparklinesBuilder<'a, S> {
     /// Set the `interval` field (optional)
     pub fn interval(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `interval` field to an Option value (optional)
     pub fn maybe_interval(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -211,11 +210,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> GetSparklinesBuilder<'a, get_sparklines_state::SetSlices<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         GetSparklinesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -228,15 +227,9 @@ where
     /// Build the final struct
     pub fn build(self) -> GetSparklines<'a> {
         GetSparklines {
-            duration: self
-                .__unsafe_private_named
-                .0
-                .or_else(|| Some(CowStr::from("24h"))),
-            interval: self
-                .__unsafe_private_named
-                .1
-                .or_else(|| Some(CowStr::from("hour"))),
-            slices: self.__unsafe_private_named.2.unwrap(),
+            duration: self._fields.0.or_else(|| Some(CowStr::from("24h"))),
+            interval: self._fields.1.or_else(|| Some(CowStr::from("hour"))),
+            slices: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -249,15 +242,9 @@ where
         >,
     ) -> GetSparklines<'a> {
         GetSparklines {
-            duration: self
-                .__unsafe_private_named
-                .0
-                .or_else(|| Some(CowStr::from("24h"))),
-            interval: self
-                .__unsafe_private_named
-                .1
-                .or_else(|| Some(CowStr::from("hour"))),
-            slices: self.__unsafe_private_named.2.unwrap(),
+            duration: self._fields.0.or_else(|| Some(CowStr::from("24h"))),
+            interval: self._fields.1.or_else(|| Some(CowStr::from("hour"))),
+            slices: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -273,45 +260,45 @@ pub mod sparkline_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Points;
         type SliceUri;
+        type Points;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Points = Unset;
         type SliceUri = Unset;
-    }
-    ///State transition - sets the `points` field to Set
-    pub struct SetPoints<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPoints<S> {}
-    impl<S: State> State for SetPoints<S> {
-        type Points = Set<members::points>;
-        type SliceUri = S::SliceUri;
+        type Points = Unset;
     }
     ///State transition - sets the `slice_uri` field to Set
     pub struct SetSliceUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSliceUri<S> {}
     impl<S: State> State for SetSliceUri<S> {
-        type Points = S::Points;
         type SliceUri = Set<members::slice_uri>;
+        type Points = S::Points;
+    }
+    ///State transition - sets the `points` field to Set
+    pub struct SetPoints<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPoints<S> {}
+    impl<S: State> State for SetPoints<S> {
+        type SliceUri = S::SliceUri;
+        type Points = Set<members::points>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `points` field
-        pub struct points(());
         ///Marker type for the `slice_uri` field
         pub struct slice_uri(());
+        ///Marker type for the `points` field
+        pub struct points(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SparklineEntryBuilder<'a, S: sparkline_entry_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<SparklinePoint<'a>>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<SparklinePoint<'a>>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SparklineEntry<'a> {
@@ -325,9 +312,9 @@ impl<'a> SparklineEntryBuilder<'a, sparkline_entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SparklineEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -342,11 +329,11 @@ where
         mut self,
         value: impl Into<Vec<SparklinePoint<'a>>>,
     ) -> SparklineEntryBuilder<'a, sparkline_entry_state::SetPoints<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SparklineEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -361,11 +348,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SparklineEntryBuilder<'a, sparkline_entry_state::SetSliceUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SparklineEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -373,14 +360,14 @@ where
 impl<'a, S> SparklineEntryBuilder<'a, S>
 where
     S: sparkline_entry_state::State,
-    S::Points: sparkline_entry_state::IsSet,
     S::SliceUri: sparkline_entry_state::IsSet,
+    S::Points: sparkline_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> SparklineEntry<'a> {
         SparklineEntry {
-            points: self.__unsafe_private_named.0.unwrap(),
-            slice_uri: self.__unsafe_private_named.1.unwrap(),
+            points: self._fields.0.unwrap(),
+            slice_uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -393,8 +380,8 @@ where
         >,
     ) -> SparklineEntry<'a> {
         SparklineEntry {
-            points: self.__unsafe_private_named.0.unwrap(),
-            slice_uri: self.__unsafe_private_named.1.unwrap(),
+            points: self._fields.0.unwrap(),
+            slice_uri: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

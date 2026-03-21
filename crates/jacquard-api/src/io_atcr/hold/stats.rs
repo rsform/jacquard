@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -154,83 +157,83 @@ pub mod stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type PushCount;
         type UpdatedAt;
         type Repository;
         type PullCount;
-        type PushCount;
         type OwnerDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type PushCount = Unset;
         type UpdatedAt = Unset;
         type Repository = Unset;
         type PullCount = Unset;
-        type PushCount = Unset;
         type OwnerDid = Unset;
+    }
+    ///State transition - sets the `push_count` field to Set
+    pub struct SetPushCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPushCount<S> {}
+    impl<S: State> State for SetPushCount<S> {
+        type PushCount = Set<members::push_count>;
+        type UpdatedAt = S::UpdatedAt;
+        type Repository = S::Repository;
+        type PullCount = S::PullCount;
+        type OwnerDid = S::OwnerDid;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
+        type PushCount = S::PushCount;
         type UpdatedAt = Set<members::updated_at>;
         type Repository = S::Repository;
         type PullCount = S::PullCount;
-        type PushCount = S::PushCount;
         type OwnerDid = S::OwnerDid;
     }
     ///State transition - sets the `repository` field to Set
     pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepository<S> {}
     impl<S: State> State for SetRepository<S> {
+        type PushCount = S::PushCount;
         type UpdatedAt = S::UpdatedAt;
         type Repository = Set<members::repository>;
         type PullCount = S::PullCount;
-        type PushCount = S::PushCount;
         type OwnerDid = S::OwnerDid;
     }
     ///State transition - sets the `pull_count` field to Set
     pub struct SetPullCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPullCount<S> {}
     impl<S: State> State for SetPullCount<S> {
+        type PushCount = S::PushCount;
         type UpdatedAt = S::UpdatedAt;
         type Repository = S::Repository;
         type PullCount = Set<members::pull_count>;
-        type PushCount = S::PushCount;
-        type OwnerDid = S::OwnerDid;
-    }
-    ///State transition - sets the `push_count` field to Set
-    pub struct SetPushCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPushCount<S> {}
-    impl<S: State> State for SetPushCount<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Repository = S::Repository;
-        type PullCount = S::PullCount;
-        type PushCount = Set<members::push_count>;
         type OwnerDid = S::OwnerDid;
     }
     ///State transition - sets the `owner_did` field to Set
     pub struct SetOwnerDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOwnerDid<S> {}
     impl<S: State> State for SetOwnerDid<S> {
+        type PushCount = S::PushCount;
         type UpdatedAt = S::UpdatedAt;
         type Repository = S::Repository;
         type PullCount = S::PullCount;
-        type PushCount = S::PushCount;
         type OwnerDid = Set<members::owner_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `push_count` field
+        pub struct push_count(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
         ///Marker type for the `repository` field
         pub struct repository(());
         ///Marker type for the `pull_count` field
         pub struct pull_count(());
-        ///Marker type for the `push_count` field
-        pub struct push_count(());
         ///Marker type for the `owner_did` field
         pub struct owner_did(());
     }
@@ -238,8 +241,8 @@ pub mod stats_state {
 
 /// Builder for constructing an instance of this type
 pub struct StatsBuilder<'a, S: stats_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Datetime>,
         Option<Did<'a>>,
@@ -248,7 +251,7 @@ pub struct StatsBuilder<'a, S: stats_state::State> {
         Option<CowStr<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Stats<'a> {
@@ -262,9 +265,9 @@ impl<'a> StatsBuilder<'a, stats_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StatsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -272,12 +275,12 @@ impl<'a> StatsBuilder<'a, stats_state::Empty> {
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `lastPull` field (optional)
     pub fn last_pull(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `lastPull` field to an Option value (optional)
     pub fn maybe_last_pull(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -285,12 +288,12 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `lastPush` field (optional)
     pub fn last_push(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `lastPush` field to an Option value (optional)
     pub fn maybe_last_push(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -305,11 +308,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> StatsBuilder<'a, stats_state::SetOwnerDid<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -324,11 +327,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> StatsBuilder<'a, stats_state::SetPullCount<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -343,11 +346,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> StatsBuilder<'a, stats_state::SetPushCount<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -362,11 +365,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> StatsBuilder<'a, stats_state::SetRepository<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -381,11 +384,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> StatsBuilder<'a, stats_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -393,22 +396,22 @@ where
 impl<'a, S> StatsBuilder<'a, S>
 where
     S: stats_state::State,
+    S::PushCount: stats_state::IsSet,
     S::UpdatedAt: stats_state::IsSet,
     S::Repository: stats_state::IsSet,
     S::PullCount: stats_state::IsSet,
-    S::PushCount: stats_state::IsSet,
     S::OwnerDid: stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Stats<'a> {
         Stats {
-            last_pull: self.__unsafe_private_named.0,
-            last_push: self.__unsafe_private_named.1,
-            owner_did: self.__unsafe_private_named.2.unwrap(),
-            pull_count: self.__unsafe_private_named.3.unwrap(),
-            push_count: self.__unsafe_private_named.4.unwrap(),
-            repository: self.__unsafe_private_named.5.unwrap(),
-            updated_at: self.__unsafe_private_named.6.unwrap(),
+            last_pull: self._fields.0,
+            last_push: self._fields.1,
+            owner_did: self._fields.2.unwrap(),
+            pull_count: self._fields.3.unwrap(),
+            push_count: self._fields.4.unwrap(),
+            repository: self._fields.5.unwrap(),
+            updated_at: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -421,13 +424,13 @@ where
         >,
     ) -> Stats<'a> {
         Stats {
-            last_pull: self.__unsafe_private_named.0,
-            last_push: self.__unsafe_private_named.1,
-            owner_did: self.__unsafe_private_named.2.unwrap(),
-            pull_count: self.__unsafe_private_named.3.unwrap(),
-            push_count: self.__unsafe_private_named.4.unwrap(),
-            repository: self.__unsafe_private_named.5.unwrap(),
-            updated_at: self.__unsafe_private_named.6.unwrap(),
+            last_pull: self._fields.0,
+            last_push: self._fields.1,
+            owner_did: self._fields.2.unwrap(),
+            pull_count: self._fields.3.unwrap(),
+            push_count: self._fields.4.unwrap(),
+            repository: self._fields.5.unwrap(),
+            updated_at: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

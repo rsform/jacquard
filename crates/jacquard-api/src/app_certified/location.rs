@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -397,92 +400,92 @@ pub mod location_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Srs;
-        type CreatedAt;
         type Location;
-        type LocationType;
         type LpVersion;
+        type CreatedAt;
+        type LocationType;
+        type Srs;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Srs = Unset;
-        type CreatedAt = Unset;
         type Location = Unset;
-        type LocationType = Unset;
         type LpVersion = Unset;
-    }
-    ///State transition - sets the `srs` field to Set
-    pub struct SetSrs<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSrs<S> {}
-    impl<S: State> State for SetSrs<S> {
-        type Srs = Set<members::srs>;
-        type CreatedAt = S::CreatedAt;
-        type Location = S::Location;
-        type LocationType = S::LocationType;
-        type LpVersion = S::LpVersion;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Srs = S::Srs;
-        type CreatedAt = Set<members::created_at>;
-        type Location = S::Location;
-        type LocationType = S::LocationType;
-        type LpVersion = S::LpVersion;
+        type CreatedAt = Unset;
+        type LocationType = Unset;
+        type Srs = Unset;
     }
     ///State transition - sets the `location` field to Set
     pub struct SetLocation<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLocation<S> {}
     impl<S: State> State for SetLocation<S> {
-        type Srs = S::Srs;
-        type CreatedAt = S::CreatedAt;
         type Location = Set<members::location>;
-        type LocationType = S::LocationType;
         type LpVersion = S::LpVersion;
-    }
-    ///State transition - sets the `location_type` field to Set
-    pub struct SetLocationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLocationType<S> {}
-    impl<S: State> State for SetLocationType<S> {
-        type Srs = S::Srs;
         type CreatedAt = S::CreatedAt;
-        type Location = S::Location;
-        type LocationType = Set<members::location_type>;
-        type LpVersion = S::LpVersion;
+        type LocationType = S::LocationType;
+        type Srs = S::Srs;
     }
     ///State transition - sets the `lp_version` field to Set
     pub struct SetLpVersion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLpVersion<S> {}
     impl<S: State> State for SetLpVersion<S> {
-        type Srs = S::Srs;
-        type CreatedAt = S::CreatedAt;
         type Location = S::Location;
-        type LocationType = S::LocationType;
         type LpVersion = Set<members::lp_version>;
+        type CreatedAt = S::CreatedAt;
+        type LocationType = S::LocationType;
+        type Srs = S::Srs;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Location = S::Location;
+        type LpVersion = S::LpVersion;
+        type CreatedAt = Set<members::created_at>;
+        type LocationType = S::LocationType;
+        type Srs = S::Srs;
+    }
+    ///State transition - sets the `location_type` field to Set
+    pub struct SetLocationType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLocationType<S> {}
+    impl<S: State> State for SetLocationType<S> {
+        type Location = S::Location;
+        type LpVersion = S::LpVersion;
+        type CreatedAt = S::CreatedAt;
+        type LocationType = Set<members::location_type>;
+        type Srs = S::Srs;
+    }
+    ///State transition - sets the `srs` field to Set
+    pub struct SetSrs<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSrs<S> {}
+    impl<S: State> State for SetSrs<S> {
+        type Location = S::Location;
+        type LpVersion = S::LpVersion;
+        type CreatedAt = S::CreatedAt;
+        type LocationType = S::LocationType;
+        type Srs = Set<members::srs>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `srs` field
-        pub struct srs(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `location` field
         pub struct location(());
-        ///Marker type for the `location_type` field
-        pub struct location_type(());
         ///Marker type for the `lp_version` field
         pub struct lp_version(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `location_type` field
+        pub struct location_type(());
+        ///Marker type for the `srs` field
+        pub struct srs(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LocationBuilder<'a, S: location_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<LocationLocation<'a>>,
@@ -491,7 +494,7 @@ pub struct LocationBuilder<'a, S: location_state::State> {
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Location<'a> {
@@ -505,9 +508,9 @@ impl<'a> LocationBuilder<'a, location_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LocationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -522,11 +525,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LocationBuilder<'a, location_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LocationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -534,12 +537,12 @@ where
 impl<'a, S: location_state::State> LocationBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -554,11 +557,11 @@ where
         mut self,
         value: impl Into<LocationLocation<'a>>,
     ) -> LocationBuilder<'a, location_state::SetLocation<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LocationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -573,11 +576,11 @@ where
         mut self,
         value: impl Into<LocationLocationType<'a>>,
     ) -> LocationBuilder<'a, location_state::SetLocationType<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         LocationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -592,11 +595,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LocationBuilder<'a, location_state::SetLpVersion<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         LocationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -604,12 +607,12 @@ where
 impl<'a, S: location_state::State> LocationBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -624,11 +627,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> LocationBuilder<'a, location_state::SetSrs<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         LocationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -636,22 +639,22 @@ where
 impl<'a, S> LocationBuilder<'a, S>
 where
     S: location_state::State,
-    S::Srs: location_state::IsSet,
-    S::CreatedAt: location_state::IsSet,
     S::Location: location_state::IsSet,
-    S::LocationType: location_state::IsSet,
     S::LpVersion: location_state::IsSet,
+    S::CreatedAt: location_state::IsSet,
+    S::LocationType: location_state::IsSet,
+    S::Srs: location_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Location<'a> {
         Location {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            location: self.__unsafe_private_named.2.unwrap(),
-            location_type: self.__unsafe_private_named.3.unwrap(),
-            lp_version: self.__unsafe_private_named.4.unwrap(),
-            name: self.__unsafe_private_named.5,
-            srs: self.__unsafe_private_named.6.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1,
+            location: self._fields.2.unwrap(),
+            location_type: self._fields.3.unwrap(),
+            lp_version: self._fields.4.unwrap(),
+            name: self._fields.5,
+            srs: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -664,13 +667,13 @@ where
         >,
     ) -> Location<'a> {
         Location {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            location: self.__unsafe_private_named.2.unwrap(),
-            location_type: self.__unsafe_private_named.3.unwrap(),
-            lp_version: self.__unsafe_private_named.4.unwrap(),
-            name: self.__unsafe_private_named.5,
-            srs: self.__unsafe_private_named.6.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1,
+            location: self._fields.2.unwrap(),
+            location_type: self._fields.3.unwrap(),
+            lp_version: self._fields.4.unwrap(),
+            name: self._fields.5,
+            srs: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

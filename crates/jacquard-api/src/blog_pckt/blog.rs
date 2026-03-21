@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -243,8 +246,8 @@ pub mod blog_state {
 
 /// Builder for constructing an instance of this type
 pub struct BlogBuilder<'a, S: blog_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<BlobRef<'a>>,
         Option<CowStr<'a>>,
@@ -253,7 +256,7 @@ pub struct BlogBuilder<'a, S: blog_state::State> {
         Option<Datetime>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Blog<'a> {
@@ -267,9 +270,9 @@ impl<'a> BlogBuilder<'a, blog_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BlogBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -277,12 +280,12 @@ impl<'a> BlogBuilder<'a, blog_state::Empty> {
 impl<'a, S: blog_state::State> BlogBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -290,12 +293,12 @@ impl<'a, S: blog_state::State> BlogBuilder<'a, S> {
 impl<'a, S: blog_state::State> BlogBuilder<'a, S> {
     /// Set the `icon` field (optional)
     pub fn icon(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `icon` field to an Option value (optional)
     pub fn maybe_icon(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -310,11 +313,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BlogBuilder<'a, blog_state::SetName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         BlogBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -322,12 +325,12 @@ where
 impl<'a, S: blog_state::State> BlogBuilder<'a, S> {
     /// Set the `rss` field (optional)
     pub fn rss(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `rss` field to an Option value (optional)
     pub fn maybe_rss(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -335,12 +338,12 @@ impl<'a, S: blog_state::State> BlogBuilder<'a, S> {
 impl<'a, S: blog_state::State> BlogBuilder<'a, S> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<blog::Theme<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `theme` field to an Option value (optional)
     pub fn maybe_theme(mut self, value: Option<blog::Theme<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -348,12 +351,12 @@ impl<'a, S: blog_state::State> BlogBuilder<'a, S> {
 impl<'a, S: blog_state::State> BlogBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -361,12 +364,12 @@ impl<'a, S: blog_state::State> BlogBuilder<'a, S> {
 impl<'a, S: blog_state::State> BlogBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -379,13 +382,13 @@ where
     /// Build the final struct
     pub fn build(self) -> Blog<'a> {
         Blog {
-            description: self.__unsafe_private_named.0,
-            icon: self.__unsafe_private_named.1,
-            name: self.__unsafe_private_named.2.unwrap(),
-            rss: self.__unsafe_private_named.3,
-            theme: self.__unsafe_private_named.4,
-            updated_at: self.__unsafe_private_named.5,
-            url: self.__unsafe_private_named.6,
+            description: self._fields.0,
+            icon: self._fields.1,
+            name: self._fields.2.unwrap(),
+            rss: self._fields.3,
+            theme: self._fields.4,
+            updated_at: self._fields.5,
+            url: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -398,13 +401,13 @@ where
         >,
     ) -> Blog<'a> {
         Blog {
-            description: self.__unsafe_private_named.0,
-            icon: self.__unsafe_private_named.1,
-            name: self.__unsafe_private_named.2.unwrap(),
-            rss: self.__unsafe_private_named.3,
-            theme: self.__unsafe_private_named.4,
-            updated_at: self.__unsafe_private_named.5,
-            url: self.__unsafe_private_named.6,
+            description: self._fields.0,
+            icon: self._fields.1,
+            name: self._fields.2.unwrap(),
+            rss: self._fields.3,
+            theme: self._fields.4,
+            updated_at: self._fields.5,
+            url: self._fields.6,
             extra_data: Some(extra_data),
         }
     }

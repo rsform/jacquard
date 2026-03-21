@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::deps::bytes::Bytes;
@@ -213,8 +216,8 @@ pub mod sequence_state {
 
 /// Builder for constructing an instance of this type
 pub struct SequenceBuilder<'a, S: sequence_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<StrongRef<'a>>,
         Option<Vec<Credit<'a>>>,
         Option<Bytes>,
@@ -227,7 +230,7 @@ pub struct SequenceBuilder<'a, S: sequence_state::State> {
         Option<UriValue<'a>>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Sequence<'a> {
@@ -241,21 +244,9 @@ impl<'a> SequenceBuilder<'a, sequence_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SequenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -263,12 +254,12 @@ impl<'a> SequenceBuilder<'a, sequence_state::Empty> {
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `bskyPostRef` field (optional)
     pub fn bsky_post_ref(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `bskyPostRef` field to an Option value (optional)
     pub fn maybe_bsky_post_ref(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -276,12 +267,12 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `credits` field (optional)
     pub fn credits(mut self, value: impl Into<Option<Vec<Credit<'a>>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `credits` field to an Option value (optional)
     pub fn maybe_credits(mut self, value: Option<Vec<Credit<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -296,11 +287,11 @@ where
         mut self,
         value: impl Into<Bytes>,
     ) -> SequenceBuilder<'a, sequence_state::SetEvents<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SequenceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -308,12 +299,12 @@ where
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `id` field to an Option value (optional)
     pub fn maybe_id(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -321,12 +312,12 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -334,12 +325,12 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `publishedAt` field (optional)
     pub fn published_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `publishedAt` field to an Option value (optional)
     pub fn maybe_published_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -350,7 +341,7 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<sequence::Sequence<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `sequences` field to an Option value (optional)
@@ -358,7 +349,7 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
         mut self,
         value: Option<Vec<sequence::Sequence<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -366,12 +357,12 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -379,12 +370,12 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -392,12 +383,12 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -405,12 +396,12 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
 impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     /// Set the `version` field (optional)
     pub fn version(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `version` field to an Option value (optional)
     pub fn maybe_version(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -423,17 +414,17 @@ where
     /// Build the final struct
     pub fn build(self) -> Sequence<'a> {
         Sequence {
-            bsky_post_ref: self.__unsafe_private_named.0,
-            credits: self.__unsafe_private_named.1,
-            events: self.__unsafe_private_named.2.unwrap(),
-            id: self.__unsafe_private_named.3,
-            name: self.__unsafe_private_named.4,
-            published_at: self.__unsafe_private_named.5,
-            sequences: self.__unsafe_private_named.6,
-            tags: self.__unsafe_private_named.7,
-            updated_at: self.__unsafe_private_named.8,
-            url: self.__unsafe_private_named.9,
-            version: self.__unsafe_private_named.10,
+            bsky_post_ref: self._fields.0,
+            credits: self._fields.1,
+            events: self._fields.2.unwrap(),
+            id: self._fields.3,
+            name: self._fields.4,
+            published_at: self._fields.5,
+            sequences: self._fields.6,
+            tags: self._fields.7,
+            updated_at: self._fields.8,
+            url: self._fields.9,
+            version: self._fields.10,
             extra_data: Default::default(),
         }
     }
@@ -446,17 +437,17 @@ where
         >,
     ) -> Sequence<'a> {
         Sequence {
-            bsky_post_ref: self.__unsafe_private_named.0,
-            credits: self.__unsafe_private_named.1,
-            events: self.__unsafe_private_named.2.unwrap(),
-            id: self.__unsafe_private_named.3,
-            name: self.__unsafe_private_named.4,
-            published_at: self.__unsafe_private_named.5,
-            sequences: self.__unsafe_private_named.6,
-            tags: self.__unsafe_private_named.7,
-            updated_at: self.__unsafe_private_named.8,
-            url: self.__unsafe_private_named.9,
-            version: self.__unsafe_private_named.10,
+            bsky_post_ref: self._fields.0,
+            credits: self._fields.1,
+            events: self._fields.2.unwrap(),
+            id: self._fields.3,
+            name: self._fields.4,
+            published_at: self._fields.5,
+            sequences: self._fields.6,
+            tags: self._fields.7,
+            updated_at: self._fields.8,
+            url: self._fields.9,
+            version: self._fields.10,
             extra_data: Some(extra_data),
         }
     }

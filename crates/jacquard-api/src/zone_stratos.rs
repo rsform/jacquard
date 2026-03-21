@@ -12,7 +12,11 @@ pub mod feed;
 pub mod repo;
 pub mod sync;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -199,49 +203,49 @@ pub mod source_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Vary;
         type Subject;
+        type Vary;
         type Service;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Vary = Unset;
         type Subject = Unset;
+        type Vary = Unset;
         type Service = Unset;
-    }
-    ///State transition - sets the `vary` field to Set
-    pub struct SetVary<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVary<S> {}
-    impl<S: State> State for SetVary<S> {
-        type Vary = Set<members::vary>;
-        type Subject = S::Subject;
-        type Service = S::Service;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSubject<S> {}
     impl<S: State> State for SetSubject<S> {
-        type Vary = S::Vary;
         type Subject = Set<members::subject>;
+        type Vary = S::Vary;
+        type Service = S::Service;
+    }
+    ///State transition - sets the `vary` field to Set
+    pub struct SetVary<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetVary<S> {}
+    impl<S: State> State for SetVary<S> {
+        type Subject = S::Subject;
+        type Vary = Set<members::vary>;
         type Service = S::Service;
     }
     ///State transition - sets the `service` field to Set
     pub struct SetService<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetService<S> {}
     impl<S: State> State for SetService<S> {
-        type Vary = S::Vary;
         type Subject = S::Subject;
+        type Vary = S::Vary;
         type Service = Set<members::service>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `vary` field
-        pub struct vary(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `vary` field
+        pub struct vary(());
         ///Marker type for the `service` field
         pub struct service(());
     }
@@ -249,13 +253,13 @@ pub mod source_state {
 
 /// Builder for constructing an instance of this type
 pub struct SourceBuilder<'a, S: source_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Did<'a>>,
         Option<zone_stratos::SubjectRef<'a>>,
         Option<SourceVary<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Source<'a> {
@@ -269,9 +273,9 @@ impl<'a> SourceBuilder<'a, source_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SourceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -286,11 +290,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> SourceBuilder<'a, source_state::SetService<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SourceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -305,11 +309,11 @@ where
         mut self,
         value: impl Into<zone_stratos::SubjectRef<'a>>,
     ) -> SourceBuilder<'a, source_state::SetSubject<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SourceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -324,11 +328,11 @@ where
         mut self,
         value: impl Into<SourceVary<'a>>,
     ) -> SourceBuilder<'a, source_state::SetVary<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SourceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -336,16 +340,16 @@ where
 impl<'a, S> SourceBuilder<'a, S>
 where
     S: source_state::State,
-    S::Vary: source_state::IsSet,
     S::Subject: source_state::IsSet,
+    S::Vary: source_state::IsSet,
     S::Service: source_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Source<'a> {
         Source {
-            service: self.__unsafe_private_named.0.unwrap(),
-            subject: self.__unsafe_private_named.1.unwrap(),
-            vary: self.__unsafe_private_named.2.unwrap(),
+            service: self._fields.0.unwrap(),
+            subject: self._fields.1.unwrap(),
+            vary: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -358,9 +362,9 @@ where
         >,
     ) -> Source<'a> {
         Source {
-            service: self.__unsafe_private_named.0.unwrap(),
-            subject: self.__unsafe_private_named.1.unwrap(),
-            vary: self.__unsafe_private_named.2.unwrap(),
+            service: self._fields.0.unwrap(),
+            subject: self._fields.1.unwrap(),
+            vary: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -524,9 +528,9 @@ pub mod subject_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct SubjectRefBuilder<'a, S: subject_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Cid<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Cid<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SubjectRef<'a> {
@@ -540,9 +544,9 @@ impl<'a> SubjectRefBuilder<'a, subject_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SubjectRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -557,11 +561,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> SubjectRefBuilder<'a, subject_ref_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SubjectRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -576,11 +580,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> SubjectRefBuilder<'a, subject_ref_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SubjectRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -594,8 +598,8 @@ where
     /// Build the final struct
     pub fn build(self) -> SubjectRef<'a> {
         SubjectRef {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -608,8 +612,8 @@ where
         >,
     ) -> SubjectRef<'a> {
         SubjectRef {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

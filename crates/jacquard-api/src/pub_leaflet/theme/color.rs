@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -219,58 +222,58 @@ pub mod rgb_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type R;
-        type G;
         type B;
+        type G;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type R = Unset;
-        type G = Unset;
         type B = Unset;
+        type G = Unset;
     }
     ///State transition - sets the `r` field to Set
     pub struct SetR<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetR<S> {}
     impl<S: State> State for SetR<S> {
         type R = Set<members::r>;
+        type B = S::B;
         type G = S::G;
-        type B = S::B;
-    }
-    ///State transition - sets the `g` field to Set
-    pub struct SetG<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetG<S> {}
-    impl<S: State> State for SetG<S> {
-        type R = S::R;
-        type G = Set<members::g>;
-        type B = S::B;
     }
     ///State transition - sets the `b` field to Set
     pub struct SetB<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetB<S> {}
     impl<S: State> State for SetB<S> {
         type R = S::R;
-        type G = S::G;
         type B = Set<members::b>;
+        type G = S::G;
+    }
+    ///State transition - sets the `g` field to Set
+    pub struct SetG<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetG<S> {}
+    impl<S: State> State for SetG<S> {
+        type R = S::R;
+        type B = S::B;
+        type G = Set<members::g>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `r` field
         pub struct r(());
-        ///Marker type for the `g` field
-        pub struct g(());
         ///Marker type for the `b` field
         pub struct b(());
+        ///Marker type for the `g` field
+        pub struct g(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RgbBuilder<'a, S: rgb_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Rgb<'a> {
@@ -284,9 +287,9 @@ impl<'a> RgbBuilder<'a, rgb_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RgbBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -298,11 +301,11 @@ where
 {
     /// Set the `b` field (required)
     pub fn b(mut self, value: impl Into<i64>) -> RgbBuilder<'a, rgb_state::SetB<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RgbBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -314,11 +317,11 @@ where
 {
     /// Set the `g` field (required)
     pub fn g(mut self, value: impl Into<i64>) -> RgbBuilder<'a, rgb_state::SetG<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RgbBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -330,11 +333,11 @@ where
 {
     /// Set the `r` field (required)
     pub fn r(mut self, value: impl Into<i64>) -> RgbBuilder<'a, rgb_state::SetR<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RgbBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -343,15 +346,15 @@ impl<'a, S> RgbBuilder<'a, S>
 where
     S: rgb_state::State,
     S::R: rgb_state::IsSet,
-    S::G: rgb_state::IsSet,
     S::B: rgb_state::IsSet,
+    S::G: rgb_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Rgb<'a> {
         Rgb {
-            b: self.__unsafe_private_named.0.unwrap(),
-            g: self.__unsafe_private_named.1.unwrap(),
-            r: self.__unsafe_private_named.2.unwrap(),
+            b: self._fields.0.unwrap(),
+            g: self._fields.1.unwrap(),
+            r: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -364,9 +367,9 @@ where
         >,
     ) -> Rgb<'a> {
         Rgb {
-            b: self.__unsafe_private_named.0.unwrap(),
-            g: self.__unsafe_private_named.1.unwrap(),
-            r: self.__unsafe_private_named.2.unwrap(),
+            b: self._fields.0.unwrap(),
+            g: self._fields.1.unwrap(),
+            r: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -488,65 +491,65 @@ pub mod rgba_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type R;
         type A;
         type G;
+        type R;
         type B;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type R = Unset;
         type A = Unset;
         type G = Unset;
+        type R = Unset;
         type B = Unset;
-    }
-    ///State transition - sets the `r` field to Set
-    pub struct SetR<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetR<S> {}
-    impl<S: State> State for SetR<S> {
-        type R = Set<members::r>;
-        type A = S::A;
-        type G = S::G;
-        type B = S::B;
     }
     ///State transition - sets the `a` field to Set
     pub struct SetA<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetA<S> {}
     impl<S: State> State for SetA<S> {
-        type R = S::R;
         type A = Set<members::a>;
         type G = S::G;
+        type R = S::R;
         type B = S::B;
     }
     ///State transition - sets the `g` field to Set
     pub struct SetG<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetG<S> {}
     impl<S: State> State for SetG<S> {
-        type R = S::R;
         type A = S::A;
         type G = Set<members::g>;
+        type R = S::R;
+        type B = S::B;
+    }
+    ///State transition - sets the `r` field to Set
+    pub struct SetR<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetR<S> {}
+    impl<S: State> State for SetR<S> {
+        type A = S::A;
+        type G = S::G;
+        type R = Set<members::r>;
         type B = S::B;
     }
     ///State transition - sets the `b` field to Set
     pub struct SetB<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetB<S> {}
     impl<S: State> State for SetB<S> {
-        type R = S::R;
         type A = S::A;
         type G = S::G;
+        type R = S::R;
         type B = Set<members::b>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `r` field
-        pub struct r(());
         ///Marker type for the `a` field
         pub struct a(());
         ///Marker type for the `g` field
         pub struct g(());
+        ///Marker type for the `r` field
+        pub struct r(());
         ///Marker type for the `b` field
         pub struct b(());
     }
@@ -554,9 +557,9 @@ pub mod rgba_state {
 
 /// Builder for constructing an instance of this type
 pub struct RgbaBuilder<'a, S: rgba_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>, Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>, Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Rgba<'a> {
@@ -570,9 +573,9 @@ impl<'a> RgbaBuilder<'a, rgba_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RgbaBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -584,11 +587,11 @@ where
 {
     /// Set the `a` field (required)
     pub fn a(mut self, value: impl Into<i64>) -> RgbaBuilder<'a, rgba_state::SetA<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RgbaBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -600,11 +603,11 @@ where
 {
     /// Set the `b` field (required)
     pub fn b(mut self, value: impl Into<i64>) -> RgbaBuilder<'a, rgba_state::SetB<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RgbaBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -616,11 +619,11 @@ where
 {
     /// Set the `g` field (required)
     pub fn g(mut self, value: impl Into<i64>) -> RgbaBuilder<'a, rgba_state::SetG<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RgbaBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -632,11 +635,11 @@ where
 {
     /// Set the `r` field (required)
     pub fn r(mut self, value: impl Into<i64>) -> RgbaBuilder<'a, rgba_state::SetR<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         RgbaBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -644,18 +647,18 @@ where
 impl<'a, S> RgbaBuilder<'a, S>
 where
     S: rgba_state::State,
-    S::R: rgba_state::IsSet,
     S::A: rgba_state::IsSet,
     S::G: rgba_state::IsSet,
+    S::R: rgba_state::IsSet,
     S::B: rgba_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Rgba<'a> {
         Rgba {
-            a: self.__unsafe_private_named.0.unwrap(),
-            b: self.__unsafe_private_named.1.unwrap(),
-            g: self.__unsafe_private_named.2.unwrap(),
-            r: self.__unsafe_private_named.3.unwrap(),
+            a: self._fields.0.unwrap(),
+            b: self._fields.1.unwrap(),
+            g: self._fields.2.unwrap(),
+            r: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -668,10 +671,10 @@ where
         >,
     ) -> Rgba<'a> {
         Rgba {
-            a: self.__unsafe_private_named.0.unwrap(),
-            b: self.__unsafe_private_named.1.unwrap(),
-            g: self.__unsafe_private_named.2.unwrap(),
-            r: self.__unsafe_private_named.3.unwrap(),
+            a: self._fields.0.unwrap(),
+            b: self._fields.1.unwrap(),
+            g: self._fields.2.unwrap(),
+            r: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

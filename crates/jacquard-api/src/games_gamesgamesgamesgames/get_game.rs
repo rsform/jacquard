@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::AtUri;
@@ -112,8 +115,8 @@ pub mod get_game_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetGameBuilder<'a, S: get_game_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
@@ -129,7 +132,7 @@ pub struct GetGameBuilder<'a, S: get_game_state::State> {
         Option<AtUri<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetGame<'a> {
@@ -143,8 +146,8 @@ impl<'a> GetGameBuilder<'a, get_game_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetGameBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -160,7 +163,7 @@ impl<'a> GetGameBuilder<'a, get_game_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -168,12 +171,12 @@ impl<'a> GetGameBuilder<'a, get_game_state::Empty> {
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `appleAppStoreId` field (optional)
     pub fn apple_app_store_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `appleAppStoreId` field to an Option value (optional)
     pub fn maybe_apple_app_store_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -181,12 +184,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `epicGamesId` field (optional)
     pub fn epic_games_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `epicGamesId` field to an Option value (optional)
     pub fn maybe_epic_games_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -194,12 +197,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `gogId` field (optional)
     pub fn gog_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `gogId` field to an Option value (optional)
     pub fn maybe_gog_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -207,12 +210,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `googlePlayId` field (optional)
     pub fn google_play_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `googlePlayId` field to an Option value (optional)
     pub fn maybe_google_play_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -220,12 +223,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `humbleBundleId` field (optional)
     pub fn humble_bundle_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `humbleBundleId` field to an Option value (optional)
     pub fn maybe_humble_bundle_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -233,12 +236,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `igdbId` field (optional)
     pub fn igdb_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `igdbId` field to an Option value (optional)
     pub fn maybe_igdb_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -246,12 +249,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `includeActorCredits` field (optional)
     pub fn include_actor_credits(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `includeActorCredits` field to an Option value (optional)
     pub fn maybe_include_actor_credits(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -259,12 +262,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `includeOrgCredits` field (optional)
     pub fn include_org_credits(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `includeOrgCredits` field to an Option value (optional)
     pub fn maybe_include_org_credits(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -272,12 +275,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `nintendoEshopId` field (optional)
     pub fn nintendo_eshop_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `nintendoEshopId` field to an Option value (optional)
     pub fn maybe_nintendo_eshop_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -285,12 +288,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `playStationId` field (optional)
     pub fn play_station_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `playStationId` field to an Option value (optional)
     pub fn maybe_play_station_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -298,12 +301,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `slug` field (optional)
     pub fn slug(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `slug` field to an Option value (optional)
     pub fn maybe_slug(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -311,12 +314,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `steamId` field (optional)
     pub fn steam_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `steamId` field to an Option value (optional)
     pub fn maybe_steam_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -324,12 +327,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `uri` field (optional)
     pub fn uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `uri` field to an Option value (optional)
     pub fn maybe_uri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -337,12 +340,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
 impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     /// Set the `xboxId` field (optional)
     pub fn xbox_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `xboxId` field to an Option value (optional)
     pub fn maybe_xbox_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -354,20 +357,20 @@ where
     /// Build the final struct
     pub fn build(self) -> GetGame<'a> {
         GetGame {
-            apple_app_store_id: self.__unsafe_private_named.0,
-            epic_games_id: self.__unsafe_private_named.1,
-            gog_id: self.__unsafe_private_named.2,
-            google_play_id: self.__unsafe_private_named.3,
-            humble_bundle_id: self.__unsafe_private_named.4,
-            igdb_id: self.__unsafe_private_named.5,
-            include_actor_credits: self.__unsafe_private_named.6,
-            include_org_credits: self.__unsafe_private_named.7,
-            nintendo_eshop_id: self.__unsafe_private_named.8,
-            play_station_id: self.__unsafe_private_named.9,
-            slug: self.__unsafe_private_named.10,
-            steam_id: self.__unsafe_private_named.11,
-            uri: self.__unsafe_private_named.12,
-            xbox_id: self.__unsafe_private_named.13,
+            apple_app_store_id: self._fields.0,
+            epic_games_id: self._fields.1,
+            gog_id: self._fields.2,
+            google_play_id: self._fields.3,
+            humble_bundle_id: self._fields.4,
+            igdb_id: self._fields.5,
+            include_actor_credits: self._fields.6,
+            include_org_credits: self._fields.7,
+            nintendo_eshop_id: self._fields.8,
+            play_station_id: self._fields.9,
+            slug: self._fields.10,
+            steam_id: self._fields.11,
+            uri: self._fields.12,
+            xbox_id: self._fields.13,
         }
     }
 }

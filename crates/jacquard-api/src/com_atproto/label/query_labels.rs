@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::Did;
@@ -104,14 +107,14 @@ pub mod query_labels_state {
 
 /// Builder for constructing an instance of this type
 pub struct QueryLabelsBuilder<'a, S: query_labels_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<i64>,
         Option<Vec<Did<'a>>>,
         Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> QueryLabels<'a> {
@@ -125,9 +128,9 @@ impl<'a> QueryLabelsBuilder<'a, query_labels_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         QueryLabelsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -135,12 +138,12 @@ impl<'a> QueryLabelsBuilder<'a, query_labels_state::Empty> {
 impl<'a, S: query_labels_state::State> QueryLabelsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -148,12 +151,12 @@ impl<'a, S: query_labels_state::State> QueryLabelsBuilder<'a, S> {
 impl<'a, S: query_labels_state::State> QueryLabelsBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -161,12 +164,12 @@ impl<'a, S: query_labels_state::State> QueryLabelsBuilder<'a, S> {
 impl<'a, S: query_labels_state::State> QueryLabelsBuilder<'a, S> {
     /// Set the `sources` field (optional)
     pub fn sources(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `sources` field to an Option value (optional)
     pub fn maybe_sources(mut self, value: Option<Vec<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -181,11 +184,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> QueryLabelsBuilder<'a, query_labels_state::SetUriPatterns<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         QueryLabelsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -198,10 +201,10 @@ where
     /// Build the final struct
     pub fn build(self) -> QueryLabels<'a> {
         QueryLabels {
-            cursor: self.__unsafe_private_named.0,
-            limit: self.__unsafe_private_named.1,
-            sources: self.__unsafe_private_named.2,
-            uri_patterns: self.__unsafe_private_named.3.unwrap(),
+            cursor: self._fields.0,
+            limit: self._fields.1,
+            sources: self._fields.2,
+            uri_patterns: self._fields.3.unwrap(),
         }
     }
 }

@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
@@ -84,8 +85,8 @@ pub mod get_event_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetEventBuilder<S: get_event_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>,),
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>,),
 }
 
 impl GetEvent {
@@ -99,8 +100,8 @@ impl GetEventBuilder<get_event_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetEventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
+            _state: PhantomData,
+            _fields: (None,),
         }
     }
 }
@@ -115,10 +116,10 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> GetEventBuilder<get_event_state::SetId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetEventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
+            _state: PhantomData,
+            _fields: self._fields,
         }
     }
 }
@@ -131,7 +132,7 @@ where
     /// Build the final struct
     pub fn build(self) -> GetEvent {
         GetEvent {
-            id: self.__unsafe_private_named.0.unwrap(),
+            id: self._fields.0.unwrap(),
         }
     }
 }

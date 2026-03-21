@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::deps::bytes::Bytes;
@@ -191,65 +194,65 @@ pub mod chart_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Game;
         type Song;
         type Difficulty;
-        type Game;
         type Rating;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Game = Unset;
         type Song = Unset;
         type Difficulty = Unset;
-        type Game = Unset;
         type Rating = Unset;
+    }
+    ///State transition - sets the `game` field to Set
+    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGame<S> {}
+    impl<S: State> State for SetGame<S> {
+        type Game = Set<members::game>;
+        type Song = S::Song;
+        type Difficulty = S::Difficulty;
+        type Rating = S::Rating;
     }
     ///State transition - sets the `song` field to Set
     pub struct SetSong<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSong<S> {}
     impl<S: State> State for SetSong<S> {
+        type Game = S::Game;
         type Song = Set<members::song>;
         type Difficulty = S::Difficulty;
-        type Game = S::Game;
         type Rating = S::Rating;
     }
     ///State transition - sets the `difficulty` field to Set
     pub struct SetDifficulty<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDifficulty<S> {}
     impl<S: State> State for SetDifficulty<S> {
+        type Game = S::Game;
         type Song = S::Song;
         type Difficulty = Set<members::difficulty>;
-        type Game = S::Game;
-        type Rating = S::Rating;
-    }
-    ///State transition - sets the `game` field to Set
-    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGame<S> {}
-    impl<S: State> State for SetGame<S> {
-        type Song = S::Song;
-        type Difficulty = S::Difficulty;
-        type Game = Set<members::game>;
         type Rating = S::Rating;
     }
     ///State transition - sets the `rating` field to Set
     pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRating<S> {}
     impl<S: State> State for SetRating<S> {
+        type Game = S::Game;
         type Song = S::Song;
         type Difficulty = S::Difficulty;
-        type Game = S::Game;
         type Rating = Set<members::rating>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `game` field
+        pub struct game(());
         ///Marker type for the `song` field
         pub struct song(());
         ///Marker type for the `difficulty` field
         pub struct difficulty(());
-        ///Marker type for the `game` field
-        pub struct game(());
         ///Marker type for the `rating` field
         pub struct rating(());
     }
@@ -257,8 +260,8 @@ pub mod chart_state {
 
 /// Builder for constructing an instance of this type
 pub struct ChartBuilder<'a, S: chart_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ChartDifficulty<'a>>,
         Option<AtUri<'a>>,
         Option<BlobRef<'a>>,
@@ -267,7 +270,7 @@ pub struct ChartBuilder<'a, S: chart_state::State> {
         Option<CowStr<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Chart<'a> {
@@ -281,9 +284,9 @@ impl<'a> ChartBuilder<'a, chart_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ChartBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -298,11 +301,11 @@ where
         mut self,
         value: impl Into<ChartDifficulty<'a>>,
     ) -> ChartBuilder<'a, chart_state::SetDifficulty<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ChartBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -317,11 +320,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ChartBuilder<'a, chart_state::SetGame<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ChartBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -329,12 +332,12 @@ where
 impl<'a, S: chart_state::State> ChartBuilder<'a, S> {
     /// Set the `jacket` field (optional)
     pub fn jacket(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `jacket` field to an Option value (optional)
     pub fn maybe_jacket(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -342,12 +345,12 @@ impl<'a, S: chart_state::State> ChartBuilder<'a, S> {
 impl<'a, S: chart_state::State> ChartBuilder<'a, S> {
     /// Set the `jacketArtist` field (optional)
     pub fn jacket_artist(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `jacketArtist` field to an Option value (optional)
     pub fn maybe_jacket_artist(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -355,12 +358,12 @@ impl<'a, S: chart_state::State> ChartBuilder<'a, S> {
 impl<'a, S: chart_state::State> ChartBuilder<'a, S> {
     /// Set the `rankedVersions` field (optional)
     pub fn ranked_versions(mut self, value: impl Into<Option<Vec<Bytes>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `rankedVersions` field to an Option value (optional)
     pub fn maybe_ranked_versions(mut self, value: Option<Vec<Bytes>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -375,11 +378,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ChartBuilder<'a, chart_state::SetRating<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ChartBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -394,11 +397,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ChartBuilder<'a, chart_state::SetSong<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         ChartBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -406,21 +409,21 @@ where
 impl<'a, S> ChartBuilder<'a, S>
 where
     S: chart_state::State,
+    S::Game: chart_state::IsSet,
     S::Song: chart_state::IsSet,
     S::Difficulty: chart_state::IsSet,
-    S::Game: chart_state::IsSet,
     S::Rating: chart_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Chart<'a> {
         Chart {
-            difficulty: self.__unsafe_private_named.0.unwrap(),
-            game: self.__unsafe_private_named.1.unwrap(),
-            jacket: self.__unsafe_private_named.2,
-            jacket_artist: self.__unsafe_private_named.3,
-            ranked_versions: self.__unsafe_private_named.4,
-            rating: self.__unsafe_private_named.5.unwrap(),
-            song: self.__unsafe_private_named.6.unwrap(),
+            difficulty: self._fields.0.unwrap(),
+            game: self._fields.1.unwrap(),
+            jacket: self._fields.2,
+            jacket_artist: self._fields.3,
+            ranked_versions: self._fields.4,
+            rating: self._fields.5.unwrap(),
+            song: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -430,13 +433,13 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Chart<'a> {
         Chart {
-            difficulty: self.__unsafe_private_named.0.unwrap(),
-            game: self.__unsafe_private_named.1.unwrap(),
-            jacket: self.__unsafe_private_named.2,
-            jacket_artist: self.__unsafe_private_named.3,
-            ranked_versions: self.__unsafe_private_named.4,
-            rating: self.__unsafe_private_named.5.unwrap(),
-            song: self.__unsafe_private_named.6.unwrap(),
+            difficulty: self._fields.0.unwrap(),
+            game: self._fields.1.unwrap(),
+            jacket: self._fields.2,
+            jacket_artist: self._fields.3,
+            ranked_versions: self._fields.4,
+            rating: self._fields.5.unwrap(),
+            song: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

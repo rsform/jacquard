@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -167,92 +170,92 @@ pub mod tool_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Description;
-        type InputSchema;
         type CreatedAt;
         type Code;
+        type Name;
+        type InputSchema;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Description = Unset;
-        type InputSchema = Unset;
         type CreatedAt = Unset;
         type Code = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Description = S::Description;
-        type InputSchema = S::InputSchema;
-        type CreatedAt = S::CreatedAt;
-        type Code = S::Code;
+        type Name = Unset;
+        type InputSchema = Unset;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type Name = S::Name;
         type Description = Set<members::description>;
-        type InputSchema = S::InputSchema;
         type CreatedAt = S::CreatedAt;
         type Code = S::Code;
-    }
-    ///State transition - sets the `input_schema` field to Set
-    pub struct SetInputSchema<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInputSchema<S> {}
-    impl<S: State> State for SetInputSchema<S> {
         type Name = S::Name;
-        type Description = S::Description;
-        type InputSchema = Set<members::input_schema>;
-        type CreatedAt = S::CreatedAt;
-        type Code = S::Code;
+        type InputSchema = S::InputSchema;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type Description = S::Description;
-        type InputSchema = S::InputSchema;
         type CreatedAt = Set<members::created_at>;
         type Code = S::Code;
+        type Name = S::Name;
+        type InputSchema = S::InputSchema;
     }
     ///State transition - sets the `code` field to Set
     pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCode<S> {}
     impl<S: State> State for SetCode<S> {
-        type Name = S::Name;
         type Description = S::Description;
-        type InputSchema = S::InputSchema;
         type CreatedAt = S::CreatedAt;
         type Code = Set<members::code>;
+        type Name = S::Name;
+        type InputSchema = S::InputSchema;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Code = S::Code;
+        type Name = Set<members::name>;
+        type InputSchema = S::InputSchema;
+    }
+    ///State transition - sets the `input_schema` field to Set
+    pub struct SetInputSchema<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetInputSchema<S> {}
+    impl<S: State> State for SetInputSchema<S> {
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Code = S::Code;
+        type Name = S::Name;
+        type InputSchema = Set<members::input_schema>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `description` field
         pub struct description(());
-        ///Marker type for the `input_schema` field
-        pub struct input_schema(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `code` field
         pub struct code(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `input_schema` field
+        pub struct input_schema(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ToolBuilder<'a, S: tool_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -266,7 +269,7 @@ pub struct ToolBuilder<'a, S: tool_state::State> {
         Option<bool>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Tool<'a> {
@@ -280,8 +283,8 @@ impl<'a> ToolBuilder<'a, tool_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ToolBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -295,7 +298,7 @@ impl<'a> ToolBuilder<'a, tool_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -310,11 +313,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ToolBuilder<'a, tool_state::SetCode<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ToolBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -329,11 +332,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ToolBuilder<'a, tool_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ToolBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -348,11 +351,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ToolBuilder<'a, tool_state::SetDescription<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ToolBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -367,11 +370,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> ToolBuilder<'a, tool_state::SetInputSchema<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ToolBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -379,12 +382,12 @@ where
 impl<'a, S: tool_state::State> ToolBuilder<'a, S> {
     /// Set the `lastUpdated` field (optional)
     pub fn last_updated(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `lastUpdated` field to an Option value (optional)
     pub fn maybe_last_updated(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -399,11 +402,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ToolBuilder<'a, tool_state::SetName<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ToolBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -414,12 +417,12 @@ impl<'a, S: tool_state::State> ToolBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `requiredCommands` field to an Option value (optional)
     pub fn maybe_required_commands(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -430,12 +433,12 @@ impl<'a, S: tool_state::State> ToolBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<CowStr<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `requiredSecrets` field to an Option value (optional)
     pub fn maybe_required_secrets(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -443,12 +446,12 @@ impl<'a, S: tool_state::State> ToolBuilder<'a, S> {
 impl<'a, S: tool_state::State> ToolBuilder<'a, S> {
     /// Set the `requiredTools` field (optional)
     pub fn required_tools(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `requiredTools` field to an Option value (optional)
     pub fn maybe_required_tools(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -456,12 +459,12 @@ impl<'a, S: tool_state::State> ToolBuilder<'a, S> {
 impl<'a, S: tool_state::State> ToolBuilder<'a, S> {
     /// Set the `requiresNetwork` field (optional)
     pub fn requires_network(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `requiresNetwork` field to an Option value (optional)
     pub fn maybe_requires_network(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -469,12 +472,12 @@ impl<'a, S: tool_state::State> ToolBuilder<'a, S> {
 impl<'a, S: tool_state::State> ToolBuilder<'a, S> {
     /// Set the `requiresWorkspace` field (optional)
     pub fn requires_workspace(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `requiresWorkspace` field to an Option value (optional)
     pub fn maybe_requires_workspace(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -482,12 +485,12 @@ impl<'a, S: tool_state::State> ToolBuilder<'a, S> {
 impl<'a, S: tool_state::State> ToolBuilder<'a, S> {
     /// Set the `version` field (optional)
     pub fn version(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `version` field to an Option value (optional)
     pub fn maybe_version(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -495,27 +498,27 @@ impl<'a, S: tool_state::State> ToolBuilder<'a, S> {
 impl<'a, S> ToolBuilder<'a, S>
 where
     S: tool_state::State,
-    S::Name: tool_state::IsSet,
     S::Description: tool_state::IsSet,
-    S::InputSchema: tool_state::IsSet,
     S::CreatedAt: tool_state::IsSet,
     S::Code: tool_state::IsSet,
+    S::Name: tool_state::IsSet,
+    S::InputSchema: tool_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tool<'a> {
         Tool {
-            code: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2.unwrap(),
-            input_schema: self.__unsafe_private_named.3.unwrap(),
-            last_updated: self.__unsafe_private_named.4,
-            name: self.__unsafe_private_named.5.unwrap(),
-            required_commands: self.__unsafe_private_named.6,
-            required_secrets: self.__unsafe_private_named.7,
-            required_tools: self.__unsafe_private_named.8,
-            requires_network: self.__unsafe_private_named.9,
-            requires_workspace: self.__unsafe_private_named.10,
-            version: self.__unsafe_private_named.11,
+            code: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2.unwrap(),
+            input_schema: self._fields.3.unwrap(),
+            last_updated: self._fields.4,
+            name: self._fields.5.unwrap(),
+            required_commands: self._fields.6,
+            required_secrets: self._fields.7,
+            required_tools: self._fields.8,
+            requires_network: self._fields.9,
+            requires_workspace: self._fields.10,
+            version: self._fields.11,
             extra_data: Default::default(),
         }
     }
@@ -525,18 +528,18 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Tool<'a> {
         Tool {
-            code: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2.unwrap(),
-            input_schema: self.__unsafe_private_named.3.unwrap(),
-            last_updated: self.__unsafe_private_named.4,
-            name: self.__unsafe_private_named.5.unwrap(),
-            required_commands: self.__unsafe_private_named.6,
-            required_secrets: self.__unsafe_private_named.7,
-            required_tools: self.__unsafe_private_named.8,
-            requires_network: self.__unsafe_private_named.9,
-            requires_workspace: self.__unsafe_private_named.10,
-            version: self.__unsafe_private_named.11,
+            code: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2.unwrap(),
+            input_schema: self._fields.3.unwrap(),
+            last_updated: self._fields.4,
+            name: self._fields.5.unwrap(),
+            required_commands: self._fields.6,
+            required_secrets: self._fields.7,
+            required_tools: self._fields.8,
+            requires_network: self._fields.9,
+            requires_workspace: self._fields.10,
+            version: self._fields.11,
             extra_data: Some(extra_data),
         }
     }

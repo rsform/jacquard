@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::Did;
@@ -161,79 +164,79 @@ pub mod unregister_push_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Token;
+        type AppId;
         type ServiceDid;
         type Platform;
-        type AppId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Token = Unset;
+        type AppId = Unset;
         type ServiceDid = Unset;
         type Platform = Unset;
-        type AppId = Unset;
     }
     ///State transition - sets the `token` field to Set
     pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetToken<S> {}
     impl<S: State> State for SetToken<S> {
         type Token = Set<members::token>;
+        type AppId = S::AppId;
         type ServiceDid = S::ServiceDid;
         type Platform = S::Platform;
-        type AppId = S::AppId;
-    }
-    ///State transition - sets the `service_did` field to Set
-    pub struct SetServiceDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServiceDid<S> {}
-    impl<S: State> State for SetServiceDid<S> {
-        type Token = S::Token;
-        type ServiceDid = Set<members::service_did>;
-        type Platform = S::Platform;
-        type AppId = S::AppId;
-    }
-    ///State transition - sets the `platform` field to Set
-    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlatform<S> {}
-    impl<S: State> State for SetPlatform<S> {
-        type Token = S::Token;
-        type ServiceDid = S::ServiceDid;
-        type Platform = Set<members::platform>;
-        type AppId = S::AppId;
     }
     ///State transition - sets the `app_id` field to Set
     pub struct SetAppId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAppId<S> {}
     impl<S: State> State for SetAppId<S> {
         type Token = S::Token;
+        type AppId = Set<members::app_id>;
         type ServiceDid = S::ServiceDid;
         type Platform = S::Platform;
-        type AppId = Set<members::app_id>;
+    }
+    ///State transition - sets the `service_did` field to Set
+    pub struct SetServiceDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetServiceDid<S> {}
+    impl<S: State> State for SetServiceDid<S> {
+        type Token = S::Token;
+        type AppId = S::AppId;
+        type ServiceDid = Set<members::service_did>;
+        type Platform = S::Platform;
+    }
+    ///State transition - sets the `platform` field to Set
+    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlatform<S> {}
+    impl<S: State> State for SetPlatform<S> {
+        type Token = S::Token;
+        type AppId = S::AppId;
+        type ServiceDid = S::ServiceDid;
+        type Platform = Set<members::platform>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `token` field
         pub struct token(());
+        ///Marker type for the `app_id` field
+        pub struct app_id(());
         ///Marker type for the `service_did` field
         pub struct service_did(());
         ///Marker type for the `platform` field
         pub struct platform(());
-        ///Marker type for the `app_id` field
-        pub struct app_id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct UnregisterPushBuilder<'a, S: unregister_push_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<UnregisterPushPlatform<'a>>,
         Option<Did<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> UnregisterPush<'a> {
@@ -247,9 +250,9 @@ impl<'a> UnregisterPushBuilder<'a, unregister_push_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UnregisterPushBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -264,11 +267,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> UnregisterPushBuilder<'a, unregister_push_state::SetAppId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         UnregisterPushBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -283,11 +286,11 @@ where
         mut self,
         value: impl Into<UnregisterPushPlatform<'a>>,
     ) -> UnregisterPushBuilder<'a, unregister_push_state::SetPlatform<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         UnregisterPushBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -302,11 +305,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> UnregisterPushBuilder<'a, unregister_push_state::SetServiceDid<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         UnregisterPushBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -321,11 +324,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> UnregisterPushBuilder<'a, unregister_push_state::SetToken<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         UnregisterPushBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -334,17 +337,17 @@ impl<'a, S> UnregisterPushBuilder<'a, S>
 where
     S: unregister_push_state::State,
     S::Token: unregister_push_state::IsSet,
+    S::AppId: unregister_push_state::IsSet,
     S::ServiceDid: unregister_push_state::IsSet,
     S::Platform: unregister_push_state::IsSet,
-    S::AppId: unregister_push_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UnregisterPush<'a> {
         UnregisterPush {
-            app_id: self.__unsafe_private_named.0.unwrap(),
-            platform: self.__unsafe_private_named.1.unwrap(),
-            service_did: self.__unsafe_private_named.2.unwrap(),
-            token: self.__unsafe_private_named.3.unwrap(),
+            app_id: self._fields.0.unwrap(),
+            platform: self._fields.1.unwrap(),
+            service_did: self._fields.2.unwrap(),
+            token: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -357,10 +360,10 @@ where
         >,
     ) -> UnregisterPush<'a> {
         UnregisterPush {
-            app_id: self.__unsafe_private_named.0.unwrap(),
-            platform: self.__unsafe_private_named.1.unwrap(),
-            service_did: self.__unsafe_private_named.2.unwrap(),
-            token: self.__unsafe_private_named.3.unwrap(),
+            app_id: self._fields.0.unwrap(),
+            platform: self._fields.1.unwrap(),
+            service_did: self._fields.2.unwrap(),
+            token: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

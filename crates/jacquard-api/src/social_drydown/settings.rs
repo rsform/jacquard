@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -322,8 +325,8 @@ pub mod settings_state {
 
 /// Builder for constructing an instance of this type
 pub struct SettingsBuilder<'a, S: settings_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<i64>,
         Option<Datetime>,
         Option<i64>,
@@ -332,7 +335,7 @@ pub struct SettingsBuilder<'a, S: settings_state::State> {
         Option<i64>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Settings<'a> {
@@ -346,9 +349,9 @@ impl<'a> SettingsBuilder<'a, settings_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SettingsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -356,12 +359,12 @@ impl<'a> SettingsBuilder<'a, settings_state::Empty> {
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `complexityPreference` field (optional)
     pub fn complexity_preference(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `complexityPreference` field to an Option value (optional)
     pub fn maybe_complexity_preference(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -376,11 +379,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SettingsBuilder<'a, settings_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SettingsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -388,12 +391,12 @@ where
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `longevityPriority` field (optional)
     pub fn longevity_priority(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `longevityPriority` field to an Option value (optional)
     pub fn maybe_longevity_priority(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -401,12 +404,12 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `presenceStyle` field (optional)
     pub fn presence_style(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `presenceStyle` field to an Option value (optional)
     pub fn maybe_presence_style(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -417,12 +420,12 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
         mut self,
         value: impl Into<Option<SettingsScoreLens<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `scoreLens` field to an Option value (optional)
     pub fn maybe_score_lens(mut self, value: Option<SettingsScoreLens<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -430,12 +433,12 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `scoringApproach` field (optional)
     pub fn scoring_approach(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `scoringApproach` field to an Option value (optional)
     pub fn maybe_scoring_approach(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -443,12 +446,12 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
 impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -461,13 +464,13 @@ where
     /// Build the final struct
     pub fn build(self) -> Settings<'a> {
         Settings {
-            complexity_preference: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            longevity_priority: self.__unsafe_private_named.2,
-            presence_style: self.__unsafe_private_named.3,
-            score_lens: self.__unsafe_private_named.4,
-            scoring_approach: self.__unsafe_private_named.5,
-            updated_at: self.__unsafe_private_named.6,
+            complexity_preference: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            longevity_priority: self._fields.2,
+            presence_style: self._fields.3,
+            score_lens: self._fields.4,
+            scoring_approach: self._fields.5,
+            updated_at: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -480,13 +483,13 @@ where
         >,
     ) -> Settings<'a> {
         Settings {
-            complexity_preference: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            longevity_priority: self.__unsafe_private_named.2,
-            presence_style: self.__unsafe_private_named.3,
-            score_lens: self.__unsafe_private_named.4,
-            scoring_approach: self.__unsafe_private_named.5,
-            updated_at: self.__unsafe_private_named.6,
+            complexity_preference: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            longevity_priority: self._fields.2,
+            presence_style: self._fields.3,
+            score_lens: self._fields.4,
+            scoring_approach: self._fields.5,
+            updated_at: self._fields.6,
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -139,80 +142,80 @@ pub mod buzz_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Book;
         type Comment;
         type Parent;
+        type CreatedAt;
+        type Book;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Book = Unset;
         type Comment = Unset;
         type Parent = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Book = S::Book;
-        type Comment = S::Comment;
-        type Parent = S::Parent;
-    }
-    ///State transition - sets the `book` field to Set
-    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBook<S> {}
-    impl<S: State> State for SetBook<S> {
-        type CreatedAt = S::CreatedAt;
-        type Book = Set<members::book>;
-        type Comment = S::Comment;
-        type Parent = S::Parent;
+        type CreatedAt = Unset;
+        type Book = Unset;
     }
     ///State transition - sets the `comment` field to Set
     pub struct SetComment<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetComment<S> {}
     impl<S: State> State for SetComment<S> {
-        type CreatedAt = S::CreatedAt;
-        type Book = S::Book;
         type Comment = Set<members::comment>;
         type Parent = S::Parent;
+        type CreatedAt = S::CreatedAt;
+        type Book = S::Book;
     }
     ///State transition - sets the `parent` field to Set
     pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetParent<S> {}
     impl<S: State> State for SetParent<S> {
-        type CreatedAt = S::CreatedAt;
-        type Book = S::Book;
         type Comment = S::Comment;
         type Parent = Set<members::parent>;
+        type CreatedAt = S::CreatedAt;
+        type Book = S::Book;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Comment = S::Comment;
+        type Parent = S::Parent;
+        type CreatedAt = Set<members::created_at>;
+        type Book = S::Book;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBook<S> {}
+    impl<S: State> State for SetBook<S> {
+        type Comment = S::Comment;
+        type Parent = S::Parent;
+        type CreatedAt = S::CreatedAt;
+        type Book = Set<members::book>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `book` field
-        pub struct book(());
         ///Marker type for the `comment` field
         pub struct comment(());
         ///Marker type for the `parent` field
         pub struct parent(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `book` field
+        pub struct book(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BuzzBuilder<'a, S: buzz_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<StrongRef<'a>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<StrongRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Buzz<'a> {
@@ -226,9 +229,9 @@ impl<'a> BuzzBuilder<'a, buzz_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BuzzBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -243,11 +246,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> BuzzBuilder<'a, buzz_state::SetBook<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BuzzBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -262,11 +265,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> BuzzBuilder<'a, buzz_state::SetComment<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         BuzzBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -281,11 +284,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> BuzzBuilder<'a, buzz_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         BuzzBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -300,11 +303,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> BuzzBuilder<'a, buzz_state::SetParent<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         BuzzBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -312,18 +315,18 @@ where
 impl<'a, S> BuzzBuilder<'a, S>
 where
     S: buzz_state::State,
-    S::CreatedAt: buzz_state::IsSet,
-    S::Book: buzz_state::IsSet,
     S::Comment: buzz_state::IsSet,
     S::Parent: buzz_state::IsSet,
+    S::CreatedAt: buzz_state::IsSet,
+    S::Book: buzz_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Buzz<'a> {
         Buzz {
-            book: self.__unsafe_private_named.0.unwrap(),
-            comment: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            parent: self.__unsafe_private_named.3.unwrap(),
+            book: self._fields.0.unwrap(),
+            comment: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            parent: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -336,10 +339,10 @@ where
         >,
     ) -> Buzz<'a> {
         Buzz {
-            book: self.__unsafe_private_named.0.unwrap(),
-            comment: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            parent: self.__unsafe_private_named.3.unwrap(),
+            book: self._fields.0.unwrap(),
+            comment: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            parent: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

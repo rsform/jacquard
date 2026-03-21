@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::deps::bytes::Bytes;
@@ -131,8 +134,8 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Src;
         type Uri;
+        type Src;
         type Cts;
         type Val;
     }
@@ -140,26 +143,26 @@ pub mod vote_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Src = Unset;
         type Uri = Unset;
+        type Src = Unset;
         type Cts = Unset;
         type Val = Unset;
-    }
-    ///State transition - sets the `src` field to Set
-    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSrc<S> {}
-    impl<S: State> State for SetSrc<S> {
-        type Src = Set<members::src>;
-        type Uri = S::Uri;
-        type Cts = S::Cts;
-        type Val = S::Val;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Src = S::Src;
         type Uri = Set<members::uri>;
+        type Src = S::Src;
+        type Cts = S::Cts;
+        type Val = S::Val;
+    }
+    ///State transition - sets the `src` field to Set
+    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSrc<S> {}
+    impl<S: State> State for SetSrc<S> {
+        type Uri = S::Uri;
+        type Src = Set<members::src>;
         type Cts = S::Cts;
         type Val = S::Val;
     }
@@ -167,8 +170,8 @@ pub mod vote_state {
     pub struct SetCts<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCts<S> {}
     impl<S: State> State for SetCts<S> {
-        type Src = S::Src;
         type Uri = S::Uri;
+        type Src = S::Src;
         type Cts = Set<members::cts>;
         type Val = S::Val;
     }
@@ -176,18 +179,18 @@ pub mod vote_state {
     pub struct SetVal<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVal<S> {}
     impl<S: State> State for SetVal<S> {
-        type Src = S::Src;
         type Uri = S::Uri;
+        type Src = S::Src;
         type Cts = S::Cts;
         type Val = Set<members::val>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `src` field
-        pub struct src(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `src` field
+        pub struct src(());
         ///Marker type for the `cts` field
         pub struct cts(());
         ///Marker type for the `val` field
@@ -197,8 +200,8 @@ pub mod vote_state {
 
 /// Builder for constructing an instance of this type
 pub struct VoteBuilder<'a, S: vote_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Cid<'a>>,
         Option<Datetime>,
@@ -208,7 +211,7 @@ pub struct VoteBuilder<'a, S: vote_state::State> {
         Option<UriValue<'a>>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Vote<'a> {
@@ -222,9 +225,9 @@ impl<'a> VoteBuilder<'a, vote_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         VoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -232,12 +235,12 @@ impl<'a> VoteBuilder<'a, vote_state::Empty> {
 impl<'a, S: vote_state::State> VoteBuilder<'a, S> {
     /// Set the `aid` field (optional)
     pub fn aid(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `aid` field to an Option value (optional)
     pub fn maybe_aid(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -245,12 +248,12 @@ impl<'a, S: vote_state::State> VoteBuilder<'a, S> {
 impl<'a, S: vote_state::State> VoteBuilder<'a, S> {
     /// Set the `cid` field (optional)
     pub fn cid(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `cid` field to an Option value (optional)
     pub fn maybe_cid(mut self, value: Option<Cid<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -265,11 +268,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> VoteBuilder<'a, vote_state::SetCts<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         VoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -277,12 +280,12 @@ where
 impl<'a, S: vote_state::State> VoteBuilder<'a, S> {
     /// Set the `reasons` field (optional)
     pub fn reasons(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `reasons` field to an Option value (optional)
     pub fn maybe_reasons(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -290,12 +293,12 @@ impl<'a, S: vote_state::State> VoteBuilder<'a, S> {
 impl<'a, S: vote_state::State> VoteBuilder<'a, S> {
     /// Set the `sig` field (optional)
     pub fn sig(mut self, value: impl Into<Option<Bytes>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `sig` field to an Option value (optional)
     pub fn maybe_sig(mut self, value: Option<Bytes>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -310,11 +313,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> VoteBuilder<'a, vote_state::SetSrc<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         VoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -329,11 +332,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> VoteBuilder<'a, vote_state::SetUri<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         VoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -348,11 +351,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> VoteBuilder<'a, vote_state::SetVal<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         VoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -360,22 +363,22 @@ where
 impl<'a, S> VoteBuilder<'a, S>
 where
     S: vote_state::State,
-    S::Src: vote_state::IsSet,
     S::Uri: vote_state::IsSet,
+    S::Src: vote_state::IsSet,
     S::Cts: vote_state::IsSet,
     S::Val: vote_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Vote<'a> {
         Vote {
-            aid: self.__unsafe_private_named.0,
-            cid: self.__unsafe_private_named.1,
-            cts: self.__unsafe_private_named.2.unwrap(),
-            reasons: self.__unsafe_private_named.3,
-            sig: self.__unsafe_private_named.4,
-            src: self.__unsafe_private_named.5.unwrap(),
-            uri: self.__unsafe_private_named.6.unwrap(),
-            val: self.__unsafe_private_named.7.unwrap(),
+            aid: self._fields.0,
+            cid: self._fields.1,
+            cts: self._fields.2.unwrap(),
+            reasons: self._fields.3,
+            sig: self._fields.4,
+            src: self._fields.5.unwrap(),
+            uri: self._fields.6.unwrap(),
+            val: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -388,14 +391,14 @@ where
         >,
     ) -> Vote<'a> {
         Vote {
-            aid: self.__unsafe_private_named.0,
-            cid: self.__unsafe_private_named.1,
-            cts: self.__unsafe_private_named.2.unwrap(),
-            reasons: self.__unsafe_private_named.3,
-            sig: self.__unsafe_private_named.4,
-            src: self.__unsafe_private_named.5.unwrap(),
-            uri: self.__unsafe_private_named.6.unwrap(),
-            val: self.__unsafe_private_named.7.unwrap(),
+            aid: self._fields.0,
+            cid: self._fields.1,
+            cts: self._fields.2.unwrap(),
+            reasons: self._fields.3,
+            sig: self._fields.4,
+            src: self._fields.5.unwrap(),
+            uri: self._fields.6.unwrap(),
+            val: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }

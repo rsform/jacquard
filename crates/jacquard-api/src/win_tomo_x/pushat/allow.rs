@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -134,9 +137,9 @@ pub mod allow_state {
 
 /// Builder for constructing an instance of this type
 pub struct AllowBuilder<'a, S: allow_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Data<'a>>, Option<Datetime>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Data<'a>>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Allow<'a> {
@@ -150,9 +153,9 @@ impl<'a> AllowBuilder<'a, allow_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AllowBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -160,12 +163,12 @@ impl<'a> AllowBuilder<'a, allow_state::Empty> {
 impl<'a, S: allow_state::State> AllowBuilder<'a, S> {
     /// Set the `config` field (optional)
     pub fn config(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `config` field to an Option value (optional)
     pub fn maybe_config(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -180,11 +183,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> AllowBuilder<'a, allow_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AllowBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -197,8 +200,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Allow<'a> {
         Allow {
-            config: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
+            config: self._fields.0,
+            created_at: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -208,8 +211,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Allow<'a> {
         Allow {
-            config: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
+            config: self._fields.0,
+            created_at: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -200,58 +203,58 @@ pub mod skill_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Sim;
         type Name;
         type CreatedAt;
-        type Sim;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Sim = Unset;
         type Name = Unset;
         type CreatedAt = Unset;
-        type Sim = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
-        type Sim = S::Sim;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type CreatedAt = Set<members::created_at>;
-        type Sim = S::Sim;
     }
     ///State transition - sets the `sim` field to Set
     pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSim<S> {}
     impl<S: State> State for SetSim<S> {
+        type Sim = Set<members::sim>;
         type Name = S::Name;
         type CreatedAt = S::CreatedAt;
-        type Sim = Set<members::sim>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Sim = S::Sim;
+        type Name = Set<members::name>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Sim = S::Sim;
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `sim` field
+        pub struct sim(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `sim` field
-        pub struct sim(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct SkillBuilder<'a, S: skill_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<Vec<Facet<'a>>>,
@@ -261,7 +264,7 @@ pub struct SkillBuilder<'a, S: skill_state::State> {
         Option<StrongRef<'a>>,
         Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Skill<'a> {
@@ -275,9 +278,9 @@ impl<'a> SkillBuilder<'a, skill_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SkillBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -292,11 +295,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> SkillBuilder<'a, skill_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SkillBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -304,12 +307,12 @@ where
 impl<'a, S: skill_state::State> SkillBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -320,12 +323,12 @@ impl<'a, S: skill_state::State> SkillBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<Facet<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `descriptionFacets` field to an Option value (optional)
     pub fn maybe_description_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -333,12 +336,12 @@ impl<'a, S: skill_state::State> SkillBuilder<'a, S> {
 impl<'a, S: skill_state::State> SkillBuilder<'a, S> {
     /// Set the `instructions` field (optional)
     pub fn instructions(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `instructions` field to an Option value (optional)
     pub fn maybe_instructions(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -349,12 +352,12 @@ impl<'a, S: skill_state::State> SkillBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<Facet<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `instructionsFacets` field to an Option value (optional)
     pub fn maybe_instructions_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -369,11 +372,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SkillBuilder<'a, skill_state::SetName<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         SkillBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -388,11 +391,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> SkillBuilder<'a, skill_state::SetSim<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         SkillBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -400,12 +403,12 @@ where
 impl<'a, S: skill_state::State> SkillBuilder<'a, S> {
     /// Set the `triggers` field (optional)
     pub fn triggers(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `triggers` field to an Option value (optional)
     pub fn maybe_triggers(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -413,21 +416,21 @@ impl<'a, S: skill_state::State> SkillBuilder<'a, S> {
 impl<'a, S> SkillBuilder<'a, S>
 where
     S: skill_state::State,
+    S::Sim: skill_state::IsSet,
     S::Name: skill_state::IsSet,
     S::CreatedAt: skill_state::IsSet,
-    S::Sim: skill_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Skill<'a> {
         Skill {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            description_facets: self.__unsafe_private_named.2,
-            instructions: self.__unsafe_private_named.3,
-            instructions_facets: self.__unsafe_private_named.4,
-            name: self.__unsafe_private_named.5.unwrap(),
-            sim: self.__unsafe_private_named.6.unwrap(),
-            triggers: self.__unsafe_private_named.7,
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1,
+            description_facets: self._fields.2,
+            instructions: self._fields.3,
+            instructions_facets: self._fields.4,
+            name: self._fields.5.unwrap(),
+            sim: self._fields.6.unwrap(),
+            triggers: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -440,14 +443,14 @@ where
         >,
     ) -> Skill<'a> {
         Skill {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            description: self.__unsafe_private_named.1,
-            description_facets: self.__unsafe_private_named.2,
-            instructions: self.__unsafe_private_named.3,
-            instructions_facets: self.__unsafe_private_named.4,
-            name: self.__unsafe_private_named.5.unwrap(),
-            sim: self.__unsafe_private_named.6.unwrap(),
-            triggers: self.__unsafe_private_named.7,
+            created_at: self._fields.0.unwrap(),
+            description: self._fields.1,
+            description_facets: self._fields.2,
+            instructions: self._fields.3,
+            instructions_facets: self._fields.4,
+            name: self._fields.5.unwrap(),
+            sim: self._fields.6.unwrap(),
+            triggers: self._fields.7,
             extra_data: Some(extra_data),
         }
     }

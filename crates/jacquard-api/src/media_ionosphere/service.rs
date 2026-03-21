@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -197,49 +200,49 @@ pub mod service_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Language;
+        type Name;
         type Ionosphere;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Language = Unset;
+        type Name = Unset;
         type Ionosphere = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Language = S::Language;
-        type Ionosphere = S::Ionosphere;
     }
     ///State transition - sets the `language` field to Set
     pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLanguage<S> {}
     impl<S: State> State for SetLanguage<S> {
-        type Name = S::Name;
         type Language = Set<members::language>;
+        type Name = S::Name;
+        type Ionosphere = S::Ionosphere;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Language = S::Language;
+        type Name = Set<members::name>;
         type Ionosphere = S::Ionosphere;
     }
     ///State transition - sets the `ionosphere` field to Set
     pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIonosphere<S> {}
     impl<S: State> State for SetIonosphere<S> {
-        type Name = S::Name;
         type Language = S::Language;
+        type Name = S::Name;
         type Ionosphere = Set<members::ionosphere>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `language` field
         pub struct language(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `ionosphere` field
         pub struct ionosphere(());
     }
@@ -247,8 +250,8 @@ pub mod service_state {
 
 /// Builder for constructing an instance of this type
 pub struct ServiceBuilder<'a, S: service_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<Broadcast<'a>>>,
         Option<CowStr<'a>>,
         Option<Vec<Genre<'a>>>,
@@ -260,7 +263,7 @@ pub struct ServiceBuilder<'a, S: service_state::State> {
         Option<CowStr<'a>>,
         Option<Language>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Service<'a> {
@@ -274,20 +277,9 @@ impl<'a> ServiceBuilder<'a, service_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ServiceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -295,12 +287,12 @@ impl<'a> ServiceBuilder<'a, service_state::Empty> {
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `broadcast` field (optional)
     pub fn broadcast(mut self, value: impl Into<Option<Vec<Broadcast<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `broadcast` field to an Option value (optional)
     pub fn maybe_broadcast(mut self, value: Option<Vec<Broadcast<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -308,12 +300,12 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -321,12 +313,12 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `genres` field (optional)
     pub fn genres(mut self, value: impl Into<Option<Vec<Genre<'a>>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `genres` field to an Option value (optional)
     pub fn maybe_genres(mut self, value: Option<Vec<Genre<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -334,12 +326,12 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `geolocation` field (optional)
     pub fn geolocation(mut self, value: impl Into<Option<Geocoordinates<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `geolocation` field to an Option value (optional)
     pub fn maybe_geolocation(mut self, value: Option<Geocoordinates<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -347,12 +339,12 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `icon` field (optional)
     pub fn icon(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `icon` field to an Option value (optional)
     pub fn maybe_icon(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -367,11 +359,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ServiceBuilder<'a, service_state::SetIonosphere<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ServiceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -379,12 +371,12 @@ where
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `keywords` field to an Option value (optional)
     pub fn maybe_keywords(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -399,11 +391,11 @@ where
         mut self,
         value: impl Into<Language>,
     ) -> ServiceBuilder<'a, service_state::SetLanguage<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         ServiceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -418,11 +410,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ServiceBuilder<'a, service_state::SetName<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         ServiceBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -430,12 +422,12 @@ where
 impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     /// Set the `presentationLanguage` field (optional)
     pub fn presentation_language(mut self, value: impl Into<Option<Language>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `presentationLanguage` field to an Option value (optional)
     pub fn maybe_presentation_language(mut self, value: Option<Language>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -443,23 +435,23 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
 impl<'a, S> ServiceBuilder<'a, S>
 where
     S: service_state::State,
-    S::Name: service_state::IsSet,
     S::Language: service_state::IsSet,
+    S::Name: service_state::IsSet,
     S::Ionosphere: service_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Service<'a> {
         Service {
-            broadcast: self.__unsafe_private_named.0,
-            description: self.__unsafe_private_named.1,
-            genres: self.__unsafe_private_named.2,
-            geolocation: self.__unsafe_private_named.3,
-            icon: self.__unsafe_private_named.4,
-            ionosphere: self.__unsafe_private_named.5.unwrap(),
-            keywords: self.__unsafe_private_named.6,
-            language: self.__unsafe_private_named.7.unwrap(),
-            name: self.__unsafe_private_named.8.unwrap(),
-            presentation_language: self.__unsafe_private_named.9,
+            broadcast: self._fields.0,
+            description: self._fields.1,
+            genres: self._fields.2,
+            geolocation: self._fields.3,
+            icon: self._fields.4,
+            ionosphere: self._fields.5.unwrap(),
+            keywords: self._fields.6,
+            language: self._fields.7.unwrap(),
+            name: self._fields.8.unwrap(),
+            presentation_language: self._fields.9,
             extra_data: Default::default(),
         }
     }
@@ -472,16 +464,16 @@ where
         >,
     ) -> Service<'a> {
         Service {
-            broadcast: self.__unsafe_private_named.0,
-            description: self.__unsafe_private_named.1,
-            genres: self.__unsafe_private_named.2,
-            geolocation: self.__unsafe_private_named.3,
-            icon: self.__unsafe_private_named.4,
-            ionosphere: self.__unsafe_private_named.5.unwrap(),
-            keywords: self.__unsafe_private_named.6,
-            language: self.__unsafe_private_named.7.unwrap(),
-            name: self.__unsafe_private_named.8.unwrap(),
-            presentation_language: self.__unsafe_private_named.9,
+            broadcast: self._fields.0,
+            description: self._fields.1,
+            genres: self._fields.2,
+            geolocation: self._fields.3,
+            icon: self._fields.4,
+            ionosphere: self._fields.5.unwrap(),
+            keywords: self._fields.6,
+            language: self._fields.7.unwrap(),
+            name: self._fields.8.unwrap(),
+            presentation_language: self._fields.9,
             extra_data: Some(extra_data),
         }
     }

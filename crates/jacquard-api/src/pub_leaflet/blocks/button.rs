@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -55,45 +58,45 @@ pub mod button_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type Text;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type Text = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Text = S::Text;
+        type Url = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type Url = S::Url;
         type Text = Set<members::text>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Text = S::Text;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ButtonBuilder<'a, S: button_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<UriValue<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Button<'a> {
@@ -107,9 +110,9 @@ impl<'a> ButtonBuilder<'a, button_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ButtonBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -124,11 +127,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ButtonBuilder<'a, button_state::SetText<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ButtonBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -143,11 +146,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> ButtonBuilder<'a, button_state::SetUrl<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ButtonBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -155,14 +158,14 @@ where
 impl<'a, S> ButtonBuilder<'a, S>
 where
     S: button_state::State,
-    S::Url: button_state::IsSet,
     S::Text: button_state::IsSet,
+    S::Url: button_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Button<'a> {
         Button {
-            text: self.__unsafe_private_named.0.unwrap(),
-            url: self.__unsafe_private_named.1.unwrap(),
+            text: self._fields.0.unwrap(),
+            url: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -175,8 +178,8 @@ where
         >,
     ) -> Button<'a> {
         Button {
-            text: self.__unsafe_private_named.0.unwrap(),
-            url: self.__unsafe_private_named.1.unwrap(),
+            text: self._fields.0.unwrap(),
+            url: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

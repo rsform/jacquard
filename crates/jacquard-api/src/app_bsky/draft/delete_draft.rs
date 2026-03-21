@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::string::Tid;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -80,9 +83,9 @@ pub mod delete_draft_state {
 
 /// Builder for constructing an instance of this type
 pub struct DeleteDraftBuilder<'a, S: delete_draft_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Tid>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Tid>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DeleteDraft<'a> {
@@ -96,9 +99,9 @@ impl<'a> DeleteDraftBuilder<'a, delete_draft_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeleteDraftBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -113,11 +116,11 @@ where
         mut self,
         value: impl Into<Tid>,
     ) -> DeleteDraftBuilder<'a, delete_draft_state::SetId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DeleteDraftBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -130,7 +133,7 @@ where
     /// Build the final struct
     pub fn build(self) -> DeleteDraft<'a> {
         DeleteDraft {
-            id: self.__unsafe_private_named.0.unwrap(),
+            id: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -143,7 +146,7 @@ where
         >,
     ) -> DeleteDraft<'a> {
         DeleteDraft {
-            id: self.__unsafe_private_named.0.unwrap(),
+            id: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

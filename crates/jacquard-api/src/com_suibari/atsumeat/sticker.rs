@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -465,112 +468,112 @@ pub mod sticker_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type OriginalOwner;
-        type ObtainedAt;
-        type Signature;
-        type SignedPayload;
-        type Model;
         type Image;
+        type SignedPayload;
+        type ObtainedAt;
+        type Model;
+        type OriginalOwner;
+        type Signature;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type OriginalOwner = Unset;
-        type ObtainedAt = Unset;
-        type Signature = Unset;
-        type SignedPayload = Unset;
-        type Model = Unset;
         type Image = Unset;
-    }
-    ///State transition - sets the `original_owner` field to Set
-    pub struct SetOriginalOwner<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOriginalOwner<S> {}
-    impl<S: State> State for SetOriginalOwner<S> {
-        type OriginalOwner = Set<members::original_owner>;
-        type ObtainedAt = S::ObtainedAt;
-        type Signature = S::Signature;
-        type SignedPayload = S::SignedPayload;
-        type Model = S::Model;
-        type Image = S::Image;
-    }
-    ///State transition - sets the `obtained_at` field to Set
-    pub struct SetObtainedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObtainedAt<S> {}
-    impl<S: State> State for SetObtainedAt<S> {
-        type OriginalOwner = S::OriginalOwner;
-        type ObtainedAt = Set<members::obtained_at>;
-        type Signature = S::Signature;
-        type SignedPayload = S::SignedPayload;
-        type Model = S::Model;
-        type Image = S::Image;
-    }
-    ///State transition - sets the `signature` field to Set
-    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignature<S> {}
-    impl<S: State> State for SetSignature<S> {
-        type OriginalOwner = S::OriginalOwner;
-        type ObtainedAt = S::ObtainedAt;
-        type Signature = Set<members::signature>;
-        type SignedPayload = S::SignedPayload;
-        type Model = S::Model;
-        type Image = S::Image;
-    }
-    ///State transition - sets the `signed_payload` field to Set
-    pub struct SetSignedPayload<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignedPayload<S> {}
-    impl<S: State> State for SetSignedPayload<S> {
-        type OriginalOwner = S::OriginalOwner;
-        type ObtainedAt = S::ObtainedAt;
-        type Signature = S::Signature;
-        type SignedPayload = Set<members::signed_payload>;
-        type Model = S::Model;
-        type Image = S::Image;
-    }
-    ///State transition - sets the `model` field to Set
-    pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetModel<S> {}
-    impl<S: State> State for SetModel<S> {
-        type OriginalOwner = S::OriginalOwner;
-        type ObtainedAt = S::ObtainedAt;
-        type Signature = S::Signature;
-        type SignedPayload = S::SignedPayload;
-        type Model = Set<members::model>;
-        type Image = S::Image;
+        type SignedPayload = Unset;
+        type ObtainedAt = Unset;
+        type Model = Unset;
+        type OriginalOwner = Unset;
+        type Signature = Unset;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
-        type OriginalOwner = S::OriginalOwner;
-        type ObtainedAt = S::ObtainedAt;
-        type Signature = S::Signature;
-        type SignedPayload = S::SignedPayload;
-        type Model = S::Model;
         type Image = Set<members::image>;
+        type SignedPayload = S::SignedPayload;
+        type ObtainedAt = S::ObtainedAt;
+        type Model = S::Model;
+        type OriginalOwner = S::OriginalOwner;
+        type Signature = S::Signature;
+    }
+    ///State transition - sets the `signed_payload` field to Set
+    pub struct SetSignedPayload<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignedPayload<S> {}
+    impl<S: State> State for SetSignedPayload<S> {
+        type Image = S::Image;
+        type SignedPayload = Set<members::signed_payload>;
+        type ObtainedAt = S::ObtainedAt;
+        type Model = S::Model;
+        type OriginalOwner = S::OriginalOwner;
+        type Signature = S::Signature;
+    }
+    ///State transition - sets the `obtained_at` field to Set
+    pub struct SetObtainedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetObtainedAt<S> {}
+    impl<S: State> State for SetObtainedAt<S> {
+        type Image = S::Image;
+        type SignedPayload = S::SignedPayload;
+        type ObtainedAt = Set<members::obtained_at>;
+        type Model = S::Model;
+        type OriginalOwner = S::OriginalOwner;
+        type Signature = S::Signature;
+    }
+    ///State transition - sets the `model` field to Set
+    pub struct SetModel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetModel<S> {}
+    impl<S: State> State for SetModel<S> {
+        type Image = S::Image;
+        type SignedPayload = S::SignedPayload;
+        type ObtainedAt = S::ObtainedAt;
+        type Model = Set<members::model>;
+        type OriginalOwner = S::OriginalOwner;
+        type Signature = S::Signature;
+    }
+    ///State transition - sets the `original_owner` field to Set
+    pub struct SetOriginalOwner<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOriginalOwner<S> {}
+    impl<S: State> State for SetOriginalOwner<S> {
+        type Image = S::Image;
+        type SignedPayload = S::SignedPayload;
+        type ObtainedAt = S::ObtainedAt;
+        type Model = S::Model;
+        type OriginalOwner = Set<members::original_owner>;
+        type Signature = S::Signature;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSignature<S> {}
+    impl<S: State> State for SetSignature<S> {
+        type Image = S::Image;
+        type SignedPayload = S::SignedPayload;
+        type ObtainedAt = S::ObtainedAt;
+        type Model = S::Model;
+        type OriginalOwner = S::OriginalOwner;
+        type Signature = Set<members::signature>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `original_owner` field
-        pub struct original_owner(());
-        ///Marker type for the `obtained_at` field
-        pub struct obtained_at(());
-        ///Marker type for the `signature` field
-        pub struct signature(());
-        ///Marker type for the `signed_payload` field
-        pub struct signed_payload(());
-        ///Marker type for the `model` field
-        pub struct model(());
         ///Marker type for the `image` field
         pub struct image(());
+        ///Marker type for the `signed_payload` field
+        pub struct signed_payload(());
+        ///Marker type for the `obtained_at` field
+        pub struct obtained_at(());
+        ///Marker type for the `model` field
+        pub struct model(());
+        ///Marker type for the `original_owner` field
+        pub struct original_owner(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct StickerBuilder<'a, S: sticker_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Data<'a>>,
         Option<StickerImageType<'a>>,
         Option<CowStr<'a>>,
@@ -585,7 +588,7 @@ pub struct StickerBuilder<'a, S: sticker_state::State> {
         Option<Did<'a>>,
         Option<Vec<CowStr<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Sticker<'a> {
@@ -599,8 +602,8 @@ impl<'a> StickerBuilder<'a, sticker_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StickerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -615,7 +618,7 @@ impl<'a> StickerBuilder<'a, sticker_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -630,11 +633,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> StickerBuilder<'a, sticker_state::SetImage<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         StickerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -642,12 +645,12 @@ where
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `imageType` field (optional)
     pub fn image_type(mut self, value: impl Into<Option<StickerImageType<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `imageType` field to an Option value (optional)
     pub fn maybe_image_type(mut self, value: Option<StickerImageType<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -655,12 +658,12 @@ impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
     pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -675,11 +678,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> StickerBuilder<'a, sticker_state::SetModel<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         StickerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -687,12 +690,12 @@ where
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -707,11 +710,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> StickerBuilder<'a, sticker_state::SetObtainedAt<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         StickerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -719,12 +722,12 @@ where
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `obtainedFrom` field (optional)
     pub fn obtained_from(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `obtainedFrom` field to an Option value (optional)
     pub fn maybe_obtained_from(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -739,11 +742,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> StickerBuilder<'a, sticker_state::SetOriginalOwner<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         StickerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -751,12 +754,12 @@ where
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `shape` field (optional)
     pub fn shape(mut self, value: impl Into<Option<StickerShape<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `shape` field to an Option value (optional)
     pub fn maybe_shape(mut self, value: Option<StickerShape<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -771,11 +774,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> StickerBuilder<'a, sticker_state::SetSignature<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         StickerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -790,11 +793,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> StickerBuilder<'a, sticker_state::SetSignedPayload<S>> {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         StickerBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -802,12 +805,12 @@ where
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `subjectDid` field (optional)
     pub fn subject_did(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `subjectDid` field to an Option value (optional)
     pub fn maybe_subject_did(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -815,12 +818,12 @@ impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
 impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -828,29 +831,29 @@ impl<'a, S: sticker_state::State> StickerBuilder<'a, S> {
 impl<'a, S> StickerBuilder<'a, S>
 where
     S: sticker_state::State,
-    S::OriginalOwner: sticker_state::IsSet,
-    S::ObtainedAt: sticker_state::IsSet,
-    S::Signature: sticker_state::IsSet,
-    S::SignedPayload: sticker_state::IsSet,
-    S::Model: sticker_state::IsSet,
     S::Image: sticker_state::IsSet,
+    S::SignedPayload: sticker_state::IsSet,
+    S::ObtainedAt: sticker_state::IsSet,
+    S::Model: sticker_state::IsSet,
+    S::OriginalOwner: sticker_state::IsSet,
+    S::Signature: sticker_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Sticker<'a> {
         Sticker {
-            image: self.__unsafe_private_named.0.unwrap(),
-            image_type: self.__unsafe_private_named.1,
-            message: self.__unsafe_private_named.2,
-            model: self.__unsafe_private_named.3.unwrap(),
-            name: self.__unsafe_private_named.4,
-            obtained_at: self.__unsafe_private_named.5.unwrap(),
-            obtained_from: self.__unsafe_private_named.6,
-            original_owner: self.__unsafe_private_named.7.unwrap(),
-            shape: self.__unsafe_private_named.8,
-            signature: self.__unsafe_private_named.9.unwrap(),
-            signed_payload: self.__unsafe_private_named.10.unwrap(),
-            subject_did: self.__unsafe_private_named.11,
-            tags: self.__unsafe_private_named.12,
+            image: self._fields.0.unwrap(),
+            image_type: self._fields.1,
+            message: self._fields.2,
+            model: self._fields.3.unwrap(),
+            name: self._fields.4,
+            obtained_at: self._fields.5.unwrap(),
+            obtained_from: self._fields.6,
+            original_owner: self._fields.7.unwrap(),
+            shape: self._fields.8,
+            signature: self._fields.9.unwrap(),
+            signed_payload: self._fields.10.unwrap(),
+            subject_did: self._fields.11,
+            tags: self._fields.12,
             extra_data: Default::default(),
         }
     }
@@ -860,19 +863,19 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Sticker<'a> {
         Sticker {
-            image: self.__unsafe_private_named.0.unwrap(),
-            image_type: self.__unsafe_private_named.1,
-            message: self.__unsafe_private_named.2,
-            model: self.__unsafe_private_named.3.unwrap(),
-            name: self.__unsafe_private_named.4,
-            obtained_at: self.__unsafe_private_named.5.unwrap(),
-            obtained_from: self.__unsafe_private_named.6,
-            original_owner: self.__unsafe_private_named.7.unwrap(),
-            shape: self.__unsafe_private_named.8,
-            signature: self.__unsafe_private_named.9.unwrap(),
-            signed_payload: self.__unsafe_private_named.10.unwrap(),
-            subject_did: self.__unsafe_private_named.11,
-            tags: self.__unsafe_private_named.12,
+            image: self._fields.0.unwrap(),
+            image_type: self._fields.1,
+            message: self._fields.2,
+            model: self._fields.3.unwrap(),
+            name: self._fields.4,
+            obtained_at: self._fields.5.unwrap(),
+            obtained_from: self._fields.6,
+            original_owner: self._fields.7.unwrap(),
+            shape: self._fields.8,
+            signature: self._fields.9.unwrap(),
+            signed_payload: self._fields.10.unwrap(),
+            subject_did: self._fields.11,
+            tags: self._fields.12,
             extra_data: Some(extra_data),
         }
     }

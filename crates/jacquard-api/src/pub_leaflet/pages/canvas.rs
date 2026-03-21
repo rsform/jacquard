@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -218,74 +221,74 @@ pub mod block_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Block;
+        type Width;
         type Y;
         type X;
-        type Width;
-        type Block;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Block = Unset;
+        type Width = Unset;
         type Y = Unset;
         type X = Unset;
-        type Width = Unset;
-        type Block = Unset;
-    }
-    ///State transition - sets the `y` field to Set
-    pub struct SetY<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetY<S> {}
-    impl<S: State> State for SetY<S> {
-        type Y = Set<members::y>;
-        type X = S::X;
-        type Width = S::Width;
-        type Block = S::Block;
-    }
-    ///State transition - sets the `x` field to Set
-    pub struct SetX<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetX<S> {}
-    impl<S: State> State for SetX<S> {
-        type Y = S::Y;
-        type X = Set<members::x>;
-        type Width = S::Width;
-        type Block = S::Block;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type Y = S::Y;
-        type X = S::X;
-        type Width = Set<members::width>;
-        type Block = S::Block;
     }
     ///State transition - sets the `block` field to Set
     pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlock<S> {}
     impl<S: State> State for SetBlock<S> {
+        type Block = Set<members::block>;
+        type Width = S::Width;
         type Y = S::Y;
         type X = S::X;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidth<S> {}
+    impl<S: State> State for SetWidth<S> {
+        type Block = S::Block;
+        type Width = Set<members::width>;
+        type Y = S::Y;
+        type X = S::X;
+    }
+    ///State transition - sets the `y` field to Set
+    pub struct SetY<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetY<S> {}
+    impl<S: State> State for SetY<S> {
+        type Block = S::Block;
         type Width = S::Width;
-        type Block = Set<members::block>;
+        type Y = Set<members::y>;
+        type X = S::X;
+    }
+    ///State transition - sets the `x` field to Set
+    pub struct SetX<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetX<S> {}
+    impl<S: State> State for SetX<S> {
+        type Block = S::Block;
+        type Width = S::Width;
+        type Y = S::Y;
+        type X = Set<members::x>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `block` field
+        pub struct block(());
+        ///Marker type for the `width` field
+        pub struct width(());
         ///Marker type for the `y` field
         pub struct y(());
         ///Marker type for the `x` field
         pub struct x(());
-        ///Marker type for the `width` field
-        pub struct width(());
-        ///Marker type for the `block` field
-        pub struct block(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BlockBuilder<'a, S: block_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<BlockBlock<'a>>,
         Option<i64>,
         Option<i64>,
@@ -293,7 +296,7 @@ pub struct BlockBuilder<'a, S: block_state::State> {
         Option<i64>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Block<'a> {
@@ -307,9 +310,9 @@ impl<'a> BlockBuilder<'a, block_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -324,11 +327,11 @@ where
         mut self,
         value: impl Into<BlockBlock<'a>>,
     ) -> BlockBuilder<'a, block_state::SetBlock<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -336,12 +339,12 @@ where
 impl<'a, S: block_state::State> BlockBuilder<'a, S> {
     /// Set the `height` field (optional)
     pub fn height(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `height` field to an Option value (optional)
     pub fn maybe_height(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -349,12 +352,12 @@ impl<'a, S: block_state::State> BlockBuilder<'a, S> {
 impl<'a, S: block_state::State> BlockBuilder<'a, S> {
     /// Set the `rotation` field (optional)
     pub fn rotation(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `rotation` field to an Option value (optional)
     pub fn maybe_rotation(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -369,11 +372,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> BlockBuilder<'a, block_state::SetWidth<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         BlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -385,11 +388,11 @@ where
 {
     /// Set the `x` field (required)
     pub fn x(mut self, value: impl Into<i64>) -> BlockBuilder<'a, block_state::SetX<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         BlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -401,11 +404,11 @@ where
 {
     /// Set the `y` field (required)
     pub fn y(mut self, value: impl Into<i64>) -> BlockBuilder<'a, block_state::SetY<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         BlockBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -413,20 +416,20 @@ where
 impl<'a, S> BlockBuilder<'a, S>
 where
     S: block_state::State,
+    S::Block: block_state::IsSet,
+    S::Width: block_state::IsSet,
     S::Y: block_state::IsSet,
     S::X: block_state::IsSet,
-    S::Width: block_state::IsSet,
-    S::Block: block_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Block<'a> {
         Block {
-            block: self.__unsafe_private_named.0.unwrap(),
-            height: self.__unsafe_private_named.1,
-            rotation: self.__unsafe_private_named.2,
-            width: self.__unsafe_private_named.3.unwrap(),
-            x: self.__unsafe_private_named.4.unwrap(),
-            y: self.__unsafe_private_named.5.unwrap(),
+            block: self._fields.0.unwrap(),
+            height: self._fields.1,
+            rotation: self._fields.2,
+            width: self._fields.3.unwrap(),
+            x: self._fields.4.unwrap(),
+            y: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -439,12 +442,12 @@ where
         >,
     ) -> Block<'a> {
         Block {
-            block: self.__unsafe_private_named.0.unwrap(),
-            height: self.__unsafe_private_named.1,
-            rotation: self.__unsafe_private_named.2,
-            width: self.__unsafe_private_named.3.unwrap(),
-            x: self.__unsafe_private_named.4.unwrap(),
-            y: self.__unsafe_private_named.5.unwrap(),
+            block: self._fields.0.unwrap(),
+            height: self._fields.1,
+            rotation: self._fields.2,
+            width: self._fields.3.unwrap(),
+            x: self._fields.4.unwrap(),
+            y: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -665,9 +668,9 @@ pub mod canvas_state {
 
 /// Builder for constructing an instance of this type
 pub struct CanvasBuilder<'a, S: canvas_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<canvas::Block<'a>>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<canvas::Block<'a>>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Canvas<'a> {
@@ -681,9 +684,9 @@ impl<'a> CanvasBuilder<'a, canvas_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CanvasBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -698,11 +701,11 @@ where
         mut self,
         value: impl Into<Vec<canvas::Block<'a>>>,
     ) -> CanvasBuilder<'a, canvas_state::SetBlocks<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CanvasBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -710,12 +713,12 @@ where
 impl<'a, S: canvas_state::State> CanvasBuilder<'a, S> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `id` field to an Option value (optional)
     pub fn maybe_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -728,8 +731,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Canvas<'a> {
         Canvas {
-            blocks: self.__unsafe_private_named.0.unwrap(),
-            id: self.__unsafe_private_named.1,
+            blocks: self._fields.0.unwrap(),
+            id: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -742,8 +745,8 @@ where
         >,
     ) -> Canvas<'a> {
         Canvas {
-            blocks: self.__unsafe_private_named.0.unwrap(),
-            id: self.__unsafe_private_named.1,
+            blocks: self._fields.0.unwrap(),
+            id: self._fields.1,
             extra_data: Some(extra_data),
         }
     }
@@ -759,45 +762,45 @@ pub mod position_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Block;
         type Offset;
+        type Block;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Block = Unset;
         type Offset = Unset;
-    }
-    ///State transition - sets the `block` field to Set
-    pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlock<S> {}
-    impl<S: State> State for SetBlock<S> {
-        type Block = Set<members::block>;
-        type Offset = S::Offset;
+        type Block = Unset;
     }
     ///State transition - sets the `offset` field to Set
     pub struct SetOffset<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOffset<S> {}
     impl<S: State> State for SetOffset<S> {
-        type Block = S::Block;
         type Offset = Set<members::offset>;
+        type Block = S::Block;
+    }
+    ///State transition - sets the `block` field to Set
+    pub struct SetBlock<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlock<S> {}
+    impl<S: State> State for SetBlock<S> {
+        type Offset = S::Offset;
+        type Block = Set<members::block>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `block` field
-        pub struct block(());
         ///Marker type for the `offset` field
         pub struct offset(());
+        ///Marker type for the `block` field
+        pub struct block(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PositionBuilder<'a, S: position_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<i64>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<i64>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Position<'a> {
@@ -811,9 +814,9 @@ impl<'a> PositionBuilder<'a, position_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PositionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -828,11 +831,11 @@ where
         mut self,
         value: impl Into<Vec<i64>>,
     ) -> PositionBuilder<'a, position_state::SetBlock<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PositionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -847,11 +850,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PositionBuilder<'a, position_state::SetOffset<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PositionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -859,14 +862,14 @@ where
 impl<'a, S> PositionBuilder<'a, S>
 where
     S: position_state::State,
-    S::Block: position_state::IsSet,
     S::Offset: position_state::IsSet,
+    S::Block: position_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Position<'a> {
         Position {
-            block: self.__unsafe_private_named.0.unwrap(),
-            offset: self.__unsafe_private_named.1.unwrap(),
+            block: self._fields.0.unwrap(),
+            offset: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -879,8 +882,8 @@ where
         >,
     ) -> Position<'a> {
         Position {
-            block: self.__unsafe_private_named.0.unwrap(),
-            offset: self.__unsafe_private_named.1.unwrap(),
+            block: self._fields.0.unwrap(),
+            offset: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -932,9 +935,9 @@ pub mod quote_state {
 
 /// Builder for constructing an instance of this type
 pub struct QuoteBuilder<'a, S: quote_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<canvas::Position<'a>>, Option<canvas::Position<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<canvas::Position<'a>>, Option<canvas::Position<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Quote<'a> {
@@ -948,9 +951,9 @@ impl<'a> QuoteBuilder<'a, quote_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         QuoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -965,11 +968,11 @@ where
         mut self,
         value: impl Into<canvas::Position<'a>>,
     ) -> QuoteBuilder<'a, quote_state::SetEnd<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         QuoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -984,11 +987,11 @@ where
         mut self,
         value: impl Into<canvas::Position<'a>>,
     ) -> QuoteBuilder<'a, quote_state::SetStart<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         QuoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1002,8 +1005,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Quote<'a> {
         Quote {
-            end: self.__unsafe_private_named.0.unwrap(),
-            start: self.__unsafe_private_named.1.unwrap(),
+            end: self._fields.0.unwrap(),
+            start: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1016,8 +1019,8 @@ where
         >,
     ) -> Quote<'a> {
         Quote {
-            end: self.__unsafe_private_named.0.unwrap(),
-            start: self.__unsafe_private_named.1.unwrap(),
+            end: self._fields.0.unwrap(),
+            start: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -22,7 +22,11 @@ pub mod richtext;
 pub mod segment;
 pub mod server;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -129,98 +133,98 @@ pub mod block_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Blocker;
-        type Uri;
+        type IndexedAt;
         type Cid;
         type Record;
-        type IndexedAt;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Blocker = Unset;
-        type Uri = Unset;
+        type IndexedAt = Unset;
         type Cid = Unset;
         type Record = Unset;
-        type IndexedAt = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `blocker` field to Set
     pub struct SetBlocker<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBlocker<S> {}
     impl<S: State> State for SetBlocker<S> {
         type Blocker = Set<members::blocker>;
-        type Uri = S::Uri;
+        type IndexedAt = S::IndexedAt;
         type Cid = S::Cid;
         type Record = S::Record;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Blocker = S::Blocker;
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type Record = S::Record;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Blocker = S::Blocker;
         type Uri = S::Uri;
-        type Cid = Set<members::cid>;
-        type Record = S::Record;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Blocker = S::Blocker;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Record = Set<members::record>;
-        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
         type Blocker = S::Blocker;
-        type Uri = S::Uri;
+        type IndexedAt = Set<members::indexed_at>;
         type Cid = S::Cid;
         type Record = S::Record;
-        type IndexedAt = Set<members::indexed_at>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Blocker = S::Blocker;
+        type IndexedAt = S::IndexedAt;
+        type Cid = Set<members::cid>;
+        type Record = S::Record;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Blocker = S::Blocker;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
+        type Record = Set<members::record>;
+        type Uri = S::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Blocker = S::Blocker;
+        type IndexedAt = S::IndexedAt;
+        type Cid = S::Cid;
+        type Record = S::Record;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `blocker` field
         pub struct blocker(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
         ///Marker type for the `cid` field
         pub struct cid(());
         ///Marker type for the `record` field
         pub struct record(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct BlockViewBuilder<'a, S: block_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ProfileViewBasic<'a>>,
         Option<Cid<'a>>,
         Option<Datetime>,
         Option<Block<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> BlockView<'a> {
@@ -234,9 +238,9 @@ impl<'a> BlockViewBuilder<'a, block_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BlockViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -251,11 +255,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> BlockViewBuilder<'a, block_view_state::SetBlocker<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BlockViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -270,11 +274,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> BlockViewBuilder<'a, block_view_state::SetCid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         BlockViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -289,11 +293,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> BlockViewBuilder<'a, block_view_state::SetIndexedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         BlockViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -308,11 +312,11 @@ where
         mut self,
         value: impl Into<Block<'a>>,
     ) -> BlockViewBuilder<'a, block_view_state::SetRecord<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         BlockViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -327,11 +331,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> BlockViewBuilder<'a, block_view_state::SetUri<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         BlockViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -340,19 +344,19 @@ impl<'a, S> BlockViewBuilder<'a, S>
 where
     S: block_view_state::State,
     S::Blocker: block_view_state::IsSet,
-    S::Uri: block_view_state::IsSet,
+    S::IndexedAt: block_view_state::IsSet,
     S::Cid: block_view_state::IsSet,
     S::Record: block_view_state::IsSet,
-    S::IndexedAt: block_view_state::IsSet,
+    S::Uri: block_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> BlockView<'a> {
         BlockView {
-            blocker: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            record: self.__unsafe_private_named.3.unwrap(),
-            uri: self.__unsafe_private_named.4.unwrap(),
+            blocker: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
+            record: self._fields.3.unwrap(),
+            uri: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -365,11 +369,11 @@ where
         >,
     ) -> BlockView<'a> {
         BlockView {
-            blocker: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            indexed_at: self.__unsafe_private_named.2.unwrap(),
-            record: self.__unsafe_private_named.3.unwrap(),
-            uri: self.__unsafe_private_named.4.unwrap(),
+            blocker: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            indexed_at: self._fields.2.unwrap(),
+            record: self._fields.3.unwrap(),
+            uri: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -519,9 +523,9 @@ pub mod renditions_state {
 
 /// Builder for constructing an instance of this type
 pub struct RenditionsBuilder<'a, S: renditions_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<place_stream::Rendition<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<place_stream::Rendition<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Renditions<'a> {
@@ -535,9 +539,9 @@ impl<'a> RenditionsBuilder<'a, renditions_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RenditionsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -552,11 +556,11 @@ where
         mut self,
         value: impl Into<Vec<place_stream::Rendition<'a>>>,
     ) -> RenditionsBuilder<'a, renditions_state::SetRenditions<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RenditionsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -569,7 +573,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Renditions<'a> {
         Renditions {
-            renditions: self.__unsafe_private_named.0.unwrap(),
+            renditions: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -582,7 +586,7 @@ where
         >,
     ) -> Renditions<'a> {
         Renditions {
-            renditions: self.__unsafe_private_named.0.unwrap(),
+            renditions: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

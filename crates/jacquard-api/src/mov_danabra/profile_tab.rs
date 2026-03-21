@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::AtUri;
@@ -193,9 +196,9 @@ pub mod profile_tab_state {
 
 /// Builder for constructing an instance of this type
 pub struct ProfileTabBuilder<'a, S: profile_tab_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<ProfileTabTab<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<ProfileTabTab<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ProfileTab<'a> {
@@ -209,9 +212,9 @@ impl<'a> ProfileTabBuilder<'a, profile_tab_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileTabBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -219,12 +222,12 @@ impl<'a> ProfileTabBuilder<'a, profile_tab_state::Empty> {
 impl<'a, S: profile_tab_state::State> ProfileTabBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -232,12 +235,12 @@ impl<'a, S: profile_tab_state::State> ProfileTabBuilder<'a, S> {
 impl<'a, S: profile_tab_state::State> ProfileTabBuilder<'a, S> {
     /// Set the `tab` field (optional)
     pub fn tab(mut self, value: impl Into<Option<ProfileTabTab<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `tab` field to an Option value (optional)
     pub fn maybe_tab(mut self, value: Option<ProfileTabTab<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -252,11 +255,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ProfileTabBuilder<'a, profile_tab_state::SetUri<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ProfileTabBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -269,9 +272,9 @@ where
     /// Build the final struct
     pub fn build(self) -> ProfileTab<'a> {
         ProfileTab {
-            limit: self.__unsafe_private_named.0.or_else(|| Some(10i64)),
-            tab: self.__unsafe_private_named.1,
-            uri: self.__unsafe_private_named.2.unwrap(),
+            limit: self._fields.0.or_else(|| Some(10i64)),
+            tab: self._fields.1,
+            uri: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -281,9 +284,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ProfileTab<'a> {
         ProfileTab {
-            limit: self.__unsafe_private_named.0.or_else(|| Some(10i64)),
-            tab: self.__unsafe_private_named.1,
-            uri: self.__unsafe_private_named.2.unwrap(),
+            limit: self._fields.0.or_else(|| Some(10i64)),
+            tab: self._fields.1,
+            uri: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

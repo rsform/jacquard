@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -176,9 +179,9 @@ pub mod author_list_item_state {
 
 /// Builder for constructing an instance of this type
 pub struct AuthorListItemBuilder<'a, S: author_list_item_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<AuthorListItemProfile<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<AuthorListItemProfile<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> AuthorListItem<'a> {
@@ -192,9 +195,9 @@ impl<'a> AuthorListItemBuilder<'a, author_list_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AuthorListItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -202,12 +205,12 @@ impl<'a> AuthorListItemBuilder<'a, author_list_item_state::Empty> {
 impl<'a, S: author_list_item_state::State> AuthorListItemBuilder<'a, S> {
     /// Set the `index` field (optional)
     pub fn index(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `index` field to an Option value (optional)
     pub fn maybe_index(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -218,12 +221,12 @@ impl<'a, S: author_list_item_state::State> AuthorListItemBuilder<'a, S> {
         mut self,
         value: impl Into<Option<AuthorListItemProfile<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `profile` field to an Option value (optional)
     pub fn maybe_profile(mut self, value: Option<AuthorListItemProfile<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -236,8 +239,8 @@ where
     /// Build the final struct
     pub fn build(self) -> AuthorListItem<'a> {
         AuthorListItem {
-            index: self.__unsafe_private_named.0,
-            profile: self.__unsafe_private_named.1,
+            index: self._fields.0,
+            profile: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -250,8 +253,8 @@ where
         >,
     ) -> AuthorListItem<'a> {
         AuthorListItem {
-            index: self.__unsafe_private_named.0,
-            profile: self.__unsafe_private_named.1,
+            index: self._fields.0,
+            profile: self._fields.1,
             extra_data: Some(extra_data),
         }
     }
@@ -374,9 +377,9 @@ pub mod authors_state {
 
 /// Builder for constructing an instance of this type
 pub struct AuthorsBuilder<'a, S: authors_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<authors::AuthorListItem<'a>>>, Option<Datetime>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<authors::AuthorListItem<'a>>>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Authors<'a> {
@@ -390,9 +393,9 @@ impl<'a> AuthorsBuilder<'a, authors_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AuthorsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -407,11 +410,11 @@ where
         mut self,
         value: impl Into<Vec<authors::AuthorListItem<'a>>>,
     ) -> AuthorsBuilder<'a, authors_state::SetAuthorList<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AuthorsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -419,12 +422,12 @@ where
 impl<'a, S: authors_state::State> AuthorsBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -437,8 +440,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Authors<'a> {
         Authors {
-            author_list: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1,
+            author_list: self._fields.0.unwrap(),
+            created_at: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -451,8 +454,8 @@ where
         >,
     ) -> Authors<'a> {
         Authors {
-            author_list: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1,
+            author_list: self._fields.0.unwrap(),
+            created_at: self._fields.1,
             extra_data: Some(extra_data),
         }
     }

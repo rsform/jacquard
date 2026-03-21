@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -192,14 +195,14 @@ pub mod comment_state {
 
 /// Builder for constructing an instance of this type
 pub struct CommentBuilder<'a, S: comment_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<AtUri<'a>>,
         Option<SubjectRef<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Comment<'a> {
@@ -213,9 +216,9 @@ impl<'a> CommentBuilder<'a, comment_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -230,11 +233,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CommentBuilder<'a, comment_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -242,12 +245,12 @@ where
 impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     /// Set the `replyTo` field (optional)
     pub fn reply_to(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `replyTo` field to an Option value (optional)
     pub fn maybe_reply_to(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -262,11 +265,11 @@ where
         mut self,
         value: impl Into<SubjectRef<'a>>,
     ) -> CommentBuilder<'a, comment_state::SetSubject<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -281,11 +284,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CommentBuilder<'a, comment_state::SetText<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -300,10 +303,10 @@ where
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {
         Comment {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            reply_to: self.__unsafe_private_named.1,
-            subject: self.__unsafe_private_named.2.unwrap(),
-            text: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            reply_to: self._fields.1,
+            subject: self._fields.2.unwrap(),
+            text: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -316,10 +319,10 @@ where
         >,
     ) -> Comment<'a> {
         Comment {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            reply_to: self.__unsafe_private_named.1,
-            subject: self.__unsafe_private_named.2.unwrap(),
-            text: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            reply_to: self._fields.1,
+            subject: self._fields.2.unwrap(),
+            text: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

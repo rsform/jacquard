@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -115,64 +118,64 @@ pub mod group_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AddedAt;
-        type Group;
         type Image;
+        type Group;
+        type AddedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AddedAt = Unset;
-        type Group = Unset;
         type Image = Unset;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type AddedAt = Set<members::added_at>;
-        type Group = S::Group;
-        type Image = S::Image;
-    }
-    ///State transition - sets the `group` field to Set
-    pub struct SetGroup<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGroup<S> {}
-    impl<S: State> State for SetGroup<S> {
-        type AddedAt = S::AddedAt;
-        type Group = Set<members::group>;
-        type Image = S::Image;
+        type Group = Unset;
+        type AddedAt = Unset;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
-        type AddedAt = S::AddedAt;
-        type Group = S::Group;
         type Image = Set<members::image>;
+        type Group = S::Group;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `group` field to Set
+    pub struct SetGroup<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGroup<S> {}
+    impl<S: State> State for SetGroup<S> {
+        type Image = S::Image;
+        type Group = Set<members::group>;
+        type AddedAt = S::AddedAt;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
+    impl<S: State> State for SetAddedAt<S> {
+        type Image = S::Image;
+        type Group = S::Group;
+        type AddedAt = Set<members::added_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `added_at` field
-        pub struct added_at(());
-        ///Marker type for the `group` field
-        pub struct group(());
         ///Marker type for the `image` field
         pub struct image(());
+        ///Marker type for the `group` field
+        pub struct group(());
+        ///Marker type for the `added_at` field
+        pub struct added_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GroupItemBuilder<'a, S: group_item_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<AtUri<'a>>,
         Option<AtUri<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GroupItem<'a> {
@@ -186,9 +189,9 @@ impl<'a> GroupItemBuilder<'a, group_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GroupItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -203,11 +206,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> GroupItemBuilder<'a, group_item_state::SetAddedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GroupItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -222,11 +225,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> GroupItemBuilder<'a, group_item_state::SetGroup<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GroupItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -241,11 +244,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> GroupItemBuilder<'a, group_item_state::SetImage<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         GroupItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -253,12 +256,12 @@ where
 impl<'a, S: group_item_state::State> GroupItemBuilder<'a, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
     pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -266,17 +269,17 @@ impl<'a, S: group_item_state::State> GroupItemBuilder<'a, S> {
 impl<'a, S> GroupItemBuilder<'a, S>
 where
     S: group_item_state::State,
-    S::AddedAt: group_item_state::IsSet,
-    S::Group: group_item_state::IsSet,
     S::Image: group_item_state::IsSet,
+    S::Group: group_item_state::IsSet,
+    S::AddedAt: group_item_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GroupItem<'a> {
         GroupItem {
-            added_at: self.__unsafe_private_named.0.unwrap(),
-            group: self.__unsafe_private_named.1.unwrap(),
-            image: self.__unsafe_private_named.2.unwrap(),
-            note: self.__unsafe_private_named.3,
+            added_at: self._fields.0.unwrap(),
+            group: self._fields.1.unwrap(),
+            image: self._fields.2.unwrap(),
+            note: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -289,10 +292,10 @@ where
         >,
     ) -> GroupItem<'a> {
         GroupItem {
-            added_at: self.__unsafe_private_named.0.unwrap(),
-            group: self.__unsafe_private_named.1.unwrap(),
-            image: self.__unsafe_private_named.2.unwrap(),
-            note: self.__unsafe_private_named.3,
+            added_at: self._fields.0.unwrap(),
+            group: self._fields.1.unwrap(),
+            image: self._fields.2.unwrap(),
+            note: self._fields.3,
             extra_data: Some(extra_data),
         }
     }

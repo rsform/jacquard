@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::UriValue;
@@ -162,44 +165,44 @@ pub mod create_webhook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Url;
         type Events;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Url = Unset;
         type Events = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Url = Set<members::url>;
-        type Events = S::Events;
+        type Url = Unset;
     }
     ///State transition - sets the `events` field to Set
     pub struct SetEvents<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEvents<S> {}
     impl<S: State> State for SetEvents<S> {
-        type Url = S::Url;
         type Events = Set<members::events>;
+        type Url = S::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUrl<S> {}
+    impl<S: State> State for SetUrl<S> {
+        type Events = S::Events;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `events` field
         pub struct events(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CreateWebhookBuilder<'a, S: create_webhook_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<bool>,
         Option<CowStr<'a>>,
         Option<Vec<CowStr<'a>>>,
@@ -210,7 +213,7 @@ pub struct CreateWebhookBuilder<'a, S: create_webhook_state::State> {
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CreateWebhook<'a> {
@@ -224,19 +227,9 @@ impl<'a> CreateWebhookBuilder<'a, create_webhook_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreateWebhookBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -244,12 +237,12 @@ impl<'a> CreateWebhookBuilder<'a, create_webhook_state::Empty> {
 impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
     /// Set the `active` field (optional)
     pub fn active(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `active` field to an Option value (optional)
     pub fn maybe_active(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -257,12 +250,12 @@ impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
 impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -277,11 +270,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> CreateWebhookBuilder<'a, create_webhook_state::SetEvents<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CreateWebhookBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -289,12 +282,12 @@ where
 impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
     /// Set the `muteWords` field (optional)
     pub fn mute_words(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `muteWords` field to an Option value (optional)
     pub fn maybe_mute_words(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -302,12 +295,12 @@ impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
 impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -315,12 +308,12 @@ impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
 impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
     /// Set the `prefix` field (optional)
     pub fn prefix(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `prefix` field to an Option value (optional)
     pub fn maybe_prefix(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -328,12 +321,12 @@ impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
 impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
     /// Set the `rewrite` field (optional)
     pub fn rewrite(mut self, value: impl Into<Option<Vec<RewriteRule<'a>>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `rewrite` field to an Option value (optional)
     pub fn maybe_rewrite(mut self, value: Option<Vec<RewriteRule<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -341,12 +334,12 @@ impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
 impl<'a, S: create_webhook_state::State> CreateWebhookBuilder<'a, S> {
     /// Set the `suffix` field (optional)
     pub fn suffix(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `suffix` field to an Option value (optional)
     pub fn maybe_suffix(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -361,11 +354,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> CreateWebhookBuilder<'a, create_webhook_state::SetUrl<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         CreateWebhookBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -373,21 +366,21 @@ where
 impl<'a, S> CreateWebhookBuilder<'a, S>
 where
     S: create_webhook_state::State,
-    S::Url: create_webhook_state::IsSet,
     S::Events: create_webhook_state::IsSet,
+    S::Url: create_webhook_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CreateWebhook<'a> {
         CreateWebhook {
-            active: self.__unsafe_private_named.0.or_else(|| Some(false)),
-            description: self.__unsafe_private_named.1,
-            events: self.__unsafe_private_named.2.unwrap(),
-            mute_words: self.__unsafe_private_named.3,
-            name: self.__unsafe_private_named.4,
-            prefix: self.__unsafe_private_named.5,
-            rewrite: self.__unsafe_private_named.6,
-            suffix: self.__unsafe_private_named.7,
-            url: self.__unsafe_private_named.8.unwrap(),
+            active: self._fields.0.or_else(|| Some(false)),
+            description: self._fields.1,
+            events: self._fields.2.unwrap(),
+            mute_words: self._fields.3,
+            name: self._fields.4,
+            prefix: self._fields.5,
+            rewrite: self._fields.6,
+            suffix: self._fields.7,
+            url: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -400,15 +393,15 @@ where
         >,
     ) -> CreateWebhook<'a> {
         CreateWebhook {
-            active: self.__unsafe_private_named.0.or_else(|| Some(false)),
-            description: self.__unsafe_private_named.1,
-            events: self.__unsafe_private_named.2.unwrap(),
-            mute_words: self.__unsafe_private_named.3,
-            name: self.__unsafe_private_named.4,
-            prefix: self.__unsafe_private_named.5,
-            rewrite: self.__unsafe_private_named.6,
-            suffix: self.__unsafe_private_named.7,
-            url: self.__unsafe_private_named.8.unwrap(),
+            active: self._fields.0.or_else(|| Some(false)),
+            description: self._fields.1,
+            events: self._fields.2.unwrap(),
+            mute_words: self._fields.3,
+            name: self._fields.4,
+            prefix: self._fields.5,
+            rewrite: self._fields.6,
+            suffix: self._fields.7,
+            url: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }

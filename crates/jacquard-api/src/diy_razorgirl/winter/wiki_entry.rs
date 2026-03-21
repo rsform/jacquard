@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -286,92 +289,92 @@ pub mod wiki_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Content;
         type Title;
-        type Slug;
+        type Content;
         type LastUpdated;
+        type CreatedAt;
+        type Slug;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Content = Unset;
         type Title = Unset;
-        type Slug = Unset;
+        type Content = Unset;
         type LastUpdated = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Content = S::Content;
-        type Title = S::Title;
-        type Slug = S::Slug;
-        type LastUpdated = S::LastUpdated;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type CreatedAt = S::CreatedAt;
-        type Content = Set<members::content>;
-        type Title = S::Title;
-        type Slug = S::Slug;
-        type LastUpdated = S::LastUpdated;
+        type CreatedAt = Unset;
+        type Slug = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
         type Title = Set<members::title>;
-        type Slug = S::Slug;
-        type LastUpdated = S::LastUpdated;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type CreatedAt = S::CreatedAt;
         type Content = S::Content;
-        type Title = S::Title;
-        type Slug = Set<members::slug>;
         type LastUpdated = S::LastUpdated;
+        type CreatedAt = S::CreatedAt;
+        type Slug = S::Slug;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Title = S::Title;
+        type Content = Set<members::content>;
+        type LastUpdated = S::LastUpdated;
+        type CreatedAt = S::CreatedAt;
+        type Slug = S::Slug;
     }
     ///State transition - sets the `last_updated` field to Set
     pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
     impl<S: State> State for SetLastUpdated<S> {
-        type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
         type Title = S::Title;
-        type Slug = S::Slug;
+        type Content = S::Content;
         type LastUpdated = Set<members::last_updated>;
+        type CreatedAt = S::CreatedAt;
+        type Slug = S::Slug;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Title = S::Title;
+        type Content = S::Content;
+        type LastUpdated = S::LastUpdated;
+        type CreatedAt = Set<members::created_at>;
+        type Slug = S::Slug;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSlug<S> {}
+    impl<S: State> State for SetSlug<S> {
+        type Title = S::Title;
+        type Content = S::Content;
+        type LastUpdated = S::LastUpdated;
+        type CreatedAt = S::CreatedAt;
+        type Slug = Set<members::slug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `slug` field
-        pub struct slug(());
+        ///Marker type for the `content` field
+        pub struct content(());
         ///Marker type for the `last_updated` field
         pub struct last_updated(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct WikiEntryBuilder<'a, S: wiki_entry_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
@@ -383,7 +386,7 @@ pub struct WikiEntryBuilder<'a, S: wiki_entry_state::State> {
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> WikiEntry<'a> {
@@ -397,20 +400,9 @@ impl<'a> WikiEntryBuilder<'a, wiki_entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         WikiEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -418,12 +410,12 @@ impl<'a> WikiEntryBuilder<'a, wiki_entry_state::Empty> {
 impl<'a, S: wiki_entry_state::State> WikiEntryBuilder<'a, S> {
     /// Set the `aliases` field (optional)
     pub fn aliases(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `aliases` field to an Option value (optional)
     pub fn maybe_aliases(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -438,11 +430,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> WikiEntryBuilder<'a, wiki_entry_state::SetContent<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         WikiEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -457,11 +449,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> WikiEntryBuilder<'a, wiki_entry_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         WikiEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -476,11 +468,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> WikiEntryBuilder<'a, wiki_entry_state::SetLastUpdated<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         WikiEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -495,11 +487,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> WikiEntryBuilder<'a, wiki_entry_state::SetSlug<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         WikiEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -507,12 +499,12 @@ where
 impl<'a, S: wiki_entry_state::State> WikiEntryBuilder<'a, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<WikiEntryStatus<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<WikiEntryStatus<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -520,12 +512,12 @@ impl<'a, S: wiki_entry_state::State> WikiEntryBuilder<'a, S> {
 impl<'a, S: wiki_entry_state::State> WikiEntryBuilder<'a, S> {
     /// Set the `summary` field (optional)
     pub fn summary(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `summary` field to an Option value (optional)
     pub fn maybe_summary(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -533,12 +525,12 @@ impl<'a, S: wiki_entry_state::State> WikiEntryBuilder<'a, S> {
 impl<'a, S: wiki_entry_state::State> WikiEntryBuilder<'a, S> {
     /// Set the `supersedes` field (optional)
     pub fn supersedes(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `supersedes` field to an Option value (optional)
     pub fn maybe_supersedes(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -546,12 +538,12 @@ impl<'a, S: wiki_entry_state::State> WikiEntryBuilder<'a, S> {
 impl<'a, S: wiki_entry_state::State> WikiEntryBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -566,11 +558,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> WikiEntryBuilder<'a, wiki_entry_state::SetTitle<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         WikiEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -578,25 +570,25 @@ where
 impl<'a, S> WikiEntryBuilder<'a, S>
 where
     S: wiki_entry_state::State,
-    S::CreatedAt: wiki_entry_state::IsSet,
-    S::Content: wiki_entry_state::IsSet,
     S::Title: wiki_entry_state::IsSet,
-    S::Slug: wiki_entry_state::IsSet,
+    S::Content: wiki_entry_state::IsSet,
     S::LastUpdated: wiki_entry_state::IsSet,
+    S::CreatedAt: wiki_entry_state::IsSet,
+    S::Slug: wiki_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WikiEntry<'a> {
         WikiEntry {
-            aliases: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            last_updated: self.__unsafe_private_named.3.unwrap(),
-            slug: self.__unsafe_private_named.4.unwrap(),
-            status: self.__unsafe_private_named.5,
-            summary: self.__unsafe_private_named.6,
-            supersedes: self.__unsafe_private_named.7,
-            tags: self.__unsafe_private_named.8,
-            title: self.__unsafe_private_named.9.unwrap(),
+            aliases: self._fields.0,
+            content: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            last_updated: self._fields.3.unwrap(),
+            slug: self._fields.4.unwrap(),
+            status: self._fields.5,
+            summary: self._fields.6,
+            supersedes: self._fields.7,
+            tags: self._fields.8,
+            title: self._fields.9.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -609,16 +601,16 @@ where
         >,
     ) -> WikiEntry<'a> {
         WikiEntry {
-            aliases: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            last_updated: self.__unsafe_private_named.3.unwrap(),
-            slug: self.__unsafe_private_named.4.unwrap(),
-            status: self.__unsafe_private_named.5,
-            summary: self.__unsafe_private_named.6,
-            supersedes: self.__unsafe_private_named.7,
-            tags: self.__unsafe_private_named.8,
-            title: self.__unsafe_private_named.9.unwrap(),
+            aliases: self._fields.0,
+            content: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            last_updated: self._fields.3.unwrap(),
+            slug: self._fields.4.unwrap(),
+            status: self._fields.5,
+            summary: self._fields.6,
+            supersedes: self._fields.7,
+            tags: self._fields.8,
+            title: self._fields.9.unwrap(),
             extra_data: Some(extra_data),
         }
     }

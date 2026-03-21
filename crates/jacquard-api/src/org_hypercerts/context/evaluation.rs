@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -234,58 +237,58 @@ pub mod evaluation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Summary;
         type Evaluators;
+        type Summary;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Summary = Unset;
         type Evaluators = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Summary = S::Summary;
-        type Evaluators = S::Evaluators;
-    }
-    ///State transition - sets the `summary` field to Set
-    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSummary<S> {}
-    impl<S: State> State for SetSummary<S> {
-        type CreatedAt = S::CreatedAt;
-        type Summary = Set<members::summary>;
-        type Evaluators = S::Evaluators;
+        type Summary = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `evaluators` field to Set
     pub struct SetEvaluators<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEvaluators<S> {}
     impl<S: State> State for SetEvaluators<S> {
-        type CreatedAt = S::CreatedAt;
-        type Summary = S::Summary;
         type Evaluators = Set<members::evaluators>;
+        type Summary = S::Summary;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `summary` field to Set
+    pub struct SetSummary<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSummary<S> {}
+    impl<S: State> State for SetSummary<S> {
+        type Evaluators = S::Evaluators;
+        type Summary = Set<members::summary>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Evaluators = S::Evaluators;
+        type Summary = S::Summary;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `summary` field
-        pub struct summary(());
         ///Marker type for the `evaluators` field
         pub struct evaluators(());
+        ///Marker type for the `summary` field
+        pub struct summary(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EvaluationBuilder<'a, S: evaluation_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<EvaluationContentItem<'a>>>,
         Option<Datetime>,
         Option<Vec<Did<'a>>>,
@@ -295,7 +298,7 @@ pub struct EvaluationBuilder<'a, S: evaluation_state::State> {
         Option<StrongRef<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Evaluation<'a> {
@@ -309,9 +312,9 @@ impl<'a> EvaluationBuilder<'a, evaluation_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EvaluationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -322,7 +325,7 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<EvaluationContentItem<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `content` field to an Option value (optional)
@@ -330,7 +333,7 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
         mut self,
         value: Option<Vec<EvaluationContentItem<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -345,11 +348,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> EvaluationBuilder<'a, evaluation_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         EvaluationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -364,11 +367,11 @@ where
         mut self,
         value: impl Into<Vec<Did<'a>>>,
     ) -> EvaluationBuilder<'a, evaluation_state::SetEvaluators<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         EvaluationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -376,12 +379,12 @@ where
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `location` field to an Option value (optional)
     pub fn maybe_location(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -389,12 +392,12 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `measurements` field (optional)
     pub fn measurements(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `measurements` field to an Option value (optional)
     pub fn maybe_measurements(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -402,12 +405,12 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `score` field (optional)
     pub fn score(mut self, value: impl Into<Option<evaluation::Score<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `score` field to an Option value (optional)
     pub fn maybe_score(mut self, value: Option<evaluation::Score<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -415,12 +418,12 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
 impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
     pub fn maybe_subject(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -435,11 +438,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EvaluationBuilder<'a, evaluation_state::SetSummary<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         EvaluationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -447,21 +450,21 @@ where
 impl<'a, S> EvaluationBuilder<'a, S>
 where
     S: evaluation_state::State,
-    S::CreatedAt: evaluation_state::IsSet,
-    S::Summary: evaluation_state::IsSet,
     S::Evaluators: evaluation_state::IsSet,
+    S::Summary: evaluation_state::IsSet,
+    S::CreatedAt: evaluation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Evaluation<'a> {
         Evaluation {
-            content: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            evaluators: self.__unsafe_private_named.2.unwrap(),
-            location: self.__unsafe_private_named.3,
-            measurements: self.__unsafe_private_named.4,
-            score: self.__unsafe_private_named.5,
-            subject: self.__unsafe_private_named.6,
-            summary: self.__unsafe_private_named.7.unwrap(),
+            content: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            evaluators: self._fields.2.unwrap(),
+            location: self._fields.3,
+            measurements: self._fields.4,
+            score: self._fields.5,
+            subject: self._fields.6,
+            summary: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -474,14 +477,14 @@ where
         >,
     ) -> Evaluation<'a> {
         Evaluation {
-            content: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            evaluators: self.__unsafe_private_named.2.unwrap(),
-            location: self.__unsafe_private_named.3,
-            measurements: self.__unsafe_private_named.4,
-            score: self.__unsafe_private_named.5,
-            subject: self.__unsafe_private_named.6,
-            summary: self.__unsafe_private_named.7.unwrap(),
+            content: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            evaluators: self._fields.2.unwrap(),
+            location: self._fields.3,
+            measurements: self._fields.4,
+            score: self._fields.5,
+            subject: self._fields.6,
+            summary: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -673,59 +676,59 @@ pub mod score_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Max;
         type Min;
         type Value;
+        type Max;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Max = Unset;
         type Min = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `max` field to Set
-    pub struct SetMax<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMax<S> {}
-    impl<S: State> State for SetMax<S> {
-        type Max = Set<members::max>;
-        type Min = S::Min;
-        type Value = S::Value;
+        type Max = Unset;
     }
     ///State transition - sets the `min` field to Set
     pub struct SetMin<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMin<S> {}
     impl<S: State> State for SetMin<S> {
-        type Max = S::Max;
         type Min = Set<members::min>;
         type Value = S::Value;
+        type Max = S::Max;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Max = S::Max;
         type Min = S::Min;
         type Value = Set<members::value>;
+        type Max = S::Max;
+    }
+    ///State transition - sets the `max` field to Set
+    pub struct SetMax<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMax<S> {}
+    impl<S: State> State for SetMax<S> {
+        type Min = S::Min;
+        type Value = S::Value;
+        type Max = Set<members::max>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `max` field
-        pub struct max(());
         ///Marker type for the `min` field
         pub struct min(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `max` field
+        pub struct max(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ScoreBuilder<'a, S: score_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Score<'a> {
@@ -739,9 +742,9 @@ impl<'a> ScoreBuilder<'a, score_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ScoreBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -756,11 +759,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ScoreBuilder<'a, score_state::SetMax<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ScoreBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -775,11 +778,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ScoreBuilder<'a, score_state::SetMin<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ScoreBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -794,11 +797,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ScoreBuilder<'a, score_state::SetValue<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ScoreBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -806,16 +809,16 @@ where
 impl<'a, S> ScoreBuilder<'a, S>
 where
     S: score_state::State,
-    S::Max: score_state::IsSet,
     S::Min: score_state::IsSet,
     S::Value: score_state::IsSet,
+    S::Max: score_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Score<'a> {
         Score {
-            max: self.__unsafe_private_named.0.unwrap(),
-            min: self.__unsafe_private_named.1.unwrap(),
-            value: self.__unsafe_private_named.2.unwrap(),
+            max: self._fields.0.unwrap(),
+            min: self._fields.1.unwrap(),
+            value: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -828,9 +831,9 @@ where
         >,
     ) -> Score<'a> {
         Score {
-            max: self.__unsafe_private_named.0.unwrap(),
-            min: self.__unsafe_private_named.1.unwrap(),
-            value: self.__unsafe_private_named.2.unwrap(),
+            max: self._fields.0.unwrap(),
+            min: self._fields.1.unwrap(),
+            value: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -157,74 +160,74 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blocks;
         type Title;
-        type Blog;
         type Url;
+        type Blocks;
+        type Blog;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blocks = Unset;
         type Title = Unset;
-        type Blog = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `blocks` field to Set
-    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlocks<S> {}
-    impl<S: State> State for SetBlocks<S> {
-        type Blocks = Set<members::blocks>;
-        type Title = S::Title;
-        type Blog = S::Blog;
-        type Url = S::Url;
+        type Blocks = Unset;
+        type Blog = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
-        type Blocks = S::Blocks;
         type Title = Set<members::title>;
-        type Blog = S::Blog;
         type Url = S::Url;
-    }
-    ///State transition - sets the `blog` field to Set
-    pub struct SetBlog<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlog<S> {}
-    impl<S: State> State for SetBlog<S> {
         type Blocks = S::Blocks;
-        type Title = S::Title;
-        type Blog = Set<members::blog>;
-        type Url = S::Url;
+        type Blog = S::Blog;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
-        type Blocks = S::Blocks;
         type Title = S::Title;
-        type Blog = S::Blog;
         type Url = Set<members::url>;
+        type Blocks = S::Blocks;
+        type Blog = S::Blog;
+    }
+    ///State transition - sets the `blocks` field to Set
+    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlocks<S> {}
+    impl<S: State> State for SetBlocks<S> {
+        type Title = S::Title;
+        type Url = S::Url;
+        type Blocks = Set<members::blocks>;
+        type Blog = S::Blog;
+    }
+    ///State transition - sets the `blog` field to Set
+    pub struct SetBlog<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBlog<S> {}
+    impl<S: State> State for SetBlog<S> {
+        type Title = S::Title;
+        type Url = S::Url;
+        type Blocks = S::Blocks;
+        type Blog = Set<members::blog>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blocks` field
-        pub struct blocks(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `blog` field
-        pub struct blog(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `blocks` field
+        pub struct blocks(());
+        ///Marker type for the `blog` field
+        pub struct blog(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PostBuilder<'a, S: post_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Data<'a>>,
         Option<StrongRef<'a>>,
         Option<CowStr<'a>>,
@@ -236,7 +239,7 @@ pub struct PostBuilder<'a, S: post_state::State> {
         Option<Datetime>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Post<'a> {
@@ -250,20 +253,9 @@ impl<'a> PostBuilder<'a, post_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -278,11 +270,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> PostBuilder<'a, post_state::SetBlocks<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -297,11 +289,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> PostBuilder<'a, post_state::SetBlog<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -309,12 +301,12 @@ where
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `bodyPlain` field (optional)
     pub fn body_plain(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `bodyPlain` field to an Option value (optional)
     pub fn maybe_body_plain(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -322,12 +314,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `cover` field (optional)
     pub fn cover(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `cover` field to an Option value (optional)
     pub fn maybe_cover(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -335,12 +327,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `images` field (optional)
     pub fn images(mut self, value: impl Into<Option<Vec<BlobRef<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `images` field to an Option value (optional)
     pub fn maybe_images(mut self, value: Option<Vec<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -348,12 +340,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `publishedAt` field (optional)
     pub fn published_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `publishedAt` field to an Option value (optional)
     pub fn maybe_published_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -361,12 +353,12 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -381,11 +373,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PostBuilder<'a, post_state::SetTitle<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -393,12 +385,12 @@ where
 impl<'a, S: post_state::State> PostBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -413,11 +405,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> PostBuilder<'a, post_state::SetUrl<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         PostBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -425,24 +417,24 @@ where
 impl<'a, S> PostBuilder<'a, S>
 where
     S: post_state::State,
-    S::Blocks: post_state::IsSet,
     S::Title: post_state::IsSet,
-    S::Blog: post_state::IsSet,
     S::Url: post_state::IsSet,
+    S::Blocks: post_state::IsSet,
+    S::Blog: post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Post<'a> {
         Post {
-            blocks: self.__unsafe_private_named.0.unwrap(),
-            blog: self.__unsafe_private_named.1.unwrap(),
-            body_plain: self.__unsafe_private_named.2,
-            cover: self.__unsafe_private_named.3,
-            images: self.__unsafe_private_named.4,
-            published_at: self.__unsafe_private_named.5,
-            tags: self.__unsafe_private_named.6,
-            title: self.__unsafe_private_named.7.unwrap(),
-            updated_at: self.__unsafe_private_named.8,
-            url: self.__unsafe_private_named.9.unwrap(),
+            blocks: self._fields.0.unwrap(),
+            blog: self._fields.1.unwrap(),
+            body_plain: self._fields.2,
+            cover: self._fields.3,
+            images: self._fields.4,
+            published_at: self._fields.5,
+            tags: self._fields.6,
+            title: self._fields.7.unwrap(),
+            updated_at: self._fields.8,
+            url: self._fields.9.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -452,16 +444,16 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Post<'a> {
         Post {
-            blocks: self.__unsafe_private_named.0.unwrap(),
-            blog: self.__unsafe_private_named.1.unwrap(),
-            body_plain: self.__unsafe_private_named.2,
-            cover: self.__unsafe_private_named.3,
-            images: self.__unsafe_private_named.4,
-            published_at: self.__unsafe_private_named.5,
-            tags: self.__unsafe_private_named.6,
-            title: self.__unsafe_private_named.7.unwrap(),
-            updated_at: self.__unsafe_private_named.8,
-            url: self.__unsafe_private_named.9.unwrap(),
+            blocks: self._fields.0.unwrap(),
+            blog: self._fields.1.unwrap(),
+            body_plain: self._fields.2,
+            cover: self._fields.3,
+            images: self._fields.4,
+            published_at: self._fields.5,
+            tags: self._fields.6,
+            title: self._fields.7.unwrap(),
+            updated_at: self._fields.8,
+            url: self._fields.9.unwrap(),
             extra_data: Some(extra_data),
         }
     }

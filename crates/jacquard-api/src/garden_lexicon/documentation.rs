@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -516,9 +519,9 @@ pub mod localized_string_state {
 
 /// Builder for constructing an instance of this type
 pub struct LocalizedStringBuilder<'a, S: localized_string_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Language>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Language>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LocalizedString<'a> {
@@ -532,9 +535,9 @@ impl<'a> LocalizedStringBuilder<'a, localized_string_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LocalizedStringBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -549,11 +552,11 @@ where
         mut self,
         value: impl Into<Language>,
     ) -> LocalizedStringBuilder<'a, localized_string_state::SetLang<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LocalizedStringBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -568,11 +571,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LocalizedStringBuilder<'a, localized_string_state::SetValue<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LocalizedStringBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -586,8 +589,8 @@ where
     /// Build the final struct
     pub fn build(self) -> LocalizedString<'a> {
         LocalizedString {
-            lang: self.__unsafe_private_named.0.unwrap(),
-            value: self.__unsafe_private_named.1.unwrap(),
+            lang: self._fields.0.unwrap(),
+            value: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -600,8 +603,8 @@ where
         >,
     ) -> LocalizedString<'a> {
         LocalizedString {
-            lang: self.__unsafe_private_named.0.unwrap(),
-            value: self.__unsafe_private_named.1.unwrap(),
+            lang: self._fields.0.unwrap(),
+            value: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -617,50 +620,50 @@ pub mod documentation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Lexicon;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Lexicon = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Lexicon = S::Lexicon;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `lexicon` field to Set
     pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLexicon<S> {}
     impl<S: State> State for SetLexicon<S> {
-        type CreatedAt = S::CreatedAt;
         type Lexicon = Set<members::lexicon>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Lexicon = S::Lexicon;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `lexicon` field
         pub struct lexicon(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DocumentationBuilder<'a, S: documentation_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Vec<documentation::DefinitionDoc<'a>>>,
         Option<Vec<documentation::LocalizedString<'a>>>,
         Option<Nsid<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Documentation<'a> {
@@ -674,9 +677,9 @@ impl<'a> DocumentationBuilder<'a, documentation_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DocumentationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -691,11 +694,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> DocumentationBuilder<'a, documentation_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DocumentationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -706,7 +709,7 @@ impl<'a, S: documentation_state::State> DocumentationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<documentation::DefinitionDoc<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `definitions` field to an Option value (optional)
@@ -714,7 +717,7 @@ impl<'a, S: documentation_state::State> DocumentationBuilder<'a, S> {
         mut self,
         value: Option<Vec<documentation::DefinitionDoc<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -725,7 +728,7 @@ impl<'a, S: documentation_state::State> DocumentationBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<documentation::LocalizedString<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
@@ -733,7 +736,7 @@ impl<'a, S: documentation_state::State> DocumentationBuilder<'a, S> {
         mut self,
         value: Option<Vec<documentation::LocalizedString<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -748,11 +751,11 @@ where
         mut self,
         value: impl Into<Nsid<'a>>,
     ) -> DocumentationBuilder<'a, documentation_state::SetLexicon<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         DocumentationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -760,16 +763,16 @@ where
 impl<'a, S> DocumentationBuilder<'a, S>
 where
     S: documentation_state::State,
-    S::CreatedAt: documentation_state::IsSet,
     S::Lexicon: documentation_state::IsSet,
+    S::CreatedAt: documentation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Documentation<'a> {
         Documentation {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            definitions: self.__unsafe_private_named.1,
-            description: self.__unsafe_private_named.2,
-            lexicon: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            definitions: self._fields.1,
+            description: self._fields.2,
+            lexicon: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -782,10 +785,10 @@ where
         >,
     ) -> Documentation<'a> {
         Documentation {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            definitions: self.__unsafe_private_named.1,
-            description: self.__unsafe_private_named.2,
-            lexicon: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            definitions: self._fields.1,
+            description: self._fields.2,
+            lexicon: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

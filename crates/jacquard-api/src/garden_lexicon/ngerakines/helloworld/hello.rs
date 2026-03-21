@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -74,9 +77,9 @@ pub mod hello_state {
 
 /// Builder for constructing an instance of this type
 pub struct HelloBuilder<'a, S: hello_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Hello<'a> {
@@ -90,9 +93,9 @@ impl<'a> HelloBuilder<'a, hello_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         HelloBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -100,12 +103,12 @@ impl<'a> HelloBuilder<'a, hello_state::Empty> {
 impl<'a, S: hello_state::State> HelloBuilder<'a, S> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
     pub fn maybe_subject(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -116,8 +119,6 @@ where
 {
     /// Build the final struct
     pub fn build(self) -> Hello<'a> {
-        Hello {
-            subject: self.__unsafe_private_named.0,
-        }
+        Hello { subject: self._fields.0 }
     }
 }

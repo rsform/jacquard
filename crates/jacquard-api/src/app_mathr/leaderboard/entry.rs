@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -183,92 +186,92 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Level;
-        type PlayerDid;
         type TotalSuccesses;
         type TotalChallenges;
+        type CreatedAt;
+        type PlayerDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Level = Unset;
-        type PlayerDid = Unset;
         type TotalSuccesses = Unset;
         type TotalChallenges = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Level = S::Level;
-        type PlayerDid = S::PlayerDid;
-        type TotalSuccesses = S::TotalSuccesses;
-        type TotalChallenges = S::TotalChallenges;
+        type CreatedAt = Unset;
+        type PlayerDid = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
-        type CreatedAt = S::CreatedAt;
         type Level = Set<members::level>;
-        type PlayerDid = S::PlayerDid;
         type TotalSuccesses = S::TotalSuccesses;
         type TotalChallenges = S::TotalChallenges;
-    }
-    ///State transition - sets the `player_did` field to Set
-    pub struct SetPlayerDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlayerDid<S> {}
-    impl<S: State> State for SetPlayerDid<S> {
         type CreatedAt = S::CreatedAt;
-        type Level = S::Level;
-        type PlayerDid = Set<members::player_did>;
-        type TotalSuccesses = S::TotalSuccesses;
-        type TotalChallenges = S::TotalChallenges;
+        type PlayerDid = S::PlayerDid;
     }
     ///State transition - sets the `total_successes` field to Set
     pub struct SetTotalSuccesses<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotalSuccesses<S> {}
     impl<S: State> State for SetTotalSuccesses<S> {
-        type CreatedAt = S::CreatedAt;
         type Level = S::Level;
-        type PlayerDid = S::PlayerDid;
         type TotalSuccesses = Set<members::total_successes>;
         type TotalChallenges = S::TotalChallenges;
+        type CreatedAt = S::CreatedAt;
+        type PlayerDid = S::PlayerDid;
     }
     ///State transition - sets the `total_challenges` field to Set
     pub struct SetTotalChallenges<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotalChallenges<S> {}
     impl<S: State> State for SetTotalChallenges<S> {
-        type CreatedAt = S::CreatedAt;
         type Level = S::Level;
-        type PlayerDid = S::PlayerDid;
         type TotalSuccesses = S::TotalSuccesses;
         type TotalChallenges = Set<members::total_challenges>;
+        type CreatedAt = S::CreatedAt;
+        type PlayerDid = S::PlayerDid;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Level = S::Level;
+        type TotalSuccesses = S::TotalSuccesses;
+        type TotalChallenges = S::TotalChallenges;
+        type CreatedAt = Set<members::created_at>;
+        type PlayerDid = S::PlayerDid;
+    }
+    ///State transition - sets the `player_did` field to Set
+    pub struct SetPlayerDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlayerDid<S> {}
+    impl<S: State> State for SetPlayerDid<S> {
+        type Level = S::Level;
+        type TotalSuccesses = S::TotalSuccesses;
+        type TotalChallenges = S::TotalChallenges;
+        type CreatedAt = S::CreatedAt;
+        type PlayerDid = Set<members::player_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `level` field
         pub struct level(());
-        ///Marker type for the `player_did` field
-        pub struct player_did(());
         ///Marker type for the `total_successes` field
         pub struct total_successes(());
         ///Marker type for the `total_challenges` field
         pub struct total_challenges(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `player_did` field
+        pub struct player_did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EntryBuilder<'a, S: entry_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<i64>,
         Option<i64>,
@@ -280,7 +283,7 @@ pub struct EntryBuilder<'a, S: entry_state::State> {
         Option<i64>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Entry<'a> {
@@ -294,20 +297,9 @@ impl<'a> EntryBuilder<'a, entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -322,11 +314,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> EntryBuilder<'a, entry_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -341,11 +333,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> EntryBuilder<'a, entry_state::SetLevel<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -353,12 +345,12 @@ where
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `percentage` field (optional)
     pub fn percentage(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `percentage` field to an Option value (optional)
     pub fn maybe_percentage(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -366,12 +358,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `playerAvatar` field (optional)
     pub fn player_avatar(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `playerAvatar` field to an Option value (optional)
     pub fn maybe_player_avatar(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -386,11 +378,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> EntryBuilder<'a, entry_state::SetPlayerDid<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -398,12 +390,12 @@ where
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `playerDisplayName` field (optional)
     pub fn player_display_name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `playerDisplayName` field to an Option value (optional)
     pub fn maybe_player_display_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -411,12 +403,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `playerHandle` field (optional)
     pub fn player_handle(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `playerHandle` field to an Option value (optional)
     pub fn maybe_player_handle(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -424,12 +416,12 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
 impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     /// Set the `postUri` field (optional)
     pub fn post_uri(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `postUri` field to an Option value (optional)
     pub fn maybe_post_uri(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -444,11 +436,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> EntryBuilder<'a, entry_state::SetTotalChallenges<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -463,11 +455,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> EntryBuilder<'a, entry_state::SetTotalSuccesses<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         EntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -475,25 +467,25 @@ where
 impl<'a, S> EntryBuilder<'a, S>
 where
     S: entry_state::State,
-    S::CreatedAt: entry_state::IsSet,
     S::Level: entry_state::IsSet,
-    S::PlayerDid: entry_state::IsSet,
     S::TotalSuccesses: entry_state::IsSet,
     S::TotalChallenges: entry_state::IsSet,
+    S::CreatedAt: entry_state::IsSet,
+    S::PlayerDid: entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Entry<'a> {
         Entry {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            level: self.__unsafe_private_named.1.unwrap(),
-            percentage: self.__unsafe_private_named.2,
-            player_avatar: self.__unsafe_private_named.3,
-            player_did: self.__unsafe_private_named.4.unwrap(),
-            player_display_name: self.__unsafe_private_named.5,
-            player_handle: self.__unsafe_private_named.6,
-            post_uri: self.__unsafe_private_named.7,
-            total_challenges: self.__unsafe_private_named.8.unwrap(),
-            total_successes: self.__unsafe_private_named.9.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            level: self._fields.1.unwrap(),
+            percentage: self._fields.2,
+            player_avatar: self._fields.3,
+            player_did: self._fields.4.unwrap(),
+            player_display_name: self._fields.5,
+            player_handle: self._fields.6,
+            post_uri: self._fields.7,
+            total_challenges: self._fields.8.unwrap(),
+            total_successes: self._fields.9.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -506,16 +498,16 @@ where
         >,
     ) -> Entry<'a> {
         Entry {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            level: self.__unsafe_private_named.1.unwrap(),
-            percentage: self.__unsafe_private_named.2,
-            player_avatar: self.__unsafe_private_named.3,
-            player_did: self.__unsafe_private_named.4.unwrap(),
-            player_display_name: self.__unsafe_private_named.5,
-            player_handle: self.__unsafe_private_named.6,
-            post_uri: self.__unsafe_private_named.7,
-            total_challenges: self.__unsafe_private_named.8.unwrap(),
-            total_successes: self.__unsafe_private_named.9.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            level: self._fields.1.unwrap(),
+            percentage: self._fields.2,
+            player_avatar: self._fields.3,
+            player_did: self._fields.4.unwrap(),
+            player_display_name: self._fields.5,
+            player_handle: self._fields.6,
+            post_uri: self._fields.7,
+            total_challenges: self._fields.8.unwrap(),
+            total_successes: self._fields.9.unwrap(),
             extra_data: Some(extra_data),
         }
     }

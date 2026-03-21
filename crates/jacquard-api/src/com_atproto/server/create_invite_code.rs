@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::Did;
@@ -93,9 +96,9 @@ pub mod create_invite_code_state {
 
 /// Builder for constructing an instance of this type
 pub struct CreateInviteCodeBuilder<'a, S: create_invite_code_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CreateInviteCode<'a> {
@@ -109,9 +112,9 @@ impl<'a> CreateInviteCodeBuilder<'a, create_invite_code_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreateInviteCodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -119,12 +122,12 @@ impl<'a> CreateInviteCodeBuilder<'a, create_invite_code_state::Empty> {
 impl<'a, S: create_invite_code_state::State> CreateInviteCodeBuilder<'a, S> {
     /// Set the `forAccount` field (optional)
     pub fn for_account(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `forAccount` field to an Option value (optional)
     pub fn maybe_for_account(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -139,11 +142,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CreateInviteCodeBuilder<'a, create_invite_code_state::SetUseCount<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CreateInviteCodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -156,8 +159,8 @@ where
     /// Build the final struct
     pub fn build(self) -> CreateInviteCode<'a> {
         CreateInviteCode {
-            for_account: self.__unsafe_private_named.0,
-            use_count: self.__unsafe_private_named.1.unwrap(),
+            for_account: self._fields.0,
+            use_count: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -170,8 +173,8 @@ where
         >,
     ) -> CreateInviteCode<'a> {
         CreateInviteCode {
-            for_account: self.__unsafe_private_named.0,
-            use_count: self.__unsafe_private_named.1.unwrap(),
+            for_account: self._fields.0,
+            use_count: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

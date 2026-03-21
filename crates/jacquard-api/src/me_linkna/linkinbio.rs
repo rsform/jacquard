@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -2999,59 +3002,59 @@ pub mod github_contribution_day_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Count;
-        type Date;
         type Level;
+        type Date;
+        type Count;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Count = Unset;
-        type Date = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `count` field to Set
-    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCount<S> {}
-    impl<S: State> State for SetCount<S> {
-        type Count = Set<members::count>;
-        type Date = S::Date;
-        type Level = S::Level;
-    }
-    ///State transition - sets the `date` field to Set
-    pub struct SetDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDate<S> {}
-    impl<S: State> State for SetDate<S> {
-        type Count = S::Count;
-        type Date = Set<members::date>;
-        type Level = S::Level;
+        type Date = Unset;
+        type Count = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
-        type Count = S::Count;
-        type Date = S::Date;
         type Level = Set<members::level>;
+        type Date = S::Date;
+        type Count = S::Count;
+    }
+    ///State transition - sets the `date` field to Set
+    pub struct SetDate<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDate<S> {}
+    impl<S: State> State for SetDate<S> {
+        type Level = S::Level;
+        type Date = Set<members::date>;
+        type Count = S::Count;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCount<S> {}
+    impl<S: State> State for SetCount<S> {
+        type Level = S::Level;
+        type Date = S::Date;
+        type Count = Set<members::count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `count` field
-        pub struct count(());
-        ///Marker type for the `date` field
-        pub struct date(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `date` field
+        pub struct date(());
+        ///Marker type for the `count` field
+        pub struct count(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct GithubContributionDayBuilder<'a, S: github_contribution_day_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<CowStr<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<CowStr<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GithubContributionDay<'a> {
@@ -3068,9 +3071,9 @@ impl<'a> GithubContributionDayBuilder<'a, github_contribution_day_state::Empty> 
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GithubContributionDayBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3085,11 +3088,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> GithubContributionDayBuilder<'a, github_contribution_day_state::SetCount<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GithubContributionDayBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3104,11 +3107,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GithubContributionDayBuilder<'a, github_contribution_day_state::SetDate<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GithubContributionDayBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3123,11 +3126,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> GithubContributionDayBuilder<'a, github_contribution_day_state::SetLevel<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         GithubContributionDayBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3135,16 +3138,16 @@ where
 impl<'a, S> GithubContributionDayBuilder<'a, S>
 where
     S: github_contribution_day_state::State,
-    S::Count: github_contribution_day_state::IsSet,
-    S::Date: github_contribution_day_state::IsSet,
     S::Level: github_contribution_day_state::IsSet,
+    S::Date: github_contribution_day_state::IsSet,
+    S::Count: github_contribution_day_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GithubContributionDay<'a> {
         GithubContributionDay {
-            count: self.__unsafe_private_named.0.unwrap(),
-            date: self.__unsafe_private_named.1.unwrap(),
-            level: self.__unsafe_private_named.2.unwrap(),
+            count: self._fields.0.unwrap(),
+            date: self._fields.1.unwrap(),
+            level: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -3157,9 +3160,9 @@ where
         >,
     ) -> GithubContributionDay<'a> {
         GithubContributionDay {
-            count: self.__unsafe_private_named.0.unwrap(),
-            date: self.__unsafe_private_named.1.unwrap(),
-            level: self.__unsafe_private_named.2.unwrap(),
+            count: self._fields.0.unwrap(),
+            date: self._fields.1.unwrap(),
+            level: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -3199,15 +3202,15 @@ pub mod linkinbio_state {
 
 /// Builder for constructing an instance of this type
 pub struct LinkinbioBuilder<'a, S: linkinbio_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<LinkinbioCardsItem<'a>>>,
         Option<linkinbio::ConnectedServices<'a>>,
         Option<Vec<linkinbio::SocialIcon<'a>>>,
         Option<CowStr<'a>>,
         Option<linkinbio::ThemeConfig<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Linkinbio<'a> {
@@ -3221,9 +3224,9 @@ impl<'a> LinkinbioBuilder<'a, linkinbio_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LinkinbioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3238,11 +3241,11 @@ where
         mut self,
         value: impl Into<Vec<LinkinbioCardsItem<'a>>>,
     ) -> LinkinbioBuilder<'a, linkinbio_state::SetCards<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LinkinbioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3253,7 +3256,7 @@ impl<'a, S: linkinbio_state::State> LinkinbioBuilder<'a, S> {
         mut self,
         value: impl Into<Option<linkinbio::ConnectedServices<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `connectedServices` field to an Option value (optional)
@@ -3261,7 +3264,7 @@ impl<'a, S: linkinbio_state::State> LinkinbioBuilder<'a, S> {
         mut self,
         value: Option<linkinbio::ConnectedServices<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -3272,7 +3275,7 @@ impl<'a, S: linkinbio_state::State> LinkinbioBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<linkinbio::SocialIcon<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `socialIcons` field to an Option value (optional)
@@ -3280,7 +3283,7 @@ impl<'a, S: linkinbio_state::State> LinkinbioBuilder<'a, S> {
         mut self,
         value: Option<Vec<linkinbio::SocialIcon<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -3288,12 +3291,12 @@ impl<'a, S: linkinbio_state::State> LinkinbioBuilder<'a, S> {
 impl<'a, S: linkinbio_state::State> LinkinbioBuilder<'a, S> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `theme` field to an Option value (optional)
     pub fn maybe_theme(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -3304,7 +3307,7 @@ impl<'a, S: linkinbio_state::State> LinkinbioBuilder<'a, S> {
         mut self,
         value: impl Into<Option<linkinbio::ThemeConfig<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `themeConfig` field to an Option value (optional)
@@ -3312,7 +3315,7 @@ impl<'a, S: linkinbio_state::State> LinkinbioBuilder<'a, S> {
         mut self,
         value: Option<linkinbio::ThemeConfig<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -3325,11 +3328,11 @@ where
     /// Build the final struct
     pub fn build(self) -> Linkinbio<'a> {
         Linkinbio {
-            cards: self.__unsafe_private_named.0.unwrap(),
-            connected_services: self.__unsafe_private_named.1,
-            social_icons: self.__unsafe_private_named.2,
-            theme: self.__unsafe_private_named.3,
-            theme_config: self.__unsafe_private_named.4,
+            cards: self._fields.0.unwrap(),
+            connected_services: self._fields.1,
+            social_icons: self._fields.2,
+            theme: self._fields.3,
+            theme_config: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -3342,11 +3345,11 @@ where
         >,
     ) -> Linkinbio<'a> {
         Linkinbio {
-            cards: self.__unsafe_private_named.0.unwrap(),
-            connected_services: self.__unsafe_private_named.1,
-            social_icons: self.__unsafe_private_named.2,
-            theme: self.__unsafe_private_named.3,
-            theme_config: self.__unsafe_private_named.4,
+            cards: self._fields.0.unwrap(),
+            connected_services: self._fields.1,
+            social_icons: self._fields.2,
+            theme: self._fields.3,
+            theme_config: self._fields.4,
             extra_data: Some(extra_data),
         }
     }
@@ -3412,13 +3415,9 @@ pub mod social_icon_state {
 
 /// Builder for constructing an instance of this type
 pub struct SocialIconBuilder<'a, S: social_icon_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<UriValue<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<UriValue<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SocialIcon<'a> {
@@ -3432,9 +3431,9 @@ impl<'a> SocialIconBuilder<'a, social_icon_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SocialIconBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3449,11 +3448,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SocialIconBuilder<'a, social_icon_state::SetId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SocialIconBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3468,11 +3467,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SocialIconBuilder<'a, social_icon_state::SetPlatform<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SocialIconBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3487,11 +3486,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> SocialIconBuilder<'a, social_icon_state::SetUrl<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SocialIconBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3506,9 +3505,9 @@ where
     /// Build the final struct
     pub fn build(self) -> SocialIcon<'a> {
         SocialIcon {
-            id: self.__unsafe_private_named.0.unwrap(),
-            platform: self.__unsafe_private_named.1.unwrap(),
-            url: self.__unsafe_private_named.2.unwrap(),
+            id: self._fields.0.unwrap(),
+            platform: self._fields.1.unwrap(),
+            url: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -3521,9 +3520,9 @@ where
         >,
     ) -> SocialIcon<'a> {
         SocialIcon {
-            id: self.__unsafe_private_named.0.unwrap(),
-            platform: self.__unsafe_private_named.1.unwrap(),
-            url: self.__unsafe_private_named.2.unwrap(),
+            id: self._fields.0.unwrap(),
+            platform: self._fields.1.unwrap(),
+            url: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -3539,74 +3538,74 @@ pub mod widget_github_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GithubUsername;
-        type Contributions;
         type Id;
+        type GithubUsername;
         type Type;
+        type Contributions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GithubUsername = Unset;
-        type Contributions = Unset;
         type Id = Unset;
+        type GithubUsername = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `github_username` field to Set
-    pub struct SetGithubUsername<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGithubUsername<S> {}
-    impl<S: State> State for SetGithubUsername<S> {
-        type GithubUsername = Set<members::github_username>;
-        type Contributions = S::Contributions;
-        type Id = S::Id;
-        type Type = S::Type;
-    }
-    ///State transition - sets the `contributions` field to Set
-    pub struct SetContributions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContributions<S> {}
-    impl<S: State> State for SetContributions<S> {
-        type GithubUsername = S::GithubUsername;
-        type Contributions = Set<members::contributions>;
-        type Id = S::Id;
-        type Type = S::Type;
+        type Contributions = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type GithubUsername = S::GithubUsername;
-        type Contributions = S::Contributions;
         type Id = Set<members::id>;
+        type GithubUsername = S::GithubUsername;
         type Type = S::Type;
+        type Contributions = S::Contributions;
+    }
+    ///State transition - sets the `github_username` field to Set
+    pub struct SetGithubUsername<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetGithubUsername<S> {}
+    impl<S: State> State for SetGithubUsername<S> {
+        type Id = S::Id;
+        type GithubUsername = Set<members::github_username>;
+        type Type = S::Type;
+        type Contributions = S::Contributions;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetType<S> {}
     impl<S: State> State for SetType<S> {
-        type GithubUsername = S::GithubUsername;
-        type Contributions = S::Contributions;
         type Id = S::Id;
+        type GithubUsername = S::GithubUsername;
         type Type = Set<members::r#type>;
+        type Contributions = S::Contributions;
+    }
+    ///State transition - sets the `contributions` field to Set
+    pub struct SetContributions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContributions<S> {}
+    impl<S: State> State for SetContributions<S> {
+        type Id = S::Id;
+        type GithubUsername = S::GithubUsername;
+        type Type = S::Type;
+        type Contributions = Set<members::contributions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `github_username` field
-        pub struct github_username(());
-        ///Marker type for the `contributions` field
-        pub struct contributions(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `github_username` field
+        pub struct github_username(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `contributions` field
+        pub struct contributions(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct WidgetGithubBuilder<'a, S: widget_github_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<linkinbio::GithubContributionDay<'a>>>,
         Option<bool>,
         Option<CowStr<'a>>,
@@ -3616,7 +3615,7 @@ pub struct WidgetGithubBuilder<'a, S: widget_github_state::State> {
         Option<i64>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> WidgetGithub<'a> {
@@ -3630,9 +3629,9 @@ impl<'a> WidgetGithubBuilder<'a, widget_github_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         WidgetGithubBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3647,11 +3646,11 @@ where
         mut self,
         value: impl Into<Vec<linkinbio::GithubContributionDay<'a>>>,
     ) -> WidgetGithubBuilder<'a, widget_github_state::SetContributions<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         WidgetGithubBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3659,12 +3658,12 @@ where
 impl<'a, S: widget_github_state::State> WidgetGithubBuilder<'a, S> {
     /// Set the `enabled` field (optional)
     pub fn enabled(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `enabled` field to an Option value (optional)
     pub fn maybe_enabled(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -3679,11 +3678,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> WidgetGithubBuilder<'a, widget_github_state::SetGithubUsername<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         WidgetGithubBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3698,11 +3697,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> WidgetGithubBuilder<'a, widget_github_state::SetId<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         WidgetGithubBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3710,12 +3709,12 @@ where
 impl<'a, S: widget_github_state::State> WidgetGithubBuilder<'a, S> {
     /// Set the `lastSyncedAt` field (optional)
     pub fn last_synced_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `lastSyncedAt` field to an Option value (optional)
     pub fn maybe_last_synced_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -3723,12 +3722,12 @@ impl<'a, S: widget_github_state::State> WidgetGithubBuilder<'a, S> {
 impl<'a, S: widget_github_state::State> WidgetGithubBuilder<'a, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<WidgetGithubSize<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
     pub fn maybe_size(mut self, value: Option<WidgetGithubSize<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -3736,12 +3735,12 @@ impl<'a, S: widget_github_state::State> WidgetGithubBuilder<'a, S> {
 impl<'a, S: widget_github_state::State> WidgetGithubBuilder<'a, S> {
     /// Set the `totalContributions` field (optional)
     pub fn total_contributions(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `totalContributions` field to an Option value (optional)
     pub fn maybe_total_contributions(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -3756,11 +3755,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> WidgetGithubBuilder<'a, widget_github_state::SetType<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         WidgetGithubBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3768,22 +3767,22 @@ where
 impl<'a, S> WidgetGithubBuilder<'a, S>
 where
     S: widget_github_state::State,
-    S::GithubUsername: widget_github_state::IsSet,
-    S::Contributions: widget_github_state::IsSet,
     S::Id: widget_github_state::IsSet,
+    S::GithubUsername: widget_github_state::IsSet,
     S::Type: widget_github_state::IsSet,
+    S::Contributions: widget_github_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WidgetGithub<'a> {
         WidgetGithub {
-            contributions: self.__unsafe_private_named.0.unwrap(),
-            enabled: self.__unsafe_private_named.1,
-            github_username: self.__unsafe_private_named.2.unwrap(),
-            id: self.__unsafe_private_named.3.unwrap(),
-            last_synced_at: self.__unsafe_private_named.4,
-            size: self.__unsafe_private_named.5,
-            total_contributions: self.__unsafe_private_named.6,
-            r#type: self.__unsafe_private_named.7.unwrap(),
+            contributions: self._fields.0.unwrap(),
+            enabled: self._fields.1,
+            github_username: self._fields.2.unwrap(),
+            id: self._fields.3.unwrap(),
+            last_synced_at: self._fields.4,
+            size: self._fields.5,
+            total_contributions: self._fields.6,
+            r#type: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -3796,14 +3795,14 @@ where
         >,
     ) -> WidgetGithub<'a> {
         WidgetGithub {
-            contributions: self.__unsafe_private_named.0.unwrap(),
-            enabled: self.__unsafe_private_named.1,
-            github_username: self.__unsafe_private_named.2.unwrap(),
-            id: self.__unsafe_private_named.3.unwrap(),
-            last_synced_at: self.__unsafe_private_named.4,
-            size: self.__unsafe_private_named.5,
-            total_contributions: self.__unsafe_private_named.6,
-            r#type: self.__unsafe_private_named.7.unwrap(),
+            contributions: self._fields.0.unwrap(),
+            enabled: self._fields.1,
+            github_username: self._fields.2.unwrap(),
+            id: self._fields.3.unwrap(),
+            last_synced_at: self._fields.4,
+            size: self._fields.5,
+            total_contributions: self._fields.6,
+            r#type: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -3819,92 +3818,92 @@ pub mod widget_goodreads_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type Books;
-        type Type;
         type GoodreadsUserId;
+        type Id;
         type Shelf;
+        type Type;
+        type Books;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type Books = Unset;
-        type Type = Unset;
         type GoodreadsUserId = Unset;
+        type Id = Unset;
         type Shelf = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Books = S::Books;
-        type Type = S::Type;
-        type GoodreadsUserId = S::GoodreadsUserId;
-        type Shelf = S::Shelf;
-    }
-    ///State transition - sets the `books` field to Set
-    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBooks<S> {}
-    impl<S: State> State for SetBooks<S> {
-        type Id = S::Id;
-        type Books = Set<members::books>;
-        type Type = S::Type;
-        type GoodreadsUserId = S::GoodreadsUserId;
-        type Shelf = S::Shelf;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Id = S::Id;
-        type Books = S::Books;
-        type Type = Set<members::r#type>;
-        type GoodreadsUserId = S::GoodreadsUserId;
-        type Shelf = S::Shelf;
+        type Type = Unset;
+        type Books = Unset;
     }
     ///State transition - sets the `goodreads_user_id` field to Set
     pub struct SetGoodreadsUserId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGoodreadsUserId<S> {}
     impl<S: State> State for SetGoodreadsUserId<S> {
-        type Id = S::Id;
-        type Books = S::Books;
-        type Type = S::Type;
         type GoodreadsUserId = Set<members::goodreads_user_id>;
+        type Id = S::Id;
         type Shelf = S::Shelf;
+        type Type = S::Type;
+        type Books = S::Books;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type GoodreadsUserId = S::GoodreadsUserId;
+        type Id = Set<members::id>;
+        type Shelf = S::Shelf;
+        type Type = S::Type;
+        type Books = S::Books;
     }
     ///State transition - sets the `shelf` field to Set
     pub struct SetShelf<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetShelf<S> {}
     impl<S: State> State for SetShelf<S> {
-        type Id = S::Id;
-        type Books = S::Books;
-        type Type = S::Type;
         type GoodreadsUserId = S::GoodreadsUserId;
+        type Id = S::Id;
         type Shelf = Set<members::shelf>;
+        type Type = S::Type;
+        type Books = S::Books;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type GoodreadsUserId = S::GoodreadsUserId;
+        type Id = S::Id;
+        type Shelf = S::Shelf;
+        type Type = Set<members::r#type>;
+        type Books = S::Books;
+    }
+    ///State transition - sets the `books` field to Set
+    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBooks<S> {}
+    impl<S: State> State for SetBooks<S> {
+        type GoodreadsUserId = S::GoodreadsUserId;
+        type Id = S::Id;
+        type Shelf = S::Shelf;
+        type Type = S::Type;
+        type Books = Set<members::books>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `books` field
-        pub struct books(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `goodreads_user_id` field
         pub struct goodreads_user_id(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `shelf` field
         pub struct shelf(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `books` field
+        pub struct books(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct WidgetGoodreadsBuilder<'a, S: widget_goodreads_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<linkinbio::GoodreadsBook<'a>>>,
         Option<bool>,
         Option<CowStr<'a>>,
@@ -3915,7 +3914,7 @@ pub struct WidgetGoodreadsBuilder<'a, S: widget_goodreads_state::State> {
         Option<WidgetGoodreadsSize<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> WidgetGoodreads<'a> {
@@ -3929,19 +3928,9 @@ impl<'a> WidgetGoodreadsBuilder<'a, widget_goodreads_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         WidgetGoodreadsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3956,11 +3945,11 @@ where
         mut self,
         value: impl Into<Vec<linkinbio::GoodreadsBook<'a>>>,
     ) -> WidgetGoodreadsBuilder<'a, widget_goodreads_state::SetBooks<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         WidgetGoodreadsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3968,12 +3957,12 @@ where
 impl<'a, S: widget_goodreads_state::State> WidgetGoodreadsBuilder<'a, S> {
     /// Set the `enabled` field (optional)
     pub fn enabled(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `enabled` field to an Option value (optional)
     pub fn maybe_enabled(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -3988,11 +3977,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> WidgetGoodreadsBuilder<'a, widget_goodreads_state::SetGoodreadsUserId<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         WidgetGoodreadsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4007,11 +3996,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> WidgetGoodreadsBuilder<'a, widget_goodreads_state::SetId<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         WidgetGoodreadsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4019,12 +4008,12 @@ where
 impl<'a, S: widget_goodreads_state::State> WidgetGoodreadsBuilder<'a, S> {
     /// Set the `lastSyncedAt` field (optional)
     pub fn last_synced_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `lastSyncedAt` field to an Option value (optional)
     pub fn maybe_last_synced_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -4035,7 +4024,7 @@ impl<'a, S: widget_goodreads_state::State> WidgetGoodreadsBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<linkinbio::GoodreadsBook<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `readBooks` field to an Option value (optional)
@@ -4043,7 +4032,7 @@ impl<'a, S: widget_goodreads_state::State> WidgetGoodreadsBuilder<'a, S> {
         mut self,
         value: Option<Vec<linkinbio::GoodreadsBook<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -4058,11 +4047,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> WidgetGoodreadsBuilder<'a, widget_goodreads_state::SetShelf<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         WidgetGoodreadsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4070,12 +4059,12 @@ where
 impl<'a, S: widget_goodreads_state::State> WidgetGoodreadsBuilder<'a, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<WidgetGoodreadsSize<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
     pub fn maybe_size(mut self, value: Option<WidgetGoodreadsSize<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -4090,11 +4079,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> WidgetGoodreadsBuilder<'a, widget_goodreads_state::SetType<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         WidgetGoodreadsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4102,24 +4091,24 @@ where
 impl<'a, S> WidgetGoodreadsBuilder<'a, S>
 where
     S: widget_goodreads_state::State,
-    S::Id: widget_goodreads_state::IsSet,
-    S::Books: widget_goodreads_state::IsSet,
-    S::Type: widget_goodreads_state::IsSet,
     S::GoodreadsUserId: widget_goodreads_state::IsSet,
+    S::Id: widget_goodreads_state::IsSet,
     S::Shelf: widget_goodreads_state::IsSet,
+    S::Type: widget_goodreads_state::IsSet,
+    S::Books: widget_goodreads_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WidgetGoodreads<'a> {
         WidgetGoodreads {
-            books: self.__unsafe_private_named.0.unwrap(),
-            enabled: self.__unsafe_private_named.1,
-            goodreads_user_id: self.__unsafe_private_named.2.unwrap(),
-            id: self.__unsafe_private_named.3.unwrap(),
-            last_synced_at: self.__unsafe_private_named.4,
-            read_books: self.__unsafe_private_named.5,
-            shelf: self.__unsafe_private_named.6.unwrap(),
-            size: self.__unsafe_private_named.7,
-            r#type: self.__unsafe_private_named.8.unwrap(),
+            books: self._fields.0.unwrap(),
+            enabled: self._fields.1,
+            goodreads_user_id: self._fields.2.unwrap(),
+            id: self._fields.3.unwrap(),
+            last_synced_at: self._fields.4,
+            read_books: self._fields.5,
+            shelf: self._fields.6.unwrap(),
+            size: self._fields.7,
+            r#type: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -4132,15 +4121,15 @@ where
         >,
     ) -> WidgetGoodreads<'a> {
         WidgetGoodreads {
-            books: self.__unsafe_private_named.0.unwrap(),
-            enabled: self.__unsafe_private_named.1,
-            goodreads_user_id: self.__unsafe_private_named.2.unwrap(),
-            id: self.__unsafe_private_named.3.unwrap(),
-            last_synced_at: self.__unsafe_private_named.4,
-            read_books: self.__unsafe_private_named.5,
-            shelf: self.__unsafe_private_named.6.unwrap(),
-            size: self.__unsafe_private_named.7,
-            r#type: self.__unsafe_private_named.8.unwrap(),
+            books: self._fields.0.unwrap(),
+            enabled: self._fields.1,
+            goodreads_user_id: self._fields.2.unwrap(),
+            id: self._fields.3.unwrap(),
+            last_synced_at: self._fields.4,
+            read_books: self._fields.5,
+            shelf: self._fields.6.unwrap(),
+            size: self._fields.7,
+            r#type: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -4157,57 +4146,57 @@ pub mod widget_tealfm_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Id;
-        type Type;
         type Plays;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Id = Unset;
-        type Type = Unset;
         type Plays = Unset;
+        type Type = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
         type Id = Set<members::id>;
+        type Plays = S::Plays;
         type Type = S::Type;
-        type Plays = S::Plays;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Id = S::Id;
-        type Type = Set<members::r#type>;
-        type Plays = S::Plays;
     }
     ///State transition - sets the `plays` field to Set
     pub struct SetPlays<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPlays<S> {}
     impl<S: State> State for SetPlays<S> {
         type Id = S::Id;
-        type Type = S::Type;
         type Plays = Set<members::plays>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Id = S::Id;
+        type Plays = S::Plays;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `plays` field
         pub struct plays(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct WidgetTealfmBuilder<'a, S: widget_tealfm_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<bool>,
         Option<CowStr<'a>>,
@@ -4216,7 +4205,7 @@ pub struct WidgetTealfmBuilder<'a, S: widget_tealfm_state::State> {
         Option<WidgetTealfmSize<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> WidgetTealfm<'a> {
@@ -4230,9 +4219,9 @@ impl<'a> WidgetTealfmBuilder<'a, widget_tealfm_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         WidgetTealfmBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4240,12 +4229,12 @@ impl<'a> WidgetTealfmBuilder<'a, widget_tealfm_state::Empty> {
 impl<'a, S: widget_tealfm_state::State> WidgetTealfmBuilder<'a, S> {
     /// Set the `coverArtNotice` field (optional)
     pub fn cover_art_notice(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `coverArtNotice` field to an Option value (optional)
     pub fn maybe_cover_art_notice(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -4253,12 +4242,12 @@ impl<'a, S: widget_tealfm_state::State> WidgetTealfmBuilder<'a, S> {
 impl<'a, S: widget_tealfm_state::State> WidgetTealfmBuilder<'a, S> {
     /// Set the `enabled` field (optional)
     pub fn enabled(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `enabled` field to an Option value (optional)
     pub fn maybe_enabled(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -4273,11 +4262,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> WidgetTealfmBuilder<'a, widget_tealfm_state::SetId<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         WidgetTealfmBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4285,12 +4274,12 @@ where
 impl<'a, S: widget_tealfm_state::State> WidgetTealfmBuilder<'a, S> {
     /// Set the `lastSyncedAt` field (optional)
     pub fn last_synced_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `lastSyncedAt` field to an Option value (optional)
     pub fn maybe_last_synced_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -4305,11 +4294,11 @@ where
         mut self,
         value: impl Into<Vec<linkinbio::TealfmPlay<'a>>>,
     ) -> WidgetTealfmBuilder<'a, widget_tealfm_state::SetPlays<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         WidgetTealfmBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4317,12 +4306,12 @@ where
 impl<'a, S: widget_tealfm_state::State> WidgetTealfmBuilder<'a, S> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<WidgetTealfmSize<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `size` field to an Option value (optional)
     pub fn maybe_size(mut self, value: Option<WidgetTealfmSize<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -4337,11 +4326,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> WidgetTealfmBuilder<'a, widget_tealfm_state::SetType<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         WidgetTealfmBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -4350,19 +4339,19 @@ impl<'a, S> WidgetTealfmBuilder<'a, S>
 where
     S: widget_tealfm_state::State,
     S::Id: widget_tealfm_state::IsSet,
-    S::Type: widget_tealfm_state::IsSet,
     S::Plays: widget_tealfm_state::IsSet,
+    S::Type: widget_tealfm_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> WidgetTealfm<'a> {
         WidgetTealfm {
-            cover_art_notice: self.__unsafe_private_named.0,
-            enabled: self.__unsafe_private_named.1,
-            id: self.__unsafe_private_named.2.unwrap(),
-            last_synced_at: self.__unsafe_private_named.3,
-            plays: self.__unsafe_private_named.4.unwrap(),
-            size: self.__unsafe_private_named.5,
-            r#type: self.__unsafe_private_named.6.unwrap(),
+            cover_art_notice: self._fields.0,
+            enabled: self._fields.1,
+            id: self._fields.2.unwrap(),
+            last_synced_at: self._fields.3,
+            plays: self._fields.4.unwrap(),
+            size: self._fields.5,
+            r#type: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -4375,13 +4364,13 @@ where
         >,
     ) -> WidgetTealfm<'a> {
         WidgetTealfm {
-            cover_art_notice: self.__unsafe_private_named.0,
-            enabled: self.__unsafe_private_named.1,
-            id: self.__unsafe_private_named.2.unwrap(),
-            last_synced_at: self.__unsafe_private_named.3,
-            plays: self.__unsafe_private_named.4.unwrap(),
-            size: self.__unsafe_private_named.5,
-            r#type: self.__unsafe_private_named.6.unwrap(),
+            cover_art_notice: self._fields.0,
+            enabled: self._fields.1,
+            id: self._fields.2.unwrap(),
+            last_synced_at: self._fields.3,
+            plays: self._fields.4.unwrap(),
+            size: self._fields.5,
+            r#type: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

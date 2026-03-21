@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::{Did, Nsid, Datetime, UriValue};
@@ -156,8 +159,8 @@ pub mod query_events_state {
 
 /// Builder for constructing an instance of this type
 pub struct QueryEventsBuilder<'a, S: query_events_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<CowStr<'a>>>,
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
@@ -182,7 +185,7 @@ pub struct QueryEventsBuilder<'a, S: query_events_state::State> {
         Option<Vec<CowStr<'a>>>,
         Option<bool>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> QueryEvents<'a> {
@@ -196,8 +199,8 @@ impl<'a> QueryEventsBuilder<'a, query_events_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         QueryEventsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -222,7 +225,7 @@ impl<'a> QueryEventsBuilder<'a, query_events_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -230,12 +233,12 @@ impl<'a> QueryEventsBuilder<'a, query_events_state::Empty> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `addedLabels` field (optional)
     pub fn added_labels(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `addedLabels` field to an Option value (optional)
     pub fn maybe_added_labels(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -243,12 +246,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `addedTags` field (optional)
     pub fn added_tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `addedTags` field to an Option value (optional)
     pub fn maybe_added_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -256,12 +259,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `ageAssuranceState` field (optional)
     pub fn age_assurance_state(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `ageAssuranceState` field to an Option value (optional)
     pub fn maybe_age_assurance_state(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -269,12 +272,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `batchId` field (optional)
     pub fn batch_id(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `batchId` field to an Option value (optional)
     pub fn maybe_batch_id(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -282,12 +285,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `collections` field (optional)
     pub fn collections(mut self, value: impl Into<Option<Vec<Nsid<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `collections` field to an Option value (optional)
     pub fn maybe_collections(mut self, value: Option<Vec<Nsid<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -295,12 +298,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
     pub fn maybe_comment(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -308,12 +311,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `createdAfter` field (optional)
     pub fn created_after(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `createdAfter` field to an Option value (optional)
     pub fn maybe_created_after(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -321,12 +324,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `createdBefore` field (optional)
     pub fn created_before(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `createdBefore` field to an Option value (optional)
     pub fn maybe_created_before(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -334,12 +337,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `createdBy` field (optional)
     pub fn created_by(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `createdBy` field to an Option value (optional)
     pub fn maybe_created_by(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -347,12 +350,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -360,12 +363,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `hasComment` field (optional)
     pub fn has_comment(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `hasComment` field to an Option value (optional)
     pub fn maybe_has_comment(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -373,12 +376,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `includeAllUserRecords` field (optional)
     pub fn include_all_user_records(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `includeAllUserRecords` field to an Option value (optional)
     pub fn maybe_include_all_user_records(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -386,12 +389,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -399,12 +402,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `modTool` field (optional)
     pub fn mod_tool(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `modTool` field to an Option value (optional)
     pub fn maybe_mod_tool(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -412,12 +415,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `policies` field (optional)
     pub fn policies(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.14 = value.into();
+        self._fields.14 = value.into();
         self
     }
     /// Set the `policies` field to an Option value (optional)
     pub fn maybe_policies(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.14 = value;
+        self._fields.14 = value;
         self
     }
 }
@@ -425,12 +428,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `removedLabels` field (optional)
     pub fn removed_labels(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.15 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `removedLabels` field to an Option value (optional)
     pub fn maybe_removed_labels(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.15 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -438,12 +441,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `removedTags` field (optional)
     pub fn removed_tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.16 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `removedTags` field to an Option value (optional)
     pub fn maybe_removed_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.16 = value;
+        self._fields.16 = value;
         self
     }
 }
@@ -451,12 +454,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `reportTypes` field (optional)
     pub fn report_types(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.17 = value.into();
+        self._fields.17 = value.into();
         self
     }
     /// Set the `reportTypes` field to an Option value (optional)
     pub fn maybe_report_types(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.17 = value;
+        self._fields.17 = value;
         self
     }
 }
@@ -464,12 +467,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `sortDirection` field (optional)
     pub fn sort_direction(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.18 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `sortDirection` field to an Option value (optional)
     pub fn maybe_sort_direction(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.18 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -477,12 +480,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.19 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
     pub fn maybe_subject(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.19 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -490,12 +493,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `subjectType` field (optional)
     pub fn subject_type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.20 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `subjectType` field to an Option value (optional)
     pub fn maybe_subject_type(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.20 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -503,12 +506,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `types` field (optional)
     pub fn types(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.21 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `types` field to an Option value (optional)
     pub fn maybe_types(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.21 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -516,12 +519,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
 impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     /// Set the `withStrike` field (optional)
     pub fn with_strike(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.22 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `withStrike` field to an Option value (optional)
     pub fn maybe_with_strike(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.22 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -533,29 +536,29 @@ where
     /// Build the final struct
     pub fn build(self) -> QueryEvents<'a> {
         QueryEvents {
-            added_labels: self.__unsafe_private_named.0,
-            added_tags: self.__unsafe_private_named.1,
-            age_assurance_state: self.__unsafe_private_named.2,
-            batch_id: self.__unsafe_private_named.3,
-            collections: self.__unsafe_private_named.4,
-            comment: self.__unsafe_private_named.5,
-            created_after: self.__unsafe_private_named.6,
-            created_before: self.__unsafe_private_named.7,
-            created_by: self.__unsafe_private_named.8,
-            cursor: self.__unsafe_private_named.9,
-            has_comment: self.__unsafe_private_named.10,
-            include_all_user_records: self.__unsafe_private_named.11,
-            limit: self.__unsafe_private_named.12,
-            mod_tool: self.__unsafe_private_named.13,
-            policies: self.__unsafe_private_named.14,
-            removed_labels: self.__unsafe_private_named.15,
-            removed_tags: self.__unsafe_private_named.16,
-            report_types: self.__unsafe_private_named.17,
-            sort_direction: self.__unsafe_private_named.18,
-            subject: self.__unsafe_private_named.19,
-            subject_type: self.__unsafe_private_named.20,
-            types: self.__unsafe_private_named.21,
-            with_strike: self.__unsafe_private_named.22,
+            added_labels: self._fields.0,
+            added_tags: self._fields.1,
+            age_assurance_state: self._fields.2,
+            batch_id: self._fields.3,
+            collections: self._fields.4,
+            comment: self._fields.5,
+            created_after: self._fields.6,
+            created_before: self._fields.7,
+            created_by: self._fields.8,
+            cursor: self._fields.9,
+            has_comment: self._fields.10,
+            include_all_user_records: self._fields.11,
+            limit: self._fields.12,
+            mod_tool: self._fields.13,
+            policies: self._fields.14,
+            removed_labels: self._fields.15,
+            removed_tags: self._fields.16,
+            report_types: self._fields.17,
+            sort_direction: self._fields.18,
+            subject: self._fields.19,
+            subject_type: self._fields.20,
+            types: self._fields.21,
+            with_strike: self._fields.22,
         }
     }
 }

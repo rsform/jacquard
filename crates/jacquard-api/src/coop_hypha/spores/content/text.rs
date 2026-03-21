@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -259,50 +262,50 @@ pub mod text_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type CreatedAt;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type CreatedAt = S::CreatedAt;
+        type Content = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Content = S::Content;
         type CreatedAt = Set<members::created_at>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type CreatedAt = S::CreatedAt;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TextBuilder<'a, S: text_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<TextFormat<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Text<'a> {
@@ -316,9 +319,9 @@ impl<'a> TextBuilder<'a, text_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TextBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -333,11 +336,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TextBuilder<'a, text_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TextBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -352,11 +355,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> TextBuilder<'a, text_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TextBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -364,12 +367,12 @@ where
 impl<'a, S: text_state::State> TextBuilder<'a, S> {
     /// Set the `format` field (optional)
     pub fn format(mut self, value: impl Into<Option<TextFormat<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `format` field to an Option value (optional)
     pub fn maybe_format(mut self, value: Option<TextFormat<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -377,12 +380,12 @@ impl<'a, S: text_state::State> TextBuilder<'a, S> {
 impl<'a, S: text_state::State> TextBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -390,16 +393,16 @@ impl<'a, S: text_state::State> TextBuilder<'a, S> {
 impl<'a, S> TextBuilder<'a, S>
 where
     S: text_state::State,
-    S::Content: text_state::IsSet,
     S::CreatedAt: text_state::IsSet,
+    S::Content: text_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Text<'a> {
         Text {
-            content: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            format: self.__unsafe_private_named.2,
-            title: self.__unsafe_private_named.3,
+            content: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            format: self._fields.2,
+            title: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -412,10 +415,10 @@ where
         >,
     ) -> Text<'a> {
         Text {
-            content: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            format: self.__unsafe_private_named.2,
-            title: self.__unsafe_private_named.3,
+            content: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            format: self._fields.2,
+            title: self._fields.3,
             extra_data: Some(extra_data),
         }
     }

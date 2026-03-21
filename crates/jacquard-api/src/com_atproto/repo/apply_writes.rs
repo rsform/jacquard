@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -517,49 +520,45 @@ pub mod create_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
         type Value;
+        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type Value = S::Value;
+        type Collection = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
-        type Collection = S::Collection;
         type Value = Set<members::value>;
+        type Collection = S::Collection;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type Value = S::Value;
+        type Collection = Set<members::collection>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CreateBuilder<'a, S: create_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Nsid<'a>>,
-        Option<RecordKey<Rkey<'a>>>,
-        Option<Data<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Nsid<'a>>, Option<RecordKey<Rkey<'a>>>, Option<Data<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Create<'a> {
@@ -573,9 +572,9 @@ impl<'a> CreateBuilder<'a, create_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -590,11 +589,11 @@ where
         mut self,
         value: impl Into<Nsid<'a>>,
     ) -> CreateBuilder<'a, create_state::SetCollection<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CreateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -602,12 +601,12 @@ where
 impl<'a, S: create_state::State> CreateBuilder<'a, S> {
     /// Set the `rkey` field (optional)
     pub fn rkey(mut self, value: impl Into<Option<RecordKey<Rkey<'a>>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `rkey` field to an Option value (optional)
     pub fn maybe_rkey(mut self, value: Option<RecordKey<Rkey<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -622,11 +621,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> CreateBuilder<'a, create_state::SetValue<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CreateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -634,15 +633,15 @@ where
 impl<'a, S> CreateBuilder<'a, S>
 where
     S: create_state::State,
-    S::Collection: create_state::IsSet,
     S::Value: create_state::IsSet,
+    S::Collection: create_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Create<'a> {
         Create {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            rkey: self.__unsafe_private_named.1,
-            value: self.__unsafe_private_named.2.unwrap(),
+            collection: self._fields.0.unwrap(),
+            rkey: self._fields.1,
+            value: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -652,9 +651,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Create<'a> {
         Create {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            rkey: self.__unsafe_private_named.1,
-            value: self.__unsafe_private_named.2.unwrap(),
+            collection: self._fields.0.unwrap(),
+            rkey: self._fields.1,
+            value: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -987,13 +986,13 @@ pub mod create_result_state {
 
 /// Builder for constructing an instance of this type
 pub struct CreateResultBuilder<'a, S: create_result_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Cid<'a>>,
         Option<AtUri<'a>>,
         Option<CreateResultValidationStatus<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CreateResult<'a> {
@@ -1007,9 +1006,9 @@ impl<'a> CreateResultBuilder<'a, create_result_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CreateResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1024,11 +1023,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> CreateResultBuilder<'a, create_result_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CreateResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1043,11 +1042,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> CreateResultBuilder<'a, create_result_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CreateResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1058,7 +1057,7 @@ impl<'a, S: create_result_state::State> CreateResultBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CreateResultValidationStatus<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `validationStatus` field to an Option value (optional)
@@ -1066,7 +1065,7 @@ impl<'a, S: create_result_state::State> CreateResultBuilder<'a, S> {
         mut self,
         value: Option<CreateResultValidationStatus<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1080,9 +1079,9 @@ where
     /// Build the final struct
     pub fn build(self) -> CreateResult<'a> {
         CreateResult {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
-            validation_status: self.__unsafe_private_named.2,
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
+            validation_status: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -1092,9 +1091,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> CreateResult<'a> {
         CreateResult {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
-            validation_status: self.__unsafe_private_named.2,
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
+            validation_status: self._fields.2,
             extra_data: Some(extra_data),
         }
     }
@@ -1146,9 +1145,9 @@ pub mod delete_state {
 
 /// Builder for constructing an instance of this type
 pub struct DeleteBuilder<'a, S: delete_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Nsid<'a>>, Option<RecordKey<Rkey<'a>>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Nsid<'a>>, Option<RecordKey<Rkey<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Delete<'a> {
@@ -1162,9 +1161,9 @@ impl<'a> DeleteBuilder<'a, delete_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeleteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1179,11 +1178,11 @@ where
         mut self,
         value: impl Into<Nsid<'a>>,
     ) -> DeleteBuilder<'a, delete_state::SetCollection<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DeleteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1198,11 +1197,11 @@ where
         mut self,
         value: impl Into<RecordKey<Rkey<'a>>>,
     ) -> DeleteBuilder<'a, delete_state::SetRkey<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DeleteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1216,8 +1215,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Delete<'a> {
         Delete {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            rkey: self.__unsafe_private_named.1.unwrap(),
+            collection: self._fields.0.unwrap(),
+            rkey: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1227,8 +1226,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Delete<'a> {
         Delete {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            rkey: self.__unsafe_private_named.1.unwrap(),
+            collection: self._fields.0.unwrap(),
+            rkey: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1244,50 +1243,50 @@ pub mod apply_writes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Writes;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Writes = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Writes = S::Writes;
+        type Repo = Unset;
     }
     ///State transition - sets the `writes` field to Set
     pub struct SetWrites<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWrites<S> {}
     impl<S: State> State for SetWrites<S> {
-        type Repo = S::Repo;
         type Writes = Set<members::writes>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Writes = S::Writes;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `writes` field
         pub struct writes(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ApplyWritesBuilder<'a, S: apply_writes_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<AtIdentifier<'a>>,
         Option<Cid<'a>>,
         Option<bool>,
         Option<Vec<ApplyWritesWritesItem<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ApplyWrites<'a> {
@@ -1301,9 +1300,9 @@ impl<'a> ApplyWritesBuilder<'a, apply_writes_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ApplyWritesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1318,11 +1317,11 @@ where
         mut self,
         value: impl Into<AtIdentifier<'a>>,
     ) -> ApplyWritesBuilder<'a, apply_writes_state::SetRepo<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ApplyWritesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1330,12 +1329,12 @@ where
 impl<'a, S: apply_writes_state::State> ApplyWritesBuilder<'a, S> {
     /// Set the `swapCommit` field (optional)
     pub fn swap_commit(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `swapCommit` field to an Option value (optional)
     pub fn maybe_swap_commit(mut self, value: Option<Cid<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1343,12 +1342,12 @@ impl<'a, S: apply_writes_state::State> ApplyWritesBuilder<'a, S> {
 impl<'a, S: apply_writes_state::State> ApplyWritesBuilder<'a, S> {
     /// Set the `validate` field (optional)
     pub fn validate(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `validate` field to an Option value (optional)
     pub fn maybe_validate(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1363,11 +1362,11 @@ where
         mut self,
         value: impl Into<Vec<ApplyWritesWritesItem<'a>>>,
     ) -> ApplyWritesBuilder<'a, apply_writes_state::SetWrites<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ApplyWritesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1375,16 +1374,16 @@ where
 impl<'a, S> ApplyWritesBuilder<'a, S>
 where
     S: apply_writes_state::State,
-    S::Repo: apply_writes_state::IsSet,
     S::Writes: apply_writes_state::IsSet,
+    S::Repo: apply_writes_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ApplyWrites<'a> {
         ApplyWrites {
-            repo: self.__unsafe_private_named.0.unwrap(),
-            swap_commit: self.__unsafe_private_named.1,
-            validate: self.__unsafe_private_named.2,
-            writes: self.__unsafe_private_named.3.unwrap(),
+            repo: self._fields.0.unwrap(),
+            swap_commit: self._fields.1,
+            validate: self._fields.2,
+            writes: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1394,10 +1393,10 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> ApplyWrites<'a> {
         ApplyWrites {
-            repo: self.__unsafe_private_named.0.unwrap(),
-            swap_commit: self.__unsafe_private_named.1,
-            validate: self.__unsafe_private_named.2,
-            writes: self.__unsafe_private_named.3.unwrap(),
+            repo: self._fields.0.unwrap(),
+            swap_commit: self._fields.1,
+            validate: self._fields.2,
+            writes: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1463,13 +1462,9 @@ pub mod update_state {
 
 /// Builder for constructing an instance of this type
 pub struct UpdateBuilder<'a, S: update_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Nsid<'a>>,
-        Option<RecordKey<Rkey<'a>>>,
-        Option<Data<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Nsid<'a>>, Option<RecordKey<Rkey<'a>>>, Option<Data<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Update<'a> {
@@ -1483,9 +1478,9 @@ impl<'a> UpdateBuilder<'a, update_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1500,11 +1495,11 @@ where
         mut self,
         value: impl Into<Nsid<'a>>,
     ) -> UpdateBuilder<'a, update_state::SetCollection<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         UpdateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1519,11 +1514,11 @@ where
         mut self,
         value: impl Into<RecordKey<Rkey<'a>>>,
     ) -> UpdateBuilder<'a, update_state::SetRkey<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         UpdateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1538,11 +1533,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> UpdateBuilder<'a, update_state::SetValue<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         UpdateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1557,9 +1552,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Update<'a> {
         Update {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            rkey: self.__unsafe_private_named.1.unwrap(),
-            value: self.__unsafe_private_named.2.unwrap(),
+            collection: self._fields.0.unwrap(),
+            rkey: self._fields.1.unwrap(),
+            value: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1569,9 +1564,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Update<'a> {
         Update {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            rkey: self.__unsafe_private_named.1.unwrap(),
-            value: self.__unsafe_private_named.2.unwrap(),
+            collection: self._fields.0.unwrap(),
+            rkey: self._fields.1.unwrap(),
+            value: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1587,49 +1582,49 @@ pub mod update_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Uri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct UpdateResultBuilder<'a, S: update_result_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Cid<'a>>,
         Option<AtUri<'a>>,
         Option<UpdateResultValidationStatus<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> UpdateResult<'a> {
@@ -1643,9 +1638,9 @@ impl<'a> UpdateResultBuilder<'a, update_result_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UpdateResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1660,11 +1655,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> UpdateResultBuilder<'a, update_result_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         UpdateResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1679,11 +1674,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> UpdateResultBuilder<'a, update_result_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         UpdateResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1694,7 +1689,7 @@ impl<'a, S: update_result_state::State> UpdateResultBuilder<'a, S> {
         mut self,
         value: impl Into<Option<UpdateResultValidationStatus<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `validationStatus` field to an Option value (optional)
@@ -1702,7 +1697,7 @@ impl<'a, S: update_result_state::State> UpdateResultBuilder<'a, S> {
         mut self,
         value: Option<UpdateResultValidationStatus<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1710,15 +1705,15 @@ impl<'a, S: update_result_state::State> UpdateResultBuilder<'a, S> {
 impl<'a, S> UpdateResultBuilder<'a, S>
 where
     S: update_result_state::State,
-    S::Cid: update_result_state::IsSet,
     S::Uri: update_result_state::IsSet,
+    S::Cid: update_result_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> UpdateResult<'a> {
         UpdateResult {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
-            validation_status: self.__unsafe_private_named.2,
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
+            validation_status: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -1728,9 +1723,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> UpdateResult<'a> {
         UpdateResult {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
-            validation_status: self.__unsafe_private_named.2,
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
+            validation_status: self._fields.2,
             extra_data: Some(extra_data),
         }
     }

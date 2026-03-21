@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -77,9 +80,9 @@ pub mod bluesky_embed_state {
 
 /// Builder for constructing an instance of this type
 pub struct BlueskyEmbedBuilder<'a, S: bluesky_embed_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<StrongRef<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<StrongRef<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> BlueskyEmbed<'a> {
@@ -93,9 +96,9 @@ impl<'a> BlueskyEmbedBuilder<'a, bluesky_embed_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BlueskyEmbedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -110,11 +113,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> BlueskyEmbedBuilder<'a, bluesky_embed_state::SetPostRef<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BlueskyEmbedBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -127,7 +130,7 @@ where
     /// Build the final struct
     pub fn build(self) -> BlueskyEmbed<'a> {
         BlueskyEmbed {
-            post_ref: self.__unsafe_private_named.0.unwrap(),
+            post_ref: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -140,7 +143,7 @@ where
         >,
     ) -> BlueskyEmbed<'a> {
         BlueskyEmbed {
-            post_ref: self.__unsafe_private_named.0.unwrap(),
+            post_ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

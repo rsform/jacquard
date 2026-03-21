@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -180,8 +183,8 @@ pub mod rights_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RightsName;
         type RightsDescription;
+        type RightsName;
         type RightsType;
         type CreatedAt;
     }
@@ -189,26 +192,26 @@ pub mod rights_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RightsName = Unset;
         type RightsDescription = Unset;
+        type RightsName = Unset;
         type RightsType = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `rights_name` field to Set
-    pub struct SetRightsName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRightsName<S> {}
-    impl<S: State> State for SetRightsName<S> {
-        type RightsName = Set<members::rights_name>;
-        type RightsDescription = S::RightsDescription;
-        type RightsType = S::RightsType;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `rights_description` field to Set
     pub struct SetRightsDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRightsDescription<S> {}
     impl<S: State> State for SetRightsDescription<S> {
-        type RightsName = S::RightsName;
         type RightsDescription = Set<members::rights_description>;
+        type RightsName = S::RightsName;
+        type RightsType = S::RightsType;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `rights_name` field to Set
+    pub struct SetRightsName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRightsName<S> {}
+    impl<S: State> State for SetRightsName<S> {
+        type RightsDescription = S::RightsDescription;
+        type RightsName = Set<members::rights_name>;
         type RightsType = S::RightsType;
         type CreatedAt = S::CreatedAt;
     }
@@ -216,8 +219,8 @@ pub mod rights_state {
     pub struct SetRightsType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRightsType<S> {}
     impl<S: State> State for SetRightsType<S> {
-        type RightsName = S::RightsName;
         type RightsDescription = S::RightsDescription;
+        type RightsName = S::RightsName;
         type RightsType = Set<members::rights_type>;
         type CreatedAt = S::CreatedAt;
     }
@@ -225,18 +228,18 @@ pub mod rights_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type RightsName = S::RightsName;
         type RightsDescription = S::RightsDescription;
+        type RightsName = S::RightsName;
         type RightsType = S::RightsType;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rights_name` field
-        pub struct rights_name(());
         ///Marker type for the `rights_description` field
         pub struct rights_description(());
+        ///Marker type for the `rights_name` field
+        pub struct rights_name(());
         ///Marker type for the `rights_type` field
         pub struct rights_type(());
         ///Marker type for the `created_at` field
@@ -246,15 +249,15 @@ pub mod rights_state {
 
 /// Builder for constructing an instance of this type
 pub struct RightsBuilder<'a, S: rights_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<RightsAttachment<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Rights<'a> {
@@ -268,9 +271,9 @@ impl<'a> RightsBuilder<'a, rights_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RightsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -278,12 +281,12 @@ impl<'a> RightsBuilder<'a, rights_state::Empty> {
 impl<'a, S: rights_state::State> RightsBuilder<'a, S> {
     /// Set the `attachment` field (optional)
     pub fn attachment(mut self, value: impl Into<Option<RightsAttachment<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `attachment` field to an Option value (optional)
     pub fn maybe_attachment(mut self, value: Option<RightsAttachment<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -298,11 +301,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> RightsBuilder<'a, rights_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RightsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -317,11 +320,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RightsBuilder<'a, rights_state::SetRightsDescription<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RightsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -336,11 +339,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RightsBuilder<'a, rights_state::SetRightsName<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         RightsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -355,11 +358,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RightsBuilder<'a, rights_state::SetRightsType<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         RightsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -367,19 +370,19 @@ where
 impl<'a, S> RightsBuilder<'a, S>
 where
     S: rights_state::State,
-    S::RightsName: rights_state::IsSet,
     S::RightsDescription: rights_state::IsSet,
+    S::RightsName: rights_state::IsSet,
     S::RightsType: rights_state::IsSet,
     S::CreatedAt: rights_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Rights<'a> {
         Rights {
-            attachment: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            rights_description: self.__unsafe_private_named.2.unwrap(),
-            rights_name: self.__unsafe_private_named.3.unwrap(),
-            rights_type: self.__unsafe_private_named.4.unwrap(),
+            attachment: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            rights_description: self._fields.2.unwrap(),
+            rights_name: self._fields.3.unwrap(),
+            rights_type: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -392,11 +395,11 @@ where
         >,
     ) -> Rights<'a> {
         Rights {
-            attachment: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            rights_description: self.__unsafe_private_named.2.unwrap(),
-            rights_name: self.__unsafe_private_named.3.unwrap(),
-            rights_type: self.__unsafe_private_named.4.unwrap(),
+            attachment: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            rights_description: self._fields.2.unwrap(),
+            rights_name: self._fields.3.unwrap(),
+            rights_type: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

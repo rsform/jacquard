@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -119,81 +122,81 @@ pub mod reply_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Content;
-        type Root;
         type Parent;
+        type Root;
+        type Content;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Content = Unset;
-        type Root = Unset;
         type Parent = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Content = S::Content;
-        type Root = S::Root;
-        type Parent = S::Parent;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type CreatedAt = S::CreatedAt;
-        type Content = Set<members::content>;
-        type Root = S::Root;
-        type Parent = S::Parent;
-    }
-    ///State transition - sets the `root` field to Set
-    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoot<S> {}
-    impl<S: State> State for SetRoot<S> {
-        type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
-        type Root = Set<members::root>;
-        type Parent = S::Parent;
+        type Root = Unset;
+        type Content = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `parent` field to Set
     pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetParent<S> {}
     impl<S: State> State for SetParent<S> {
-        type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
-        type Root = S::Root;
         type Parent = Set<members::parent>;
+        type Root = S::Root;
+        type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRoot<S> {}
+    impl<S: State> State for SetRoot<S> {
+        type Parent = S::Parent;
+        type Root = Set<members::root>;
+        type Content = S::Content;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Parent = S::Parent;
+        type Root = S::Root;
+        type Content = Set<members::content>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Parent = S::Parent;
+        type Root = S::Root;
+        type Content = S::Content;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `content` field
-        pub struct content(());
-        ///Marker type for the `root` field
-        pub struct root(());
         ///Marker type for the `parent` field
         pub struct parent(());
+        ///Marker type for the `root` field
+        pub struct root(());
+        ///Marker type for the `content` field
+        pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ReplyBuilder<'a, S: reply_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Document<'a>>,
         Option<Datetime>,
         Option<StrongRef<'a>>,
         Option<StrongRef<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Reply<'a> {
@@ -207,9 +210,9 @@ impl<'a> ReplyBuilder<'a, reply_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ReplyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -224,11 +227,11 @@ where
         mut self,
         value: impl Into<Document<'a>>,
     ) -> ReplyBuilder<'a, reply_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ReplyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -243,11 +246,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ReplyBuilder<'a, reply_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ReplyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -262,11 +265,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> ReplyBuilder<'a, reply_state::SetParent<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ReplyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -281,11 +284,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> ReplyBuilder<'a, reply_state::SetRoot<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ReplyBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -293,12 +296,12 @@ where
 impl<'a, S: reply_state::State> ReplyBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -306,19 +309,19 @@ impl<'a, S: reply_state::State> ReplyBuilder<'a, S> {
 impl<'a, S> ReplyBuilder<'a, S>
 where
     S: reply_state::State,
-    S::CreatedAt: reply_state::IsSet,
-    S::Content: reply_state::IsSet,
-    S::Root: reply_state::IsSet,
     S::Parent: reply_state::IsSet,
+    S::Root: reply_state::IsSet,
+    S::Content: reply_state::IsSet,
+    S::CreatedAt: reply_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Reply<'a> {
         Reply {
-            content: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            parent: self.__unsafe_private_named.2.unwrap(),
-            root: self.__unsafe_private_named.3.unwrap(),
-            updated_at: self.__unsafe_private_named.4,
+            content: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            parent: self._fields.2.unwrap(),
+            root: self._fields.3.unwrap(),
+            updated_at: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -331,11 +334,11 @@ where
         >,
     ) -> Reply<'a> {
         Reply {
-            content: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            parent: self.__unsafe_private_named.2.unwrap(),
-            root: self.__unsafe_private_named.3.unwrap(),
-            updated_at: self.__unsafe_private_named.4,
+            content: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            parent: self._fields.2.unwrap(),
+            root: self._fields.3.unwrap(),
+            updated_at: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -7064,15 +7067,15 @@ pub mod custom_stat_state {
 
 /// Builder for constructing an instance of this type
 pub struct CustomStatBuilder<'a, S: custom_stat_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<i64>,
         Option<i64>,
         Option<CowStr<'a>>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CustomStat<'a> {
@@ -7086,9 +7089,9 @@ impl<'a> CustomStatBuilder<'a, custom_stat_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CustomStatBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7096,12 +7099,12 @@ impl<'a> CustomStatBuilder<'a, custom_stat_state::Empty> {
 impl<'a, S: custom_stat_state::State> CustomStatBuilder<'a, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
     pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -7109,12 +7112,12 @@ impl<'a, S: custom_stat_state::State> CustomStatBuilder<'a, S> {
 impl<'a, S: custom_stat_state::State> CustomStatBuilder<'a, S> {
     /// Set the `max` field (optional)
     pub fn max(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `max` field to an Option value (optional)
     pub fn maybe_max(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -7122,12 +7125,12 @@ impl<'a, S: custom_stat_state::State> CustomStatBuilder<'a, S> {
 impl<'a, S: custom_stat_state::State> CustomStatBuilder<'a, S> {
     /// Set the `min` field (optional)
     pub fn min(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `min` field to an Option value (optional)
     pub fn maybe_min(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -7142,11 +7145,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CustomStatBuilder<'a, custom_stat_state::SetName<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         CustomStatBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7161,11 +7164,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CustomStatBuilder<'a, custom_stat_state::SetValue<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         CustomStatBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7179,11 +7182,11 @@ where
     /// Build the final struct
     pub fn build(self) -> CustomStat<'a> {
         CustomStat {
-            category: self.__unsafe_private_named.0,
-            max: self.__unsafe_private_named.1,
-            min: self.__unsafe_private_named.2,
-            name: self.__unsafe_private_named.3.unwrap(),
-            value: self.__unsafe_private_named.4.unwrap(),
+            category: self._fields.0,
+            max: self._fields.1,
+            min: self._fields.2,
+            name: self._fields.3.unwrap(),
+            value: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -7196,11 +7199,11 @@ where
         >,
     ) -> CustomStat<'a> {
         CustomStat {
-            category: self.__unsafe_private_named.0,
-            max: self.__unsafe_private_named.1,
-            min: self.__unsafe_private_named.2,
-            name: self.__unsafe_private_named.3.unwrap(),
-            value: self.__unsafe_private_named.4.unwrap(),
+            category: self._fields.0,
+            max: self._fields.1,
+            min: self._fields.2,
+            name: self._fields.3.unwrap(),
+            value: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -7216,50 +7219,45 @@ pub mod dcc_cleric_spell_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Level;
         type Name;
+        type Level;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Level = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type Level = Set<members::level>;
-        type Name = S::Name;
+        type Level = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type Level = S::Level;
         type Name = Set<members::name>;
+        type Level = S::Level;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLevel<S> {}
+    impl<S: State> State for SetLevel<S> {
+        type Name = S::Name;
+        type Level = Set<members::level>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `level` field
-        pub struct level(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `level` field
+        pub struct level(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DccClericSpellBuilder<'a, S: dcc_cleric_spell_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<i64>,
-        Option<CowStr<'a>>,
-        Option<CowStr<'a>>,
-        Option<bool>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<CowStr<'a>>, Option<CowStr<'a>>, Option<bool>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DccClericSpell<'a> {
@@ -7273,9 +7271,9 @@ impl<'a> DccClericSpellBuilder<'a, dcc_cleric_spell_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DccClericSpellBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7290,11 +7288,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> DccClericSpellBuilder<'a, dcc_cleric_spell_state::SetLevel<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DccClericSpellBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7309,11 +7307,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DccClericSpellBuilder<'a, dcc_cleric_spell_state::SetName<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DccClericSpellBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7321,12 +7319,12 @@ where
 impl<'a, S: dcc_cleric_spell_state::State> DccClericSpellBuilder<'a, S> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
     pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -7334,12 +7332,12 @@ impl<'a, S: dcc_cleric_spell_state::State> DccClericSpellBuilder<'a, S> {
 impl<'a, S: dcc_cleric_spell_state::State> DccClericSpellBuilder<'a, S> {
     /// Set the `sinful` field (optional)
     pub fn sinful(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `sinful` field to an Option value (optional)
     pub fn maybe_sinful(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -7347,16 +7345,16 @@ impl<'a, S: dcc_cleric_spell_state::State> DccClericSpellBuilder<'a, S> {
 impl<'a, S> DccClericSpellBuilder<'a, S>
 where
     S: dcc_cleric_spell_state::State,
-    S::Level: dcc_cleric_spell_state::IsSet,
     S::Name: dcc_cleric_spell_state::IsSet,
+    S::Level: dcc_cleric_spell_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DccClericSpell<'a> {
         DccClericSpell {
-            level: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1.unwrap(),
-            notes: self.__unsafe_private_named.2,
-            sinful: self.__unsafe_private_named.3,
+            level: self._fields.0.unwrap(),
+            name: self._fields.1.unwrap(),
+            notes: self._fields.2,
+            sinful: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -7369,10 +7367,10 @@ where
         >,
     ) -> DccClericSpell<'a> {
         DccClericSpell {
-            level: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1.unwrap(),
-            notes: self.__unsafe_private_named.2,
-            sinful: self.__unsafe_private_named.3,
+            level: self._fields.0.unwrap(),
+            name: self._fields.1.unwrap(),
+            notes: self._fields.2,
+            sinful: self._fields.3,
             extra_data: Some(extra_data),
         }
     }
@@ -7424,8 +7422,8 @@ pub mod dcc_wizard_spell_state {
 
 /// Builder for constructing an instance of this type
 pub struct DccWizardSpellBuilder<'a, S: dcc_wizard_spell_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<i64>,
         Option<bool>,
         Option<CowStr<'a>>,
@@ -7433,7 +7431,7 @@ pub struct DccWizardSpellBuilder<'a, S: dcc_wizard_spell_state::State> {
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DccWizardSpell<'a> {
@@ -7447,9 +7445,9 @@ impl<'a> DccWizardSpellBuilder<'a, dcc_wizard_spell_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DccWizardSpellBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7464,11 +7462,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> DccWizardSpellBuilder<'a, dcc_wizard_spell_state::SetLevel<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DccWizardSpellBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7476,12 +7474,12 @@ where
 impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
     /// Set the `lost` field (optional)
     pub fn lost(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `lost` field to an Option value (optional)
     pub fn maybe_lost(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -7489,12 +7487,12 @@ impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
 impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
     /// Set the `mercurialMagic` field (optional)
     pub fn mercurial_magic(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `mercurialMagic` field to an Option value (optional)
     pub fn maybe_mercurial_magic(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -7502,12 +7500,12 @@ impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
 impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
     /// Set the `mercurialRoll` field (optional)
     pub fn mercurial_roll(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `mercurialRoll` field to an Option value (optional)
     pub fn maybe_mercurial_roll(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -7522,11 +7520,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DccWizardSpellBuilder<'a, dcc_wizard_spell_state::SetName<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         DccWizardSpellBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7534,12 +7532,12 @@ where
 impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `notes` field to an Option value (optional)
     pub fn maybe_notes(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -7553,12 +7551,12 @@ where
     /// Build the final struct
     pub fn build(self) -> DccWizardSpell<'a> {
         DccWizardSpell {
-            level: self.__unsafe_private_named.0.unwrap(),
-            lost: self.__unsafe_private_named.1,
-            mercurial_magic: self.__unsafe_private_named.2,
-            mercurial_roll: self.__unsafe_private_named.3,
-            name: self.__unsafe_private_named.4.unwrap(),
-            notes: self.__unsafe_private_named.5,
+            level: self._fields.0.unwrap(),
+            lost: self._fields.1,
+            mercurial_magic: self._fields.2,
+            mercurial_roll: self._fields.3,
+            name: self._fields.4.unwrap(),
+            notes: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -7571,12 +7569,12 @@ where
         >,
     ) -> DccWizardSpell<'a> {
         DccWizardSpell {
-            level: self.__unsafe_private_named.0.unwrap(),
-            lost: self.__unsafe_private_named.1,
-            mercurial_magic: self.__unsafe_private_named.2,
-            mercurial_roll: self.__unsafe_private_named.3,
-            name: self.__unsafe_private_named.4.unwrap(),
-            notes: self.__unsafe_private_named.5,
+            level: self._fields.0.unwrap(),
+            lost: self._fields.1,
+            mercurial_magic: self._fields.2,
+            mercurial_roll: self._fields.3,
+            name: self._fields.4.unwrap(),
+            notes: self._fields.5,
             extra_data: Some(extra_data),
         }
     }
@@ -7616,8 +7614,8 @@ pub mod stats_state {
 
 /// Builder for constructing an instance of this type
 pub struct StatsBuilder<'a, S: stats_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<stats::CustomStats<'a>>,
         Option<stats::DccStats<'a>>,
@@ -7626,7 +7624,7 @@ pub struct StatsBuilder<'a, S: stats_state::State> {
         Option<stats::RmmzStats<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Stats<'a> {
@@ -7640,9 +7638,9 @@ impl<'a> StatsBuilder<'a, stats_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StatsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7657,11 +7655,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> StatsBuilder<'a, stats_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7669,12 +7667,12 @@ where
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `custom` field (optional)
     pub fn custom(mut self, value: impl Into<Option<stats::CustomStats<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `custom` field to an Option value (optional)
     pub fn maybe_custom(mut self, value: Option<stats::CustomStats<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -7682,12 +7680,12 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `dcc` field (optional)
     pub fn dcc(mut self, value: impl Into<Option<stats::DccStats<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `dcc` field to an Option value (optional)
     pub fn maybe_dcc(mut self, value: Option<stats::DccStats<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -7695,12 +7693,12 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `dnd` field (optional)
     pub fn dnd(mut self, value: impl Into<Option<stats::DndStats<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `dnd` field to an Option value (optional)
     pub fn maybe_dnd(mut self, value: Option<stats::DndStats<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -7708,12 +7706,12 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `reverie` field (optional)
     pub fn reverie(mut self, value: impl Into<Option<stats::ReverieStats<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `reverie` field to an Option value (optional)
     pub fn maybe_reverie(mut self, value: Option<stats::ReverieStats<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -7721,12 +7719,12 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `rmmz` field (optional)
     pub fn rmmz(mut self, value: impl Into<Option<stats::RmmzStats<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `rmmz` field to an Option value (optional)
     pub fn maybe_rmmz(mut self, value: Option<stats::RmmzStats<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -7734,12 +7732,12 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
 impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -7752,13 +7750,13 @@ where
     /// Build the final struct
     pub fn build(self) -> Stats<'a> {
         Stats {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            custom: self.__unsafe_private_named.1,
-            dcc: self.__unsafe_private_named.2,
-            dnd: self.__unsafe_private_named.3,
-            reverie: self.__unsafe_private_named.4,
-            rmmz: self.__unsafe_private_named.5,
-            updated_at: self.__unsafe_private_named.6,
+            created_at: self._fields.0.unwrap(),
+            custom: self._fields.1,
+            dcc: self._fields.2,
+            dnd: self._fields.3,
+            reverie: self._fields.4,
+            rmmz: self._fields.5,
+            updated_at: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -7771,13 +7769,13 @@ where
         >,
     ) -> Stats<'a> {
         Stats {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            custom: self.__unsafe_private_named.1,
-            dcc: self.__unsafe_private_named.2,
-            dnd: self.__unsafe_private_named.3,
-            reverie: self.__unsafe_private_named.4,
-            rmmz: self.__unsafe_private_named.5,
-            updated_at: self.__unsafe_private_named.6,
+            created_at: self._fields.0.unwrap(),
+            custom: self._fields.1,
+            dcc: self._fields.2,
+            dnd: self._fields.3,
+            reverie: self._fields.4,
+            rmmz: self._fields.5,
+            updated_at: self._fields.6,
             extra_data: Some(extra_data),
         }
     }
@@ -7829,9 +7827,9 @@ pub mod spellslot_state {
 
 /// Builder for constructing an instance of this type
 pub struct SpellslotBuilder<'a, S: spellslot_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Spellslot<'a> {
@@ -7845,9 +7843,9 @@ impl<'a> SpellslotBuilder<'a, spellslot_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SpellslotBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7862,11 +7860,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SpellslotBuilder<'a, spellslot_state::SetLevel<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SpellslotBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7881,11 +7879,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> SpellslotBuilder<'a, spellslot_state::SetTotal<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SpellslotBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -7893,12 +7891,12 @@ where
 impl<'a, S: spellslot_state::State> SpellslotBuilder<'a, S> {
     /// Set the `used` field (optional)
     pub fn used(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `used` field to an Option value (optional)
     pub fn maybe_used(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -7912,9 +7910,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Spellslot<'a> {
         Spellslot {
-            level: self.__unsafe_private_named.0.unwrap(),
-            total: self.__unsafe_private_named.1.unwrap(),
-            used: self.__unsafe_private_named.2,
+            level: self._fields.0.unwrap(),
+            total: self._fields.1.unwrap(),
+            used: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -7927,9 +7925,9 @@ where
         >,
     ) -> Spellslot<'a> {
         Spellslot {
-            level: self.__unsafe_private_named.0.unwrap(),
-            total: self.__unsafe_private_named.1.unwrap(),
-            used: self.__unsafe_private_named.2,
+            level: self._fields.0.unwrap(),
+            total: self._fields.1.unwrap(),
+            used: self._fields.2,
             extra_data: Some(extra_data),
         }
     }

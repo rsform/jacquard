@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -439,58 +442,58 @@ pub mod tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Name;
         type CreatedAt;
         type Key;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Name = Unset;
         type CreatedAt = Unset;
         type Key = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Key = S::Key;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type CreatedAt = S::CreatedAt;
-        type Key = Set<members::key>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
         type CreatedAt = S::CreatedAt;
         type Key = S::Key;
-        type Name = Set<members::name>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type CreatedAt = Set<members::created_at>;
+        type Key = S::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKey<S> {}
+    impl<S: State> State for SetKey<S> {
+        type Name = S::Name;
+        type CreatedAt = S::CreatedAt;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `key` field
         pub struct key(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TagBuilder<'a, S: tag_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<CowStr<'a>>>,
         Option<TagCategory<'a>>,
         Option<Datetime>,
@@ -503,7 +506,7 @@ pub struct TagBuilder<'a, S: tag_state::State> {
         Option<TagStatus<'a>>,
         Option<StrongRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Tag<'a> {
@@ -517,21 +520,9 @@ impl<'a> TagBuilder<'a, tag_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TagBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -539,12 +530,12 @@ impl<'a> TagBuilder<'a, tag_state::Empty> {
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `aliases` field (optional)
     pub fn aliases(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `aliases` field to an Option value (optional)
     pub fn maybe_aliases(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -552,12 +543,12 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<TagCategory<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
     pub fn maybe_category(mut self, value: Option<TagCategory<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -572,11 +563,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> TagBuilder<'a, tag_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         TagBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -584,12 +575,12 @@ where
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -604,11 +595,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TagBuilder<'a, tag_state::SetKey<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         TagBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -623,11 +614,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TagBuilder<'a, tag_state::SetName<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         TagBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -635,12 +626,12 @@ where
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `parent` field to an Option value (optional)
     pub fn maybe_parent(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -651,7 +642,7 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
         mut self,
         value: impl Into<Option<TagReferenceDocument<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `referenceDocument` field to an Option value (optional)
@@ -659,7 +650,7 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
         mut self,
         value: Option<TagReferenceDocument<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -667,12 +658,12 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<Vec<UriValue<'a>>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `sameAs` field to an Option value (optional)
     pub fn maybe_same_as(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -680,12 +671,12 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<TagStatus<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<TagStatus<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -693,12 +684,12 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
 impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     /// Set the `supersededBy` field (optional)
     pub fn superseded_by(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `supersededBy` field to an Option value (optional)
     pub fn maybe_superseded_by(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -706,24 +697,24 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
 impl<'a, S> TagBuilder<'a, S>
 where
     S: tag_state::State,
+    S::Name: tag_state::IsSet,
     S::CreatedAt: tag_state::IsSet,
     S::Key: tag_state::IsSet,
-    S::Name: tag_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Tag<'a> {
         Tag {
-            aliases: self.__unsafe_private_named.0,
-            category: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3,
-            key: self.__unsafe_private_named.4.unwrap(),
-            name: self.__unsafe_private_named.5.unwrap(),
-            parent: self.__unsafe_private_named.6,
-            reference_document: self.__unsafe_private_named.7,
-            same_as: self.__unsafe_private_named.8,
-            status: self.__unsafe_private_named.9,
-            superseded_by: self.__unsafe_private_named.10,
+            aliases: self._fields.0,
+            category: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3,
+            key: self._fields.4.unwrap(),
+            name: self._fields.5.unwrap(),
+            parent: self._fields.6,
+            reference_document: self._fields.7,
+            same_as: self._fields.8,
+            status: self._fields.9,
+            superseded_by: self._fields.10,
             extra_data: Default::default(),
         }
     }
@@ -736,17 +727,17 @@ where
         >,
     ) -> Tag<'a> {
         Tag {
-            aliases: self.__unsafe_private_named.0,
-            category: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3,
-            key: self.__unsafe_private_named.4.unwrap(),
-            name: self.__unsafe_private_named.5.unwrap(),
-            parent: self.__unsafe_private_named.6,
-            reference_document: self.__unsafe_private_named.7,
-            same_as: self.__unsafe_private_named.8,
-            status: self.__unsafe_private_named.9,
-            superseded_by: self.__unsafe_private_named.10,
+            aliases: self._fields.0,
+            category: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3,
+            key: self._fields.4.unwrap(),
+            name: self._fields.5.unwrap(),
+            parent: self._fields.6,
+            reference_document: self._fields.7,
+            same_as: self._fields.8,
+            status: self._fields.9,
+            superseded_by: self._fields.10,
             extra_data: Some(extra_data),
         }
     }

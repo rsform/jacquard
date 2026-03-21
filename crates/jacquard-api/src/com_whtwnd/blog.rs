@@ -11,7 +11,11 @@ pub mod get_entry_metadata_by_name;
 pub mod get_mentions_by_entry;
 pub mod notify_of_new_entry;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -216,9 +220,9 @@ pub mod blob_metadata_state {
 
 /// Builder for constructing an instance of this type
 pub struct BlobMetadataBuilder<'a, S: blob_metadata_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<BlobRef<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<BlobRef<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> BlobMetadata<'a> {
@@ -232,9 +236,9 @@ impl<'a> BlobMetadataBuilder<'a, blob_metadata_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BlobMetadataBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -249,11 +253,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> BlobMetadataBuilder<'a, blob_metadata_state::SetBlobref<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BlobMetadataBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -261,12 +265,12 @@ where
 impl<'a, S: blob_metadata_state::State> BlobMetadataBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -279,8 +283,8 @@ where
     /// Build the final struct
     pub fn build(self) -> BlobMetadata<'a> {
         BlobMetadata {
-            blobref: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1,
+            blobref: self._fields.0.unwrap(),
+            name: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -293,8 +297,8 @@ where
         >,
     ) -> BlobMetadata<'a> {
         BlobMetadata {
-            blobref: self.__unsafe_private_named.0.unwrap(),
-            name: self.__unsafe_private_named.1,
+            blobref: self._fields.0.unwrap(),
+            name: self._fields.1,
             extra_data: Some(extra_data),
         }
     }
@@ -434,45 +438,45 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type EntryUri;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type EntryUri = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type EntryUri = S::EntryUri;
+        type Content = Unset;
     }
     ///State transition - sets the `entry_uri` field to Set
     pub struct SetEntryUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEntryUri<S> {}
     impl<S: State> State for SetEntryUri<S> {
-        type Content = S::Content;
         type EntryUri = Set<members::entry_uri>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type EntryUri = S::EntryUri;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `entry_uri` field
         pub struct entry_uri(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CommentBuilder<'a, S: comment_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Comment<'a> {
@@ -486,9 +490,9 @@ impl<'a> CommentBuilder<'a, comment_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -503,11 +507,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CommentBuilder<'a, comment_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -522,11 +526,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> CommentBuilder<'a, comment_state::SetEntryUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CommentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -534,14 +538,14 @@ where
 impl<'a, S> CommentBuilder<'a, S>
 where
     S: comment_state::State,
-    S::Content: comment_state::IsSet,
     S::EntryUri: comment_state::IsSet,
+    S::Content: comment_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Comment<'a> {
         Comment {
-            content: self.__unsafe_private_named.0.unwrap(),
-            entry_uri: self.__unsafe_private_named.1.unwrap(),
+            content: self._fields.0.unwrap(),
+            entry_uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -554,8 +558,8 @@ where
         >,
     ) -> Comment<'a> {
         Comment {
-            content: self.__unsafe_private_named.0.unwrap(),
-            entry_uri: self.__unsafe_private_named.1.unwrap(),
+            content: self._fields.0.unwrap(),
+            entry_uri: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -595,9 +599,9 @@ pub mod ogp_state {
 
 /// Builder for constructing an instance of this type
 pub struct OgpBuilder<'a, S: ogp_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<UriValue<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<UriValue<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Ogp<'a> {
@@ -611,9 +615,9 @@ impl<'a> OgpBuilder<'a, ogp_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         OgpBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -621,12 +625,12 @@ impl<'a> OgpBuilder<'a, ogp_state::Empty> {
 impl<'a, S: ogp_state::State> OgpBuilder<'a, S> {
     /// Set the `height` field (optional)
     pub fn height(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `height` field to an Option value (optional)
     pub fn maybe_height(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -641,11 +645,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> OgpBuilder<'a, ogp_state::SetUrl<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         OgpBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -653,12 +657,12 @@ where
 impl<'a, S: ogp_state::State> OgpBuilder<'a, S> {
     /// Set the `width` field (optional)
     pub fn width(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `width` field to an Option value (optional)
     pub fn maybe_width(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -671,9 +675,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Ogp<'a> {
         Ogp {
-            height: self.__unsafe_private_named.0,
-            url: self.__unsafe_private_named.1.unwrap(),
-            width: self.__unsafe_private_named.2,
+            height: self._fields.0,
+            url: self._fields.1.unwrap(),
+            width: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -686,9 +690,9 @@ where
         >,
     ) -> Ogp<'a> {
         Ogp {
-            height: self.__unsafe_private_named.0,
-            url: self.__unsafe_private_named.1.unwrap(),
-            width: self.__unsafe_private_named.2,
+            height: self._fields.0,
+            url: self._fields.1.unwrap(),
+            width: self._fields.2,
             extra_data: Some(extra_data),
         }
     }

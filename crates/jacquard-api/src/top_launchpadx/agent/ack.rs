@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -118,50 +121,50 @@ pub mod ack_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type WorkType;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type WorkType = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type WorkType = S::WorkType;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `work_type` field to Set
     pub struct SetWorkType<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWorkType<S> {}
     impl<S: State> State for SetWorkType<S> {
-        type CreatedAt = S::CreatedAt;
         type WorkType = Set<members::work_type>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type WorkType = S::WorkType;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `work_type` field
         pub struct work_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AckBuilder<'a, S: ack_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Ack<'a> {
@@ -175,9 +178,9 @@ impl<'a> AckBuilder<'a, ack_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AckBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -192,11 +195,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> AckBuilder<'a, ack_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AckBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -204,12 +207,12 @@ where
 impl<'a, S: ack_state::State> AckBuilder<'a, S> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `note` field to an Option value (optional)
     pub fn maybe_note(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -217,12 +220,12 @@ impl<'a, S: ack_state::State> AckBuilder<'a, S> {
 impl<'a, S: ack_state::State> AckBuilder<'a, S> {
     /// Set the `subjectUri` field (optional)
     pub fn subject_uri(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `subjectUri` field to an Option value (optional)
     pub fn maybe_subject_uri(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -237,11 +240,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> AckBuilder<'a, ack_state::SetWorkType<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         AckBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -249,16 +252,16 @@ where
 impl<'a, S> AckBuilder<'a, S>
 where
     S: ack_state::State,
-    S::CreatedAt: ack_state::IsSet,
     S::WorkType: ack_state::IsSet,
+    S::CreatedAt: ack_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Ack<'a> {
         Ack {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            note: self.__unsafe_private_named.1,
-            subject_uri: self.__unsafe_private_named.2,
-            work_type: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            note: self._fields.1,
+            subject_uri: self._fields.2,
+            work_type: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -271,10 +274,10 @@ where
         >,
     ) -> Ack<'a> {
         Ack {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            note: self.__unsafe_private_named.1,
-            subject_uri: self.__unsafe_private_named.2,
-            work_type: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            note: self._fields.1,
+            subject_uri: self._fields.2,
+            work_type: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

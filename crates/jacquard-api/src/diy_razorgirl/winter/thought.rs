@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -304,8 +307,8 @@ pub mod thought_state {
 
 /// Builder for constructing an instance of this type
 pub struct ThoughtBuilder<'a, S: thought_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<i64>,
@@ -313,7 +316,7 @@ pub struct ThoughtBuilder<'a, S: thought_state::State> {
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Thought<'a> {
@@ -327,9 +330,9 @@ impl<'a> ThoughtBuilder<'a, thought_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ThoughtBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -344,11 +347,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ThoughtBuilder<'a, thought_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ThoughtBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -363,11 +366,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ThoughtBuilder<'a, thought_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ThoughtBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -375,12 +378,12 @@ where
 impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
     /// Set the `durationMs` field (optional)
     pub fn duration_ms(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `durationMs` field to an Option value (optional)
     pub fn maybe_duration_ms(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -395,11 +398,11 @@ where
         mut self,
         value: impl Into<ThoughtKind<'a>>,
     ) -> ThoughtBuilder<'a, thought_state::SetKind<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ThoughtBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -407,12 +410,12 @@ where
 impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -420,12 +423,12 @@ impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
 impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
     /// Set the `trigger` field (optional)
     pub fn trigger(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `trigger` field to an Option value (optional)
     pub fn maybe_trigger(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -440,12 +443,12 @@ where
     /// Build the final struct
     pub fn build(self) -> Thought<'a> {
         Thought {
-            content: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            duration_ms: self.__unsafe_private_named.2,
-            kind: self.__unsafe_private_named.3.unwrap(),
-            tags: self.__unsafe_private_named.4,
-            trigger: self.__unsafe_private_named.5,
+            content: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            duration_ms: self._fields.2,
+            kind: self._fields.3.unwrap(),
+            tags: self._fields.4,
+            trigger: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -458,12 +461,12 @@ where
         >,
     ) -> Thought<'a> {
         Thought {
-            content: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            duration_ms: self.__unsafe_private_named.2,
-            kind: self.__unsafe_private_named.3.unwrap(),
-            tags: self.__unsafe_private_named.4,
-            trigger: self.__unsafe_private_named.5,
+            content: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            duration_ms: self._fields.2,
+            kind: self._fields.3.unwrap(),
+            tags: self._fields.4,
+            trigger: self._fields.5,
             extra_data: Some(extra_data),
         }
     }

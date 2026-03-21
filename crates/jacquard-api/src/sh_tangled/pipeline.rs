@@ -8,7 +8,11 @@
 pub mod cancel_pipeline;
 pub mod status;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -407,59 +411,59 @@ pub mod clone_opts_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Skip;
         type Depth;
         type Submodules;
-        type Skip;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Skip = Unset;
         type Depth = Unset;
         type Submodules = Unset;
-        type Skip = Unset;
-    }
-    ///State transition - sets the `depth` field to Set
-    pub struct SetDepth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDepth<S> {}
-    impl<S: State> State for SetDepth<S> {
-        type Depth = Set<members::depth>;
-        type Submodules = S::Submodules;
-        type Skip = S::Skip;
-    }
-    ///State transition - sets the `submodules` field to Set
-    pub struct SetSubmodules<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubmodules<S> {}
-    impl<S: State> State for SetSubmodules<S> {
-        type Depth = S::Depth;
-        type Submodules = Set<members::submodules>;
-        type Skip = S::Skip;
     }
     ///State transition - sets the `skip` field to Set
     pub struct SetSkip<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSkip<S> {}
     impl<S: State> State for SetSkip<S> {
+        type Skip = Set<members::skip>;
         type Depth = S::Depth;
         type Submodules = S::Submodules;
-        type Skip = Set<members::skip>;
+    }
+    ///State transition - sets the `depth` field to Set
+    pub struct SetDepth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDepth<S> {}
+    impl<S: State> State for SetDepth<S> {
+        type Skip = S::Skip;
+        type Depth = Set<members::depth>;
+        type Submodules = S::Submodules;
+    }
+    ///State transition - sets the `submodules` field to Set
+    pub struct SetSubmodules<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubmodules<S> {}
+    impl<S: State> State for SetSubmodules<S> {
+        type Skip = S::Skip;
+        type Depth = S::Depth;
+        type Submodules = Set<members::submodules>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `skip` field
+        pub struct skip(());
         ///Marker type for the `depth` field
         pub struct depth(());
         ///Marker type for the `submodules` field
         pub struct submodules(());
-        ///Marker type for the `skip` field
-        pub struct skip(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CloneOptsBuilder<'a, S: clone_opts_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<bool>, Option<bool>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<bool>, Option<bool>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CloneOpts<'a> {
@@ -473,9 +477,9 @@ impl<'a> CloneOptsBuilder<'a, clone_opts_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CloneOptsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -490,11 +494,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CloneOptsBuilder<'a, clone_opts_state::SetDepth<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CloneOptsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -509,11 +513,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> CloneOptsBuilder<'a, clone_opts_state::SetSkip<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CloneOptsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -528,11 +532,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> CloneOptsBuilder<'a, clone_opts_state::SetSubmodules<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CloneOptsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -540,16 +544,16 @@ where
 impl<'a, S> CloneOptsBuilder<'a, S>
 where
     S: clone_opts_state::State,
+    S::Skip: clone_opts_state::IsSet,
     S::Depth: clone_opts_state::IsSet,
     S::Submodules: clone_opts_state::IsSet,
-    S::Skip: clone_opts_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CloneOpts<'a> {
         CloneOpts {
-            depth: self.__unsafe_private_named.0.unwrap(),
-            skip: self.__unsafe_private_named.1.unwrap(),
-            submodules: self.__unsafe_private_named.2.unwrap(),
+            depth: self._fields.0.unwrap(),
+            skip: self._fields.1.unwrap(),
+            submodules: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -562,9 +566,9 @@ where
         >,
     ) -> CloneOpts<'a> {
         CloneOpts {
-            depth: self.__unsafe_private_named.0.unwrap(),
-            skip: self.__unsafe_private_named.1.unwrap(),
-            submodules: self.__unsafe_private_named.2.unwrap(),
+            depth: self._fields.0.unwrap(),
+            skip: self._fields.1.unwrap(),
+            submodules: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -907,48 +911,48 @@ pub mod pipeline_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TriggerMetadata;
         type Workflows;
+        type TriggerMetadata;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TriggerMetadata = Unset;
         type Workflows = Unset;
-    }
-    ///State transition - sets the `trigger_metadata` field to Set
-    pub struct SetTriggerMetadata<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTriggerMetadata<S> {}
-    impl<S: State> State for SetTriggerMetadata<S> {
-        type TriggerMetadata = Set<members::trigger_metadata>;
-        type Workflows = S::Workflows;
+        type TriggerMetadata = Unset;
     }
     ///State transition - sets the `workflows` field to Set
     pub struct SetWorkflows<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetWorkflows<S> {}
     impl<S: State> State for SetWorkflows<S> {
-        type TriggerMetadata = S::TriggerMetadata;
         type Workflows = Set<members::workflows>;
+        type TriggerMetadata = S::TriggerMetadata;
+    }
+    ///State transition - sets the `trigger_metadata` field to Set
+    pub struct SetTriggerMetadata<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTriggerMetadata<S> {}
+    impl<S: State> State for SetTriggerMetadata<S> {
+        type Workflows = S::Workflows;
+        type TriggerMetadata = Set<members::trigger_metadata>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `trigger_metadata` field
-        pub struct trigger_metadata(());
         ///Marker type for the `workflows` field
         pub struct workflows(());
+        ///Marker type for the `trigger_metadata` field
+        pub struct trigger_metadata(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PipelineBuilder<'a, S: pipeline_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<pipeline::TriggerMetadata<'a>>,
         Option<Vec<pipeline::Workflow<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Pipeline<'a> {
@@ -962,9 +966,9 @@ impl<'a> PipelineBuilder<'a, pipeline_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PipelineBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -979,11 +983,11 @@ where
         mut self,
         value: impl Into<pipeline::TriggerMetadata<'a>>,
     ) -> PipelineBuilder<'a, pipeline_state::SetTriggerMetadata<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PipelineBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -998,11 +1002,11 @@ where
         mut self,
         value: impl Into<Vec<pipeline::Workflow<'a>>>,
     ) -> PipelineBuilder<'a, pipeline_state::SetWorkflows<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PipelineBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1010,14 +1014,14 @@ where
 impl<'a, S> PipelineBuilder<'a, S>
 where
     S: pipeline_state::State,
-    S::TriggerMetadata: pipeline_state::IsSet,
     S::Workflows: pipeline_state::IsSet,
+    S::TriggerMetadata: pipeline_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pipeline<'a> {
         Pipeline {
-            trigger_metadata: self.__unsafe_private_named.0.unwrap(),
-            workflows: self.__unsafe_private_named.1.unwrap(),
+            trigger_metadata: self._fields.0.unwrap(),
+            workflows: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1030,8 +1034,8 @@ where
         >,
     ) -> Pipeline<'a> {
         Pipeline {
-            trigger_metadata: self.__unsafe_private_named.0.unwrap(),
-            workflows: self.__unsafe_private_named.1.unwrap(),
+            trigger_metadata: self._fields.0.unwrap(),
+            workflows: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1047,51 +1051,51 @@ pub mod trigger_metadata_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Kind;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Kind = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Kind = S::Kind;
+        type Repo = Unset;
     }
     ///State transition - sets the `kind` field to Set
     pub struct SetKind<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetKind<S> {}
     impl<S: State> State for SetKind<S> {
-        type Repo = S::Repo;
         type Kind = Set<members::kind>;
+        type Repo = S::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepo<S> {}
+    impl<S: State> State for SetRepo<S> {
+        type Kind = S::Kind;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `kind` field
         pub struct kind(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TriggerMetadataBuilder<'a, S: trigger_metadata_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<pipeline::ManualTriggerData<'a>>,
         Option<pipeline::PullRequestTriggerData<'a>>,
         Option<pipeline::PushTriggerData<'a>>,
         Option<pipeline::TriggerRepo<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TriggerMetadata<'a> {
@@ -1105,9 +1109,9 @@ impl<'a> TriggerMetadataBuilder<'a, trigger_metadata_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TriggerMetadataBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1122,11 +1126,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TriggerMetadataBuilder<'a, trigger_metadata_state::SetKind<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TriggerMetadataBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1137,7 +1141,7 @@ impl<'a, S: trigger_metadata_state::State> TriggerMetadataBuilder<'a, S> {
         mut self,
         value: impl Into<Option<pipeline::ManualTriggerData<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `manual` field to an Option value (optional)
@@ -1145,7 +1149,7 @@ impl<'a, S: trigger_metadata_state::State> TriggerMetadataBuilder<'a, S> {
         mut self,
         value: Option<pipeline::ManualTriggerData<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1156,7 +1160,7 @@ impl<'a, S: trigger_metadata_state::State> TriggerMetadataBuilder<'a, S> {
         mut self,
         value: impl Into<Option<pipeline::PullRequestTriggerData<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `pullRequest` field to an Option value (optional)
@@ -1164,7 +1168,7 @@ impl<'a, S: trigger_metadata_state::State> TriggerMetadataBuilder<'a, S> {
         mut self,
         value: Option<pipeline::PullRequestTriggerData<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1175,12 +1179,12 @@ impl<'a, S: trigger_metadata_state::State> TriggerMetadataBuilder<'a, S> {
         mut self,
         value: impl Into<Option<pipeline::PushTriggerData<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `push` field to an Option value (optional)
     pub fn maybe_push(mut self, value: Option<pipeline::PushTriggerData<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1195,11 +1199,11 @@ where
         mut self,
         value: impl Into<pipeline::TriggerRepo<'a>>,
     ) -> TriggerMetadataBuilder<'a, trigger_metadata_state::SetRepo<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         TriggerMetadataBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1207,17 +1211,17 @@ where
 impl<'a, S> TriggerMetadataBuilder<'a, S>
 where
     S: trigger_metadata_state::State,
-    S::Repo: trigger_metadata_state::IsSet,
     S::Kind: trigger_metadata_state::IsSet,
+    S::Repo: trigger_metadata_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TriggerMetadata<'a> {
         TriggerMetadata {
-            kind: self.__unsafe_private_named.0.unwrap(),
-            manual: self.__unsafe_private_named.1,
-            pull_request: self.__unsafe_private_named.2,
-            push: self.__unsafe_private_named.3,
-            repo: self.__unsafe_private_named.4.unwrap(),
+            kind: self._fields.0.unwrap(),
+            manual: self._fields.1,
+            pull_request: self._fields.2,
+            push: self._fields.3,
+            repo: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1230,11 +1234,11 @@ where
         >,
     ) -> TriggerMetadata<'a> {
         TriggerMetadata {
-            kind: self.__unsafe_private_named.0.unwrap(),
-            manual: self.__unsafe_private_named.1,
-            pull_request: self.__unsafe_private_named.2,
-            push: self.__unsafe_private_named.3,
-            repo: self.__unsafe_private_named.4.unwrap(),
+            kind: self._fields.0.unwrap(),
+            manual: self._fields.1,
+            pull_request: self._fields.2,
+            push: self._fields.3,
+            repo: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1250,80 +1254,80 @@ pub mod trigger_repo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Knot;
         type DefaultBranch;
-        type Did;
+        type Knot;
         type Repo;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Knot = Unset;
         type DefaultBranch = Unset;
-        type Did = Unset;
+        type Knot = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `knot` field to Set
-    pub struct SetKnot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKnot<S> {}
-    impl<S: State> State for SetKnot<S> {
-        type Knot = Set<members::knot>;
-        type DefaultBranch = S::DefaultBranch;
-        type Did = S::Did;
-        type Repo = S::Repo;
+        type Did = Unset;
     }
     ///State transition - sets the `default_branch` field to Set
     pub struct SetDefaultBranch<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDefaultBranch<S> {}
     impl<S: State> State for SetDefaultBranch<S> {
-        type Knot = S::Knot;
         type DefaultBranch = Set<members::default_branch>;
-        type Did = S::Did;
-        type Repo = S::Repo;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
         type Knot = S::Knot;
-        type DefaultBranch = S::DefaultBranch;
-        type Did = Set<members::did>;
         type Repo = S::Repo;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `knot` field to Set
+    pub struct SetKnot<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetKnot<S> {}
+    impl<S: State> State for SetKnot<S> {
+        type DefaultBranch = S::DefaultBranch;
+        type Knot = Set<members::knot>;
+        type Repo = S::Repo;
+        type Did = S::Did;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRepo<S> {}
     impl<S: State> State for SetRepo<S> {
-        type Knot = S::Knot;
         type DefaultBranch = S::DefaultBranch;
-        type Did = S::Did;
+        type Knot = S::Knot;
         type Repo = Set<members::repo>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type DefaultBranch = S::DefaultBranch;
+        type Knot = S::Knot;
+        type Repo = S::Repo;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `knot` field
-        pub struct knot(());
         ///Marker type for the `default_branch` field
         pub struct default_branch(());
-        ///Marker type for the `did` field
-        pub struct did(());
+        ///Marker type for the `knot` field
+        pub struct knot(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TriggerRepoBuilder<'a, S: trigger_repo_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Did<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TriggerRepo<'a> {
@@ -1337,9 +1341,9 @@ impl<'a> TriggerRepoBuilder<'a, trigger_repo_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TriggerRepoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1354,11 +1358,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TriggerRepoBuilder<'a, trigger_repo_state::SetDefaultBranch<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TriggerRepoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1373,11 +1377,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> TriggerRepoBuilder<'a, trigger_repo_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TriggerRepoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1392,11 +1396,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TriggerRepoBuilder<'a, trigger_repo_state::SetKnot<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         TriggerRepoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1411,11 +1415,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TriggerRepoBuilder<'a, trigger_repo_state::SetRepo<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         TriggerRepoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1423,18 +1427,18 @@ where
 impl<'a, S> TriggerRepoBuilder<'a, S>
 where
     S: trigger_repo_state::State,
-    S::Knot: trigger_repo_state::IsSet,
     S::DefaultBranch: trigger_repo_state::IsSet,
-    S::Did: trigger_repo_state::IsSet,
+    S::Knot: trigger_repo_state::IsSet,
     S::Repo: trigger_repo_state::IsSet,
+    S::Did: trigger_repo_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TriggerRepo<'a> {
         TriggerRepo {
-            default_branch: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            knot: self.__unsafe_private_named.2.unwrap(),
-            repo: self.__unsafe_private_named.3.unwrap(),
+            default_branch: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            knot: self._fields.2.unwrap(),
+            repo: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1447,10 +1451,10 @@ where
         >,
     ) -> TriggerRepo<'a> {
         TriggerRepo {
-            default_branch: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            knot: self.__unsafe_private_named.2.unwrap(),
-            repo: self.__unsafe_private_named.3.unwrap(),
+            default_branch: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            knot: self._fields.2.unwrap(),
+            repo: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1466,80 +1470,80 @@ pub mod workflow_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
+        type Raw;
         type Engine;
         type Clone;
-        type Raw;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
+        type Raw = Unset;
         type Engine = Unset;
         type Clone = Unset;
-        type Raw = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Engine = S::Engine;
-        type Clone = S::Clone;
-        type Raw = S::Raw;
-    }
-    ///State transition - sets the `engine` field to Set
-    pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEngine<S> {}
-    impl<S: State> State for SetEngine<S> {
-        type Name = S::Name;
-        type Engine = Set<members::engine>;
-        type Clone = S::Clone;
-        type Raw = S::Raw;
-    }
-    ///State transition - sets the `clone` field to Set
-    pub struct SetClone<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClone<S> {}
-    impl<S: State> State for SetClone<S> {
-        type Name = S::Name;
-        type Engine = S::Engine;
-        type Clone = Set<members::clone>;
-        type Raw = S::Raw;
+        type Name = Unset;
     }
     ///State transition - sets the `raw` field to Set
     pub struct SetRaw<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRaw<S> {}
     impl<S: State> State for SetRaw<S> {
-        type Name = S::Name;
+        type Raw = Set<members::raw>;
         type Engine = S::Engine;
         type Clone = S::Clone;
-        type Raw = Set<members::raw>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `engine` field to Set
+    pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetEngine<S> {}
+    impl<S: State> State for SetEngine<S> {
+        type Raw = S::Raw;
+        type Engine = Set<members::engine>;
+        type Clone = S::Clone;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `clone` field to Set
+    pub struct SetClone<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetClone<S> {}
+    impl<S: State> State for SetClone<S> {
+        type Raw = S::Raw;
+        type Engine = S::Engine;
+        type Clone = Set<members::clone>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Raw = S::Raw;
+        type Engine = S::Engine;
+        type Clone = S::Clone;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
+        ///Marker type for the `raw` field
+        pub struct raw(());
         ///Marker type for the `engine` field
         pub struct engine(());
         ///Marker type for the `clone` field
         pub struct clone(());
-        ///Marker type for the `raw` field
-        pub struct raw(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct WorkflowBuilder<'a, S: workflow_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<pipeline::CloneOpts<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Workflow<'a> {
@@ -1553,9 +1557,9 @@ impl<'a> WorkflowBuilder<'a, workflow_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         WorkflowBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1570,11 +1574,11 @@ where
         mut self,
         value: impl Into<pipeline::CloneOpts<'a>>,
     ) -> WorkflowBuilder<'a, workflow_state::SetClone<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         WorkflowBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1589,11 +1593,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> WorkflowBuilder<'a, workflow_state::SetEngine<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         WorkflowBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1608,11 +1612,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> WorkflowBuilder<'a, workflow_state::SetName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         WorkflowBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1627,11 +1631,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> WorkflowBuilder<'a, workflow_state::SetRaw<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         WorkflowBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1639,18 +1643,18 @@ where
 impl<'a, S> WorkflowBuilder<'a, S>
 where
     S: workflow_state::State,
-    S::Name: workflow_state::IsSet,
+    S::Raw: workflow_state::IsSet,
     S::Engine: workflow_state::IsSet,
     S::Clone: workflow_state::IsSet,
-    S::Raw: workflow_state::IsSet,
+    S::Name: workflow_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Workflow<'a> {
         Workflow {
-            clone: self.__unsafe_private_named.0.unwrap(),
-            engine: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
-            raw: self.__unsafe_private_named.3.unwrap(),
+            clone: self._fields.0.unwrap(),
+            engine: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
+            raw: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1663,10 +1667,10 @@ where
         >,
     ) -> Workflow<'a> {
         Workflow {
-            clone: self.__unsafe_private_named.0.unwrap(),
-            engine: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
-            raw: self.__unsafe_private_named.3.unwrap(),
+            clone: self._fields.0.unwrap(),
+            engine: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
+            raw: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

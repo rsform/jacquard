@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -122,49 +125,49 @@ pub mod page_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Authors;
         type EntryList;
+        type Authors;
         type Notebook;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Authors = Unset;
         type EntryList = Unset;
+        type Authors = Unset;
         type Notebook = Unset;
-    }
-    ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthors<S> {}
-    impl<S: State> State for SetAuthors<S> {
-        type Authors = Set<members::authors>;
-        type EntryList = S::EntryList;
-        type Notebook = S::Notebook;
     }
     ///State transition - sets the `entry_list` field to Set
     pub struct SetEntryList<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEntryList<S> {}
     impl<S: State> State for SetEntryList<S> {
-        type Authors = S::Authors;
         type EntryList = Set<members::entry_list>;
+        type Authors = S::Authors;
+        type Notebook = S::Notebook;
+    }
+    ///State transition - sets the `authors` field to Set
+    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthors<S> {}
+    impl<S: State> State for SetAuthors<S> {
+        type EntryList = S::EntryList;
+        type Authors = Set<members::authors>;
         type Notebook = S::Notebook;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNotebook<S> {}
     impl<S: State> State for SetNotebook<S> {
-        type Authors = S::Authors;
         type EntryList = S::EntryList;
+        type Authors = S::Authors;
         type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `authors` field
-        pub struct authors(());
         ///Marker type for the `entry_list` field
         pub struct entry_list(());
+        ///Marker type for the `authors` field
+        pub struct authors(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
     }
@@ -172,15 +175,15 @@ pub mod page_state {
 
 /// Builder for constructing an instance of this type
 pub struct PageBuilder<'a, S: page_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Vec<StrongRef<'a>>>,
         Option<StrongRef<'a>>,
         Option<Tags<'a>>,
         Option<Title<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Page<'a> {
@@ -194,9 +197,9 @@ impl<'a> PageBuilder<'a, page_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -204,12 +207,12 @@ impl<'a> PageBuilder<'a, page_state::Empty> {
 impl<'a, S: page_state::State> PageBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -224,11 +227,11 @@ where
         mut self,
         value: impl Into<Vec<StrongRef<'a>>>,
     ) -> PageBuilder<'a, page_state::SetEntryList<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -243,11 +246,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> PageBuilder<'a, page_state::SetNotebook<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -255,12 +258,12 @@ where
 impl<'a, S: page_state::State> PageBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Tags<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Tags<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -268,12 +271,12 @@ impl<'a, S: page_state::State> PageBuilder<'a, S> {
 impl<'a, S: page_state::State> PageBuilder<'a, S> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<Title<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `title` field to an Option value (optional)
     pub fn maybe_title(mut self, value: Option<Title<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -281,18 +284,18 @@ impl<'a, S: page_state::State> PageBuilder<'a, S> {
 impl<'a, S> PageBuilder<'a, S>
 where
     S: page_state::State,
-    S::Authors: page_state::IsSet,
     S::EntryList: page_state::IsSet,
+    S::Authors: page_state::IsSet,
     S::Notebook: page_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Page<'a> {
         Page {
-            created_at: self.__unsafe_private_named.0,
-            entry_list: self.__unsafe_private_named.1.unwrap(),
-            notebook: self.__unsafe_private_named.2.unwrap(),
-            tags: self.__unsafe_private_named.3,
-            title: self.__unsafe_private_named.4,
+            created_at: self._fields.0,
+            entry_list: self._fields.1.unwrap(),
+            notebook: self._fields.2.unwrap(),
+            tags: self._fields.3,
+            title: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -305,11 +308,11 @@ where
         >,
     ) -> Page<'a> {
         Page {
-            created_at: self.__unsafe_private_named.0,
-            entry_list: self.__unsafe_private_named.1.unwrap(),
-            notebook: self.__unsafe_private_named.2.unwrap(),
-            tags: self.__unsafe_private_named.3,
-            title: self.__unsafe_private_named.4,
+            created_at: self._fields.0,
+            entry_list: self._fields.1.unwrap(),
+            notebook: self._fields.2.unwrap(),
+            tags: self._fields.3,
+            title: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

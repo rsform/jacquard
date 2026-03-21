@@ -23,7 +23,11 @@ pub mod unmute_convo;
 pub mod update_all_read;
 pub mod update_read;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -805,92 +809,92 @@ pub mod convo_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Rev;
         type Muted;
         type UnreadCount;
-        type Rev;
-        type Id;
         type Members;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Rev = Unset;
         type Muted = Unset;
         type UnreadCount = Unset;
-        type Rev = Unset;
-        type Id = Unset;
         type Members = Unset;
-    }
-    ///State transition - sets the `muted` field to Set
-    pub struct SetMuted<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMuted<S> {}
-    impl<S: State> State for SetMuted<S> {
-        type Muted = Set<members::muted>;
-        type UnreadCount = S::UnreadCount;
-        type Rev = S::Rev;
-        type Id = S::Id;
-        type Members = S::Members;
-    }
-    ///State transition - sets the `unread_count` field to Set
-    pub struct SetUnreadCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUnreadCount<S> {}
-    impl<S: State> State for SetUnreadCount<S> {
-        type Muted = S::Muted;
-        type UnreadCount = Set<members::unread_count>;
-        type Rev = S::Rev;
-        type Id = S::Id;
-        type Members = S::Members;
+        type Id = Unset;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
-        type Muted = S::Muted;
-        type UnreadCount = S::UnreadCount;
         type Rev = Set<members::rev>;
-        type Id = S::Id;
-        type Members = S::Members;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
         type Muted = S::Muted;
         type UnreadCount = S::UnreadCount;
-        type Rev = S::Rev;
-        type Id = Set<members::id>;
         type Members = S::Members;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `muted` field to Set
+    pub struct SetMuted<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMuted<S> {}
+    impl<S: State> State for SetMuted<S> {
+        type Rev = S::Rev;
+        type Muted = Set<members::muted>;
+        type UnreadCount = S::UnreadCount;
+        type Members = S::Members;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `unread_count` field to Set
+    pub struct SetUnreadCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUnreadCount<S> {}
+    impl<S: State> State for SetUnreadCount<S> {
+        type Rev = S::Rev;
+        type Muted = S::Muted;
+        type UnreadCount = Set<members::unread_count>;
+        type Members = S::Members;
+        type Id = S::Id;
     }
     ///State transition - sets the `members` field to Set
     pub struct SetMembers<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMembers<S> {}
     impl<S: State> State for SetMembers<S> {
+        type Rev = S::Rev;
         type Muted = S::Muted;
         type UnreadCount = S::UnreadCount;
-        type Rev = S::Rev;
-        type Id = S::Id;
         type Members = Set<members::members>;
+        type Id = S::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type Rev = S::Rev;
+        type Muted = S::Muted;
+        type UnreadCount = S::UnreadCount;
+        type Members = S::Members;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `rev` field
+        pub struct rev(());
         ///Marker type for the `muted` field
         pub struct muted(());
         ///Marker type for the `unread_count` field
         pub struct unread_count(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `members` field
         pub struct members(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ConvoViewBuilder<'a, S: convo_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<ConvoViewLastMessage<'a>>,
         Option<convo::MessageAndReactionView<'a>>,
@@ -900,7 +904,7 @@ pub struct ConvoViewBuilder<'a, S: convo_view_state::State> {
         Option<ConvoViewStatus<'a>>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ConvoView<'a> {
@@ -914,9 +918,9 @@ impl<'a> ConvoViewBuilder<'a, convo_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ConvoViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -931,11 +935,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ConvoViewBuilder<'a, convo_view_state::SetId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ConvoViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -946,7 +950,7 @@ impl<'a, S: convo_view_state::State> ConvoViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ConvoViewLastMessage<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `lastMessage` field to an Option value (optional)
@@ -954,7 +958,7 @@ impl<'a, S: convo_view_state::State> ConvoViewBuilder<'a, S> {
         mut self,
         value: Option<ConvoViewLastMessage<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -965,7 +969,7 @@ impl<'a, S: convo_view_state::State> ConvoViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<convo::MessageAndReactionView<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `lastReaction` field to an Option value (optional)
@@ -973,7 +977,7 @@ impl<'a, S: convo_view_state::State> ConvoViewBuilder<'a, S> {
         mut self,
         value: Option<convo::MessageAndReactionView<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -988,11 +992,11 @@ where
         mut self,
         value: impl Into<Vec<ProfileViewBasic<'a>>>,
     ) -> ConvoViewBuilder<'a, convo_view_state::SetMembers<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ConvoViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1007,11 +1011,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> ConvoViewBuilder<'a, convo_view_state::SetMuted<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ConvoViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1026,11 +1030,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ConvoViewBuilder<'a, convo_view_state::SetRev<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ConvoViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1038,12 +1042,12 @@ where
 impl<'a, S: convo_view_state::State> ConvoViewBuilder<'a, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<ConvoViewStatus<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<ConvoViewStatus<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1058,11 +1062,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ConvoViewBuilder<'a, convo_view_state::SetUnreadCount<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         ConvoViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1070,23 +1074,23 @@ where
 impl<'a, S> ConvoViewBuilder<'a, S>
 where
     S: convo_view_state::State,
+    S::Rev: convo_view_state::IsSet,
     S::Muted: convo_view_state::IsSet,
     S::UnreadCount: convo_view_state::IsSet,
-    S::Rev: convo_view_state::IsSet,
-    S::Id: convo_view_state::IsSet,
     S::Members: convo_view_state::IsSet,
+    S::Id: convo_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ConvoView<'a> {
         ConvoView {
-            id: self.__unsafe_private_named.0.unwrap(),
-            last_message: self.__unsafe_private_named.1,
-            last_reaction: self.__unsafe_private_named.2,
-            members: self.__unsafe_private_named.3.unwrap(),
-            muted: self.__unsafe_private_named.4.unwrap(),
-            rev: self.__unsafe_private_named.5.unwrap(),
-            status: self.__unsafe_private_named.6,
-            unread_count: self.__unsafe_private_named.7.unwrap(),
+            id: self._fields.0.unwrap(),
+            last_message: self._fields.1,
+            last_reaction: self._fields.2,
+            members: self._fields.3.unwrap(),
+            muted: self._fields.4.unwrap(),
+            rev: self._fields.5.unwrap(),
+            status: self._fields.6,
+            unread_count: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1099,14 +1103,14 @@ where
         >,
     ) -> ConvoView<'a> {
         ConvoView {
-            id: self.__unsafe_private_named.0.unwrap(),
-            last_message: self.__unsafe_private_named.1,
-            last_reaction: self.__unsafe_private_named.2,
-            members: self.__unsafe_private_named.3.unwrap(),
-            muted: self.__unsafe_private_named.4.unwrap(),
-            rev: self.__unsafe_private_named.5.unwrap(),
-            status: self.__unsafe_private_named.6,
-            unread_count: self.__unsafe_private_named.7.unwrap(),
+            id: self._fields.0.unwrap(),
+            last_message: self._fields.1,
+            last_reaction: self._fields.2,
+            members: self._fields.3.unwrap(),
+            muted: self._fields.4.unwrap(),
+            rev: self._fields.5.unwrap(),
+            status: self._fields.6,
+            unread_count: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1814,80 +1818,80 @@ pub mod deleted_message_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type Rev;
         type SentAt;
+        type Id;
         type Sender;
+        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type Rev = Unset;
         type SentAt = Unset;
+        type Id = Unset;
         type Sender = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Rev = S::Rev;
-        type SentAt = S::SentAt;
-        type Sender = S::Sender;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
-        type Id = S::Id;
-        type Rev = Set<members::rev>;
-        type SentAt = S::SentAt;
-        type Sender = S::Sender;
+        type Rev = Unset;
     }
     ///State transition - sets the `sent_at` field to Set
     pub struct SetSentAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSentAt<S> {}
     impl<S: State> State for SetSentAt<S> {
-        type Id = S::Id;
-        type Rev = S::Rev;
         type SentAt = Set<members::sent_at>;
+        type Id = S::Id;
         type Sender = S::Sender;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetId<S> {}
+    impl<S: State> State for SetId<S> {
+        type SentAt = S::SentAt;
+        type Id = Set<members::id>;
+        type Sender = S::Sender;
+        type Rev = S::Rev;
     }
     ///State transition - sets the `sender` field to Set
     pub struct SetSender<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSender<S> {}
     impl<S: State> State for SetSender<S> {
-        type Id = S::Id;
-        type Rev = S::Rev;
         type SentAt = S::SentAt;
+        type Id = S::Id;
         type Sender = Set<members::sender>;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type SentAt = S::SentAt;
+        type Id = S::Id;
+        type Sender = S::Sender;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `sent_at` field
         pub struct sent_at(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `sender` field
         pub struct sender(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct DeletedMessageViewBuilder<'a, S: deleted_message_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<convo::MessageViewSender<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DeletedMessageView<'a> {
@@ -1901,9 +1905,9 @@ impl<'a> DeletedMessageViewBuilder<'a, deleted_message_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DeletedMessageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1918,11 +1922,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DeletedMessageViewBuilder<'a, deleted_message_view_state::SetId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DeletedMessageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1937,11 +1941,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DeletedMessageViewBuilder<'a, deleted_message_view_state::SetRev<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DeletedMessageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1956,11 +1960,11 @@ where
         mut self,
         value: impl Into<convo::MessageViewSender<'a>>,
     ) -> DeletedMessageViewBuilder<'a, deleted_message_view_state::SetSender<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         DeletedMessageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1975,11 +1979,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> DeletedMessageViewBuilder<'a, deleted_message_view_state::SetSentAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         DeletedMessageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1987,18 +1991,18 @@ where
 impl<'a, S> DeletedMessageViewBuilder<'a, S>
 where
     S: deleted_message_view_state::State,
-    S::Id: deleted_message_view_state::IsSet,
-    S::Rev: deleted_message_view_state::IsSet,
     S::SentAt: deleted_message_view_state::IsSet,
+    S::Id: deleted_message_view_state::IsSet,
     S::Sender: deleted_message_view_state::IsSet,
+    S::Rev: deleted_message_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> DeletedMessageView<'a> {
         DeletedMessageView {
-            id: self.__unsafe_private_named.0.unwrap(),
-            rev: self.__unsafe_private_named.1.unwrap(),
-            sender: self.__unsafe_private_named.2.unwrap(),
-            sent_at: self.__unsafe_private_named.3.unwrap(),
+            id: self._fields.0.unwrap(),
+            rev: self._fields.1.unwrap(),
+            sender: self._fields.2.unwrap(),
+            sent_at: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2011,10 +2015,10 @@ where
         >,
     ) -> DeletedMessageView<'a> {
         DeletedMessageView {
-            id: self.__unsafe_private_named.0.unwrap(),
-            rev: self.__unsafe_private_named.1.unwrap(),
-            sender: self.__unsafe_private_named.2.unwrap(),
-            sent_at: self.__unsafe_private_named.3.unwrap(),
+            id: self._fields.0.unwrap(),
+            rev: self._fields.1.unwrap(),
+            sender: self._fields.2.unwrap(),
+            sent_at: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2030,65 +2034,65 @@ pub mod log_add_reaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type ConvoId;
         type Rev;
         type Message;
-        type ConvoId;
         type Reaction;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type ConvoId = Unset;
         type Rev = Unset;
         type Message = Unset;
-        type ConvoId = Unset;
         type Reaction = Unset;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvoId<S> {}
+    impl<S: State> State for SetConvoId<S> {
+        type ConvoId = Set<members::convo_id>;
+        type Rev = S::Rev;
+        type Message = S::Message;
+        type Reaction = S::Reaction;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
+        type ConvoId = S::ConvoId;
         type Rev = Set<members::rev>;
         type Message = S::Message;
-        type ConvoId = S::ConvoId;
         type Reaction = S::Reaction;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
+        type ConvoId = S::ConvoId;
         type Rev = S::Rev;
         type Message = Set<members::message>;
-        type ConvoId = S::ConvoId;
-        type Reaction = S::Reaction;
-    }
-    ///State transition - sets the `convo_id` field to Set
-    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetConvoId<S> {}
-    impl<S: State> State for SetConvoId<S> {
-        type Rev = S::Rev;
-        type Message = S::Message;
-        type ConvoId = Set<members::convo_id>;
         type Reaction = S::Reaction;
     }
     ///State transition - sets the `reaction` field to Set
     pub struct SetReaction<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReaction<S> {}
     impl<S: State> State for SetReaction<S> {
+        type ConvoId = S::ConvoId;
         type Rev = S::Rev;
         type Message = S::Message;
-        type ConvoId = S::ConvoId;
         type Reaction = Set<members::reaction>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `convo_id` field
+        pub struct convo_id(());
         ///Marker type for the `rev` field
         pub struct rev(());
         ///Marker type for the `message` field
         pub struct message(());
-        ///Marker type for the `convo_id` field
-        pub struct convo_id(());
         ///Marker type for the `reaction` field
         pub struct reaction(());
     }
@@ -2096,14 +2100,14 @@ pub mod log_add_reaction_state {
 
 /// Builder for constructing an instance of this type
 pub struct LogAddReactionBuilder<'a, S: log_add_reaction_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<LogAddReactionMessage<'a>>,
         Option<convo::ReactionView<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LogAddReaction<'a> {
@@ -2117,9 +2121,9 @@ impl<'a> LogAddReactionBuilder<'a, log_add_reaction_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LogAddReactionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2134,11 +2138,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LogAddReactionBuilder<'a, log_add_reaction_state::SetConvoId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LogAddReactionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2153,11 +2157,11 @@ where
         mut self,
         value: impl Into<LogAddReactionMessage<'a>>,
     ) -> LogAddReactionBuilder<'a, log_add_reaction_state::SetMessage<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LogAddReactionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2172,11 +2176,11 @@ where
         mut self,
         value: impl Into<convo::ReactionView<'a>>,
     ) -> LogAddReactionBuilder<'a, log_add_reaction_state::SetReaction<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LogAddReactionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2191,11 +2195,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LogAddReactionBuilder<'a, log_add_reaction_state::SetRev<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         LogAddReactionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2203,18 +2207,18 @@ where
 impl<'a, S> LogAddReactionBuilder<'a, S>
 where
     S: log_add_reaction_state::State,
+    S::ConvoId: log_add_reaction_state::IsSet,
     S::Rev: log_add_reaction_state::IsSet,
     S::Message: log_add_reaction_state::IsSet,
-    S::ConvoId: log_add_reaction_state::IsSet,
     S::Reaction: log_add_reaction_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LogAddReaction<'a> {
         LogAddReaction {
-            convo_id: self.__unsafe_private_named.0.unwrap(),
-            message: self.__unsafe_private_named.1.unwrap(),
-            reaction: self.__unsafe_private_named.2.unwrap(),
-            rev: self.__unsafe_private_named.3.unwrap(),
+            convo_id: self._fields.0.unwrap(),
+            message: self._fields.1.unwrap(),
+            reaction: self._fields.2.unwrap(),
+            rev: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2227,10 +2231,10 @@ where
         >,
     ) -> LogAddReaction<'a> {
         LogAddReaction {
-            convo_id: self.__unsafe_private_named.0.unwrap(),
-            message: self.__unsafe_private_named.1.unwrap(),
-            reaction: self.__unsafe_private_named.2.unwrap(),
-            rev: self.__unsafe_private_named.3.unwrap(),
+            convo_id: self._fields.0.unwrap(),
+            message: self._fields.1.unwrap(),
+            reaction: self._fields.2.unwrap(),
+            rev: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2246,63 +2250,63 @@ pub mod log_create_message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Rev;
         type Message;
         type ConvoId;
-        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Rev = Unset;
         type Message = Unset;
         type ConvoId = Unset;
-        type Rev = Unset;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Message = Set<members::message>;
-        type ConvoId = S::ConvoId;
-        type Rev = S::Rev;
-    }
-    ///State transition - sets the `convo_id` field to Set
-    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetConvoId<S> {}
-    impl<S: State> State for SetConvoId<S> {
-        type Message = S::Message;
-        type ConvoId = Set<members::convo_id>;
-        type Rev = S::Rev;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
+        type Rev = Set<members::rev>;
         type Message = S::Message;
         type ConvoId = S::ConvoId;
-        type Rev = Set<members::rev>;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type Rev = S::Rev;
+        type Message = Set<members::message>;
+        type ConvoId = S::ConvoId;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvoId<S> {}
+    impl<S: State> State for SetConvoId<S> {
+        type Rev = S::Rev;
+        type Message = S::Message;
+        type ConvoId = Set<members::convo_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `rev` field
+        pub struct rev(());
         ///Marker type for the `message` field
         pub struct message(());
         ///Marker type for the `convo_id` field
         pub struct convo_id(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LogCreateMessageBuilder<'a, S: log_create_message_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<LogCreateMessageMessage<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LogCreateMessage<'a> {
@@ -2316,9 +2320,9 @@ impl<'a> LogCreateMessageBuilder<'a, log_create_message_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LogCreateMessageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2333,11 +2337,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LogCreateMessageBuilder<'a, log_create_message_state::SetConvoId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LogCreateMessageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2352,11 +2356,11 @@ where
         mut self,
         value: impl Into<LogCreateMessageMessage<'a>>,
     ) -> LogCreateMessageBuilder<'a, log_create_message_state::SetMessage<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LogCreateMessageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2371,11 +2375,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LogCreateMessageBuilder<'a, log_create_message_state::SetRev<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LogCreateMessageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2383,16 +2387,16 @@ where
 impl<'a, S> LogCreateMessageBuilder<'a, S>
 where
     S: log_create_message_state::State,
+    S::Rev: log_create_message_state::IsSet,
     S::Message: log_create_message_state::IsSet,
     S::ConvoId: log_create_message_state::IsSet,
-    S::Rev: log_create_message_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LogCreateMessage<'a> {
         LogCreateMessage {
-            convo_id: self.__unsafe_private_named.0.unwrap(),
-            message: self.__unsafe_private_named.1.unwrap(),
-            rev: self.__unsafe_private_named.2.unwrap(),
+            convo_id: self._fields.0.unwrap(),
+            message: self._fields.1.unwrap(),
+            rev: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2405,9 +2409,9 @@ where
         >,
     ) -> LogCreateMessage<'a> {
         LogCreateMessage {
-            convo_id: self.__unsafe_private_named.0.unwrap(),
-            message: self.__unsafe_private_named.1.unwrap(),
-            rev: self.__unsafe_private_named.2.unwrap(),
+            convo_id: self._fields.0.unwrap(),
+            message: self._fields.1.unwrap(),
+            rev: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2423,63 +2427,63 @@ pub mod log_delete_message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type ConvoId;
         type Message;
         type Rev;
-        type ConvoId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type ConvoId = Unset;
         type Message = Unset;
         type Rev = Unset;
-        type ConvoId = Unset;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Message = Set<members::message>;
-        type Rev = S::Rev;
-        type ConvoId = S::ConvoId;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
-        type Message = S::Message;
-        type Rev = Set<members::rev>;
-        type ConvoId = S::ConvoId;
     }
     ///State transition - sets the `convo_id` field to Set
     pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetConvoId<S> {}
     impl<S: State> State for SetConvoId<S> {
+        type ConvoId = Set<members::convo_id>;
         type Message = S::Message;
         type Rev = S::Rev;
-        type ConvoId = Set<members::convo_id>;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessage<S> {}
+    impl<S: State> State for SetMessage<S> {
+        type ConvoId = S::ConvoId;
+        type Message = Set<members::message>;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type ConvoId = S::ConvoId;
+        type Message = S::Message;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `convo_id` field
+        pub struct convo_id(());
         ///Marker type for the `message` field
         pub struct message(());
         ///Marker type for the `rev` field
         pub struct rev(());
-        ///Marker type for the `convo_id` field
-        pub struct convo_id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LogDeleteMessageBuilder<'a, S: log_delete_message_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<LogDeleteMessageMessage<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LogDeleteMessage<'a> {
@@ -2493,9 +2497,9 @@ impl<'a> LogDeleteMessageBuilder<'a, log_delete_message_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LogDeleteMessageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2510,11 +2514,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LogDeleteMessageBuilder<'a, log_delete_message_state::SetConvoId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LogDeleteMessageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2529,11 +2533,11 @@ where
         mut self,
         value: impl Into<LogDeleteMessageMessage<'a>>,
     ) -> LogDeleteMessageBuilder<'a, log_delete_message_state::SetMessage<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LogDeleteMessageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2548,11 +2552,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LogDeleteMessageBuilder<'a, log_delete_message_state::SetRev<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LogDeleteMessageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2560,16 +2564,16 @@ where
 impl<'a, S> LogDeleteMessageBuilder<'a, S>
 where
     S: log_delete_message_state::State,
+    S::ConvoId: log_delete_message_state::IsSet,
     S::Message: log_delete_message_state::IsSet,
     S::Rev: log_delete_message_state::IsSet,
-    S::ConvoId: log_delete_message_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LogDeleteMessage<'a> {
         LogDeleteMessage {
-            convo_id: self.__unsafe_private_named.0.unwrap(),
-            message: self.__unsafe_private_named.1.unwrap(),
-            rev: self.__unsafe_private_named.2.unwrap(),
+            convo_id: self._fields.0.unwrap(),
+            message: self._fields.1.unwrap(),
+            rev: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2582,9 +2586,9 @@ where
         >,
     ) -> LogDeleteMessage<'a> {
         LogDeleteMessage {
-            convo_id: self.__unsafe_private_named.0.unwrap(),
-            message: self.__unsafe_private_named.1.unwrap(),
-            rev: self.__unsafe_private_named.2.unwrap(),
+            convo_id: self._fields.0.unwrap(),
+            message: self._fields.1.unwrap(),
+            rev: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2600,63 +2604,59 @@ pub mod log_read_message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ConvoId;
-        type Rev;
         type Message;
+        type Rev;
+        type ConvoId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ConvoId = Unset;
-        type Rev = Unset;
         type Message = Unset;
-    }
-    ///State transition - sets the `convo_id` field to Set
-    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetConvoId<S> {}
-    impl<S: State> State for SetConvoId<S> {
-        type ConvoId = Set<members::convo_id>;
-        type Rev = S::Rev;
-        type Message = S::Message;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
-        type ConvoId = S::ConvoId;
-        type Rev = Set<members::rev>;
-        type Message = S::Message;
+        type Rev = Unset;
+        type ConvoId = Unset;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
-        type ConvoId = S::ConvoId;
-        type Rev = S::Rev;
         type Message = Set<members::message>;
+        type Rev = S::Rev;
+        type ConvoId = S::ConvoId;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Message = S::Message;
+        type Rev = Set<members::rev>;
+        type ConvoId = S::ConvoId;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvoId<S> {}
+    impl<S: State> State for SetConvoId<S> {
+        type Message = S::Message;
+        type Rev = S::Rev;
+        type ConvoId = Set<members::convo_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `convo_id` field
-        pub struct convo_id(());
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
+        ///Marker type for the `convo_id` field
+        pub struct convo_id(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LogReadMessageBuilder<'a, S: log_read_message_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<CowStr<'a>>,
-        Option<LogReadMessageMessage<'a>>,
-        Option<CowStr<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<LogReadMessageMessage<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LogReadMessage<'a> {
@@ -2670,9 +2670,9 @@ impl<'a> LogReadMessageBuilder<'a, log_read_message_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LogReadMessageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2687,11 +2687,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LogReadMessageBuilder<'a, log_read_message_state::SetConvoId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LogReadMessageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2706,11 +2706,11 @@ where
         mut self,
         value: impl Into<LogReadMessageMessage<'a>>,
     ) -> LogReadMessageBuilder<'a, log_read_message_state::SetMessage<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LogReadMessageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2725,11 +2725,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LogReadMessageBuilder<'a, log_read_message_state::SetRev<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LogReadMessageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2737,16 +2737,16 @@ where
 impl<'a, S> LogReadMessageBuilder<'a, S>
 where
     S: log_read_message_state::State,
-    S::ConvoId: log_read_message_state::IsSet,
-    S::Rev: log_read_message_state::IsSet,
     S::Message: log_read_message_state::IsSet,
+    S::Rev: log_read_message_state::IsSet,
+    S::ConvoId: log_read_message_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LogReadMessage<'a> {
         LogReadMessage {
-            convo_id: self.__unsafe_private_named.0.unwrap(),
-            message: self.__unsafe_private_named.1.unwrap(),
-            rev: self.__unsafe_private_named.2.unwrap(),
+            convo_id: self._fields.0.unwrap(),
+            message: self._fields.1.unwrap(),
+            rev: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2759,9 +2759,9 @@ where
         >,
     ) -> LogReadMessage<'a> {
         LogReadMessage {
-            convo_id: self.__unsafe_private_named.0.unwrap(),
-            message: self.__unsafe_private_named.1.unwrap(),
-            rev: self.__unsafe_private_named.2.unwrap(),
+            convo_id: self._fields.0.unwrap(),
+            message: self._fields.1.unwrap(),
+            rev: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2777,80 +2777,80 @@ pub mod log_remove_reaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rev;
         type Reaction;
-        type ConvoId;
         type Message;
+        type ConvoId;
+        type Rev;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rev = Unset;
         type Reaction = Unset;
-        type ConvoId = Unset;
         type Message = Unset;
-    }
-    ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
-        type Rev = Set<members::rev>;
-        type Reaction = S::Reaction;
-        type ConvoId = S::ConvoId;
-        type Message = S::Message;
+        type ConvoId = Unset;
+        type Rev = Unset;
     }
     ///State transition - sets the `reaction` field to Set
     pub struct SetReaction<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetReaction<S> {}
     impl<S: State> State for SetReaction<S> {
-        type Rev = S::Rev;
         type Reaction = Set<members::reaction>;
+        type Message = S::Message;
         type ConvoId = S::ConvoId;
-        type Message = S::Message;
-    }
-    ///State transition - sets the `convo_id` field to Set
-    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetConvoId<S> {}
-    impl<S: State> State for SetConvoId<S> {
         type Rev = S::Rev;
-        type Reaction = S::Reaction;
-        type ConvoId = Set<members::convo_id>;
-        type Message = S::Message;
     }
     ///State transition - sets the `message` field to Set
     pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMessage<S> {}
     impl<S: State> State for SetMessage<S> {
-        type Rev = S::Rev;
         type Reaction = S::Reaction;
-        type ConvoId = S::ConvoId;
         type Message = Set<members::message>;
+        type ConvoId = S::ConvoId;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvoId<S> {}
+    impl<S: State> State for SetConvoId<S> {
+        type Reaction = S::Reaction;
+        type Message = S::Message;
+        type ConvoId = Set<members::convo_id>;
+        type Rev = S::Rev;
+    }
+    ///State transition - sets the `rev` field to Set
+    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRev<S> {}
+    impl<S: State> State for SetRev<S> {
+        type Reaction = S::Reaction;
+        type Message = S::Message;
+        type ConvoId = S::ConvoId;
+        type Rev = Set<members::rev>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rev` field
-        pub struct rev(());
         ///Marker type for the `reaction` field
         pub struct reaction(());
-        ///Marker type for the `convo_id` field
-        pub struct convo_id(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `convo_id` field
+        pub struct convo_id(());
+        ///Marker type for the `rev` field
+        pub struct rev(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LogRemoveReactionBuilder<'a, S: log_remove_reaction_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<LogRemoveReactionMessage<'a>>,
         Option<convo::ReactionView<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LogRemoveReaction<'a> {
@@ -2864,9 +2864,9 @@ impl<'a> LogRemoveReactionBuilder<'a, log_remove_reaction_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LogRemoveReactionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2881,11 +2881,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LogRemoveReactionBuilder<'a, log_remove_reaction_state::SetConvoId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LogRemoveReactionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2900,11 +2900,11 @@ where
         mut self,
         value: impl Into<LogRemoveReactionMessage<'a>>,
     ) -> LogRemoveReactionBuilder<'a, log_remove_reaction_state::SetMessage<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LogRemoveReactionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2919,11 +2919,11 @@ where
         mut self,
         value: impl Into<convo::ReactionView<'a>>,
     ) -> LogRemoveReactionBuilder<'a, log_remove_reaction_state::SetReaction<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         LogRemoveReactionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2938,11 +2938,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LogRemoveReactionBuilder<'a, log_remove_reaction_state::SetRev<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         LogRemoveReactionBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2950,18 +2950,18 @@ where
 impl<'a, S> LogRemoveReactionBuilder<'a, S>
 where
     S: log_remove_reaction_state::State,
-    S::Rev: log_remove_reaction_state::IsSet,
     S::Reaction: log_remove_reaction_state::IsSet,
-    S::ConvoId: log_remove_reaction_state::IsSet,
     S::Message: log_remove_reaction_state::IsSet,
+    S::ConvoId: log_remove_reaction_state::IsSet,
+    S::Rev: log_remove_reaction_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LogRemoveReaction<'a> {
         LogRemoveReaction {
-            convo_id: self.__unsafe_private_named.0.unwrap(),
-            message: self.__unsafe_private_named.1.unwrap(),
-            reaction: self.__unsafe_private_named.2.unwrap(),
-            rev: self.__unsafe_private_named.3.unwrap(),
+            convo_id: self._fields.0.unwrap(),
+            message: self._fields.1.unwrap(),
+            reaction: self._fields.2.unwrap(),
+            rev: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2974,10 +2974,10 @@ where
         >,
     ) -> LogRemoveReaction<'a> {
         LogRemoveReaction {
-            convo_id: self.__unsafe_private_named.0.unwrap(),
-            message: self.__unsafe_private_named.1.unwrap(),
-            reaction: self.__unsafe_private_named.2.unwrap(),
-            rev: self.__unsafe_private_named.3.unwrap(),
+            convo_id: self._fields.0.unwrap(),
+            message: self._fields.1.unwrap(),
+            reaction: self._fields.2.unwrap(),
+            rev: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -3029,12 +3029,9 @@ pub mod message_and_reaction_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct MessageAndReactionViewBuilder<'a, S: message_and_reaction_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<convo::MessageView<'a>>,
-        Option<convo::ReactionView<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<convo::MessageView<'a>>, Option<convo::ReactionView<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> MessageAndReactionView<'a> {
@@ -3051,9 +3048,9 @@ impl<'a> MessageAndReactionViewBuilder<'a, message_and_reaction_view_state::Empt
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MessageAndReactionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3071,11 +3068,11 @@ where
         'a,
         message_and_reaction_view_state::SetMessage<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MessageAndReactionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3093,11 +3090,11 @@ where
         'a,
         message_and_reaction_view_state::SetReaction<S>,
     > {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MessageAndReactionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3111,8 +3108,8 @@ where
     /// Build the final struct
     pub fn build(self) -> MessageAndReactionView<'a> {
         MessageAndReactionView {
-            message: self.__unsafe_private_named.0.unwrap(),
-            reaction: self.__unsafe_private_named.1.unwrap(),
+            message: self._fields.0.unwrap(),
+            reaction: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -3125,8 +3122,8 @@ where
         >,
     ) -> MessageAndReactionView<'a> {
         MessageAndReactionView {
-            message: self.__unsafe_private_named.0.unwrap(),
-            reaction: self.__unsafe_private_named.1.unwrap(),
+            message: self._fields.0.unwrap(),
+            reaction: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -3142,59 +3139,59 @@ pub mod message_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Did;
         type MessageId;
         type ConvoId;
-        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Did = Unset;
         type MessageId = Unset;
         type ConvoId = Unset;
-        type Did = Unset;
-    }
-    ///State transition - sets the `message_id` field to Set
-    pub struct SetMessageId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessageId<S> {}
-    impl<S: State> State for SetMessageId<S> {
-        type MessageId = Set<members::message_id>;
-        type ConvoId = S::ConvoId;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `convo_id` field to Set
-    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetConvoId<S> {}
-    impl<S: State> State for SetConvoId<S> {
-        type MessageId = S::MessageId;
-        type ConvoId = Set<members::convo_id>;
-        type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
+        type Did = Set<members::did>;
         type MessageId = S::MessageId;
         type ConvoId = S::ConvoId;
-        type Did = Set<members::did>;
+    }
+    ///State transition - sets the `message_id` field to Set
+    pub struct SetMessageId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMessageId<S> {}
+    impl<S: State> State for SetMessageId<S> {
+        type Did = S::Did;
+        type MessageId = Set<members::message_id>;
+        type ConvoId = S::ConvoId;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConvoId<S> {}
+    impl<S: State> State for SetConvoId<S> {
+        type Did = S::Did;
+        type MessageId = S::MessageId;
+        type ConvoId = Set<members::convo_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `message_id` field
         pub struct message_id(());
         ///Marker type for the `convo_id` field
         pub struct convo_id(());
-        ///Marker type for the `did` field
-        pub struct did(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MessageRefBuilder<'a, S: message_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<Did<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Did<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> MessageRef<'a> {
@@ -3208,9 +3205,9 @@ impl<'a> MessageRefBuilder<'a, message_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MessageRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3225,11 +3222,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> MessageRefBuilder<'a, message_ref_state::SetConvoId<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MessageRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3244,11 +3241,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> MessageRefBuilder<'a, message_ref_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MessageRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3263,11 +3260,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> MessageRefBuilder<'a, message_ref_state::SetMessageId<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         MessageRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3275,16 +3272,16 @@ where
 impl<'a, S> MessageRefBuilder<'a, S>
 where
     S: message_ref_state::State,
+    S::Did: message_ref_state::IsSet,
     S::MessageId: message_ref_state::IsSet,
     S::ConvoId: message_ref_state::IsSet,
-    S::Did: message_ref_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MessageRef<'a> {
         MessageRef {
-            convo_id: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            message_id: self.__unsafe_private_named.2.unwrap(),
+            convo_id: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            message_id: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -3297,9 +3294,9 @@ where
         >,
     ) -> MessageRef<'a> {
         MessageRef {
-            convo_id: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            message_id: self.__unsafe_private_named.2.unwrap(),
+            convo_id: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            message_id: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -3315,92 +3312,92 @@ pub mod message_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Sender;
-        type SentAt;
         type Id;
+        type SentAt;
         type Rev;
         type Text;
+        type Sender;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Sender = Unset;
-        type SentAt = Unset;
         type Id = Unset;
+        type SentAt = Unset;
         type Rev = Unset;
         type Text = Unset;
-    }
-    ///State transition - sets the `sender` field to Set
-    pub struct SetSender<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSender<S> {}
-    impl<S: State> State for SetSender<S> {
-        type Sender = Set<members::sender>;
-        type SentAt = S::SentAt;
-        type Id = S::Id;
-        type Rev = S::Rev;
-        type Text = S::Text;
-    }
-    ///State transition - sets the `sent_at` field to Set
-    pub struct SetSentAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSentAt<S> {}
-    impl<S: State> State for SetSentAt<S> {
-        type Sender = S::Sender;
-        type SentAt = Set<members::sent_at>;
-        type Id = S::Id;
-        type Rev = S::Rev;
-        type Text = S::Text;
+        type Sender = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Sender = S::Sender;
-        type SentAt = S::SentAt;
         type Id = Set<members::id>;
+        type SentAt = S::SentAt;
         type Rev = S::Rev;
         type Text = S::Text;
+        type Sender = S::Sender;
+    }
+    ///State transition - sets the `sent_at` field to Set
+    pub struct SetSentAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSentAt<S> {}
+    impl<S: State> State for SetSentAt<S> {
+        type Id = S::Id;
+        type SentAt = Set<members::sent_at>;
+        type Rev = S::Rev;
+        type Text = S::Text;
+        type Sender = S::Sender;
     }
     ///State transition - sets the `rev` field to Set
     pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRev<S> {}
     impl<S: State> State for SetRev<S> {
-        type Sender = S::Sender;
-        type SentAt = S::SentAt;
         type Id = S::Id;
+        type SentAt = S::SentAt;
         type Rev = Set<members::rev>;
         type Text = S::Text;
+        type Sender = S::Sender;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetText<S> {}
     impl<S: State> State for SetText<S> {
-        type Sender = S::Sender;
-        type SentAt = S::SentAt;
         type Id = S::Id;
+        type SentAt = S::SentAt;
         type Rev = S::Rev;
         type Text = Set<members::text>;
+        type Sender = S::Sender;
+    }
+    ///State transition - sets the `sender` field to Set
+    pub struct SetSender<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSender<S> {}
+    impl<S: State> State for SetSender<S> {
+        type Id = S::Id;
+        type SentAt = S::SentAt;
+        type Rev = S::Rev;
+        type Text = S::Text;
+        type Sender = Set<members::sender>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `sender` field
-        pub struct sender(());
-        ///Marker type for the `sent_at` field
-        pub struct sent_at(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `sent_at` field
+        pub struct sent_at(());
         ///Marker type for the `rev` field
         pub struct rev(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `sender` field
+        pub struct sender(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MessageViewBuilder<'a, S: message_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<View<'a>>,
         Option<Vec<Facet<'a>>>,
         Option<CowStr<'a>>,
@@ -3410,7 +3407,7 @@ pub struct MessageViewBuilder<'a, S: message_view_state::State> {
         Option<Datetime>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> MessageView<'a> {
@@ -3424,9 +3421,9 @@ impl<'a> MessageViewBuilder<'a, message_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MessageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3434,12 +3431,12 @@ impl<'a> MessageViewBuilder<'a, message_view_state::Empty> {
 impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
     /// Set the `embed` field (optional)
     pub fn embed(mut self, value: impl Into<Option<View<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `embed` field to an Option value (optional)
     pub fn maybe_embed(mut self, value: Option<View<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -3447,12 +3444,12 @@ impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
 impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<'a>>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `facets` field to an Option value (optional)
     pub fn maybe_facets(mut self, value: Option<Vec<Facet<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -3467,11 +3464,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> MessageViewBuilder<'a, message_view_state::SetId<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         MessageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3482,7 +3479,7 @@ impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<convo::ReactionView<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `reactions` field to an Option value (optional)
@@ -3490,7 +3487,7 @@ impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
         mut self,
         value: Option<Vec<convo::ReactionView<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -3505,11 +3502,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> MessageViewBuilder<'a, message_view_state::SetRev<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         MessageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3524,11 +3521,11 @@ where
         mut self,
         value: impl Into<convo::MessageViewSender<'a>>,
     ) -> MessageViewBuilder<'a, message_view_state::SetSender<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         MessageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3543,11 +3540,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> MessageViewBuilder<'a, message_view_state::SetSentAt<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         MessageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3562,11 +3559,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> MessageViewBuilder<'a, message_view_state::SetText<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         MessageViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3574,23 +3571,23 @@ where
 impl<'a, S> MessageViewBuilder<'a, S>
 where
     S: message_view_state::State,
-    S::Sender: message_view_state::IsSet,
-    S::SentAt: message_view_state::IsSet,
     S::Id: message_view_state::IsSet,
+    S::SentAt: message_view_state::IsSet,
     S::Rev: message_view_state::IsSet,
     S::Text: message_view_state::IsSet,
+    S::Sender: message_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> MessageView<'a> {
         MessageView {
-            embed: self.__unsafe_private_named.0,
-            facets: self.__unsafe_private_named.1,
-            id: self.__unsafe_private_named.2.unwrap(),
-            reactions: self.__unsafe_private_named.3,
-            rev: self.__unsafe_private_named.4.unwrap(),
-            sender: self.__unsafe_private_named.5.unwrap(),
-            sent_at: self.__unsafe_private_named.6.unwrap(),
-            text: self.__unsafe_private_named.7.unwrap(),
+            embed: self._fields.0,
+            facets: self._fields.1,
+            id: self._fields.2.unwrap(),
+            reactions: self._fields.3,
+            rev: self._fields.4.unwrap(),
+            sender: self._fields.5.unwrap(),
+            sent_at: self._fields.6.unwrap(),
+            text: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -3603,14 +3600,14 @@ where
         >,
     ) -> MessageView<'a> {
         MessageView {
-            embed: self.__unsafe_private_named.0,
-            facets: self.__unsafe_private_named.1,
-            id: self.__unsafe_private_named.2.unwrap(),
-            reactions: self.__unsafe_private_named.3,
-            rev: self.__unsafe_private_named.4.unwrap(),
-            sender: self.__unsafe_private_named.5.unwrap(),
-            sent_at: self.__unsafe_private_named.6.unwrap(),
-            text: self.__unsafe_private_named.7.unwrap(),
+            embed: self._fields.0,
+            facets: self._fields.1,
+            id: self._fields.2.unwrap(),
+            reactions: self._fields.3,
+            rev: self._fields.4.unwrap(),
+            sender: self._fields.5.unwrap(),
+            sent_at: self._fields.6.unwrap(),
+            text: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -3650,9 +3647,9 @@ pub mod message_view_sender_state {
 
 /// Builder for constructing an instance of this type
 pub struct MessageViewSenderBuilder<'a, S: message_view_sender_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> MessageViewSender<'a> {
@@ -3666,9 +3663,9 @@ impl<'a> MessageViewSenderBuilder<'a, message_view_sender_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MessageViewSenderBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3683,11 +3680,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> MessageViewSenderBuilder<'a, message_view_sender_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MessageViewSenderBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3700,7 +3697,7 @@ where
     /// Build the final struct
     pub fn build(self) -> MessageViewSender<'a> {
         MessageViewSender {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -3713,7 +3710,7 @@ where
         >,
     ) -> MessageViewSender<'a> {
         MessageViewSender {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -3730,62 +3727,62 @@ pub mod reaction_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Value;
-        type CreatedAt;
         type Sender;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Value = Unset;
-        type CreatedAt = Unset;
         type Sender = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetValue<S> {}
     impl<S: State> State for SetValue<S> {
         type Value = Set<members::value>;
+        type Sender = S::Sender;
         type CreatedAt = S::CreatedAt;
-        type Sender = S::Sender;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Value = S::Value;
-        type CreatedAt = Set<members::created_at>;
-        type Sender = S::Sender;
     }
     ///State transition - sets the `sender` field to Set
     pub struct SetSender<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSender<S> {}
     impl<S: State> State for SetSender<S> {
         type Value = S::Value;
-        type CreatedAt = S::CreatedAt;
         type Sender = Set<members::sender>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Value = S::Value;
+        type Sender = S::Sender;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `value` field
         pub struct value(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `sender` field
         pub struct sender(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ReactionViewBuilder<'a, S: reaction_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<convo::ReactionViewSender<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ReactionView<'a> {
@@ -3799,9 +3796,9 @@ impl<'a> ReactionViewBuilder<'a, reaction_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ReactionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3816,11 +3813,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ReactionViewBuilder<'a, reaction_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ReactionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3835,11 +3832,11 @@ where
         mut self,
         value: impl Into<convo::ReactionViewSender<'a>>,
     ) -> ReactionViewBuilder<'a, reaction_view_state::SetSender<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ReactionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3854,11 +3851,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ReactionViewBuilder<'a, reaction_view_state::SetValue<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ReactionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3867,15 +3864,15 @@ impl<'a, S> ReactionViewBuilder<'a, S>
 where
     S: reaction_view_state::State,
     S::Value: reaction_view_state::IsSet,
-    S::CreatedAt: reaction_view_state::IsSet,
     S::Sender: reaction_view_state::IsSet,
+    S::CreatedAt: reaction_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ReactionView<'a> {
         ReactionView {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            sender: self.__unsafe_private_named.1.unwrap(),
-            value: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            sender: self._fields.1.unwrap(),
+            value: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -3888,9 +3885,9 @@ where
         >,
     ) -> ReactionView<'a> {
         ReactionView {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            sender: self.__unsafe_private_named.1.unwrap(),
-            value: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            sender: self._fields.1.unwrap(),
+            value: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -3930,9 +3927,9 @@ pub mod reaction_view_sender_state {
 
 /// Builder for constructing an instance of this type
 pub struct ReactionViewSenderBuilder<'a, S: reaction_view_sender_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ReactionViewSender<'a> {
@@ -3946,9 +3943,9 @@ impl<'a> ReactionViewSenderBuilder<'a, reaction_view_sender_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ReactionViewSenderBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3963,11 +3960,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> ReactionViewSenderBuilder<'a, reaction_view_sender_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ReactionViewSenderBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3980,7 +3977,7 @@ where
     /// Build the final struct
     pub fn build(self) -> ReactionViewSender<'a> {
         ReactionViewSender {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -3993,7 +3990,7 @@ where
         >,
     ) -> ReactionViewSender<'a> {
         ReactionViewSender {
-            did: self.__unsafe_private_named.0.unwrap(),
+            did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

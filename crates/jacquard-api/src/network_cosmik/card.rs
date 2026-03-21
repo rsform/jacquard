@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -363,44 +366,44 @@ pub mod card_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type Content;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Content = S::Content;
+        type Type = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
-        type Type = S::Type;
         type Content = Set<members::content>;
+        type Type = S::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Content = S::Content;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CardBuilder<'a, S: card_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CardContent<'a>>,
         Option<Datetime>,
         Option<StrongRef<'a>>,
@@ -409,7 +412,7 @@ pub struct CardBuilder<'a, S: card_state::State> {
         Option<CardType<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Card<'a> {
@@ -423,9 +426,9 @@ impl<'a> CardBuilder<'a, card_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CardBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -440,11 +443,11 @@ where
         mut self,
         value: impl Into<CardContent<'a>>,
     ) -> CardBuilder<'a, card_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CardBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -452,12 +455,12 @@ where
 impl<'a, S: card_state::State> CardBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -465,12 +468,12 @@ impl<'a, S: card_state::State> CardBuilder<'a, S> {
 impl<'a, S: card_state::State> CardBuilder<'a, S> {
     /// Set the `originalCard` field (optional)
     pub fn original_card(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `originalCard` field to an Option value (optional)
     pub fn maybe_original_card(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -478,12 +481,12 @@ impl<'a, S: card_state::State> CardBuilder<'a, S> {
 impl<'a, S: card_state::State> CardBuilder<'a, S> {
     /// Set the `parentCard` field (optional)
     pub fn parent_card(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `parentCard` field to an Option value (optional)
     pub fn maybe_parent_card(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -491,12 +494,12 @@ impl<'a, S: card_state::State> CardBuilder<'a, S> {
 impl<'a, S: card_state::State> CardBuilder<'a, S> {
     /// Set the `provenance` field (optional)
     pub fn provenance(mut self, value: impl Into<Option<Provenance<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `provenance` field to an Option value (optional)
     pub fn maybe_provenance(mut self, value: Option<Provenance<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -511,11 +514,11 @@ where
         mut self,
         value: impl Into<CardType<'a>>,
     ) -> CardBuilder<'a, card_state::SetType<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         CardBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -523,12 +526,12 @@ where
 impl<'a, S: card_state::State> CardBuilder<'a, S> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `url` field to an Option value (optional)
     pub fn maybe_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -536,19 +539,19 @@ impl<'a, S: card_state::State> CardBuilder<'a, S> {
 impl<'a, S> CardBuilder<'a, S>
 where
     S: card_state::State,
-    S::Type: card_state::IsSet,
     S::Content: card_state::IsSet,
+    S::Type: card_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Card<'a> {
         Card {
-            content: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1,
-            original_card: self.__unsafe_private_named.2,
-            parent_card: self.__unsafe_private_named.3,
-            provenance: self.__unsafe_private_named.4,
-            r#type: self.__unsafe_private_named.5.unwrap(),
-            url: self.__unsafe_private_named.6,
+            content: self._fields.0.unwrap(),
+            created_at: self._fields.1,
+            original_card: self._fields.2,
+            parent_card: self._fields.3,
+            provenance: self._fields.4,
+            r#type: self._fields.5.unwrap(),
+            url: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -561,13 +564,13 @@ where
         >,
     ) -> Card<'a> {
         Card {
-            content: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1,
-            original_card: self.__unsafe_private_named.2,
-            parent_card: self.__unsafe_private_named.3,
-            provenance: self.__unsafe_private_named.4,
-            r#type: self.__unsafe_private_named.5.unwrap(),
-            url: self.__unsafe_private_named.6,
+            content: self._fields.0.unwrap(),
+            created_at: self._fields.1,
+            original_card: self._fields.2,
+            parent_card: self._fields.3,
+            provenance: self._fields.4,
+            r#type: self._fields.5.unwrap(),
+            url: self._fields.6,
             extra_data: Some(extra_data),
         }
     }
@@ -877,9 +880,9 @@ pub mod url_content_state {
 
 /// Builder for constructing an instance of this type
 pub struct UrlContentBuilder<'a, S: url_content_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<card::UrlMetadata<'a>>, Option<UriValue<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<card::UrlMetadata<'a>>, Option<UriValue<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> UrlContent<'a> {
@@ -893,9 +896,9 @@ impl<'a> UrlContentBuilder<'a, url_content_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UrlContentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -903,12 +906,12 @@ impl<'a> UrlContentBuilder<'a, url_content_state::Empty> {
 impl<'a, S: url_content_state::State> UrlContentBuilder<'a, S> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<card::UrlMetadata<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
     pub fn maybe_metadata(mut self, value: Option<card::UrlMetadata<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -923,11 +926,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> UrlContentBuilder<'a, url_content_state::SetUrl<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         UrlContentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -940,8 +943,8 @@ where
     /// Build the final struct
     pub fn build(self) -> UrlContent<'a> {
         UrlContent {
-            metadata: self.__unsafe_private_named.0,
-            url: self.__unsafe_private_named.1.unwrap(),
+            metadata: self._fields.0,
+            url: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -954,8 +957,8 @@ where
         >,
     ) -> UrlContent<'a> {
         UrlContent {
-            metadata: self.__unsafe_private_named.0,
-            url: self.__unsafe_private_named.1.unwrap(),
+            metadata: self._fields.0,
+            url: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

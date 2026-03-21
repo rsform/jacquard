@@ -10,7 +10,11 @@ pub mod collection_item;
 pub mod entry;
 pub mod like;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -147,9 +151,9 @@ pub mod subject_state {
 
 /// Builder for constructing an instance of this type
 pub struct SubjectBuilder<'a, S: subject_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<SelfLabels<'a>>, Option<SubjectValue<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<SelfLabels<'a>>, Option<SubjectValue<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Subject<'a> {
@@ -163,9 +167,9 @@ impl<'a> SubjectBuilder<'a, subject_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SubjectBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -173,12 +177,12 @@ impl<'a> SubjectBuilder<'a, subject_state::Empty> {
 impl<'a, S: subject_state::State> SubjectBuilder<'a, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<SelfLabels<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `labels` field to an Option value (optional)
     pub fn maybe_labels(mut self, value: Option<SelfLabels<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -193,11 +197,11 @@ where
         mut self,
         value: impl Into<SubjectValue<'a>>,
     ) -> SubjectBuilder<'a, subject_state::SetValue<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SubjectBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -210,8 +214,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Subject<'a> {
         Subject {
-            labels: self.__unsafe_private_named.0,
-            value: self.__unsafe_private_named.1.unwrap(),
+            labels: self._fields.0,
+            value: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -224,8 +228,8 @@ where
         >,
     ) -> Subject<'a> {
         Subject {
-            labels: self.__unsafe_private_named.0,
-            value: self.__unsafe_private_named.1.unwrap(),
+            labels: self._fields.0,
+            value: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -153,9 +156,9 @@ pub mod supporter_state {
 
 /// Builder for constructing an instance of this type
 pub struct SupporterBuilder<'a, S: supporter_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<SupporterSignaturesItem<'a>>>, Option<Did<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<SupporterSignaturesItem<'a>>>, Option<Did<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Supporter<'a> {
@@ -169,9 +172,9 @@ impl<'a> SupporterBuilder<'a, supporter_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SupporterBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -182,7 +185,7 @@ impl<'a, S: supporter_state::State> SupporterBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<SupporterSignaturesItem<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `signatures` field to an Option value (optional)
@@ -190,7 +193,7 @@ impl<'a, S: supporter_state::State> SupporterBuilder<'a, S> {
         mut self,
         value: Option<Vec<SupporterSignaturesItem<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -205,11 +208,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> SupporterBuilder<'a, supporter_state::SetSubject<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SupporterBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -222,8 +225,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Supporter<'a> {
         Supporter {
-            signatures: self.__unsafe_private_named.0,
-            subject: self.__unsafe_private_named.1.unwrap(),
+            signatures: self._fields.0,
+            subject: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -236,8 +239,8 @@ where
         >,
     ) -> Supporter<'a> {
         Supporter {
-            signatures: self.__unsafe_private_named.0,
-            subject: self.__unsafe_private_named.1.unwrap(),
+            signatures: self._fields.0,
+            subject: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

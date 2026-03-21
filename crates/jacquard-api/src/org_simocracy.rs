@@ -14,7 +14,11 @@ pub mod skill;
 pub mod style;
 pub mod vote;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -93,9 +97,9 @@ pub mod sprite_settings_state {
 
 /// Builder for constructing an instance of this type
 pub struct SpriteSettingsBuilder<'a, S: sprite_settings_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<Data<'a>>, Option<Data<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<Data<'a>>, Option<Data<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SpriteSettings<'a> {
@@ -109,9 +113,9 @@ impl<'a> SpriteSettingsBuilder<'a, sprite_settings_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SpriteSettingsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -119,12 +123,12 @@ impl<'a> SpriteSettingsBuilder<'a, sprite_settings_state::Empty> {
 impl<'a, S: sprite_settings_state::State> SpriteSettingsBuilder<'a, S> {
     /// Set the `currentAnimDirection` field (optional)
     pub fn current_anim_direction(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `currentAnimDirection` field to an Option value (optional)
     pub fn maybe_current_anim_direction(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -132,12 +136,12 @@ impl<'a, S: sprite_settings_state::State> SpriteSettingsBuilder<'a, S> {
 impl<'a, S: sprite_settings_state::State> SpriteSettingsBuilder<'a, S> {
     /// Set the `partColorSettings` field (optional)
     pub fn part_color_settings(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `partColorSettings` field to an Option value (optional)
     pub fn maybe_part_color_settings(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -152,11 +156,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> SpriteSettingsBuilder<'a, sprite_settings_state::SetSelectedOptions<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SpriteSettingsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -169,9 +173,9 @@ where
     /// Build the final struct
     pub fn build(self) -> SpriteSettings<'a> {
         SpriteSettings {
-            current_anim_direction: self.__unsafe_private_named.0,
-            part_color_settings: self.__unsafe_private_named.1,
-            selected_options: self.__unsafe_private_named.2.unwrap(),
+            current_anim_direction: self._fields.0,
+            part_color_settings: self._fields.1,
+            selected_options: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -181,9 +185,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> SpriteSettings<'a> {
         SpriteSettings {
-            current_anim_direction: self.__unsafe_private_named.0,
-            part_color_settings: self.__unsafe_private_named.1,
-            selected_options: self.__unsafe_private_named.2.unwrap(),
+            current_anim_direction: self._fields.0,
+            part_color_settings: self._fields.1,
+            selected_options: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -180,8 +183,8 @@ pub mod activity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type StartedAt;
+        type Type;
         type EndedAt;
         type CreatedAt;
     }
@@ -189,26 +192,26 @@ pub mod activity_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type StartedAt = Unset;
+        type Type = Unset;
         type EndedAt = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type StartedAt = S::StartedAt;
-        type EndedAt = S::EndedAt;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `started_at` field to Set
     pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStartedAt<S> {}
     impl<S: State> State for SetStartedAt<S> {
-        type Type = S::Type;
         type StartedAt = Set<members::started_at>;
+        type Type = S::Type;
+        type EndedAt = S::EndedAt;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type StartedAt = S::StartedAt;
+        type Type = Set<members::r#type>;
         type EndedAt = S::EndedAt;
         type CreatedAt = S::CreatedAt;
     }
@@ -216,8 +219,8 @@ pub mod activity_state {
     pub struct SetEndedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetEndedAt<S> {}
     impl<S: State> State for SetEndedAt<S> {
-        type Type = S::Type;
         type StartedAt = S::StartedAt;
+        type Type = S::Type;
         type EndedAt = Set<members::ended_at>;
         type CreatedAt = S::CreatedAt;
     }
@@ -225,18 +228,18 @@ pub mod activity_state {
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Type = S::Type;
         type StartedAt = S::StartedAt;
+        type Type = S::Type;
         type EndedAt = S::EndedAt;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `started_at` field
         pub struct started_at(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
         ///Marker type for the `ended_at` field
         pub struct ended_at(());
         ///Marker type for the `created_at` field
@@ -246,8 +249,8 @@ pub mod activity_state {
 
 /// Builder for constructing an instance of this type
 pub struct ActivityBuilder<'a, S: activity_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<i64>,
         Option<Datetime>,
         Option<CowStr<'a>>,
@@ -259,7 +262,7 @@ pub struct ActivityBuilder<'a, S: activity_state::State> {
         Option<i64>,
         Option<ActivityType<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Activity<'a> {
@@ -273,20 +276,9 @@ impl<'a> ActivityBuilder<'a, activity_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ActivityBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -294,12 +286,12 @@ impl<'a> ActivityBuilder<'a, activity_state::Empty> {
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `calories` field (optional)
     pub fn calories(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `calories` field to an Option value (optional)
     pub fn maybe_calories(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -314,11 +306,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ActivityBuilder<'a, activity_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ActivityBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -326,12 +318,12 @@ where
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `distance` field (optional)
     pub fn distance(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `distance` field to an Option value (optional)
     pub fn maybe_distance(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -339,12 +331,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `distanceUnits` field (optional)
     pub fn distance_units(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `distanceUnits` field to an Option value (optional)
     pub fn maybe_distance_units(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -359,11 +351,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ActivityBuilder<'a, activity_state::SetEndedAt<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ActivityBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -371,12 +363,12 @@ where
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `route` field (optional)
     pub fn route(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `route` field to an Option value (optional)
     pub fn maybe_route(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -384,12 +376,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `splits` field (optional)
     pub fn splits(mut self, value: impl Into<Option<Vec<Split<'a>>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `splits` field to an Option value (optional)
     pub fn maybe_splits(mut self, value: Option<Vec<Split<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -404,11 +396,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ActivityBuilder<'a, activity_state::SetStartedAt<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         ActivityBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -416,12 +408,12 @@ where
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `steps` field (optional)
     pub fn steps(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `steps` field to an Option value (optional)
     pub fn maybe_steps(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -436,11 +428,11 @@ where
         mut self,
         value: impl Into<ActivityType<'a>>,
     ) -> ActivityBuilder<'a, activity_state::SetType<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         ActivityBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -448,24 +440,24 @@ where
 impl<'a, S> ActivityBuilder<'a, S>
 where
     S: activity_state::State,
-    S::Type: activity_state::IsSet,
     S::StartedAt: activity_state::IsSet,
+    S::Type: activity_state::IsSet,
     S::EndedAt: activity_state::IsSet,
     S::CreatedAt: activity_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Activity<'a> {
         Activity {
-            calories: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            distance: self.__unsafe_private_named.2,
-            distance_units: self.__unsafe_private_named.3,
-            ended_at: self.__unsafe_private_named.4.unwrap(),
-            route: self.__unsafe_private_named.5,
-            splits: self.__unsafe_private_named.6,
-            started_at: self.__unsafe_private_named.7.unwrap(),
-            steps: self.__unsafe_private_named.8,
-            r#type: self.__unsafe_private_named.9.unwrap(),
+            calories: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            distance: self._fields.2,
+            distance_units: self._fields.3,
+            ended_at: self._fields.4.unwrap(),
+            route: self._fields.5,
+            splits: self._fields.6,
+            started_at: self._fields.7.unwrap(),
+            steps: self._fields.8,
+            r#type: self._fields.9.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -478,16 +470,16 @@ where
         >,
     ) -> Activity<'a> {
         Activity {
-            calories: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            distance: self.__unsafe_private_named.2,
-            distance_units: self.__unsafe_private_named.3,
-            ended_at: self.__unsafe_private_named.4.unwrap(),
-            route: self.__unsafe_private_named.5,
-            splits: self.__unsafe_private_named.6,
-            started_at: self.__unsafe_private_named.7.unwrap(),
-            steps: self.__unsafe_private_named.8,
-            r#type: self.__unsafe_private_named.9.unwrap(),
+            calories: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            distance: self._fields.2,
+            distance_units: self._fields.3,
+            ended_at: self._fields.4.unwrap(),
+            route: self._fields.5,
+            splits: self._fields.6,
+            started_at: self._fields.7.unwrap(),
+            steps: self._fields.8,
+            r#type: self._fields.9.unwrap(),
             extra_data: Some(extra_data),
         }
     }

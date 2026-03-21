@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -164,81 +167,75 @@ pub mod score_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TotalChallenges;
         type Level;
-        type CreatedAt;
         type TotalSuccesses;
+        type TotalChallenges;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TotalChallenges = Unset;
         type Level = Unset;
-        type CreatedAt = Unset;
         type TotalSuccesses = Unset;
-    }
-    ///State transition - sets the `total_challenges` field to Set
-    pub struct SetTotalChallenges<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalChallenges<S> {}
-    impl<S: State> State for SetTotalChallenges<S> {
-        type TotalChallenges = Set<members::total_challenges>;
-        type Level = S::Level;
-        type CreatedAt = S::CreatedAt;
-        type TotalSuccesses = S::TotalSuccesses;
+        type TotalChallenges = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLevel<S> {}
     impl<S: State> State for SetLevel<S> {
-        type TotalChallenges = S::TotalChallenges;
         type Level = Set<members::level>;
-        type CreatedAt = S::CreatedAt;
         type TotalSuccesses = S::TotalSuccesses;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
         type TotalChallenges = S::TotalChallenges;
-        type Level = S::Level;
-        type CreatedAt = Set<members::created_at>;
-        type TotalSuccesses = S::TotalSuccesses;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `total_successes` field to Set
     pub struct SetTotalSuccesses<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTotalSuccesses<S> {}
     impl<S: State> State for SetTotalSuccesses<S> {
-        type TotalChallenges = S::TotalChallenges;
         type Level = S::Level;
-        type CreatedAt = S::CreatedAt;
         type TotalSuccesses = Set<members::total_successes>;
+        type TotalChallenges = S::TotalChallenges;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `total_challenges` field to Set
+    pub struct SetTotalChallenges<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTotalChallenges<S> {}
+    impl<S: State> State for SetTotalChallenges<S> {
+        type Level = S::Level;
+        type TotalSuccesses = S::TotalSuccesses;
+        type TotalChallenges = Set<members::total_challenges>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Level = S::Level;
+        type TotalSuccesses = S::TotalSuccesses;
+        type TotalChallenges = S::TotalChallenges;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `total_challenges` field
-        pub struct total_challenges(());
         ///Marker type for the `level` field
         pub struct level(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `total_successes` field
         pub struct total_successes(());
+        ///Marker type for the `total_challenges` field
+        pub struct total_challenges(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ScoreBuilder<'a, S: score_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Datetime>,
-        Option<i64>,
-        Option<i64>,
-        Option<i64>,
-        Option<i64>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<i64>, Option<i64>, Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Score<'a> {
@@ -252,9 +249,9 @@ impl<'a> ScoreBuilder<'a, score_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ScoreBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -269,11 +266,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ScoreBuilder<'a, score_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ScoreBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -288,11 +285,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ScoreBuilder<'a, score_state::SetLevel<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ScoreBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -300,12 +297,12 @@ where
 impl<'a, S: score_state::State> ScoreBuilder<'a, S> {
     /// Set the `percentage` field (optional)
     pub fn percentage(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `percentage` field to an Option value (optional)
     pub fn maybe_percentage(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -320,11 +317,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ScoreBuilder<'a, score_state::SetTotalChallenges<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ScoreBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -339,11 +336,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ScoreBuilder<'a, score_state::SetTotalSuccesses<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ScoreBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -351,19 +348,19 @@ where
 impl<'a, S> ScoreBuilder<'a, S>
 where
     S: score_state::State,
-    S::TotalChallenges: score_state::IsSet,
     S::Level: score_state::IsSet,
-    S::CreatedAt: score_state::IsSet,
     S::TotalSuccesses: score_state::IsSet,
+    S::TotalChallenges: score_state::IsSet,
+    S::CreatedAt: score_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Score<'a> {
         Score {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            level: self.__unsafe_private_named.1.unwrap(),
-            percentage: self.__unsafe_private_named.2,
-            total_challenges: self.__unsafe_private_named.3.unwrap(),
-            total_successes: self.__unsafe_private_named.4.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            level: self._fields.1.unwrap(),
+            percentage: self._fields.2,
+            total_challenges: self._fields.3.unwrap(),
+            total_successes: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -376,11 +373,11 @@ where
         >,
     ) -> Score<'a> {
         Score {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            level: self.__unsafe_private_named.1.unwrap(),
-            percentage: self.__unsafe_private_named.2,
-            total_challenges: self.__unsafe_private_named.3.unwrap(),
-            total_successes: self.__unsafe_private_named.4.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            level: self._fields.1.unwrap(),
+            percentage: self._fields.2,
+            total_challenges: self._fields.3.unwrap(),
+            total_successes: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

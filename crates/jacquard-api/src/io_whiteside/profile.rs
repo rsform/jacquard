@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -135,59 +138,59 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Heading;
-        type Content;
         type UpdatedAt;
+        type Content;
+        type Heading;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Heading = Unset;
-        type Content = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `heading` field to Set
-    pub struct SetHeading<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHeading<S> {}
-    impl<S: State> State for SetHeading<S> {
-        type Heading = Set<members::heading>;
-        type Content = S::Content;
-        type UpdatedAt = S::UpdatedAt;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Heading = S::Heading;
-        type Content = Set<members::content>;
-        type UpdatedAt = S::UpdatedAt;
+        type Content = Unset;
+        type Heading = Unset;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
     impl<S: State> State for SetUpdatedAt<S> {
-        type Heading = S::Heading;
-        type Content = S::Content;
         type UpdatedAt = Set<members::updated_at>;
+        type Content = S::Content;
+        type Heading = S::Heading;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type Content = Set<members::content>;
+        type Heading = S::Heading;
+    }
+    ///State transition - sets the `heading` field to Set
+    pub struct SetHeading<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHeading<S> {}
+    impl<S: State> State for SetHeading<S> {
+        type UpdatedAt = S::UpdatedAt;
+        type Content = S::Content;
+        type Heading = Set<members::heading>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `heading` field
-        pub struct heading(());
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `content` field
+        pub struct content(());
+        ///Marker type for the `heading` field
+        pub struct heading(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ProfileBuilder<'a, S: profile_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>, Option<Datetime>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Profile<'a> {
@@ -201,9 +204,9 @@ impl<'a> ProfileBuilder<'a, profile_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -218,11 +221,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ProfileBuilder<'a, profile_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -237,11 +240,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ProfileBuilder<'a, profile_state::SetHeading<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -256,11 +259,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ProfileBuilder<'a, profile_state::SetUpdatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ProfileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -268,16 +271,16 @@ where
 impl<'a, S> ProfileBuilder<'a, S>
 where
     S: profile_state::State,
-    S::Heading: profile_state::IsSet,
-    S::Content: profile_state::IsSet,
     S::UpdatedAt: profile_state::IsSet,
+    S::Content: profile_state::IsSet,
+    S::Heading: profile_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Profile<'a> {
         Profile {
-            content: self.__unsafe_private_named.0.unwrap(),
-            heading: self.__unsafe_private_named.1.unwrap(),
-            updated_at: self.__unsafe_private_named.2.unwrap(),
+            content: self._fields.0.unwrap(),
+            heading: self._fields.1.unwrap(),
+            updated_at: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -290,9 +293,9 @@ where
         >,
     ) -> Profile<'a> {
         Profile {
-            content: self.__unsafe_private_named.0.unwrap(),
-            heading: self.__unsafe_private_named.1.unwrap(),
-            updated_at: self.__unsafe_private_named.2.unwrap(),
+            content: self._fields.0.unwrap(),
+            heading: self._fields.1.unwrap(),
+            updated_at: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

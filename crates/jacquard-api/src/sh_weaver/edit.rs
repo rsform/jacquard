@@ -15,7 +15,11 @@ pub mod get_edit_tree;
 pub mod list_drafts;
 pub mod root;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -396,9 +400,9 @@ pub mod doc_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct DocRefBuilder<'a, S: doc_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<DocRefValue<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<DocRefValue<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DocRef<'a> {
@@ -412,9 +416,9 @@ impl<'a> DocRefBuilder<'a, doc_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DocRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -429,11 +433,11 @@ where
         mut self,
         value: impl Into<DocRefValue<'a>>,
     ) -> DocRefBuilder<'a, doc_ref_state::SetValue<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         DocRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -446,7 +450,7 @@ where
     /// Build the final struct
     pub fn build(self) -> DocRef<'a> {
         DocRef {
-            value: self.__unsafe_private_named.0.unwrap(),
+            value: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -459,7 +463,7 @@ where
         >,
     ) -> DocRef<'a> {
         DocRef {
-            value: self.__unsafe_private_named.0.unwrap(),
+            value: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -792,74 +796,74 @@ pub mod edit_branch_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LastUpdated;
         type Length;
-        type Head;
         type Author;
+        type LastUpdated;
+        type Head;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LastUpdated = Unset;
         type Length = Unset;
-        type Head = Unset;
         type Author = Unset;
-    }
-    ///State transition - sets the `last_updated` field to Set
-    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
-    impl<S: State> State for SetLastUpdated<S> {
-        type LastUpdated = Set<members::last_updated>;
-        type Length = S::Length;
-        type Head = S::Head;
-        type Author = S::Author;
+        type LastUpdated = Unset;
+        type Head = Unset;
     }
     ///State transition - sets the `length` field to Set
     pub struct SetLength<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetLength<S> {}
     impl<S: State> State for SetLength<S> {
-        type LastUpdated = S::LastUpdated;
         type Length = Set<members::length>;
-        type Head = S::Head;
         type Author = S::Author;
-    }
-    ///State transition - sets the `head` field to Set
-    pub struct SetHead<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHead<S> {}
-    impl<S: State> State for SetHead<S> {
         type LastUpdated = S::LastUpdated;
-        type Length = S::Length;
-        type Head = Set<members::head>;
-        type Author = S::Author;
+        type Head = S::Head;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type LastUpdated = S::LastUpdated;
         type Length = S::Length;
-        type Head = S::Head;
         type Author = Set<members::author>;
+        type LastUpdated = S::LastUpdated;
+        type Head = S::Head;
+    }
+    ///State transition - sets the `last_updated` field to Set
+    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
+    impl<S: State> State for SetLastUpdated<S> {
+        type Length = S::Length;
+        type Author = S::Author;
+        type LastUpdated = Set<members::last_updated>;
+        type Head = S::Head;
+    }
+    ///State transition - sets the `head` field to Set
+    pub struct SetHead<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetHead<S> {}
+    impl<S: State> State for SetHead<S> {
+        type Length = S::Length;
+        type Author = S::Author;
+        type LastUpdated = S::LastUpdated;
+        type Head = Set<members::head>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `last_updated` field
-        pub struct last_updated(());
         ///Marker type for the `length` field
         pub struct length(());
-        ///Marker type for the `head` field
-        pub struct head(());
         ///Marker type for the `author` field
         pub struct author(());
+        ///Marker type for the `last_updated` field
+        pub struct last_updated(());
+        ///Marker type for the `head` field
+        pub struct head(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EditBranchViewBuilder<'a, S: edit_branch_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ProfileViewBasic<'a>>,
         Option<StrongRef<'a>>,
         Option<StrongRef<'a>>,
@@ -868,7 +872,7 @@ pub struct EditBranchViewBuilder<'a, S: edit_branch_view_state::State> {
         Option<i64>,
         Option<StrongRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> EditBranchView<'a> {
@@ -882,9 +886,9 @@ impl<'a> EditBranchViewBuilder<'a, edit_branch_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EditBranchViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -899,11 +903,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> EditBranchViewBuilder<'a, edit_branch_view_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         EditBranchViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -911,12 +915,12 @@ where
 impl<'a, S: edit_branch_view_state::State> EditBranchViewBuilder<'a, S> {
     /// Set the `divergesFrom` field (optional)
     pub fn diverges_from(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `divergesFrom` field to an Option value (optional)
     pub fn maybe_diverges_from(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -931,11 +935,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> EditBranchViewBuilder<'a, edit_branch_view_state::SetHead<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         EditBranchViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -943,12 +947,12 @@ where
 impl<'a, S: edit_branch_view_state::State> EditBranchViewBuilder<'a, S> {
     /// Set the `isMerged` field (optional)
     pub fn is_merged(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `isMerged` field to an Option value (optional)
     pub fn maybe_is_merged(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -963,11 +967,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> EditBranchViewBuilder<'a, edit_branch_view_state::SetLastUpdated<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         EditBranchViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -982,11 +986,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> EditBranchViewBuilder<'a, edit_branch_view_state::SetLength<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         EditBranchViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -994,12 +998,12 @@ where
 impl<'a, S: edit_branch_view_state::State> EditBranchViewBuilder<'a, S> {
     /// Set the `root` field (optional)
     pub fn root(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `root` field to an Option value (optional)
     pub fn maybe_root(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1007,21 +1011,21 @@ impl<'a, S: edit_branch_view_state::State> EditBranchViewBuilder<'a, S> {
 impl<'a, S> EditBranchViewBuilder<'a, S>
 where
     S: edit_branch_view_state::State,
-    S::LastUpdated: edit_branch_view_state::IsSet,
     S::Length: edit_branch_view_state::IsSet,
-    S::Head: edit_branch_view_state::IsSet,
     S::Author: edit_branch_view_state::IsSet,
+    S::LastUpdated: edit_branch_view_state::IsSet,
+    S::Head: edit_branch_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EditBranchView<'a> {
         EditBranchView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            diverges_from: self.__unsafe_private_named.1,
-            head: self.__unsafe_private_named.2.unwrap(),
-            is_merged: self.__unsafe_private_named.3,
-            last_updated: self.__unsafe_private_named.4.unwrap(),
-            length: self.__unsafe_private_named.5.unwrap(),
-            root: self.__unsafe_private_named.6,
+            author: self._fields.0.unwrap(),
+            diverges_from: self._fields.1,
+            head: self._fields.2.unwrap(),
+            is_merged: self._fields.3,
+            last_updated: self._fields.4.unwrap(),
+            length: self._fields.5.unwrap(),
+            root: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -1034,13 +1038,13 @@ where
         >,
     ) -> EditBranchView<'a> {
         EditBranchView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            diverges_from: self.__unsafe_private_named.1,
-            head: self.__unsafe_private_named.2.unwrap(),
-            is_merged: self.__unsafe_private_named.3,
-            last_updated: self.__unsafe_private_named.4.unwrap(),
-            length: self.__unsafe_private_named.5.unwrap(),
-            root: self.__unsafe_private_named.6,
+            author: self._fields.0.unwrap(),
+            diverges_from: self._fields.1,
+            head: self._fields.2.unwrap(),
+            is_merged: self._fields.3,
+            last_updated: self._fields.4.unwrap(),
+            length: self._fields.5.unwrap(),
+            root: self._fields.6,
             extra_data: Some(extra_data),
         }
     }
@@ -1056,83 +1060,83 @@ pub mod edit_history_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Cid;
-        type Type;
         type Uri;
+        type CreatedAt;
+        type Type;
         type Author;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Cid = Unset;
-        type Type = Unset;
         type Uri = Unset;
+        type CreatedAt = Unset;
+        type Type = Unset;
         type Author = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Cid = S::Cid;
-        type Type = S::Type;
-        type Uri = S::Uri;
-        type Author = S::Author;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type CreatedAt = S::CreatedAt;
         type Cid = Set<members::cid>;
-        type Type = S::Type;
         type Uri = S::Uri;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
         type CreatedAt = S::CreatedAt;
-        type Cid = S::Cid;
-        type Type = Set<members::r#type>;
-        type Uri = S::Uri;
+        type Type = S::Type;
         type Author = S::Author;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type CreatedAt = S::CreatedAt;
         type Cid = S::Cid;
-        type Type = S::Type;
         type Uri = Set<members::uri>;
+        type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type CreatedAt = Set<members::created_at>;
+        type Type = S::Type;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetType<S> {}
+    impl<S: State> State for SetType<S> {
+        type Cid = S::Cid;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Type = Set<members::r#type>;
         type Author = S::Author;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type CreatedAt = S::CreatedAt;
         type Cid = S::Cid;
-        type Type = S::Type;
         type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+        type Type = S::Type;
         type Author = Set<members::author>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
         ///Marker type for the `author` field
         pub struct author(());
     }
@@ -1140,8 +1144,8 @@ pub mod edit_history_entry_state {
 
 /// Builder for constructing an instance of this type
 pub struct EditHistoryEntryBuilder<'a, S: edit_history_entry_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ProfileViewBasic<'a>>,
         Option<Cid<'a>>,
         Option<Datetime>,
@@ -1152,7 +1156,7 @@ pub struct EditHistoryEntryBuilder<'a, S: edit_history_entry_state::State> {
         Option<EditHistoryEntryType<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> EditHistoryEntry<'a> {
@@ -1166,19 +1170,9 @@ impl<'a> EditHistoryEntryBuilder<'a, edit_history_entry_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EditHistoryEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1193,11 +1187,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> EditHistoryEntryBuilder<'a, edit_history_entry_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         EditHistoryEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1212,11 +1206,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> EditHistoryEntryBuilder<'a, edit_history_entry_state::SetCid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         EditHistoryEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1231,11 +1225,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> EditHistoryEntryBuilder<'a, edit_history_entry_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         EditHistoryEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1243,12 +1237,12 @@ where
 impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
     /// Set the `hasInlineDiff` field (optional)
     pub fn has_inline_diff(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `hasInlineDiff` field to an Option value (optional)
     pub fn maybe_has_inline_diff(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1256,12 +1250,12 @@ impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
 impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
     /// Set the `prevRef` field (optional)
     pub fn prev_ref(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `prevRef` field to an Option value (optional)
     pub fn maybe_prev_ref(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1269,12 +1263,12 @@ impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
 impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
     /// Set the `rootRef` field (optional)
     pub fn root_ref(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `rootRef` field to an Option value (optional)
     pub fn maybe_root_ref(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1282,12 +1276,12 @@ impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
 impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
     /// Set the `snapshotCid` field (optional)
     pub fn snapshot_cid(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `snapshotCid` field to an Option value (optional)
     pub fn maybe_snapshot_cid(mut self, value: Option<Cid<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1302,11 +1296,11 @@ where
         mut self,
         value: impl Into<EditHistoryEntryType<'a>>,
     ) -> EditHistoryEntryBuilder<'a, edit_history_entry_state::SetType<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         EditHistoryEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1321,11 +1315,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> EditHistoryEntryBuilder<'a, edit_history_entry_state::SetUri<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         EditHistoryEntryBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1333,24 +1327,24 @@ where
 impl<'a, S> EditHistoryEntryBuilder<'a, S>
 where
     S: edit_history_entry_state::State,
-    S::CreatedAt: edit_history_entry_state::IsSet,
     S::Cid: edit_history_entry_state::IsSet,
-    S::Type: edit_history_entry_state::IsSet,
     S::Uri: edit_history_entry_state::IsSet,
+    S::CreatedAt: edit_history_entry_state::IsSet,
+    S::Type: edit_history_entry_state::IsSet,
     S::Author: edit_history_entry_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EditHistoryEntry<'a> {
         EditHistoryEntry {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            has_inline_diff: self.__unsafe_private_named.3,
-            prev_ref: self.__unsafe_private_named.4,
-            root_ref: self.__unsafe_private_named.5,
-            snapshot_cid: self.__unsafe_private_named.6,
-            r#type: self.__unsafe_private_named.7.unwrap(),
-            uri: self.__unsafe_private_named.8.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            has_inline_diff: self._fields.3,
+            prev_ref: self._fields.4,
+            root_ref: self._fields.5,
+            snapshot_cid: self._fields.6,
+            r#type: self._fields.7.unwrap(),
+            uri: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1363,15 +1357,15 @@ where
         >,
     ) -> EditHistoryEntry<'a> {
         EditHistoryEntry {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            has_inline_diff: self.__unsafe_private_named.3,
-            prev_ref: self.__unsafe_private_named.4,
-            root_ref: self.__unsafe_private_named.5,
-            snapshot_cid: self.__unsafe_private_named.6,
-            r#type: self.__unsafe_private_named.7.unwrap(),
-            uri: self.__unsafe_private_named.8.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            has_inline_diff: self._fields.3,
+            prev_ref: self._fields.4,
+            root_ref: self._fields.5,
+            snapshot_cid: self._fields.6,
+            r#type: self._fields.7.unwrap(),
+            uri: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1387,51 +1381,51 @@ pub mod edit_tree_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Branches;
         type Resource;
+        type Branches;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Branches = Unset;
         type Resource = Unset;
-    }
-    ///State transition - sets the `branches` field to Set
-    pub struct SetBranches<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBranches<S> {}
-    impl<S: State> State for SetBranches<S> {
-        type Branches = Set<members::branches>;
-        type Resource = S::Resource;
+        type Branches = Unset;
     }
     ///State transition - sets the `resource` field to Set
     pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetResource<S> {}
     impl<S: State> State for SetResource<S> {
-        type Branches = S::Branches;
         type Resource = Set<members::resource>;
+        type Branches = S::Branches;
+    }
+    ///State transition - sets the `branches` field to Set
+    pub struct SetBranches<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBranches<S> {}
+    impl<S: State> State for SetBranches<S> {
+        type Resource = S::Resource;
+        type Branches = Set<members::branches>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `branches` field
-        pub struct branches(());
         ///Marker type for the `resource` field
         pub struct resource(());
+        ///Marker type for the `branches` field
+        pub struct branches(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EditTreeViewBuilder<'a, S: edit_tree_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<edit::EditBranchView<'a>>>,
         Option<Vec<StrongRef<'a>>>,
         Option<bool>,
         Option<edit::EditBranchView<'a>>,
         Option<StrongRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> EditTreeView<'a> {
@@ -1445,9 +1439,9 @@ impl<'a> EditTreeViewBuilder<'a, edit_tree_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EditTreeViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1462,11 +1456,11 @@ where
         mut self,
         value: impl Into<Vec<edit::EditBranchView<'a>>>,
     ) -> EditTreeViewBuilder<'a, edit_tree_view_state::SetBranches<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         EditTreeViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1477,12 +1471,12 @@ impl<'a, S: edit_tree_view_state::State> EditTreeViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<StrongRef<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `conflictPoints` field to an Option value (optional)
     pub fn maybe_conflict_points(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1490,12 +1484,12 @@ impl<'a, S: edit_tree_view_state::State> EditTreeViewBuilder<'a, S> {
 impl<'a, S: edit_tree_view_state::State> EditTreeViewBuilder<'a, S> {
     /// Set the `hasConflicts` field (optional)
     pub fn has_conflicts(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `hasConflicts` field to an Option value (optional)
     pub fn maybe_has_conflicts(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1506,12 +1500,12 @@ impl<'a, S: edit_tree_view_state::State> EditTreeViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<edit::EditBranchView<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `mainBranch` field to an Option value (optional)
     pub fn maybe_main_branch(mut self, value: Option<edit::EditBranchView<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1526,11 +1520,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> EditTreeViewBuilder<'a, edit_tree_view_state::SetResource<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         EditTreeViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1538,17 +1532,17 @@ where
 impl<'a, S> EditTreeViewBuilder<'a, S>
 where
     S: edit_tree_view_state::State,
-    S::Branches: edit_tree_view_state::IsSet,
     S::Resource: edit_tree_view_state::IsSet,
+    S::Branches: edit_tree_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EditTreeView<'a> {
         EditTreeView {
-            branches: self.__unsafe_private_named.0.unwrap(),
-            conflict_points: self.__unsafe_private_named.1,
-            has_conflicts: self.__unsafe_private_named.2,
-            main_branch: self.__unsafe_private_named.3,
-            resource: self.__unsafe_private_named.4.unwrap(),
+            branches: self._fields.0.unwrap(),
+            conflict_points: self._fields.1,
+            has_conflicts: self._fields.2,
+            main_branch: self._fields.3,
+            resource: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1561,11 +1555,11 @@ where
         >,
     ) -> EditTreeView<'a> {
         EditTreeView {
-            branches: self.__unsafe_private_named.0.unwrap(),
-            conflict_points: self.__unsafe_private_named.1,
-            has_conflicts: self.__unsafe_private_named.2,
-            main_branch: self.__unsafe_private_named.3,
-            resource: self.__unsafe_private_named.4.unwrap(),
+            branches: self._fields.0.unwrap(),
+            conflict_points: self._fields.1,
+            has_conflicts: self._fields.2,
+            main_branch: self._fields.3,
+            resource: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1605,9 +1599,9 @@ pub mod entry_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct EntryRefBuilder<'a, S: entry_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<StrongRef<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<StrongRef<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> EntryRef<'a> {
@@ -1621,9 +1615,9 @@ impl<'a> EntryRefBuilder<'a, entry_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EntryRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1638,11 +1632,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> EntryRefBuilder<'a, entry_ref_state::SetEntry<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         EntryRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1655,7 +1649,7 @@ where
     /// Build the final struct
     pub fn build(self) -> EntryRef<'a> {
         EntryRef {
-            entry: self.__unsafe_private_named.0.unwrap(),
+            entry: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1668,7 +1662,7 @@ where
         >,
     ) -> EntryRef<'a> {
         EntryRef {
-            entry: self.__unsafe_private_named.0.unwrap(),
+            entry: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1708,9 +1702,9 @@ pub mod notebook_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct NotebookRefBuilder<'a, S: notebook_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<StrongRef<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<StrongRef<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> NotebookRef<'a> {
@@ -1724,9 +1718,9 @@ impl<'a> NotebookRefBuilder<'a, notebook_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NotebookRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1741,11 +1735,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> NotebookRefBuilder<'a, notebook_ref_state::SetNotebook<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         NotebookRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1758,7 +1752,7 @@ where
     /// Build the final struct
     pub fn build(self) -> NotebookRef<'a> {
         NotebookRef {
-            notebook: self.__unsafe_private_named.0.unwrap(),
+            notebook: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1771,7 +1765,7 @@ where
         >,
     ) -> NotebookRef<'a> {
         NotebookRef {
-            notebook: self.__unsafe_private_named.0.unwrap(),
+            notebook: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

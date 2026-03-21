@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -195,80 +198,80 @@ pub mod cel_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UsedTags;
+        type Version;
         type Expression;
         type CreatedAt;
-        type Version;
+        type UsedTags;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UsedTags = Unset;
+        type Version = Unset;
         type Expression = Unset;
         type CreatedAt = Unset;
-        type Version = Unset;
-    }
-    ///State transition - sets the `used_tags` field to Set
-    pub struct SetUsedTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUsedTags<S> {}
-    impl<S: State> State for SetUsedTags<S> {
-        type UsedTags = Set<members::used_tags>;
-        type Expression = S::Expression;
-        type CreatedAt = S::CreatedAt;
-        type Version = S::Version;
-    }
-    ///State transition - sets the `expression` field to Set
-    pub struct SetExpression<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExpression<S> {}
-    impl<S: State> State for SetExpression<S> {
-        type UsedTags = S::UsedTags;
-        type Expression = Set<members::expression>;
-        type CreatedAt = S::CreatedAt;
-        type Version = S::Version;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type UsedTags = S::UsedTags;
-        type Expression = S::Expression;
-        type CreatedAt = Set<members::created_at>;
-        type Version = S::Version;
+        type UsedTags = Unset;
     }
     ///State transition - sets the `version` field to Set
     pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetVersion<S> {}
     impl<S: State> State for SetVersion<S> {
-        type UsedTags = S::UsedTags;
+        type Version = Set<members::version>;
         type Expression = S::Expression;
         type CreatedAt = S::CreatedAt;
-        type Version = Set<members::version>;
+        type UsedTags = S::UsedTags;
+    }
+    ///State transition - sets the `expression` field to Set
+    pub struct SetExpression<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetExpression<S> {}
+    impl<S: State> State for SetExpression<S> {
+        type Version = S::Version;
+        type Expression = Set<members::expression>;
+        type CreatedAt = S::CreatedAt;
+        type UsedTags = S::UsedTags;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Version = S::Version;
+        type Expression = S::Expression;
+        type CreatedAt = Set<members::created_at>;
+        type UsedTags = S::UsedTags;
+    }
+    ///State transition - sets the `used_tags` field to Set
+    pub struct SetUsedTags<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUsedTags<S> {}
+    impl<S: State> State for SetUsedTags<S> {
+        type Version = S::Version;
+        type Expression = S::Expression;
+        type CreatedAt = S::CreatedAt;
+        type UsedTags = Set<members::used_tags>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `used_tags` field
-        pub struct used_tags(());
+        ///Marker type for the `version` field
+        pub struct version(());
         ///Marker type for the `expression` field
         pub struct expression(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `version` field
-        pub struct version(());
+        ///Marker type for the `used_tags` field
+        pub struct used_tags(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CelBuilder<'a, S: cel_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<Vec<StrongRef<'a>>>,
         Option<CelVersion<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Cel<'a> {
@@ -282,9 +285,9 @@ impl<'a> CelBuilder<'a, cel_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CelBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -299,11 +302,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CelBuilder<'a, cel_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CelBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -318,11 +321,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CelBuilder<'a, cel_state::SetExpression<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CelBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -337,11 +340,11 @@ where
         mut self,
         value: impl Into<Vec<StrongRef<'a>>>,
     ) -> CelBuilder<'a, cel_state::SetUsedTags<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CelBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -356,11 +359,11 @@ where
         mut self,
         value: impl Into<CelVersion<'a>>,
     ) -> CelBuilder<'a, cel_state::SetVersion<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         CelBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -368,18 +371,18 @@ where
 impl<'a, S> CelBuilder<'a, S>
 where
     S: cel_state::State,
-    S::UsedTags: cel_state::IsSet,
+    S::Version: cel_state::IsSet,
     S::Expression: cel_state::IsSet,
     S::CreatedAt: cel_state::IsSet,
-    S::Version: cel_state::IsSet,
+    S::UsedTags: cel_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Cel<'a> {
         Cel {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            expression: self.__unsafe_private_named.1.unwrap(),
-            used_tags: self.__unsafe_private_named.2.unwrap(),
-            version: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            expression: self._fields.1.unwrap(),
+            used_tags: self._fields.2.unwrap(),
+            version: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -392,10 +395,10 @@ where
         >,
     ) -> Cel<'a> {
         Cel {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            expression: self.__unsafe_private_named.1.unwrap(),
-            used_tags: self.__unsafe_private_named.2.unwrap(),
-            version: self.__unsafe_private_named.3.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            expression: self._fields.1.unwrap(),
+            used_tags: self._fields.2.unwrap(),
+            version: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

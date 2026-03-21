@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -358,59 +361,59 @@ pub mod code_theme_file_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Content;
         type Name;
         type Did;
-        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Content = Unset;
         type Name = Unset;
         type Did = Unset;
-        type Content = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Did = S::Did;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Name = S::Name;
-        type Did = Set<members::did>;
-        type Content = S::Content;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContent<S> {}
     impl<S: State> State for SetContent<S> {
+        type Content = Set<members::content>;
         type Name = S::Name;
         type Did = S::Did;
-        type Content = Set<members::content>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Content = S::Content;
+        type Name = Set<members::name>;
+        type Did = S::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Content = S::Content;
+        type Name = S::Name;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `content` field
+        pub struct content(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `content` field
-        pub struct content(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CodeThemeFileBuilder<'a, S: code_theme_file_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<BlobRef<'a>>, Option<Did<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<BlobRef<'a>>, Option<Did<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CodeThemeFile<'a> {
@@ -424,9 +427,9 @@ impl<'a> CodeThemeFileBuilder<'a, code_theme_file_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CodeThemeFileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -441,11 +444,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> CodeThemeFileBuilder<'a, code_theme_file_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CodeThemeFileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -460,11 +463,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> CodeThemeFileBuilder<'a, code_theme_file_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CodeThemeFileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -479,11 +482,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CodeThemeFileBuilder<'a, code_theme_file_state::SetName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CodeThemeFileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -491,16 +494,16 @@ where
 impl<'a, S> CodeThemeFileBuilder<'a, S>
 where
     S: code_theme_file_state::State,
+    S::Content: code_theme_file_state::IsSet,
     S::Name: code_theme_file_state::IsSet,
     S::Did: code_theme_file_state::IsSet,
-    S::Content: code_theme_file_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CodeThemeFile<'a> {
         CodeThemeFile {
-            content: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
+            content: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -513,9 +516,9 @@ where
         >,
     ) -> CodeThemeFile<'a> {
         CodeThemeFile {
-            content: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
+            content: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -840,9 +843,9 @@ pub mod font_state {
 
 /// Builder for constructing an instance of this type
 pub struct FontBuilder<'a, S: font_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<FontValue<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<FontValue<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Font<'a> {
@@ -856,9 +859,9 @@ impl<'a> FontBuilder<'a, font_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FontBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -873,11 +876,11 @@ where
         mut self,
         value: impl Into<FontValue<'a>>,
     ) -> FontBuilder<'a, font_state::SetValue<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         FontBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -890,7 +893,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Font<'a> {
         Font {
-            value: self.__unsafe_private_named.0.unwrap(),
+            value: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -903,7 +906,7 @@ where
         >,
     ) -> Font<'a> {
         Font {
-            value: self.__unsafe_private_named.0.unwrap(),
+            value: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -919,59 +922,59 @@ pub mod font_file_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Name;
         type Did;
         type Content;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Name = Unset;
         type Did = Unset;
         type Content = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Content = S::Content;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Did = S::Did;
-        type Content = Set<members::content>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
+        type Name = Set<members::name>;
         type Did = S::Did;
         type Content = S::Content;
-        type Name = Set<members::name>;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDid<S> {}
+    impl<S: State> State for SetDid<S> {
+        type Name = S::Name;
+        type Did = Set<members::did>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Name = S::Name;
+        type Did = S::Did;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `content` field
         pub struct content(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct FontFileBuilder<'a, S: font_file_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<BlobRef<'a>>, Option<Did<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<BlobRef<'a>>, Option<Did<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> FontFile<'a> {
@@ -985,9 +988,9 @@ impl<'a> FontFileBuilder<'a, font_file_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FontFileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1002,11 +1005,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> FontFileBuilder<'a, font_file_state::SetContent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         FontFileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1021,11 +1024,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> FontFileBuilder<'a, font_file_state::SetDid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         FontFileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1040,11 +1043,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> FontFileBuilder<'a, font_file_state::SetName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         FontFileBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1052,16 +1055,16 @@ where
 impl<'a, S> FontFileBuilder<'a, S>
 where
     S: font_file_state::State,
+    S::Name: font_file_state::IsSet,
     S::Did: font_file_state::IsSet,
     S::Content: font_file_state::IsSet,
-    S::Name: font_file_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> FontFile<'a> {
         FontFile {
-            content: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
+            content: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1074,9 +1077,9 @@ where
         >,
     ) -> FontFile<'a> {
         FontFile {
-            content: self.__unsafe_private_named.0.unwrap(),
-            did: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
+            content: self._fields.0.unwrap(),
+            did: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1112,62 +1115,62 @@ pub mod theme_fonts_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Heading;
-        type Body;
         type Monospace;
+        type Body;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Heading = Unset;
-        type Body = Unset;
         type Monospace = Unset;
+        type Body = Unset;
     }
     ///State transition - sets the `heading` field to Set
     pub struct SetHeading<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHeading<S> {}
     impl<S: State> State for SetHeading<S> {
         type Heading = Set<members::heading>;
+        type Monospace = S::Monospace;
         type Body = S::Body;
-        type Monospace = S::Monospace;
-    }
-    ///State transition - sets the `body` field to Set
-    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBody<S> {}
-    impl<S: State> State for SetBody<S> {
-        type Heading = S::Heading;
-        type Body = Set<members::body>;
-        type Monospace = S::Monospace;
     }
     ///State transition - sets the `monospace` field to Set
     pub struct SetMonospace<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetMonospace<S> {}
     impl<S: State> State for SetMonospace<S> {
         type Heading = S::Heading;
-        type Body = S::Body;
         type Monospace = Set<members::monospace>;
+        type Body = S::Body;
+    }
+    ///State transition - sets the `body` field to Set
+    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetBody<S> {}
+    impl<S: State> State for SetBody<S> {
+        type Heading = S::Heading;
+        type Monospace = S::Monospace;
+        type Body = Set<members::body>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `heading` field
         pub struct heading(());
-        ///Marker type for the `body` field
-        pub struct body(());
         ///Marker type for the `monospace` field
         pub struct monospace(());
+        ///Marker type for the `body` field
+        pub struct body(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ThemeFontsBuilder<'a, S: theme_fonts_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<crate::sh_weaver::notebook::theme::Font<'a>>>,
         Option<Vec<crate::sh_weaver::notebook::theme::Font<'a>>>,
         Option<Vec<crate::sh_weaver::notebook::theme::Font<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ThemeFonts<'a> {
@@ -1181,9 +1184,9 @@ impl<'a> ThemeFontsBuilder<'a, theme_fonts_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ThemeFontsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1198,11 +1201,11 @@ where
         mut self,
         value: impl Into<Vec<crate::sh_weaver::notebook::theme::Font<'a>>>,
     ) -> ThemeFontsBuilder<'a, theme_fonts_state::SetBody<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ThemeFontsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1217,11 +1220,11 @@ where
         mut self,
         value: impl Into<Vec<crate::sh_weaver::notebook::theme::Font<'a>>>,
     ) -> ThemeFontsBuilder<'a, theme_fonts_state::SetHeading<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ThemeFontsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1236,11 +1239,11 @@ where
         mut self,
         value: impl Into<Vec<crate::sh_weaver::notebook::theme::Font<'a>>>,
     ) -> ThemeFontsBuilder<'a, theme_fonts_state::SetMonospace<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ThemeFontsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1249,15 +1252,15 @@ impl<'a, S> ThemeFontsBuilder<'a, S>
 where
     S: theme_fonts_state::State,
     S::Heading: theme_fonts_state::IsSet,
-    S::Body: theme_fonts_state::IsSet,
     S::Monospace: theme_fonts_state::IsSet,
+    S::Body: theme_fonts_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ThemeFonts<'a> {
         ThemeFonts {
-            body: self.__unsafe_private_named.0.unwrap(),
-            heading: self.__unsafe_private_named.1.unwrap(),
-            monospace: self.__unsafe_private_named.2.unwrap(),
+            body: self._fields.0.unwrap(),
+            heading: self._fields.1.unwrap(),
+            monospace: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1270,9 +1273,9 @@ where
         >,
     ) -> ThemeFonts<'a> {
         ThemeFonts {
-            body: self.__unsafe_private_named.0.unwrap(),
-            heading: self.__unsafe_private_named.1.unwrap(),
-            monospace: self.__unsafe_private_named.2.unwrap(),
+            body: self._fields.0.unwrap(),
+            heading: self._fields.1.unwrap(),
+            monospace: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1304,10 +1307,10 @@ pub mod theme_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Fonts;
+        type DarkScheme;
+        type Spacing;
         type LightScheme;
         type DarkCodeTheme;
-        type Spacing;
-        type DarkScheme;
         type LightCodeTheme;
     }
     /// Empty state - all required fields are unset
@@ -1315,10 +1318,10 @@ pub mod theme_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Fonts = Unset;
+        type DarkScheme = Unset;
+        type Spacing = Unset;
         type LightScheme = Unset;
         type DarkCodeTheme = Unset;
-        type Spacing = Unset;
-        type DarkScheme = Unset;
         type LightCodeTheme = Unset;
     }
     ///State transition - sets the `fonts` field to Set
@@ -1326,43 +1329,10 @@ pub mod theme_state {
     impl<S: State> sealed::Sealed for SetFonts<S> {}
     impl<S: State> State for SetFonts<S> {
         type Fonts = Set<members::fonts>;
+        type DarkScheme = S::DarkScheme;
+        type Spacing = S::Spacing;
         type LightScheme = S::LightScheme;
         type DarkCodeTheme = S::DarkCodeTheme;
-        type Spacing = S::Spacing;
-        type DarkScheme = S::DarkScheme;
-        type LightCodeTheme = S::LightCodeTheme;
-    }
-    ///State transition - sets the `light_scheme` field to Set
-    pub struct SetLightScheme<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLightScheme<S> {}
-    impl<S: State> State for SetLightScheme<S> {
-        type Fonts = S::Fonts;
-        type LightScheme = Set<members::light_scheme>;
-        type DarkCodeTheme = S::DarkCodeTheme;
-        type Spacing = S::Spacing;
-        type DarkScheme = S::DarkScheme;
-        type LightCodeTheme = S::LightCodeTheme;
-    }
-    ///State transition - sets the `dark_code_theme` field to Set
-    pub struct SetDarkCodeTheme<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDarkCodeTheme<S> {}
-    impl<S: State> State for SetDarkCodeTheme<S> {
-        type Fonts = S::Fonts;
-        type LightScheme = S::LightScheme;
-        type DarkCodeTheme = Set<members::dark_code_theme>;
-        type Spacing = S::Spacing;
-        type DarkScheme = S::DarkScheme;
-        type LightCodeTheme = S::LightCodeTheme;
-    }
-    ///State transition - sets the `spacing` field to Set
-    pub struct SetSpacing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSpacing<S> {}
-    impl<S: State> State for SetSpacing<S> {
-        type Fonts = S::Fonts;
-        type LightScheme = S::LightScheme;
-        type DarkCodeTheme = S::DarkCodeTheme;
-        type Spacing = Set<members::spacing>;
-        type DarkScheme = S::DarkScheme;
         type LightCodeTheme = S::LightCodeTheme;
     }
     ///State transition - sets the `dark_scheme` field to Set
@@ -1370,10 +1340,43 @@ pub mod theme_state {
     impl<S: State> sealed::Sealed for SetDarkScheme<S> {}
     impl<S: State> State for SetDarkScheme<S> {
         type Fonts = S::Fonts;
+        type DarkScheme = Set<members::dark_scheme>;
+        type Spacing = S::Spacing;
         type LightScheme = S::LightScheme;
         type DarkCodeTheme = S::DarkCodeTheme;
+        type LightCodeTheme = S::LightCodeTheme;
+    }
+    ///State transition - sets the `spacing` field to Set
+    pub struct SetSpacing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSpacing<S> {}
+    impl<S: State> State for SetSpacing<S> {
+        type Fonts = S::Fonts;
+        type DarkScheme = S::DarkScheme;
+        type Spacing = Set<members::spacing>;
+        type LightScheme = S::LightScheme;
+        type DarkCodeTheme = S::DarkCodeTheme;
+        type LightCodeTheme = S::LightCodeTheme;
+    }
+    ///State transition - sets the `light_scheme` field to Set
+    pub struct SetLightScheme<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLightScheme<S> {}
+    impl<S: State> State for SetLightScheme<S> {
+        type Fonts = S::Fonts;
+        type DarkScheme = S::DarkScheme;
         type Spacing = S::Spacing;
-        type DarkScheme = Set<members::dark_scheme>;
+        type LightScheme = Set<members::light_scheme>;
+        type DarkCodeTheme = S::DarkCodeTheme;
+        type LightCodeTheme = S::LightCodeTheme;
+    }
+    ///State transition - sets the `dark_code_theme` field to Set
+    pub struct SetDarkCodeTheme<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDarkCodeTheme<S> {}
+    impl<S: State> State for SetDarkCodeTheme<S> {
+        type Fonts = S::Fonts;
+        type DarkScheme = S::DarkScheme;
+        type Spacing = S::Spacing;
+        type LightScheme = S::LightScheme;
+        type DarkCodeTheme = Set<members::dark_code_theme>;
         type LightCodeTheme = S::LightCodeTheme;
     }
     ///State transition - sets the `light_code_theme` field to Set
@@ -1381,10 +1384,10 @@ pub mod theme_state {
     impl<S: State> sealed::Sealed for SetLightCodeTheme<S> {}
     impl<S: State> State for SetLightCodeTheme<S> {
         type Fonts = S::Fonts;
+        type DarkScheme = S::DarkScheme;
+        type Spacing = S::Spacing;
         type LightScheme = S::LightScheme;
         type DarkCodeTheme = S::DarkCodeTheme;
-        type Spacing = S::Spacing;
-        type DarkScheme = S::DarkScheme;
         type LightCodeTheme = Set<members::light_code_theme>;
     }
     /// Marker types for field names
@@ -1392,14 +1395,14 @@ pub mod theme_state {
     pub mod members {
         ///Marker type for the `fonts` field
         pub struct fonts(());
+        ///Marker type for the `dark_scheme` field
+        pub struct dark_scheme(());
+        ///Marker type for the `spacing` field
+        pub struct spacing(());
         ///Marker type for the `light_scheme` field
         pub struct light_scheme(());
         ///Marker type for the `dark_code_theme` field
         pub struct dark_code_theme(());
-        ///Marker type for the `spacing` field
-        pub struct spacing(());
-        ///Marker type for the `dark_scheme` field
-        pub struct dark_scheme(());
         ///Marker type for the `light_code_theme` field
         pub struct light_code_theme(());
     }
@@ -1407,8 +1410,8 @@ pub mod theme_state {
 
 /// Builder for constructing an instance of this type
 pub struct ThemeBuilder<'a, S: theme_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ThemeDarkCodeTheme<'a>>,
         Option<StrongRef<'a>>,
         Option<CowStr<'a>>,
@@ -1417,7 +1420,7 @@ pub struct ThemeBuilder<'a, S: theme_state::State> {
         Option<StrongRef<'a>>,
         Option<ThemeSpacing<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Theme<'a> {
@@ -1431,9 +1434,9 @@ impl<'a> ThemeBuilder<'a, theme_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ThemeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1448,11 +1451,11 @@ where
         mut self,
         value: impl Into<ThemeDarkCodeTheme<'a>>,
     ) -> ThemeBuilder<'a, theme_state::SetDarkCodeTheme<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ThemeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1467,11 +1470,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> ThemeBuilder<'a, theme_state::SetDarkScheme<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ThemeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1479,12 +1482,12 @@ where
 impl<'a, S: theme_state::State> ThemeBuilder<'a, S> {
     /// Set the `defaultTheme` field (optional)
     pub fn default_theme(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `defaultTheme` field to an Option value (optional)
     pub fn maybe_default_theme(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1499,11 +1502,11 @@ where
         mut self,
         value: impl Into<ThemeFonts<'a>>,
     ) -> ThemeBuilder<'a, theme_state::SetFonts<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ThemeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1518,11 +1521,11 @@ where
         mut self,
         value: impl Into<ThemeLightCodeTheme<'a>>,
     ) -> ThemeBuilder<'a, theme_state::SetLightCodeTheme<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ThemeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1537,11 +1540,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> ThemeBuilder<'a, theme_state::SetLightScheme<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ThemeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1556,11 +1559,11 @@ where
         mut self,
         value: impl Into<ThemeSpacing<'a>>,
     ) -> ThemeBuilder<'a, theme_state::SetSpacing<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         ThemeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1569,25 +1572,22 @@ impl<'a, S> ThemeBuilder<'a, S>
 where
     S: theme_state::State,
     S::Fonts: theme_state::IsSet,
+    S::DarkScheme: theme_state::IsSet,
+    S::Spacing: theme_state::IsSet,
     S::LightScheme: theme_state::IsSet,
     S::DarkCodeTheme: theme_state::IsSet,
-    S::Spacing: theme_state::IsSet,
-    S::DarkScheme: theme_state::IsSet,
     S::LightCodeTheme: theme_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Theme<'a> {
         Theme {
-            dark_code_theme: self.__unsafe_private_named.0.unwrap(),
-            dark_scheme: self.__unsafe_private_named.1.unwrap(),
-            default_theme: self
-                .__unsafe_private_named
-                .2
-                .or_else(|| Some(CowStr::from("auto"))),
-            fonts: self.__unsafe_private_named.3.unwrap(),
-            light_code_theme: self.__unsafe_private_named.4.unwrap(),
-            light_scheme: self.__unsafe_private_named.5.unwrap(),
-            spacing: self.__unsafe_private_named.6.unwrap(),
+            dark_code_theme: self._fields.0.unwrap(),
+            dark_scheme: self._fields.1.unwrap(),
+            default_theme: self._fields.2.or_else(|| Some(CowStr::from("auto"))),
+            fonts: self._fields.3.unwrap(),
+            light_code_theme: self._fields.4.unwrap(),
+            light_scheme: self._fields.5.unwrap(),
+            spacing: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1600,16 +1600,13 @@ where
         >,
     ) -> Theme<'a> {
         Theme {
-            dark_code_theme: self.__unsafe_private_named.0.unwrap(),
-            dark_scheme: self.__unsafe_private_named.1.unwrap(),
-            default_theme: self
-                .__unsafe_private_named
-                .2
-                .or_else(|| Some(CowStr::from("auto"))),
-            fonts: self.__unsafe_private_named.3.unwrap(),
-            light_code_theme: self.__unsafe_private_named.4.unwrap(),
-            light_scheme: self.__unsafe_private_named.5.unwrap(),
-            spacing: self.__unsafe_private_named.6.unwrap(),
+            dark_code_theme: self._fields.0.unwrap(),
+            dark_scheme: self._fields.1.unwrap(),
+            default_theme: self._fields.2.or_else(|| Some(CowStr::from("auto"))),
+            fonts: self._fields.3.unwrap(),
+            light_code_theme: self._fields.4.unwrap(),
+            light_scheme: self._fields.5.unwrap(),
+            spacing: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

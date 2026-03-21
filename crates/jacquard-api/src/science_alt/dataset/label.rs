@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -163,65 +166,65 @@ pub mod label_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
         type DatasetUri;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
         type DatasetUri = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type DatasetUri = S::DatasetUri;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
         type DatasetUri = S::DatasetUri;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `dataset_uri` field to Set
     pub struct SetDatasetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDatasetUri<S> {}
     impl<S: State> State for SetDatasetUri<S> {
-        type CreatedAt = S::CreatedAt;
         type Name = S::Name;
         type DatasetUri = Set<members::dataset_uri>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type DatasetUri = S::DatasetUri;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `dataset_uri` field
         pub struct dataset_uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct LabelBuilder<'a, S: label_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<AtUri<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Label<'a> {
@@ -235,9 +238,9 @@ impl<'a> LabelBuilder<'a, label_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LabelBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -252,11 +255,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LabelBuilder<'a, label_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LabelBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -271,11 +274,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> LabelBuilder<'a, label_state::SetDatasetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LabelBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -283,12 +286,12 @@ where
 impl<'a, S: label_state::State> LabelBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -303,11 +306,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> LabelBuilder<'a, label_state::SetName<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         LabelBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -315,12 +318,12 @@ where
 impl<'a, S: label_state::State> LabelBuilder<'a, S> {
     /// Set the `version` field (optional)
     pub fn version(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `version` field to an Option value (optional)
     pub fn maybe_version(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -328,18 +331,18 @@ impl<'a, S: label_state::State> LabelBuilder<'a, S> {
 impl<'a, S> LabelBuilder<'a, S>
 where
     S: label_state::State,
-    S::CreatedAt: label_state::IsSet,
     S::Name: label_state::IsSet,
     S::DatasetUri: label_state::IsSet,
+    S::CreatedAt: label_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Label<'a> {
         Label {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            dataset_uri: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            name: self.__unsafe_private_named.3.unwrap(),
-            version: self.__unsafe_private_named.4,
+            created_at: self._fields.0.unwrap(),
+            dataset_uri: self._fields.1.unwrap(),
+            description: self._fields.2,
+            name: self._fields.3.unwrap(),
+            version: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -352,11 +355,11 @@ where
         >,
     ) -> Label<'a> {
         Label {
-            created_at: self.__unsafe_private_named.0.unwrap(),
-            dataset_uri: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            name: self.__unsafe_private_named.3.unwrap(),
-            version: self.__unsafe_private_named.4,
+            created_at: self._fields.0.unwrap(),
+            dataset_uri: self._fields.1.unwrap(),
+            description: self._fields.2,
+            name: self._fields.3.unwrap(),
+            version: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

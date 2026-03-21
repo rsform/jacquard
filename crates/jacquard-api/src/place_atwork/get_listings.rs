@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -109,45 +112,45 @@ pub mod listing_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Uri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
         type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ListingRecordBuilder<'a, S: listing_record_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Cid<'a>>, Option<AtUri<'a>>, Option<Listing<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Cid<'a>>, Option<AtUri<'a>>, Option<Listing<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ListingRecord<'a> {
@@ -161,9 +164,9 @@ impl<'a> ListingRecordBuilder<'a, listing_record_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListingRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -178,11 +181,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> ListingRecordBuilder<'a, listing_record_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ListingRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -197,11 +200,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ListingRecordBuilder<'a, listing_record_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ListingRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -209,12 +212,12 @@ where
 impl<'a, S: listing_record_state::State> ListingRecordBuilder<'a, S> {
     /// Set the `value` field (optional)
     pub fn value(mut self, value: impl Into<Option<Listing<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `value` field to an Option value (optional)
     pub fn maybe_value(mut self, value: Option<Listing<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -222,15 +225,15 @@ impl<'a, S: listing_record_state::State> ListingRecordBuilder<'a, S> {
 impl<'a, S> ListingRecordBuilder<'a, S>
 where
     S: listing_record_state::State,
-    S::Cid: listing_record_state::IsSet,
     S::Uri: listing_record_state::IsSet,
+    S::Cid: listing_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ListingRecord<'a> {
         ListingRecord {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
-            value: self.__unsafe_private_named.2,
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
+            value: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -243,9 +246,9 @@ where
         >,
     ) -> ListingRecord<'a> {
         ListingRecord {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            uri: self.__unsafe_private_named.1.unwrap(),
-            value: self.__unsafe_private_named.2,
+            cid: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
+            value: self._fields.2,
             extra_data: Some(extra_data),
         }
     }
@@ -372,9 +375,9 @@ pub mod get_listings_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetListingsBuilder<'a, S: get_listings_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetListings<'a> {
@@ -388,9 +391,9 @@ impl<'a> GetListingsBuilder<'a, get_listings_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetListingsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -398,12 +401,12 @@ impl<'a> GetListingsBuilder<'a, get_listings_state::Empty> {
 impl<'a, S: get_listings_state::State> GetListingsBuilder<'a, S> {
     /// Set the `identity` field (optional)
     pub fn identity(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `identity` field to an Option value (optional)
     pub fn maybe_identity(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -411,12 +414,12 @@ impl<'a, S: get_listings_state::State> GetListingsBuilder<'a, S> {
 impl<'a, S: get_listings_state::State> GetListingsBuilder<'a, S> {
     /// Set the `tag` field (optional)
     pub fn tag(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `tag` field to an Option value (optional)
     pub fn maybe_tag(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -428,8 +431,8 @@ where
     /// Build the final struct
     pub fn build(self) -> GetListings<'a> {
         GetListings {
-            identity: self.__unsafe_private_named.0,
-            tag: self.__unsafe_private_named.1,
+            identity: self._fields.0,
+            tag: self._fields.1,
         }
     }
 }

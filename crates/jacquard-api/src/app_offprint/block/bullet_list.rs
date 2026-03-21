@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -107,9 +110,9 @@ pub mod list_item_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListItemBuilder<'a, S: list_item_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<bullet_list::ListItem<'a>>>, Option<Text<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<bullet_list::ListItem<'a>>>, Option<Text<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ListItem<'a> {
@@ -123,9 +126,9 @@ impl<'a> ListItemBuilder<'a, list_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -136,7 +139,7 @@ impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<bullet_list::ListItem<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `children` field to an Option value (optional)
@@ -144,7 +147,7 @@ impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
         mut self,
         value: Option<Vec<bullet_list::ListItem<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -159,11 +162,11 @@ where
         mut self,
         value: impl Into<Text<'a>>,
     ) -> ListItemBuilder<'a, list_item_state::SetContent<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ListItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -176,8 +179,8 @@ where
     /// Build the final struct
     pub fn build(self) -> ListItem<'a> {
         ListItem {
-            children: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
+            children: self._fields.0,
+            content: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -190,8 +193,8 @@ where
         >,
     ) -> ListItem<'a> {
         ListItem {
-            children: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
+            children: self._fields.0,
+            content: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -300,9 +303,9 @@ pub mod bullet_list_state {
 
 /// Builder for constructing an instance of this type
 pub struct BulletListBuilder<'a, S: bullet_list_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<bullet_list::ListItem<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<bullet_list::ListItem<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> BulletList<'a> {
@@ -316,9 +319,9 @@ impl<'a> BulletListBuilder<'a, bullet_list_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BulletListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -333,11 +336,11 @@ where
         mut self,
         value: impl Into<Vec<bullet_list::ListItem<'a>>>,
     ) -> BulletListBuilder<'a, bullet_list_state::SetChildren<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BulletListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -350,7 +353,7 @@ where
     /// Build the final struct
     pub fn build(self) -> BulletList<'a> {
         BulletList {
-            children: self.__unsafe_private_named.0.unwrap(),
+            children: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -363,7 +366,7 @@ where
         >,
     ) -> BulletList<'a> {
         BulletList {
-            children: self.__unsafe_private_named.0.unwrap(),
+            children: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

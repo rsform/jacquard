@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -270,8 +273,8 @@ pub mod claim_state {
 
 /// Builder for constructing an instance of this type
 pub struct ClaimBuilder<'a, S: claim_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<Vec<AtUri<'a>>>,
@@ -279,7 +282,7 @@ pub struct ClaimBuilder<'a, S: claim_state::State> {
         Option<AtUri<'a>>,
         Option<ClaimType<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Claim<'a> {
@@ -293,9 +296,9 @@ impl<'a> ClaimBuilder<'a, claim_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ClaimBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -303,12 +306,12 @@ impl<'a> ClaimBuilder<'a, claim_state::Empty> {
 impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
     /// Set the `contact` field (optional)
     pub fn contact(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `contact` field to an Option value (optional)
     pub fn maybe_contact(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -323,11 +326,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ClaimBuilder<'a, claim_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ClaimBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -335,12 +338,12 @@ where
 impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
     /// Set the `games` field (optional)
     pub fn games(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `games` field to an Option value (optional)
     pub fn maybe_games(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -348,12 +351,12 @@ impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
 impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
     pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -361,12 +364,12 @@ impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
 impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
     /// Set the `org` field (optional)
     pub fn org(mut self, value: impl Into<Option<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `org` field to an Option value (optional)
     pub fn maybe_org(mut self, value: Option<AtUri<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -381,11 +384,11 @@ where
         mut self,
         value: impl Into<ClaimType<'a>>,
     ) -> ClaimBuilder<'a, claim_state::SetType<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         ClaimBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -399,12 +402,12 @@ where
     /// Build the final struct
     pub fn build(self) -> Claim<'a> {
         Claim {
-            contact: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            games: self.__unsafe_private_named.2,
-            message: self.__unsafe_private_named.3,
-            org: self.__unsafe_private_named.4,
-            r#type: self.__unsafe_private_named.5.unwrap(),
+            contact: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            games: self._fields.2,
+            message: self._fields.3,
+            org: self._fields.4,
+            r#type: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -417,12 +420,12 @@ where
         >,
     ) -> Claim<'a> {
         Claim {
-            contact: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            games: self.__unsafe_private_named.2,
-            message: self.__unsafe_private_named.3,
-            org: self.__unsafe_private_named.4,
-            r#type: self.__unsafe_private_named.5.unwrap(),
+            contact: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            games: self._fields.2,
+            message: self._fields.3,
+            org: self._fields.4,
+            r#type: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

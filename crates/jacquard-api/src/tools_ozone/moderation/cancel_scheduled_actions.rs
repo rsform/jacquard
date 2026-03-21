@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -175,12 +178,12 @@ pub mod cancellation_results_state {
 
 /// Builder for constructing an instance of this type
 pub struct CancellationResultsBuilder<'a, S: cancellation_results_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<cancel_scheduled_actions::FailedCancellation<'a>>>,
         Option<Vec<Did<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CancellationResults<'a> {
@@ -194,9 +197,9 @@ impl<'a> CancellationResultsBuilder<'a, cancellation_results_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CancellationResultsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -211,11 +214,11 @@ where
         mut self,
         value: impl Into<Vec<cancel_scheduled_actions::FailedCancellation<'a>>>,
     ) -> CancellationResultsBuilder<'a, cancellation_results_state::SetFailed<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CancellationResultsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -230,11 +233,11 @@ where
         mut self,
         value: impl Into<Vec<Did<'a>>>,
     ) -> CancellationResultsBuilder<'a, cancellation_results_state::SetSucceeded<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CancellationResultsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -248,8 +251,8 @@ where
     /// Build the final struct
     pub fn build(self) -> CancellationResults<'a> {
         CancellationResults {
-            failed: self.__unsafe_private_named.0.unwrap(),
-            succeeded: self.__unsafe_private_named.1.unwrap(),
+            failed: self._fields.0.unwrap(),
+            succeeded: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -262,8 +265,8 @@ where
         >,
     ) -> CancellationResults<'a> {
         CancellationResults {
-            failed: self.__unsafe_private_named.0.unwrap(),
-            succeeded: self.__unsafe_private_named.1.unwrap(),
+            failed: self._fields.0.unwrap(),
+            succeeded: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -455,9 +458,9 @@ pub mod failed_cancellation_state {
 
 /// Builder for constructing an instance of this type
 pub struct FailedCancellationBuilder<'a, S: failed_cancellation_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<CowStr<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> FailedCancellation<'a> {
@@ -471,9 +474,9 @@ impl<'a> FailedCancellationBuilder<'a, failed_cancellation_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         FailedCancellationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -488,11 +491,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> FailedCancellationBuilder<'a, failed_cancellation_state::SetDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         FailedCancellationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -507,11 +510,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> FailedCancellationBuilder<'a, failed_cancellation_state::SetError<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         FailedCancellationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -519,12 +522,12 @@ where
 impl<'a, S: failed_cancellation_state::State> FailedCancellationBuilder<'a, S> {
     /// Set the `errorCode` field (optional)
     pub fn error_code(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `errorCode` field to an Option value (optional)
     pub fn maybe_error_code(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -538,9 +541,9 @@ where
     /// Build the final struct
     pub fn build(self) -> FailedCancellation<'a> {
         FailedCancellation {
-            did: self.__unsafe_private_named.0.unwrap(),
-            error: self.__unsafe_private_named.1.unwrap(),
-            error_code: self.__unsafe_private_named.2,
+            did: self._fields.0.unwrap(),
+            error: self._fields.1.unwrap(),
+            error_code: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -553,9 +556,9 @@ where
         >,
     ) -> FailedCancellation<'a> {
         FailedCancellation {
-            did: self.__unsafe_private_named.0.unwrap(),
-            error: self.__unsafe_private_named.1.unwrap(),
-            error_code: self.__unsafe_private_named.2,
+            did: self._fields.0.unwrap(),
+            error: self._fields.1.unwrap(),
+            error_code: self._fields.2,
             extra_data: Some(extra_data),
         }
     }
@@ -595,9 +598,9 @@ pub mod cancel_scheduled_actions_state {
 
 /// Builder for constructing an instance of this type
 pub struct CancelScheduledActionsBuilder<'a, S: cancel_scheduled_actions_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<Vec<Did<'a>>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Vec<Did<'a>>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CancelScheduledActions<'a> {
@@ -614,9 +617,9 @@ impl<'a> CancelScheduledActionsBuilder<'a, cancel_scheduled_actions_state::Empty
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CancelScheduledActionsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -624,12 +627,12 @@ impl<'a> CancelScheduledActionsBuilder<'a, cancel_scheduled_actions_state::Empty
 impl<'a, S: cancel_scheduled_actions_state::State> CancelScheduledActionsBuilder<'a, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
     pub fn maybe_comment(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -647,11 +650,11 @@ where
         'a,
         cancel_scheduled_actions_state::SetSubjects<S>,
     > {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CancelScheduledActionsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -664,8 +667,8 @@ where
     /// Build the final struct
     pub fn build(self) -> CancelScheduledActions<'a> {
         CancelScheduledActions {
-            comment: self.__unsafe_private_named.0,
-            subjects: self.__unsafe_private_named.1.unwrap(),
+            comment: self._fields.0,
+            subjects: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -678,8 +681,8 @@ where
         >,
     ) -> CancelScheduledActions<'a> {
         CancelScheduledActions {
-            comment: self.__unsafe_private_named.0,
-            subjects: self.__unsafe_private_named.1.unwrap(),
+            comment: self._fields.0,
+            subjects: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

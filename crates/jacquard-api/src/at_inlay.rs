@@ -16,7 +16,11 @@ pub mod placeholder;
 pub mod slot;
 pub mod throw;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -608,9 +612,9 @@ pub mod element_state {
 
 /// Builder for constructing an instance of this type
 pub struct ElementBuilder<'a, S: element_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<Data<'a>>, Option<Nsid<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Data<'a>>, Option<Nsid<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Element<'a> {
@@ -624,9 +628,9 @@ impl<'a> ElementBuilder<'a, element_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ElementBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -634,12 +638,12 @@ impl<'a> ElementBuilder<'a, element_state::Empty> {
 impl<'a, S: element_state::State> ElementBuilder<'a, S> {
     /// Set the `key` field (optional)
     pub fn key(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `key` field to an Option value (optional)
     pub fn maybe_key(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -647,12 +651,12 @@ impl<'a, S: element_state::State> ElementBuilder<'a, S> {
 impl<'a, S: element_state::State> ElementBuilder<'a, S> {
     /// Set the `props` field (optional)
     pub fn props(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `props` field to an Option value (optional)
     pub fn maybe_props(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -667,11 +671,11 @@ where
         mut self,
         value: impl Into<Nsid<'a>>,
     ) -> ElementBuilder<'a, element_state::SetType<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ElementBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -684,9 +688,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Element<'a> {
         Element {
-            key: self.__unsafe_private_named.0,
-            props: self.__unsafe_private_named.1,
-            r#type: self.__unsafe_private_named.2.unwrap(),
+            key: self._fields.0,
+            props: self._fields.1,
+            r#type: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -696,9 +700,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Element<'a> {
         Element {
-            key: self.__unsafe_private_named.0,
-            props: self.__unsafe_private_named.1,
-            r#type: self.__unsafe_private_named.2.unwrap(),
+            key: self._fields.0,
+            props: self._fields.1,
+            r#type: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -714,48 +718,45 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Node;
         type Cache;
+        type Node;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Node = Unset;
         type Cache = Unset;
-    }
-    ///State transition - sets the `node` field to Set
-    pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNode<S> {}
-    impl<S: State> State for SetNode<S> {
-        type Node = Set<members::node>;
-        type Cache = S::Cache;
+        type Node = Unset;
     }
     ///State transition - sets the `cache` field to Set
     pub struct SetCache<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCache<S> {}
     impl<S: State> State for SetCache<S> {
-        type Node = S::Node;
         type Cache = Set<members::cache>;
+        type Node = S::Node;
+    }
+    ///State transition - sets the `node` field to Set
+    pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetNode<S> {}
+    impl<S: State> State for SetNode<S> {
+        type Cache = S::Cache;
+        type Node = Set<members::node>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `node` field
-        pub struct node(());
         ///Marker type for the `cache` field
         pub struct cache(());
+        ///Marker type for the `node` field
+        pub struct node(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ResponseBuilder<'a, S: response_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<at_inlay::CachePolicy<'a>>,
-        Option<at_inlay::Element<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<at_inlay::CachePolicy<'a>>, Option<at_inlay::Element<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Response<'a> {
@@ -769,9 +770,9 @@ impl<'a> ResponseBuilder<'a, response_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ResponseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -786,11 +787,11 @@ where
         mut self,
         value: impl Into<at_inlay::CachePolicy<'a>>,
     ) -> ResponseBuilder<'a, response_state::SetCache<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ResponseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -805,11 +806,11 @@ where
         mut self,
         value: impl Into<at_inlay::Element<'a>>,
     ) -> ResponseBuilder<'a, response_state::SetNode<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ResponseBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -817,14 +818,14 @@ where
 impl<'a, S> ResponseBuilder<'a, S>
 where
     S: response_state::State,
-    S::Node: response_state::IsSet,
     S::Cache: response_state::IsSet,
+    S::Node: response_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Response<'a> {
         Response {
-            cache: self.__unsafe_private_named.0.unwrap(),
-            node: self.__unsafe_private_named.1.unwrap(),
+            cache: self._fields.0.unwrap(),
+            node: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -834,8 +835,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Response<'a> {
         Response {
-            cache: self.__unsafe_private_named.0.unwrap(),
-            node: self.__unsafe_private_named.1.unwrap(),
+            cache: self._fields.0.unwrap(),
+            node: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -875,9 +876,9 @@ pub mod tag_link_state {
 
 /// Builder for constructing an instance of this type
 pub struct TagLinkBuilder<'a, S: tag_link_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Nsid<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Nsid<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TagLink<'a> {
@@ -891,9 +892,9 @@ impl<'a> TagLinkBuilder<'a, tag_link_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TagLinkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -901,12 +902,12 @@ impl<'a> TagLinkBuilder<'a, tag_link_state::Empty> {
 impl<'a, S: tag_link_state::State> TagLinkBuilder<'a, S> {
     /// Set the `from` field (optional)
     pub fn from(mut self, value: impl Into<Option<Nsid<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `from` field to an Option value (optional)
     pub fn maybe_from(mut self, value: Option<Nsid<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -921,11 +922,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> TagLinkBuilder<'a, tag_link_state::SetSubject<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TagLinkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -938,8 +939,8 @@ where
     /// Build the final struct
     pub fn build(self) -> TagLink<'a> {
         TagLink {
-            from: self.__unsafe_private_named.0,
-            subject: self.__unsafe_private_named.1.unwrap(),
+            from: self._fields.0,
+            subject: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -949,8 +950,8 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> TagLink<'a> {
         TagLink {
-            from: self.__unsafe_private_named.0,
-            subject: self.__unsafe_private_named.1.unwrap(),
+            from: self._fields.0,
+            subject: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -990,9 +991,9 @@ pub mod tag_record_state {
 
 /// Builder for constructing an instance of this type
 pub struct TagRecordBuilder<'a, S: tag_record_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TagRecord<'a> {
@@ -1006,9 +1007,9 @@ impl<'a> TagRecordBuilder<'a, tag_record_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TagRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1023,11 +1024,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> TagRecordBuilder<'a, tag_record_state::SetUri<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TagRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1040,7 +1041,7 @@ where
     /// Build the final struct
     pub fn build(self) -> TagRecord<'a> {
         TagRecord {
-            uri: self.__unsafe_private_named.0.unwrap(),
+            uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1050,7 +1051,7 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> TagRecord<'a> {
         TagRecord {
-            uri: self.__unsafe_private_named.0.unwrap(),
+            uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

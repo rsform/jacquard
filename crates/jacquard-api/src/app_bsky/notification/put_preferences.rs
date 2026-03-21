@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_derive::{IntoStatic, lexicon};
 use serde::{Serialize, Deserialize};
@@ -79,9 +82,9 @@ pub mod put_preferences_state {
 
 /// Builder for constructing an instance of this type
 pub struct PutPreferencesBuilder<'a, S: put_preferences_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<bool>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<bool>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> PutPreferences<'a> {
@@ -95,9 +98,9 @@ impl<'a> PutPreferencesBuilder<'a, put_preferences_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PutPreferencesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -112,11 +115,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> PutPreferencesBuilder<'a, put_preferences_state::SetPriority<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PutPreferencesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -129,7 +132,7 @@ where
     /// Build the final struct
     pub fn build(self) -> PutPreferences<'a> {
         PutPreferences {
-            priority: self.__unsafe_private_named.0.unwrap(),
+            priority: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -142,7 +145,7 @@ where
         >,
     ) -> PutPreferences<'a> {
         PutPreferences {
-            priority: self.__unsafe_private_named.0.unwrap(),
+            priority: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

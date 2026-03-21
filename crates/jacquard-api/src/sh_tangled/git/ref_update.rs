@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -602,9 +605,9 @@ pub struct IndividualEmailCommitCountBuilder<
     'a,
     S: individual_email_commit_count_state::State,
 > {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> IndividualEmailCommitCount<'a> {
@@ -623,9 +626,9 @@ impl<
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         IndividualEmailCommitCountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -643,11 +646,11 @@ where
         'a,
         individual_email_commit_count_state::SetCount<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         IndividualEmailCommitCountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -665,11 +668,11 @@ where
         'a,
         individual_email_commit_count_state::SetEmail<S>,
     > {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         IndividualEmailCommitCountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -683,8 +686,8 @@ where
     /// Build the final struct
     pub fn build(self) -> IndividualEmailCommitCount<'a> {
         IndividualEmailCommitCount {
-            count: self.__unsafe_private_named.0.unwrap(),
-            email: self.__unsafe_private_named.1.unwrap(),
+            count: self._fields.0.unwrap(),
+            email: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -697,8 +700,8 @@ where
         >,
     ) -> IndividualEmailCommitCount<'a> {
         IndividualEmailCommitCount {
-            count: self.__unsafe_private_named.0.unwrap(),
-            email: self.__unsafe_private_named.1.unwrap(),
+            count: self._fields.0.unwrap(),
+            email: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -750,9 +753,9 @@ pub mod individual_language_size_state {
 
 /// Builder for constructing an instance of this type
 pub struct IndividualLanguageSizeBuilder<'a, S: individual_language_size_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> IndividualLanguageSize<'a> {
@@ -769,9 +772,9 @@ impl<'a> IndividualLanguageSizeBuilder<'a, individual_language_size_state::Empty
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         IndividualLanguageSizeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -786,11 +789,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> IndividualLanguageSizeBuilder<'a, individual_language_size_state::SetLang<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         IndividualLanguageSizeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -805,11 +808,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> IndividualLanguageSizeBuilder<'a, individual_language_size_state::SetSize<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         IndividualLanguageSizeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -823,8 +826,8 @@ where
     /// Build the final struct
     pub fn build(self) -> IndividualLanguageSize<'a> {
         IndividualLanguageSize {
-            lang: self.__unsafe_private_named.0.unwrap(),
-            size: self.__unsafe_private_named.1.unwrap(),
+            lang: self._fields.0.unwrap(),
+            size: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -837,8 +840,8 @@ where
         >,
     ) -> IndividualLanguageSize<'a> {
         IndividualLanguageSize {
-            lang: self.__unsafe_private_named.0.unwrap(),
-            size: self.__unsafe_private_named.1.unwrap(),
+            lang: self._fields.0.unwrap(),
+            size: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -854,134 +857,134 @@ pub mod ref_update_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RepoName;
+        type NewSha;
         type CommitterDid;
+        type RepoDid;
+        type RepoName;
         type Meta;
         type Ref;
-        type RepoDid;
         type OldSha;
-        type NewSha;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RepoName = Unset;
+        type NewSha = Unset;
         type CommitterDid = Unset;
+        type RepoDid = Unset;
+        type RepoName = Unset;
         type Meta = Unset;
         type Ref = Unset;
-        type RepoDid = Unset;
         type OldSha = Unset;
-        type NewSha = Unset;
-    }
-    ///State transition - sets the `repo_name` field to Set
-    pub struct SetRepoName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepoName<S> {}
-    impl<S: State> State for SetRepoName<S> {
-        type RepoName = Set<members::repo_name>;
-        type CommitterDid = S::CommitterDid;
-        type Meta = S::Meta;
-        type Ref = S::Ref;
-        type RepoDid = S::RepoDid;
-        type OldSha = S::OldSha;
-        type NewSha = S::NewSha;
-    }
-    ///State transition - sets the `committer_did` field to Set
-    pub struct SetCommitterDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommitterDid<S> {}
-    impl<S: State> State for SetCommitterDid<S> {
-        type RepoName = S::RepoName;
-        type CommitterDid = Set<members::committer_did>;
-        type Meta = S::Meta;
-        type Ref = S::Ref;
-        type RepoDid = S::RepoDid;
-        type OldSha = S::OldSha;
-        type NewSha = S::NewSha;
-    }
-    ///State transition - sets the `meta` field to Set
-    pub struct SetMeta<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMeta<S> {}
-    impl<S: State> State for SetMeta<S> {
-        type RepoName = S::RepoName;
-        type CommitterDid = S::CommitterDid;
-        type Meta = Set<members::meta>;
-        type Ref = S::Ref;
-        type RepoDid = S::RepoDid;
-        type OldSha = S::OldSha;
-        type NewSha = S::NewSha;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type RepoName = S::RepoName;
-        type CommitterDid = S::CommitterDid;
-        type Meta = S::Meta;
-        type Ref = Set<members::r#ref>;
-        type RepoDid = S::RepoDid;
-        type OldSha = S::OldSha;
-        type NewSha = S::NewSha;
-    }
-    ///State transition - sets the `repo_did` field to Set
-    pub struct SetRepoDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepoDid<S> {}
-    impl<S: State> State for SetRepoDid<S> {
-        type RepoName = S::RepoName;
-        type CommitterDid = S::CommitterDid;
-        type Meta = S::Meta;
-        type Ref = S::Ref;
-        type RepoDid = Set<members::repo_did>;
-        type OldSha = S::OldSha;
-        type NewSha = S::NewSha;
-    }
-    ///State transition - sets the `old_sha` field to Set
-    pub struct SetOldSha<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOldSha<S> {}
-    impl<S: State> State for SetOldSha<S> {
-        type RepoName = S::RepoName;
-        type CommitterDid = S::CommitterDid;
-        type Meta = S::Meta;
-        type Ref = S::Ref;
-        type RepoDid = S::RepoDid;
-        type OldSha = Set<members::old_sha>;
-        type NewSha = S::NewSha;
     }
     ///State transition - sets the `new_sha` field to Set
     pub struct SetNewSha<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetNewSha<S> {}
     impl<S: State> State for SetNewSha<S> {
-        type RepoName = S::RepoName;
+        type NewSha = Set<members::new_sha>;
         type CommitterDid = S::CommitterDid;
+        type RepoDid = S::RepoDid;
+        type RepoName = S::RepoName;
         type Meta = S::Meta;
         type Ref = S::Ref;
-        type RepoDid = S::RepoDid;
         type OldSha = S::OldSha;
-        type NewSha = Set<members::new_sha>;
+    }
+    ///State transition - sets the `committer_did` field to Set
+    pub struct SetCommitterDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommitterDid<S> {}
+    impl<S: State> State for SetCommitterDid<S> {
+        type NewSha = S::NewSha;
+        type CommitterDid = Set<members::committer_did>;
+        type RepoDid = S::RepoDid;
+        type RepoName = S::RepoName;
+        type Meta = S::Meta;
+        type Ref = S::Ref;
+        type OldSha = S::OldSha;
+    }
+    ///State transition - sets the `repo_did` field to Set
+    pub struct SetRepoDid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepoDid<S> {}
+    impl<S: State> State for SetRepoDid<S> {
+        type NewSha = S::NewSha;
+        type CommitterDid = S::CommitterDid;
+        type RepoDid = Set<members::repo_did>;
+        type RepoName = S::RepoName;
+        type Meta = S::Meta;
+        type Ref = S::Ref;
+        type OldSha = S::OldSha;
+    }
+    ///State transition - sets the `repo_name` field to Set
+    pub struct SetRepoName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRepoName<S> {}
+    impl<S: State> State for SetRepoName<S> {
+        type NewSha = S::NewSha;
+        type CommitterDid = S::CommitterDid;
+        type RepoDid = S::RepoDid;
+        type RepoName = Set<members::repo_name>;
+        type Meta = S::Meta;
+        type Ref = S::Ref;
+        type OldSha = S::OldSha;
+    }
+    ///State transition - sets the `meta` field to Set
+    pub struct SetMeta<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMeta<S> {}
+    impl<S: State> State for SetMeta<S> {
+        type NewSha = S::NewSha;
+        type CommitterDid = S::CommitterDid;
+        type RepoDid = S::RepoDid;
+        type RepoName = S::RepoName;
+        type Meta = Set<members::meta>;
+        type Ref = S::Ref;
+        type OldSha = S::OldSha;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRef<S> {}
+    impl<S: State> State for SetRef<S> {
+        type NewSha = S::NewSha;
+        type CommitterDid = S::CommitterDid;
+        type RepoDid = S::RepoDid;
+        type RepoName = S::RepoName;
+        type Meta = S::Meta;
+        type Ref = Set<members::r#ref>;
+        type OldSha = S::OldSha;
+    }
+    ///State transition - sets the `old_sha` field to Set
+    pub struct SetOldSha<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetOldSha<S> {}
+    impl<S: State> State for SetOldSha<S> {
+        type NewSha = S::NewSha;
+        type CommitterDid = S::CommitterDid;
+        type RepoDid = S::RepoDid;
+        type RepoName = S::RepoName;
+        type Meta = S::Meta;
+        type Ref = S::Ref;
+        type OldSha = Set<members::old_sha>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo_name` field
-        pub struct repo_name(());
+        ///Marker type for the `new_sha` field
+        pub struct new_sha(());
         ///Marker type for the `committer_did` field
         pub struct committer_did(());
+        ///Marker type for the `repo_did` field
+        pub struct repo_did(());
+        ///Marker type for the `repo_name` field
+        pub struct repo_name(());
         ///Marker type for the `meta` field
         pub struct meta(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
-        ///Marker type for the `repo_did` field
-        pub struct repo_did(());
         ///Marker type for the `old_sha` field
         pub struct old_sha(());
-        ///Marker type for the `new_sha` field
-        pub struct new_sha(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RefUpdateBuilder<'a, S: ref_update_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Did<'a>>,
         Option<ref_update::Meta<'a>>,
         Option<CowStr<'a>>,
@@ -990,7 +993,7 @@ pub struct RefUpdateBuilder<'a, S: ref_update_state::State> {
         Option<Did<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RefUpdate<'a> {
@@ -1004,9 +1007,9 @@ impl<'a> RefUpdateBuilder<'a, ref_update_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RefUpdateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1021,11 +1024,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetCommitterDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RefUpdateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1040,11 +1043,11 @@ where
         mut self,
         value: impl Into<ref_update::Meta<'a>>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetMeta<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RefUpdateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1059,11 +1062,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetNewSha<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RefUpdateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1078,11 +1081,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetOldSha<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         RefUpdateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1097,11 +1100,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetRef<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         RefUpdateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1116,11 +1119,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetRepoDid<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         RefUpdateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1135,11 +1138,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RefUpdateBuilder<'a, ref_update_state::SetRepoName<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         RefUpdateBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1147,24 +1150,24 @@ where
 impl<'a, S> RefUpdateBuilder<'a, S>
 where
     S: ref_update_state::State,
-    S::RepoName: ref_update_state::IsSet,
+    S::NewSha: ref_update_state::IsSet,
     S::CommitterDid: ref_update_state::IsSet,
+    S::RepoDid: ref_update_state::IsSet,
+    S::RepoName: ref_update_state::IsSet,
     S::Meta: ref_update_state::IsSet,
     S::Ref: ref_update_state::IsSet,
-    S::RepoDid: ref_update_state::IsSet,
     S::OldSha: ref_update_state::IsSet,
-    S::NewSha: ref_update_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RefUpdate<'a> {
         RefUpdate {
-            committer_did: self.__unsafe_private_named.0.unwrap(),
-            meta: self.__unsafe_private_named.1.unwrap(),
-            new_sha: self.__unsafe_private_named.2.unwrap(),
-            old_sha: self.__unsafe_private_named.3.unwrap(),
-            r#ref: self.__unsafe_private_named.4.unwrap(),
-            repo_did: self.__unsafe_private_named.5.unwrap(),
-            repo_name: self.__unsafe_private_named.6.unwrap(),
+            committer_did: self._fields.0.unwrap(),
+            meta: self._fields.1.unwrap(),
+            new_sha: self._fields.2.unwrap(),
+            old_sha: self._fields.3.unwrap(),
+            r#ref: self._fields.4.unwrap(),
+            repo_did: self._fields.5.unwrap(),
+            repo_name: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1177,13 +1180,13 @@ where
         >,
     ) -> RefUpdate<'a> {
         RefUpdate {
-            committer_did: self.__unsafe_private_named.0.unwrap(),
-            meta: self.__unsafe_private_named.1.unwrap(),
-            new_sha: self.__unsafe_private_named.2.unwrap(),
-            old_sha: self.__unsafe_private_named.3.unwrap(),
-            r#ref: self.__unsafe_private_named.4.unwrap(),
-            repo_did: self.__unsafe_private_named.5.unwrap(),
-            repo_name: self.__unsafe_private_named.6.unwrap(),
+            committer_did: self._fields.0.unwrap(),
+            meta: self._fields.1.unwrap(),
+            new_sha: self._fields.2.unwrap(),
+            old_sha: self._fields.3.unwrap(),
+            r#ref: self._fields.4.unwrap(),
+            repo_did: self._fields.5.unwrap(),
+            repo_name: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1203,49 +1206,49 @@ pub mod meta_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CommitCount;
         type IsDefaultRef;
+        type CommitCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CommitCount = Unset;
         type IsDefaultRef = Unset;
-    }
-    ///State transition - sets the `commit_count` field to Set
-    pub struct SetCommitCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommitCount<S> {}
-    impl<S: State> State for SetCommitCount<S> {
-        type CommitCount = Set<members::commit_count>;
-        type IsDefaultRef = S::IsDefaultRef;
+        type CommitCount = Unset;
     }
     ///State transition - sets the `is_default_ref` field to Set
     pub struct SetIsDefaultRef<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetIsDefaultRef<S> {}
     impl<S: State> State for SetIsDefaultRef<S> {
-        type CommitCount = S::CommitCount;
         type IsDefaultRef = Set<members::is_default_ref>;
+        type CommitCount = S::CommitCount;
+    }
+    ///State transition - sets the `commit_count` field to Set
+    pub struct SetCommitCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCommitCount<S> {}
+    impl<S: State> State for SetCommitCount<S> {
+        type IsDefaultRef = S::IsDefaultRef;
+        type CommitCount = Set<members::commit_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `commit_count` field
-        pub struct commit_count(());
         ///Marker type for the `is_default_ref` field
         pub struct is_default_ref(());
+        ///Marker type for the `commit_count` field
+        pub struct commit_count(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MetaBuilder<'a, S: meta_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ref_update::CommitCountBreakdown<'a>>,
         Option<bool>,
         Option<ref_update::LangBreakdown<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Meta<'a> {
@@ -1259,9 +1262,9 @@ impl<'a> MetaBuilder<'a, meta_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MetaBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1276,11 +1279,11 @@ where
         mut self,
         value: impl Into<ref_update::CommitCountBreakdown<'a>>,
     ) -> MetaBuilder<'a, meta_state::SetCommitCount<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MetaBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1295,11 +1298,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> MetaBuilder<'a, meta_state::SetIsDefaultRef<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MetaBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1310,7 +1313,7 @@ impl<'a, S: meta_state::State> MetaBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ref_update::LangBreakdown<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `langBreakdown` field to an Option value (optional)
@@ -1318,7 +1321,7 @@ impl<'a, S: meta_state::State> MetaBuilder<'a, S> {
         mut self,
         value: Option<ref_update::LangBreakdown<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1326,15 +1329,15 @@ impl<'a, S: meta_state::State> MetaBuilder<'a, S> {
 impl<'a, S> MetaBuilder<'a, S>
 where
     S: meta_state::State,
-    S::CommitCount: meta_state::IsSet,
     S::IsDefaultRef: meta_state::IsSet,
+    S::CommitCount: meta_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Meta<'a> {
         Meta {
-            commit_count: self.__unsafe_private_named.0.unwrap(),
-            is_default_ref: self.__unsafe_private_named.1.unwrap(),
-            lang_breakdown: self.__unsafe_private_named.2,
+            commit_count: self._fields.0.unwrap(),
+            is_default_ref: self._fields.1.unwrap(),
+            lang_breakdown: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -1347,9 +1350,9 @@ where
         >,
     ) -> Meta<'a> {
         Meta {
-            commit_count: self.__unsafe_private_named.0.unwrap(),
-            is_default_ref: self.__unsafe_private_named.1.unwrap(),
-            lang_breakdown: self.__unsafe_private_named.2,
+            commit_count: self._fields.0.unwrap(),
+            is_default_ref: self._fields.1.unwrap(),
+            lang_breakdown: self._fields.2,
             extra_data: Some(extra_data),
         }
     }

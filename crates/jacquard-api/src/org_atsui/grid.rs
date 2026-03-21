@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::value::Data;
@@ -205,9 +208,9 @@ pub mod grid_state {
 
 /// Builder for constructing an instance of this type
 pub struct GridBuilder<'a, S: grid_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Data<'a>>, Option<i64>, Option<GridGap<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Data<'a>>, Option<i64>, Option<GridGap<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Grid<'a> {
@@ -221,9 +224,9 @@ impl<'a> GridBuilder<'a, grid_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GridBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -238,11 +241,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> GridBuilder<'a, grid_state::SetChildren<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GridBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -250,12 +253,12 @@ where
 impl<'a, S: grid_state::State> GridBuilder<'a, S> {
     /// Set the `columns` field (optional)
     pub fn columns(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `columns` field to an Option value (optional)
     pub fn maybe_columns(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -263,12 +266,12 @@ impl<'a, S: grid_state::State> GridBuilder<'a, S> {
 impl<'a, S: grid_state::State> GridBuilder<'a, S> {
     /// Set the `gap` field (optional)
     pub fn gap(mut self, value: impl Into<Option<GridGap<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `gap` field to an Option value (optional)
     pub fn maybe_gap(mut self, value: Option<GridGap<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -281,9 +284,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Grid<'a> {
         Grid {
-            children: self.__unsafe_private_named.0.unwrap(),
-            columns: self.__unsafe_private_named.1.or_else(|| Some(3i64)),
-            gap: self.__unsafe_private_named.2,
+            children: self._fields.0.unwrap(),
+            columns: self._fields.1.or_else(|| Some(3i64)),
+            gap: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -293,9 +296,9 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Grid<'a> {
         Grid {
-            children: self.__unsafe_private_named.0.unwrap(),
-            columns: self.__unsafe_private_named.1.or_else(|| Some(3i64)),
-            gap: self.__unsafe_private_named.2,
+            children: self._fields.0.unwrap(),
+            columns: self._fields.1.or_else(|| Some(3i64)),
+            gap: self._fields.2,
             extra_data: Some(extra_data),
         }
     }

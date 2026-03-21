@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -131,45 +134,45 @@ pub mod teleport_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartsAt;
         type Streamer;
+        type StartsAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartsAt = Unset;
         type Streamer = Unset;
-    }
-    ///State transition - sets the `starts_at` field to Set
-    pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartsAt<S> {}
-    impl<S: State> State for SetStartsAt<S> {
-        type StartsAt = Set<members::starts_at>;
-        type Streamer = S::Streamer;
+        type StartsAt = Unset;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStreamer<S> {}
     impl<S: State> State for SetStreamer<S> {
-        type StartsAt = S::StartsAt;
         type Streamer = Set<members::streamer>;
+        type StartsAt = S::StartsAt;
+    }
+    ///State transition - sets the `starts_at` field to Set
+    pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetStartsAt<S> {}
+    impl<S: State> State for SetStartsAt<S> {
+        type Streamer = S::Streamer;
+        type StartsAt = Set<members::starts_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `starts_at` field
-        pub struct starts_at(());
         ///Marker type for the `streamer` field
         pub struct streamer(());
+        ///Marker type for the `starts_at` field
+        pub struct starts_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TeleportBuilder<'a, S: teleport_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<Datetime>, Option<Did<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<Datetime>, Option<Did<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Teleport<'a> {
@@ -183,9 +186,9 @@ impl<'a> TeleportBuilder<'a, teleport_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TeleportBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -193,12 +196,12 @@ impl<'a> TeleportBuilder<'a, teleport_state::Empty> {
 impl<'a, S: teleport_state::State> TeleportBuilder<'a, S> {
     /// Set the `durationSeconds` field (optional)
     pub fn duration_seconds(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `durationSeconds` field to an Option value (optional)
     pub fn maybe_duration_seconds(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -213,11 +216,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> TeleportBuilder<'a, teleport_state::SetStartsAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TeleportBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -232,11 +235,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> TeleportBuilder<'a, teleport_state::SetStreamer<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         TeleportBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -244,15 +247,15 @@ where
 impl<'a, S> TeleportBuilder<'a, S>
 where
     S: teleport_state::State,
-    S::StartsAt: teleport_state::IsSet,
     S::Streamer: teleport_state::IsSet,
+    S::StartsAt: teleport_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Teleport<'a> {
         Teleport {
-            duration_seconds: self.__unsafe_private_named.0,
-            starts_at: self.__unsafe_private_named.1.unwrap(),
-            streamer: self.__unsafe_private_named.2.unwrap(),
+            duration_seconds: self._fields.0,
+            starts_at: self._fields.1.unwrap(),
+            streamer: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -265,9 +268,9 @@ where
         >,
     ) -> Teleport<'a> {
         Teleport {
-            duration_seconds: self.__unsafe_private_named.0,
-            starts_at: self.__unsafe_private_named.1.unwrap(),
-            streamer: self.__unsafe_private_named.2.unwrap(),
+            duration_seconds: self._fields.0,
+            starts_at: self._fields.1.unwrap(),
+            streamer: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

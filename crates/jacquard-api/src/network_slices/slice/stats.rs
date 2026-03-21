@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -110,59 +113,59 @@ pub mod collection_stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type UniqueActors;
         type Collection;
         type RecordCount;
-        type UniqueActors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type UniqueActors = Unset;
         type Collection = Unset;
         type RecordCount = Unset;
-        type UniqueActors = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type RecordCount = S::RecordCount;
-        type UniqueActors = S::UniqueActors;
-    }
-    ///State transition - sets the `record_count` field to Set
-    pub struct SetRecordCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecordCount<S> {}
-    impl<S: State> State for SetRecordCount<S> {
-        type Collection = S::Collection;
-        type RecordCount = Set<members::record_count>;
-        type UniqueActors = S::UniqueActors;
     }
     ///State transition - sets the `unique_actors` field to Set
     pub struct SetUniqueActors<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUniqueActors<S> {}
     impl<S: State> State for SetUniqueActors<S> {
+        type UniqueActors = Set<members::unique_actors>;
         type Collection = S::Collection;
         type RecordCount = S::RecordCount;
-        type UniqueActors = Set<members::unique_actors>;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCollection<S> {}
+    impl<S: State> State for SetCollection<S> {
+        type UniqueActors = S::UniqueActors;
+        type Collection = Set<members::collection>;
+        type RecordCount = S::RecordCount;
+    }
+    ///State transition - sets the `record_count` field to Set
+    pub struct SetRecordCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecordCount<S> {}
+    impl<S: State> State for SetRecordCount<S> {
+        type UniqueActors = S::UniqueActors;
+        type Collection = S::Collection;
+        type RecordCount = Set<members::record_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `unique_actors` field
+        pub struct unique_actors(());
         ///Marker type for the `collection` field
         pub struct collection(());
         ///Marker type for the `record_count` field
         pub struct record_count(());
-        ///Marker type for the `unique_actors` field
-        pub struct unique_actors(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CollectionStatsBuilder<'a, S: collection_stats_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Nsid<'a>>, Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Nsid<'a>>, Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CollectionStats<'a> {
@@ -176,9 +179,9 @@ impl<'a> CollectionStatsBuilder<'a, collection_stats_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CollectionStatsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -193,11 +196,11 @@ where
         mut self,
         value: impl Into<Nsid<'a>>,
     ) -> CollectionStatsBuilder<'a, collection_stats_state::SetCollection<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CollectionStatsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -212,11 +215,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CollectionStatsBuilder<'a, collection_stats_state::SetRecordCount<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CollectionStatsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -231,11 +234,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CollectionStatsBuilder<'a, collection_stats_state::SetUniqueActors<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CollectionStatsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -243,16 +246,16 @@ where
 impl<'a, S> CollectionStatsBuilder<'a, S>
 where
     S: collection_stats_state::State,
+    S::UniqueActors: collection_stats_state::IsSet,
     S::Collection: collection_stats_state::IsSet,
     S::RecordCount: collection_stats_state::IsSet,
-    S::UniqueActors: collection_stats_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionStats<'a> {
         CollectionStats {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            record_count: self.__unsafe_private_named.1.unwrap(),
-            unique_actors: self.__unsafe_private_named.2.unwrap(),
+            collection: self._fields.0.unwrap(),
+            record_count: self._fields.1.unwrap(),
+            unique_actors: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -265,9 +268,9 @@ where
         >,
     ) -> CollectionStats<'a> {
         CollectionStats {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            record_count: self.__unsafe_private_named.1.unwrap(),
-            unique_actors: self.__unsafe_private_named.2.unwrap(),
+            collection: self._fields.0.unwrap(),
+            record_count: self._fields.1.unwrap(),
+            unique_actors: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -389,9 +392,9 @@ pub mod stats_state {
 
 /// Builder for constructing an instance of this type
 pub struct StatsBuilder<'a, S: stats_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Stats<'a> {
@@ -405,9 +408,9 @@ impl<'a> StatsBuilder<'a, stats_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         StatsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -422,11 +425,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> StatsBuilder<'a, stats_state::SetSlice<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         StatsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -439,7 +442,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Stats<'a> {
         Stats {
-            slice: self.__unsafe_private_named.0.unwrap(),
+            slice: self._fields.0.unwrap(),
         }
     }
 }

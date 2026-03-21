@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -123,81 +126,81 @@ pub mod claim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Pfp;
-        type CreatedAt;
-        type Content;
         type Cid;
+        type CreatedAt;
+        type Pfp;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Pfp = Unset;
-        type CreatedAt = Unset;
-        type Content = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `pfp` field to Set
-    pub struct SetPfp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPfp<S> {}
-    impl<S: State> State for SetPfp<S> {
-        type Pfp = Set<members::pfp>;
-        type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Pfp = S::Pfp;
-        type CreatedAt = Set<members::created_at>;
-        type Content = S::Content;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Pfp = S::Pfp;
-        type CreatedAt = S::CreatedAt;
-        type Content = Set<members::content>;
-        type Cid = S::Cid;
+        type CreatedAt = Unset;
+        type Pfp = Unset;
+        type Content = Unset;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Pfp = S::Pfp;
-        type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
         type Cid = Set<members::cid>;
+        type CreatedAt = S::CreatedAt;
+        type Pfp = S::Pfp;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Cid = S::Cid;
+        type CreatedAt = Set<members::created_at>;
+        type Pfp = S::Pfp;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `pfp` field to Set
+    pub struct SetPfp<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPfp<S> {}
+    impl<S: State> State for SetPfp<S> {
+        type Cid = S::Cid;
+        type CreatedAt = S::CreatedAt;
+        type Pfp = Set<members::pfp>;
+        type Content = S::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type Cid = S::Cid;
+        type CreatedAt = S::CreatedAt;
+        type Pfp = S::Pfp;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `pfp` field
-        pub struct pfp(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `pfp` field
+        pub struct pfp(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ClaimBuilder<'a, S: claim_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CidLink<'a>>,
         Option<Text<'a>>,
         Option<Datetime>,
         Option<Data<'a>>,
         Option<StrongRef<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Claim<'a> {
@@ -211,9 +214,9 @@ impl<'a> ClaimBuilder<'a, claim_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ClaimBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -228,11 +231,11 @@ where
         mut self,
         value: impl Into<CidLink<'a>>,
     ) -> ClaimBuilder<'a, claim_state::SetCid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ClaimBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -247,11 +250,11 @@ where
         mut self,
         value: impl Into<Text<'a>>,
     ) -> ClaimBuilder<'a, claim_state::SetContent<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ClaimBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -266,11 +269,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ClaimBuilder<'a, claim_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ClaimBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -285,11 +288,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> ClaimBuilder<'a, claim_state::SetPfp<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ClaimBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -297,12 +300,12 @@ where
 impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
     pub fn maybe_subject(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -310,19 +313,19 @@ impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
 impl<'a, S> ClaimBuilder<'a, S>
 where
     S: claim_state::State,
-    S::Pfp: claim_state::IsSet,
-    S::CreatedAt: claim_state::IsSet,
-    S::Content: claim_state::IsSet,
     S::Cid: claim_state::IsSet,
+    S::CreatedAt: claim_state::IsSet,
+    S::Pfp: claim_state::IsSet,
+    S::Content: claim_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Claim<'a> {
         Claim {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            content: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            pfp: self.__unsafe_private_named.3.unwrap(),
-            subject: self.__unsafe_private_named.4,
+            cid: self._fields.0.unwrap(),
+            content: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            pfp: self._fields.3.unwrap(),
+            subject: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -332,11 +335,11 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Claim<'a> {
         Claim {
-            cid: self.__unsafe_private_named.0.unwrap(),
-            content: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            pfp: self.__unsafe_private_named.3.unwrap(),
-            subject: self.__unsafe_private_named.4,
+            cid: self._fields.0.unwrap(),
+            content: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            pfp: self._fields.3.unwrap(),
+            subject: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

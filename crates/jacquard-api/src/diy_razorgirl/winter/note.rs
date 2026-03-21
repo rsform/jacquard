@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -162,74 +165,74 @@ pub mod note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Content;
-        type LastUpdated;
         type CreatedAt;
+        type Content;
+        type Title;
+        type LastUpdated;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Content = Unset;
-        type LastUpdated = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Content = S::Content;
-        type LastUpdated = S::LastUpdated;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Title = S::Title;
-        type Content = Set<members::content>;
-        type LastUpdated = S::LastUpdated;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `last_updated` field to Set
-    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
-    impl<S: State> State for SetLastUpdated<S> {
-        type Title = S::Title;
-        type Content = S::Content;
-        type LastUpdated = Set<members::last_updated>;
-        type CreatedAt = S::CreatedAt;
+        type Content = Unset;
+        type Title = Unset;
+        type LastUpdated = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type Content = S::Content;
-        type LastUpdated = S::LastUpdated;
         type CreatedAt = Set<members::created_at>;
+        type Content = S::Content;
+        type Title = S::Title;
+        type LastUpdated = S::LastUpdated;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetContent<S> {}
+    impl<S: State> State for SetContent<S> {
+        type CreatedAt = S::CreatedAt;
+        type Content = Set<members::content>;
+        type Title = S::Title;
+        type LastUpdated = S::LastUpdated;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type CreatedAt = S::CreatedAt;
+        type Content = S::Content;
+        type Title = Set<members::title>;
+        type LastUpdated = S::LastUpdated;
+    }
+    ///State transition - sets the `last_updated` field to Set
+    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
+    impl<S: State> State for SetLastUpdated<S> {
+        type CreatedAt = S::CreatedAt;
+        type Content = S::Content;
+        type Title = S::Title;
+        type LastUpdated = Set<members::last_updated>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `content` field
-        pub struct content(());
-        ///Marker type for the `last_updated` field
-        pub struct last_updated(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `content` field
+        pub struct content(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `last_updated` field
+        pub struct last_updated(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct NoteBuilder<'a, S: note_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
         Option<Datetime>,
@@ -238,7 +241,7 @@ pub struct NoteBuilder<'a, S: note_state::State> {
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Note<'a> {
@@ -252,9 +255,9 @@ impl<'a> NoteBuilder<'a, note_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         NoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -262,12 +265,12 @@ impl<'a> NoteBuilder<'a, note_state::Empty> {
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `category` field to an Option value (optional)
     pub fn maybe_category(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -282,11 +285,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> NoteBuilder<'a, note_state::SetContent<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         NoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -301,11 +304,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> NoteBuilder<'a, note_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         NoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -320,11 +323,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> NoteBuilder<'a, note_state::SetLastUpdated<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         NoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -332,12 +335,12 @@ where
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `relatedFacts` field (optional)
     pub fn related_facts(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `relatedFacts` field to an Option value (optional)
     pub fn maybe_related_facts(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -345,12 +348,12 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
 impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -365,11 +368,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> NoteBuilder<'a, note_state::SetTitle<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         NoteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -377,21 +380,21 @@ where
 impl<'a, S> NoteBuilder<'a, S>
 where
     S: note_state::State,
-    S::Title: note_state::IsSet,
-    S::Content: note_state::IsSet,
-    S::LastUpdated: note_state::IsSet,
     S::CreatedAt: note_state::IsSet,
+    S::Content: note_state::IsSet,
+    S::Title: note_state::IsSet,
+    S::LastUpdated: note_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Note<'a> {
         Note {
-            category: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            last_updated: self.__unsafe_private_named.3.unwrap(),
-            related_facts: self.__unsafe_private_named.4,
-            tags: self.__unsafe_private_named.5,
-            title: self.__unsafe_private_named.6.unwrap(),
+            category: self._fields.0,
+            content: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            last_updated: self._fields.3.unwrap(),
+            related_facts: self._fields.4,
+            tags: self._fields.5,
+            title: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -404,13 +407,13 @@ where
         >,
     ) -> Note<'a> {
         Note {
-            category: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            last_updated: self.__unsafe_private_named.3.unwrap(),
-            related_facts: self.__unsafe_private_named.4,
-            tags: self.__unsafe_private_named.5,
-            title: self.__unsafe_private_named.6.unwrap(),
+            category: self._fields.0,
+            content: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            last_updated: self._fields.3.unwrap(),
+            related_facts: self._fields.4,
+            tags: self._fields.5,
+            title: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }

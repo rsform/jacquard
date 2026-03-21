@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -189,9 +192,9 @@ pub mod export_state {
 
 /// Builder for constructing an instance of this type
 pub struct ExportBuilder<'a, S: export_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<AtUri<'a>>, Option<Nsid<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<AtUri<'a>>, Option<Nsid<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Export<'a> {
@@ -205,9 +208,9 @@ impl<'a> ExportBuilder<'a, export_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ExportBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -222,11 +225,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ExportBuilder<'a, export_state::SetComponent<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ExportBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -241,11 +244,11 @@ where
         mut self,
         value: impl Into<Nsid<'a>>,
     ) -> ExportBuilder<'a, export_state::SetType<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ExportBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -259,8 +262,8 @@ where
     /// Build the final struct
     pub fn build(self) -> Export<'a> {
         Export {
-            component: self.__unsafe_private_named.0.unwrap(),
-            r#type: self.__unsafe_private_named.1.unwrap(),
+            component: self._fields.0.unwrap(),
+            r#type: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -273,8 +276,8 @@ where
         >,
     ) -> Export<'a> {
         Export {
-            component: self.__unsafe_private_named.0.unwrap(),
-            r#type: self.__unsafe_private_named.1.unwrap(),
+            component: self._fields.0.unwrap(),
+            r#type: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -397,49 +400,45 @@ pub mod pack_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Exports;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Exports = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Exports = S::Exports;
+        type Name = Unset;
     }
     ///State transition - sets the `exports` field to Set
     pub struct SetExports<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetExports<S> {}
     impl<S: State> State for SetExports<S> {
-        type Name = S::Name;
         type Exports = Set<members::exports>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Exports = S::Exports;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `exports` field
         pub struct exports(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PackBuilder<'a, S: pack_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Datetime>,
-        Option<Vec<pack::Export<'a>>>,
-        Option<CowStr<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Datetime>, Option<Vec<pack::Export<'a>>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Pack<'a> {
@@ -453,9 +452,9 @@ impl<'a> PackBuilder<'a, pack_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -463,12 +462,12 @@ impl<'a> PackBuilder<'a, pack_state::Empty> {
 impl<'a, S: pack_state::State> PackBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -483,11 +482,11 @@ where
         mut self,
         value: impl Into<Vec<pack::Export<'a>>>,
     ) -> PackBuilder<'a, pack_state::SetExports<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -502,11 +501,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PackBuilder<'a, pack_state::SetName<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PackBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -514,15 +513,15 @@ where
 impl<'a, S> PackBuilder<'a, S>
 where
     S: pack_state::State,
-    S::Name: pack_state::IsSet,
     S::Exports: pack_state::IsSet,
+    S::Name: pack_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Pack<'a> {
         Pack {
-            created_at: self.__unsafe_private_named.0,
-            exports: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0,
+            exports: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -535,9 +534,9 @@ where
         >,
     ) -> Pack<'a> {
         Pack {
-            created_at: self.__unsafe_private_named.0,
-            exports: self.__unsafe_private_named.1.unwrap(),
-            name: self.__unsafe_private_named.2.unwrap(),
+            created_at: self._fields.0,
+            exports: self._fields.1.unwrap(),
+            name: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

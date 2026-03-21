@@ -7,7 +7,11 @@
 
 pub mod favorite;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -334,8 +338,8 @@ pub mod episode_state {
 
 /// Builder for constructing an instance of this type
 pub struct EpisodeBuilder<'a, S: episode_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<BlobRef<'a>>,
         Option<Datetime>,
@@ -345,7 +349,7 @@ pub struct EpisodeBuilder<'a, S: episode_state::State> {
         Option<CowStr<'a>>,
         Option<UriValue<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Episode<'a> {
@@ -359,9 +363,9 @@ impl<'a> EpisodeBuilder<'a, episode_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EpisodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -369,12 +373,12 @@ impl<'a> EpisodeBuilder<'a, episode_state::Empty> {
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `airingDate` field (optional)
     pub fn airing_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `airingDate` field to an Option value (optional)
     pub fn maybe_airing_date(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -382,12 +386,12 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `coverArt` field (optional)
     pub fn cover_art(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `coverArt` field to an Option value (optional)
     pub fn maybe_cover_art(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -402,11 +406,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> EpisodeBuilder<'a, episode_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -414,12 +418,12 @@ where
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -434,11 +438,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> EpisodeBuilder<'a, episode_state::SetShowUri<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -446,12 +450,12 @@ where
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<EpisodeStatus<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
     pub fn maybe_status(mut self, value: Option<EpisodeStatus<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -466,11 +470,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> EpisodeBuilder<'a, episode_state::SetTitle<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         EpisodeBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -478,12 +482,12 @@ where
 impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     /// Set the `vodUrl` field (optional)
     pub fn vod_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `vodUrl` field to an Option value (optional)
     pub fn maybe_vod_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -498,14 +502,14 @@ where
     /// Build the final struct
     pub fn build(self) -> Episode<'a> {
         Episode {
-            airing_date: self.__unsafe_private_named.0,
-            cover_art: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3,
-            show_uri: self.__unsafe_private_named.4.unwrap(),
-            status: self.__unsafe_private_named.5,
-            title: self.__unsafe_private_named.6.unwrap(),
-            vod_url: self.__unsafe_private_named.7,
+            airing_date: self._fields.0,
+            cover_art: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3,
+            show_uri: self._fields.4.unwrap(),
+            status: self._fields.5,
+            title: self._fields.6.unwrap(),
+            vod_url: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -518,14 +522,14 @@ where
         >,
     ) -> Episode<'a> {
         Episode {
-            airing_date: self.__unsafe_private_named.0,
-            cover_art: self.__unsafe_private_named.1,
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3,
-            show_uri: self.__unsafe_private_named.4.unwrap(),
-            status: self.__unsafe_private_named.5,
-            title: self.__unsafe_private_named.6.unwrap(),
-            vod_url: self.__unsafe_private_named.7,
+            airing_date: self._fields.0,
+            cover_art: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3,
+            show_uri: self._fields.4.unwrap(),
+            status: self._fields.5,
+            title: self._fields.6.unwrap(),
+            vod_url: self._fields.7,
             extra_data: Some(extra_data),
         }
     }

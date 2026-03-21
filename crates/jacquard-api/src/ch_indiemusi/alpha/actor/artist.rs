@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -129,9 +132,9 @@ pub mod artist_state {
 
 /// Builder for constructing an instance of this type
 pub struct ArtistBuilder<'a, S: artist_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Artist<'a> {
@@ -145,9 +148,9 @@ impl<'a> ArtistBuilder<'a, artist_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ArtistBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -155,12 +158,12 @@ impl<'a> ArtistBuilder<'a, artist_state::Empty> {
 impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `name` field to an Option value (optional)
     pub fn maybe_name(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -172,7 +175,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Artist<'a> {
         Artist {
-            name: self.__unsafe_private_named.0,
+            name: self._fields.0,
             extra_data: Default::default(),
         }
     }
@@ -185,7 +188,7 @@ where
         >,
     ) -> Artist<'a> {
         Artist {
-            name: self.__unsafe_private_named.0,
+            name: self._fields.0,
             extra_data: Some(extra_data),
         }
     }

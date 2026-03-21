@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::Did;
@@ -145,15 +148,15 @@ pub mod search_actors_skeleton_state {
 
 /// Builder for constructing an instance of this type
 pub struct SearchActorsSkeletonBuilder<'a, S: search_actors_skeleton_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<i64>,
         Option<CowStr<'a>>,
         Option<bool>,
         Option<Did<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SearchActorsSkeleton<'a> {
@@ -170,9 +173,9 @@ impl<'a> SearchActorsSkeletonBuilder<'a, search_actors_skeleton_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SearchActorsSkeletonBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -180,12 +183,12 @@ impl<'a> SearchActorsSkeletonBuilder<'a, search_actors_skeleton_state::Empty> {
 impl<'a, S: search_actors_skeleton_state::State> SearchActorsSkeletonBuilder<'a, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cursor` field to an Option value (optional)
     pub fn maybe_cursor(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -193,12 +196,12 @@ impl<'a, S: search_actors_skeleton_state::State> SearchActorsSkeletonBuilder<'a,
 impl<'a, S: search_actors_skeleton_state::State> SearchActorsSkeletonBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -213,11 +216,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> SearchActorsSkeletonBuilder<'a, search_actors_skeleton_state::SetQ<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         SearchActorsSkeletonBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -225,12 +228,12 @@ where
 impl<'a, S: search_actors_skeleton_state::State> SearchActorsSkeletonBuilder<'a, S> {
     /// Set the `typeahead` field (optional)
     pub fn typeahead(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `typeahead` field to an Option value (optional)
     pub fn maybe_typeahead(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -238,12 +241,12 @@ impl<'a, S: search_actors_skeleton_state::State> SearchActorsSkeletonBuilder<'a,
 impl<'a, S: search_actors_skeleton_state::State> SearchActorsSkeletonBuilder<'a, S> {
     /// Set the `viewer` field (optional)
     pub fn viewer(mut self, value: impl Into<Option<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
     pub fn maybe_viewer(mut self, value: Option<Did<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -256,11 +259,11 @@ where
     /// Build the final struct
     pub fn build(self) -> SearchActorsSkeleton<'a> {
         SearchActorsSkeleton {
-            cursor: self.__unsafe_private_named.0,
-            limit: self.__unsafe_private_named.1,
-            q: self.__unsafe_private_named.2.unwrap(),
-            typeahead: self.__unsafe_private_named.3,
-            viewer: self.__unsafe_private_named.4,
+            cursor: self._fields.0,
+            limit: self._fields.1,
+            q: self._fields.2.unwrap(),
+            typeahead: self._fields.3,
+            viewer: self._fields.4,
         }
     }
 }

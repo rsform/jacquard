@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -178,44 +181,44 @@ pub mod cl022_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Description;
         type Id;
+        type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Description = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Description = Set<members::description>;
-        type Id = S::Id;
+        type Description = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetId<S> {}
     impl<S: State> State for SetId<S> {
-        type Description = S::Description;
         type Id = Set<members::id>;
+        type Description = S::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type Id = S::Id;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `description` field
-        pub struct description(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `description` field
+        pub struct description(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct Cl022Builder<'a, S: cl022_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<i64>,
@@ -228,7 +231,7 @@ pub struct Cl022Builder<'a, S: cl022_state::State> {
         Option<CowStr<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Cl022<'a> {
@@ -242,21 +245,9 @@ impl<'a> Cl022Builder<'a, cl022_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         Cl022Builder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -264,12 +255,12 @@ impl<'a> Cl022Builder<'a, cl022_state::Empty> {
 impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     /// Set the `added` field (optional)
     pub fn added(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `added` field to an Option value (optional)
     pub fn maybe_added(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -277,12 +268,12 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
 impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `comment` field to an Option value (optional)
     pub fn maybe_comment(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -290,12 +281,12 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
 impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     /// Set the `denominator` field (optional)
     pub fn denominator(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `denominator` field to an Option value (optional)
     pub fn maybe_denominator(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -310,11 +301,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> Cl022Builder<'a, cl022_state::SetDescription<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         Cl022Builder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -329,11 +320,11 @@ where
         mut self,
         value: impl Into<CodeType<'a>>,
     ) -> Cl022Builder<'a, cl022_state::SetId<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         Cl022Builder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -341,12 +332,12 @@ where
 impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     /// Set the `k2o` field (optional)
     pub fn k2o(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `k2o` field to an Option value (optional)
     pub fn maybe_k2o(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -354,12 +345,12 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
 impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     /// Set the `n` field (optional)
     pub fn n(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `n` field to an Option value (optional)
     pub fn maybe_n(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -367,12 +358,12 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
 impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     /// Set the `p2o5` field (optional)
     pub fn p2o5(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `p2o5` field to an Option value (optional)
     pub fn maybe_p2o5(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -380,12 +371,12 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
 impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     /// Set the `type` field (optional)
     pub fn r#type(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `type` field to an Option value (optional)
     pub fn maybe_type(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -393,12 +384,12 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
 impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     /// Set the `unit` field (optional)
     pub fn unit(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `unit` field to an Option value (optional)
     pub fn maybe_unit(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -406,12 +397,12 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
 impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     /// Set the `updated` field (optional)
     pub fn updated(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `updated` field to an Option value (optional)
     pub fn maybe_updated(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -419,23 +410,23 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
 impl<'a, S> Cl022Builder<'a, S>
 where
     S: cl022_state::State,
-    S::Description: cl022_state::IsSet,
     S::Id: cl022_state::IsSet,
+    S::Description: cl022_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Cl022<'a> {
         Cl022 {
-            added: self.__unsafe_private_named.0,
-            comment: self.__unsafe_private_named.1,
-            denominator: self.__unsafe_private_named.2,
-            description: self.__unsafe_private_named.3.unwrap(),
-            id: self.__unsafe_private_named.4.unwrap(),
-            k2o: self.__unsafe_private_named.5,
-            n: self.__unsafe_private_named.6,
-            p2o5: self.__unsafe_private_named.7,
-            r#type: self.__unsafe_private_named.8,
-            unit: self.__unsafe_private_named.9,
-            updated: self.__unsafe_private_named.10,
+            added: self._fields.0,
+            comment: self._fields.1,
+            denominator: self._fields.2,
+            description: self._fields.3.unwrap(),
+            id: self._fields.4.unwrap(),
+            k2o: self._fields.5,
+            n: self._fields.6,
+            p2o5: self._fields.7,
+            r#type: self._fields.8,
+            unit: self._fields.9,
+            updated: self._fields.10,
             extra_data: Default::default(),
         }
     }
@@ -448,17 +439,17 @@ where
         >,
     ) -> Cl022<'a> {
         Cl022 {
-            added: self.__unsafe_private_named.0,
-            comment: self.__unsafe_private_named.1,
-            denominator: self.__unsafe_private_named.2,
-            description: self.__unsafe_private_named.3.unwrap(),
-            id: self.__unsafe_private_named.4.unwrap(),
-            k2o: self.__unsafe_private_named.5,
-            n: self.__unsafe_private_named.6,
-            p2o5: self.__unsafe_private_named.7,
-            r#type: self.__unsafe_private_named.8,
-            unit: self.__unsafe_private_named.9,
-            updated: self.__unsafe_private_named.10,
+            added: self._fields.0,
+            comment: self._fields.1,
+            denominator: self._fields.2,
+            description: self._fields.3.unwrap(),
+            id: self._fields.4.unwrap(),
+            k2o: self._fields.5,
+            n: self._fields.6,
+            p2o5: self._fields.7,
+            r#type: self._fields.8,
+            unit: self._fields.9,
+            updated: self._fields.10,
             extra_data: Some(extra_data),
         }
     }

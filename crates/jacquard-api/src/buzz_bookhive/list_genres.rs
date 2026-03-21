@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -144,9 +147,9 @@ pub mod genre_with_count_state {
 
 /// Builder for constructing an instance of this type
 pub struct GenreWithCountBuilder<'a, S: genre_with_count_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GenreWithCount<'a> {
@@ -160,9 +163,9 @@ impl<'a> GenreWithCountBuilder<'a, genre_with_count_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GenreWithCountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -177,11 +180,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> GenreWithCountBuilder<'a, genre_with_count_state::SetCount<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GenreWithCountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -196,11 +199,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GenreWithCountBuilder<'a, genre_with_count_state::SetGenre<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GenreWithCountBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -214,8 +217,8 @@ where
     /// Build the final struct
     pub fn build(self) -> GenreWithCount<'a> {
         GenreWithCount {
-            count: self.__unsafe_private_named.0.unwrap(),
-            genre: self.__unsafe_private_named.1.unwrap(),
+            count: self._fields.0.unwrap(),
+            genre: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -228,8 +231,8 @@ where
         >,
     ) -> GenreWithCount<'a> {
         GenreWithCount {
-            count: self.__unsafe_private_named.0.unwrap(),
-            genre: self.__unsafe_private_named.1.unwrap(),
+            count: self._fields.0.unwrap(),
+            genre: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -341,8 +344,8 @@ pub mod list_genres_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListGenresBuilder<S: list_genres_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>, Option<i64>),
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>, Option<i64>),
 }
 
 impl ListGenres {
@@ -356,8 +359,8 @@ impl ListGenresBuilder<list_genres_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListGenresBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
+            _state: PhantomData,
+            _fields: (None, None, None),
         }
     }
 }
@@ -365,12 +368,12 @@ impl ListGenresBuilder<list_genres_state::Empty> {
 impl<S: list_genres_state::State> ListGenresBuilder<S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -378,12 +381,12 @@ impl<S: list_genres_state::State> ListGenresBuilder<S> {
 impl<S: list_genres_state::State> ListGenresBuilder<S> {
     /// Set the `minBooks` field (optional)
     pub fn min_books(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `minBooks` field to an Option value (optional)
     pub fn maybe_min_books(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -391,12 +394,12 @@ impl<S: list_genres_state::State> ListGenresBuilder<S> {
 impl<S: list_genres_state::State> ListGenresBuilder<S> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `offset` field to an Option value (optional)
     pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -408,9 +411,9 @@ where
     /// Build the final struct
     pub fn build(self) -> ListGenres {
         ListGenres {
-            limit: self.__unsafe_private_named.0,
-            min_books: self.__unsafe_private_named.1,
-            offset: self.__unsafe_private_named.2,
+            limit: self._fields.0,
+            min_books: self._fields.1,
+            offset: self._fields.2,
         }
     }
 }

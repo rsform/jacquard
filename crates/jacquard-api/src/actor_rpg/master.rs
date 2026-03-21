@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -247,58 +250,58 @@ pub mod master_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Player;
-        type CreatedAt;
         type System;
+        type CreatedAt;
+        type Player;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Player = Unset;
-        type CreatedAt = Unset;
         type System = Unset;
-    }
-    ///State transition - sets the `player` field to Set
-    pub struct SetPlayer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlayer<S> {}
-    impl<S: State> State for SetPlayer<S> {
-        type Player = Set<members::player>;
-        type CreatedAt = S::CreatedAt;
-        type System = S::System;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Player = S::Player;
-        type CreatedAt = Set<members::created_at>;
-        type System = S::System;
+        type CreatedAt = Unset;
+        type Player = Unset;
     }
     ///State transition - sets the `system` field to Set
     pub struct SetSystem<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSystem<S> {}
     impl<S: State> State for SetSystem<S> {
-        type Player = S::Player;
-        type CreatedAt = S::CreatedAt;
         type System = Set<members::system>;
+        type CreatedAt = S::CreatedAt;
+        type Player = S::Player;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type System = S::System;
+        type CreatedAt = Set<members::created_at>;
+        type Player = S::Player;
+    }
+    ///State transition - sets the `player` field to Set
+    pub struct SetPlayer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPlayer<S> {}
+    impl<S: State> State for SetPlayer<S> {
+        type System = S::System;
+        type CreatedAt = S::CreatedAt;
+        type Player = Set<members::player>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `player` field
-        pub struct player(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `system` field
         pub struct system(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `player` field
+        pub struct player(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct MasterBuilder<'a, S: master_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<Did<'a>>,
@@ -308,7 +311,7 @@ pub struct MasterBuilder<'a, S: master_state::State> {
         Option<CowStr<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Master<'a> {
@@ -322,9 +325,9 @@ impl<'a> MasterBuilder<'a, master_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MasterBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -332,12 +335,12 @@ impl<'a> MasterBuilder<'a, master_state::Empty> {
 impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     /// Set the `campaign` field (optional)
     pub fn campaign(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `campaign` field to an Option value (optional)
     pub fn maybe_campaign(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -352,11 +355,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> MasterBuilder<'a, master_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         MasterBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -371,11 +374,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> MasterBuilder<'a, master_state::SetPlayer<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         MasterBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -386,7 +389,7 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
         mut self,
         value: impl Into<Option<MasterSnapshotScope<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `snapshotScope` field to an Option value (optional)
@@ -394,7 +397,7 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
         mut self,
         value: Option<MasterSnapshotScope<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -402,12 +405,12 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
 impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     /// Set the `spriteCid` field (optional)
     pub fn sprite_cid(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `spriteCid` field to an Option value (optional)
     pub fn maybe_sprite_cid(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -415,12 +418,12 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
 impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     /// Set the `stats` field (optional)
     pub fn stats(mut self, value: impl Into<Option<Data<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `stats` field to an Option value (optional)
     pub fn maybe_stats(mut self, value: Option<Data<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -435,11 +438,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> MasterBuilder<'a, master_state::SetSystem<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         MasterBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -447,12 +450,12 @@ where
 impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -460,21 +463,21 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
 impl<'a, S> MasterBuilder<'a, S>
 where
     S: master_state::State,
-    S::Player: master_state::IsSet,
-    S::CreatedAt: master_state::IsSet,
     S::System: master_state::IsSet,
+    S::CreatedAt: master_state::IsSet,
+    S::Player: master_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Master<'a> {
         Master {
-            campaign: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            player: self.__unsafe_private_named.2.unwrap(),
-            snapshot_scope: self.__unsafe_private_named.3,
-            sprite_cid: self.__unsafe_private_named.4,
-            stats: self.__unsafe_private_named.5,
-            system: self.__unsafe_private_named.6.unwrap(),
-            updated_at: self.__unsafe_private_named.7,
+            campaign: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            player: self._fields.2.unwrap(),
+            snapshot_scope: self._fields.3,
+            sprite_cid: self._fields.4,
+            stats: self._fields.5,
+            system: self._fields.6.unwrap(),
+            updated_at: self._fields.7,
             extra_data: Default::default(),
         }
     }
@@ -484,14 +487,14 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> Master<'a> {
         Master {
-            campaign: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            player: self.__unsafe_private_named.2.unwrap(),
-            snapshot_scope: self.__unsafe_private_named.3,
-            sprite_cid: self.__unsafe_private_named.4,
-            stats: self.__unsafe_private_named.5,
-            system: self.__unsafe_private_named.6.unwrap(),
-            updated_at: self.__unsafe_private_named.7,
+            campaign: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            player: self._fields.2.unwrap(),
+            snapshot_scope: self._fields.3,
+            sprite_cid: self._fields.4,
+            stats: self._fields.5,
+            system: self._fields.6.unwrap(),
+            updated_at: self._fields.7,
             extra_data: Some(extra_data),
         }
     }

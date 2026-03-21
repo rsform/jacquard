@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -143,79 +146,74 @@ pub mod event_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CountGoing;
-        type CountInterested;
-        type CountNotGoing;
         type Url;
+        type CountNotGoing;
+        type CountInterested;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CountGoing = Unset;
-        type CountInterested = Unset;
-        type CountNotGoing = Unset;
         type Url = Unset;
+        type CountNotGoing = Unset;
+        type CountInterested = Unset;
     }
     ///State transition - sets the `count_going` field to Set
     pub struct SetCountGoing<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCountGoing<S> {}
     impl<S: State> State for SetCountGoing<S> {
         type CountGoing = Set<members::count_going>;
-        type CountInterested = S::CountInterested;
+        type Url = S::Url;
         type CountNotGoing = S::CountNotGoing;
-        type Url = S::Url;
-    }
-    ///State transition - sets the `count_interested` field to Set
-    pub struct SetCountInterested<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountInterested<S> {}
-    impl<S: State> State for SetCountInterested<S> {
-        type CountGoing = S::CountGoing;
-        type CountInterested = Set<members::count_interested>;
-        type CountNotGoing = S::CountNotGoing;
-        type Url = S::Url;
-    }
-    ///State transition - sets the `count_not_going` field to Set
-    pub struct SetCountNotGoing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountNotGoing<S> {}
-    impl<S: State> State for SetCountNotGoing<S> {
-        type CountGoing = S::CountGoing;
         type CountInterested = S::CountInterested;
-        type CountNotGoing = Set<members::count_not_going>;
-        type Url = S::Url;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUrl<S> {}
     impl<S: State> State for SetUrl<S> {
         type CountGoing = S::CountGoing;
-        type CountInterested = S::CountInterested;
-        type CountNotGoing = S::CountNotGoing;
         type Url = Set<members::url>;
+        type CountNotGoing = S::CountNotGoing;
+        type CountInterested = S::CountInterested;
+    }
+    ///State transition - sets the `count_not_going` field to Set
+    pub struct SetCountNotGoing<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCountNotGoing<S> {}
+    impl<S: State> State for SetCountNotGoing<S> {
+        type CountGoing = S::CountGoing;
+        type Url = S::Url;
+        type CountNotGoing = Set<members::count_not_going>;
+        type CountInterested = S::CountInterested;
+    }
+    ///State transition - sets the `count_interested` field to Set
+    pub struct SetCountInterested<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCountInterested<S> {}
+    impl<S: State> State for SetCountInterested<S> {
+        type CountGoing = S::CountGoing;
+        type Url = S::Url;
+        type CountNotGoing = S::CountNotGoing;
+        type CountInterested = Set<members::count_interested>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `count_going` field
         pub struct count_going(());
-        ///Marker type for the `count_interested` field
-        pub struct count_interested(());
-        ///Marker type for the `count_not_going` field
-        pub struct count_not_going(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `count_not_going` field
+        pub struct count_not_going(());
+        ///Marker type for the `count_interested` field
+        pub struct count_interested(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct EventViewBuilder<'a, S: event_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<i64>,
-        Option<i64>,
-        Option<i64>,
-        Option<UriValue<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>, Option<i64>, Option<UriValue<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> EventView<'a> {
@@ -229,9 +227,9 @@ impl<'a> EventViewBuilder<'a, event_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         EventViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -246,11 +244,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> EventViewBuilder<'a, event_view_state::SetCountGoing<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         EventViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -265,11 +263,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> EventViewBuilder<'a, event_view_state::SetCountInterested<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         EventViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -284,11 +282,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> EventViewBuilder<'a, event_view_state::SetCountNotGoing<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         EventViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -303,11 +301,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> EventViewBuilder<'a, event_view_state::SetUrl<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         EventViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -316,17 +314,17 @@ impl<'a, S> EventViewBuilder<'a, S>
 where
     S: event_view_state::State,
     S::CountGoing: event_view_state::IsSet,
-    S::CountInterested: event_view_state::IsSet,
-    S::CountNotGoing: event_view_state::IsSet,
     S::Url: event_view_state::IsSet,
+    S::CountNotGoing: event_view_state::IsSet,
+    S::CountInterested: event_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> EventView<'a> {
         EventView {
-            count_going: self.__unsafe_private_named.0.unwrap(),
-            count_interested: self.__unsafe_private_named.1.unwrap(),
-            count_not_going: self.__unsafe_private_named.2.unwrap(),
-            url: self.__unsafe_private_named.3.unwrap(),
+            count_going: self._fields.0.unwrap(),
+            count_interested: self._fields.1.unwrap(),
+            count_not_going: self._fields.2.unwrap(),
+            url: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -339,10 +337,10 @@ where
         >,
     ) -> EventView<'a> {
         EventView {
-            count_going: self.__unsafe_private_named.0.unwrap(),
-            count_interested: self.__unsafe_private_named.1.unwrap(),
-            count_not_going: self.__unsafe_private_named.2.unwrap(),
-            url: self.__unsafe_private_named.3.unwrap(),
+            count_going: self._fields.0.unwrap(),
+            count_interested: self._fields.1.unwrap(),
+            count_not_going: self._fields.2.unwrap(),
+            url: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -507,9 +505,9 @@ pub mod get_event_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetEventBuilder<'a, S: get_event_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<Did<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<Did<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetEvent<'a> {
@@ -523,9 +521,9 @@ impl<'a> GetEventBuilder<'a, get_event_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetEventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -540,11 +538,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GetEventBuilder<'a, get_event_state::SetRecordKey<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetEventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -559,11 +557,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> GetEventBuilder<'a, get_event_state::SetRepository<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         GetEventBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -577,8 +575,8 @@ where
     /// Build the final struct
     pub fn build(self) -> GetEvent<'a> {
         GetEvent {
-            record_key: self.__unsafe_private_named.0.unwrap(),
-            repository: self.__unsafe_private_named.1.unwrap(),
+            record_key: self._fields.0.unwrap(),
+            repository: self._fields.1.unwrap(),
         }
     }
 }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -160,74 +163,74 @@ pub mod poll_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Channel;
-        type CreatedAt;
         type Question;
         type Options;
+        type Channel;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Channel = Unset;
-        type CreatedAt = Unset;
         type Question = Unset;
         type Options = Unset;
-    }
-    ///State transition - sets the `channel` field to Set
-    pub struct SetChannel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChannel<S> {}
-    impl<S: State> State for SetChannel<S> {
-        type Channel = Set<members::channel>;
-        type CreatedAt = S::CreatedAt;
-        type Question = S::Question;
-        type Options = S::Options;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Channel = S::Channel;
-        type CreatedAt = Set<members::created_at>;
-        type Question = S::Question;
-        type Options = S::Options;
+        type Channel = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `question` field to Set
     pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetQuestion<S> {}
     impl<S: State> State for SetQuestion<S> {
-        type Channel = S::Channel;
-        type CreatedAt = S::CreatedAt;
         type Question = Set<members::question>;
         type Options = S::Options;
+        type Channel = S::Channel;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `options` field to Set
     pub struct SetOptions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetOptions<S> {}
     impl<S: State> State for SetOptions<S> {
-        type Channel = S::Channel;
-        type CreatedAt = S::CreatedAt;
         type Question = S::Question;
         type Options = Set<members::options>;
+        type Channel = S::Channel;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `channel` field to Set
+    pub struct SetChannel<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetChannel<S> {}
+    impl<S: State> State for SetChannel<S> {
+        type Question = S::Question;
+        type Options = S::Options;
+        type Channel = Set<members::channel>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Question = S::Question;
+        type Options = S::Options;
+        type Channel = S::Channel;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `channel` field
-        pub struct channel(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `question` field
         pub struct question(());
         ///Marker type for the `options` field
         pub struct options(());
+        ///Marker type for the `channel` field
+        pub struct channel(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PollBuilder<'a, S: poll_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<bool>,
         Option<AtUri<'a>>,
         Option<Datetime>,
@@ -235,7 +238,7 @@ pub struct PollBuilder<'a, S: poll_state::State> {
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Poll<'a> {
@@ -249,9 +252,9 @@ impl<'a> PollBuilder<'a, poll_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PollBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -259,12 +262,12 @@ impl<'a> PollBuilder<'a, poll_state::Empty> {
 impl<'a, S: poll_state::State> PollBuilder<'a, S> {
     /// Set the `allowMultiple` field (optional)
     pub fn allow_multiple(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `allowMultiple` field to an Option value (optional)
     pub fn maybe_allow_multiple(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -279,11 +282,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> PollBuilder<'a, poll_state::SetChannel<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PollBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -298,11 +301,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PollBuilder<'a, poll_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PollBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -310,12 +313,12 @@ where
 impl<'a, S: poll_state::State> PollBuilder<'a, S> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `expiresAt` field to an Option value (optional)
     pub fn maybe_expires_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -330,11 +333,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> PollBuilder<'a, poll_state::SetOptions<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         PollBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -349,11 +352,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PollBuilder<'a, poll_state::SetQuestion<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         PollBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -361,20 +364,20 @@ where
 impl<'a, S> PollBuilder<'a, S>
 where
     S: poll_state::State,
-    S::Channel: poll_state::IsSet,
-    S::CreatedAt: poll_state::IsSet,
     S::Question: poll_state::IsSet,
     S::Options: poll_state::IsSet,
+    S::Channel: poll_state::IsSet,
+    S::CreatedAt: poll_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Poll<'a> {
         Poll {
-            allow_multiple: self.__unsafe_private_named.0.or_else(|| Some(false)),
-            channel: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            expires_at: self.__unsafe_private_named.3,
-            options: self.__unsafe_private_named.4.unwrap(),
-            question: self.__unsafe_private_named.5.unwrap(),
+            allow_multiple: self._fields.0.or_else(|| Some(false)),
+            channel: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            expires_at: self._fields.3,
+            options: self._fields.4.unwrap(),
+            question: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -387,12 +390,12 @@ where
         >,
     ) -> Poll<'a> {
         Poll {
-            allow_multiple: self.__unsafe_private_named.0.or_else(|| Some(false)),
-            channel: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            expires_at: self.__unsafe_private_named.3,
-            options: self.__unsafe_private_named.4.unwrap(),
-            question: self.__unsafe_private_named.5.unwrap(),
+            allow_multiple: self._fields.0.or_else(|| Some(false)),
+            channel: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            expires_at: self._fields.3,
+            options: self._fields.4.unwrap(),
+            question: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

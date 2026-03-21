@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -199,62 +202,62 @@ pub mod complete_upload_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type UploadId;
-        type Digest;
         type Parts;
+        type Digest;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type UploadId = Unset;
-        type Digest = Unset;
         type Parts = Unset;
+        type Digest = Unset;
     }
     ///State transition - sets the `upload_id` field to Set
     pub struct SetUploadId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUploadId<S> {}
     impl<S: State> State for SetUploadId<S> {
         type UploadId = Set<members::upload_id>;
+        type Parts = S::Parts;
         type Digest = S::Digest;
-        type Parts = S::Parts;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type UploadId = S::UploadId;
-        type Digest = Set<members::digest>;
-        type Parts = S::Parts;
     }
     ///State transition - sets the `parts` field to Set
     pub struct SetParts<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetParts<S> {}
     impl<S: State> State for SetParts<S> {
         type UploadId = S::UploadId;
-        type Digest = S::Digest;
         type Parts = Set<members::parts>;
+        type Digest = S::Digest;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDigest<S> {}
+    impl<S: State> State for SetDigest<S> {
+        type UploadId = S::UploadId;
+        type Parts = S::Parts;
+        type Digest = Set<members::digest>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `upload_id` field
         pub struct upload_id(());
-        ///Marker type for the `digest` field
-        pub struct digest(());
         ///Marker type for the `parts` field
         pub struct parts(());
+        ///Marker type for the `digest` field
+        pub struct digest(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CompleteUploadBuilder<'a, S: complete_upload_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Vec<complete_upload::PartInfo<'a>>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CompleteUpload<'a> {
@@ -268,9 +271,9 @@ impl<'a> CompleteUploadBuilder<'a, complete_upload_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CompleteUploadBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -285,11 +288,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CompleteUploadBuilder<'a, complete_upload_state::SetDigest<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CompleteUploadBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -304,11 +307,11 @@ where
         mut self,
         value: impl Into<Vec<complete_upload::PartInfo<'a>>>,
     ) -> CompleteUploadBuilder<'a, complete_upload_state::SetParts<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CompleteUploadBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -323,11 +326,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CompleteUploadBuilder<'a, complete_upload_state::SetUploadId<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CompleteUploadBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -336,15 +339,15 @@ impl<'a, S> CompleteUploadBuilder<'a, S>
 where
     S: complete_upload_state::State,
     S::UploadId: complete_upload_state::IsSet,
-    S::Digest: complete_upload_state::IsSet,
     S::Parts: complete_upload_state::IsSet,
+    S::Digest: complete_upload_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CompleteUpload<'a> {
         CompleteUpload {
-            digest: self.__unsafe_private_named.0.unwrap(),
-            parts: self.__unsafe_private_named.1.unwrap(),
-            upload_id: self.__unsafe_private_named.2.unwrap(),
+            digest: self._fields.0.unwrap(),
+            parts: self._fields.1.unwrap(),
+            upload_id: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -357,9 +360,9 @@ where
         >,
     ) -> CompleteUpload<'a> {
         CompleteUpload {
-            digest: self.__unsafe_private_named.0.unwrap(),
-            parts: self.__unsafe_private_named.1.unwrap(),
-            upload_id: self.__unsafe_private_named.2.unwrap(),
+            digest: self._fields.0.unwrap(),
+            parts: self._fields.1.unwrap(),
+            upload_id: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -411,9 +414,9 @@ pub mod part_info_state {
 
 /// Builder for constructing an instance of this type
 pub struct PartInfoBuilder<'a, S: part_info_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> PartInfo<'a> {
@@ -427,9 +430,9 @@ impl<'a> PartInfoBuilder<'a, part_info_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PartInfoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -444,11 +447,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> PartInfoBuilder<'a, part_info_state::SetEtag<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PartInfoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -463,11 +466,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> PartInfoBuilder<'a, part_info_state::SetPartNumber<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PartInfoBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -481,8 +484,8 @@ where
     /// Build the final struct
     pub fn build(self) -> PartInfo<'a> {
         PartInfo {
-            etag: self.__unsafe_private_named.0.unwrap(),
-            part_number: self.__unsafe_private_named.1.unwrap(),
+            etag: self._fields.0.unwrap(),
+            part_number: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -495,8 +498,8 @@ where
         >,
     ) -> PartInfo<'a> {
         PartInfo {
-            etag: self.__unsafe_private_named.0.unwrap(),
-            part_number: self.__unsafe_private_named.1.unwrap(),
+            etag: self._fields.0.unwrap(),
+            part_number: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

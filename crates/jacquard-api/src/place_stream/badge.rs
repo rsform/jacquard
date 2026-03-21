@@ -7,7 +7,11 @@
 
 pub mod get_valid_badges;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -235,14 +239,14 @@ pub mod badge_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct BadgeViewBuilder<'a, S: badge_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<BadgeViewBadgeType<'a>>,
         Option<Did<'a>>,
         Option<Did<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> BadgeView<'a> {
@@ -256,9 +260,9 @@ impl<'a> BadgeViewBuilder<'a, badge_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         BadgeViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -273,11 +277,11 @@ where
         mut self,
         value: impl Into<BadgeViewBadgeType<'a>>,
     ) -> BadgeViewBuilder<'a, badge_view_state::SetBadgeType<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         BadgeViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -292,11 +296,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> BadgeViewBuilder<'a, badge_view_state::SetIssuer<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         BadgeViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -311,11 +315,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> BadgeViewBuilder<'a, badge_view_state::SetRecipient<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         BadgeViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -323,12 +327,12 @@ where
 impl<'a, S: badge_view_state::State> BadgeViewBuilder<'a, S> {
     /// Set the `signature` field (optional)
     pub fn signature(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `signature` field to an Option value (optional)
     pub fn maybe_signature(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -343,10 +347,10 @@ where
     /// Build the final struct
     pub fn build(self) -> BadgeView<'a> {
         BadgeView {
-            badge_type: self.__unsafe_private_named.0.unwrap(),
-            issuer: self.__unsafe_private_named.1.unwrap(),
-            recipient: self.__unsafe_private_named.2.unwrap(),
-            signature: self.__unsafe_private_named.3,
+            badge_type: self._fields.0.unwrap(),
+            issuer: self._fields.1.unwrap(),
+            recipient: self._fields.2.unwrap(),
+            signature: self._fields.3,
             extra_data: Default::default(),
         }
     }
@@ -359,10 +363,10 @@ where
         >,
     ) -> BadgeView<'a> {
         BadgeView {
-            badge_type: self.__unsafe_private_named.0.unwrap(),
-            issuer: self.__unsafe_private_named.1.unwrap(),
-            recipient: self.__unsafe_private_named.2.unwrap(),
-            signature: self.__unsafe_private_named.3,
+            badge_type: self._fields.0.unwrap(),
+            issuer: self._fields.1.unwrap(),
+            recipient: self._fields.2.unwrap(),
+            signature: self._fields.3,
             extra_data: Some(extra_data),
         }
     }

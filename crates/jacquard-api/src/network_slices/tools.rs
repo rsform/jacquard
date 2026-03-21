@@ -9,7 +9,11 @@ pub mod bug;
 pub mod document;
 pub mod richtext;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -136,45 +140,45 @@ pub mod image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Alt;
         type Image;
+        type Alt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Alt = Unset;
         type Image = Unset;
-    }
-    ///State transition - sets the `alt` field to Set
-    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlt<S> {}
-    impl<S: State> State for SetAlt<S> {
-        type Alt = Set<members::alt>;
-        type Image = S::Image;
+        type Alt = Unset;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
-        type Alt = S::Alt;
         type Image = Set<members::image>;
+        type Alt = S::Alt;
+    }
+    ///State transition - sets the `alt` field to Set
+    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAlt<S> {}
+    impl<S: State> State for SetAlt<S> {
+        type Image = S::Image;
+        type Alt = Set<members::alt>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `alt` field
-        pub struct alt(());
         ///Marker type for the `image` field
         pub struct image(());
+        ///Marker type for the `alt` field
+        pub struct alt(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ImageBuilder<'a, S: image_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<CowStr<'a>>, Option<BlobRef<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<BlobRef<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Image<'a> {
@@ -188,9 +192,9 @@ impl<'a> ImageBuilder<'a, image_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -205,11 +209,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ImageBuilder<'a, image_state::SetAlt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -224,11 +228,11 @@ where
         mut self,
         value: impl Into<BlobRef<'a>>,
     ) -> ImageBuilder<'a, image_state::SetImage<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ImageBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -236,14 +240,14 @@ where
 impl<'a, S> ImageBuilder<'a, S>
 where
     S: image_state::State,
-    S::Alt: image_state::IsSet,
     S::Image: image_state::IsSet,
+    S::Alt: image_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Image<'a> {
         Image {
-            alt: self.__unsafe_private_named.0.unwrap(),
-            image: self.__unsafe_private_named.1.unwrap(),
+            alt: self._fields.0.unwrap(),
+            image: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -256,8 +260,8 @@ where
         >,
     ) -> Image<'a> {
         Image {
-            alt: self.__unsafe_private_named.0.unwrap(),
-            image: self.__unsafe_private_named.1.unwrap(),
+            alt: self._fields.0.unwrap(),
+            image: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -365,9 +369,9 @@ pub mod images_state {
 
 /// Builder for constructing an instance of this type
 pub struct ImagesBuilder<'a, S: images_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<tools::Image<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<tools::Image<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Images<'a> {
@@ -381,9 +385,9 @@ impl<'a> ImagesBuilder<'a, images_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ImagesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -398,11 +402,11 @@ where
         mut self,
         value: impl Into<Vec<tools::Image<'a>>>,
     ) -> ImagesBuilder<'a, images_state::SetImages<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ImagesBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -415,7 +419,7 @@ where
     /// Build the final struct
     pub fn build(self) -> Images<'a> {
         Images {
-            images: self.__unsafe_private_named.0.unwrap(),
+            images: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -428,7 +432,7 @@ where
         >,
     ) -> Images<'a> {
         Images {
-            images: self.__unsafe_private_named.0.unwrap(),
+            images: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 
 #[allow(unused_imports)]
@@ -126,13 +129,13 @@ pub mod list_item_state {
 
 /// Builder for constructing an instance of this type
 pub struct ListItemBuilder<'a, S: list_item_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<unordered_list::ListItem<'a>>>,
         Option<ListItemContent<'a>>,
         Option<OrderedList<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ListItem<'a> {
@@ -146,9 +149,9 @@ impl<'a> ListItemBuilder<'a, list_item_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -159,7 +162,7 @@ impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<unordered_list::ListItem<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `children` field to an Option value (optional)
@@ -167,7 +170,7 @@ impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
         mut self,
         value: Option<Vec<unordered_list::ListItem<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -182,11 +185,11 @@ where
         mut self,
         value: impl Into<ListItemContent<'a>>,
     ) -> ListItemBuilder<'a, list_item_state::SetContent<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ListItemBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -197,7 +200,7 @@ impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
         mut self,
         value: impl Into<Option<OrderedList<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `orderedListChildren` field to an Option value (optional)
@@ -205,7 +208,7 @@ impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
         mut self,
         value: Option<OrderedList<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -218,9 +221,9 @@ where
     /// Build the final struct
     pub fn build(self) -> ListItem<'a> {
         ListItem {
-            children: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
-            ordered_list_children: self.__unsafe_private_named.2,
+            children: self._fields.0,
+            content: self._fields.1.unwrap(),
+            ordered_list_children: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -233,9 +236,9 @@ where
         >,
     ) -> ListItem<'a> {
         ListItem {
-            children: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1.unwrap(),
-            ordered_list_children: self.__unsafe_private_named.2,
+            children: self._fields.0,
+            content: self._fields.1.unwrap(),
+            ordered_list_children: self._fields.2,
             extra_data: Some(extra_data),
         }
     }
@@ -358,9 +361,9 @@ pub mod unordered_list_state {
 
 /// Builder for constructing an instance of this type
 pub struct UnorderedListBuilder<'a, S: unordered_list_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Vec<unordered_list::ListItem<'a>>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<unordered_list::ListItem<'a>>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> UnorderedList<'a> {
@@ -374,9 +377,9 @@ impl<'a> UnorderedListBuilder<'a, unordered_list_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         UnorderedListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -391,11 +394,11 @@ where
         mut self,
         value: impl Into<Vec<unordered_list::ListItem<'a>>>,
     ) -> UnorderedListBuilder<'a, unordered_list_state::SetChildren<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         UnorderedListBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -408,7 +411,7 @@ where
     /// Build the final struct
     pub fn build(self) -> UnorderedList<'a> {
         UnorderedList {
-            children: self.__unsafe_private_named.0.unwrap(),
+            children: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -421,7 +424,7 @@ where
         >,
     ) -> UnorderedList<'a> {
         UnorderedList {
-            children: self.__unsafe_private_named.0.unwrap(),
+            children: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }

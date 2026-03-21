@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -326,65 +329,65 @@ pub mod goal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Year;
         type CreatedAt;
         type Name;
-        type Year;
         type GoalId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Year = Unset;
         type CreatedAt = Unset;
         type Name = Unset;
-        type Year = Unset;
         type GoalId = Unset;
+    }
+    ///State transition - sets the `year` field to Set
+    pub struct SetYear<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetYear<S> {}
+    impl<S: State> State for SetYear<S> {
+        type Year = Set<members::year>;
+        type CreatedAt = S::CreatedAt;
+        type Name = S::Name;
+        type GoalId = S::GoalId;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type Year = S::Year;
         type CreatedAt = Set<members::created_at>;
         type Name = S::Name;
-        type Year = S::Year;
         type GoalId = S::GoalId;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
+        type Year = S::Year;
         type CreatedAt = S::CreatedAt;
         type Name = Set<members::name>;
-        type Year = S::Year;
-        type GoalId = S::GoalId;
-    }
-    ///State transition - sets the `year` field to Set
-    pub struct SetYear<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetYear<S> {}
-    impl<S: State> State for SetYear<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Year = Set<members::year>;
         type GoalId = S::GoalId;
     }
     ///State transition - sets the `goal_id` field to Set
     pub struct SetGoalId<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetGoalId<S> {}
     impl<S: State> State for SetGoalId<S> {
+        type Year = S::Year;
         type CreatedAt = S::CreatedAt;
         type Name = S::Name;
-        type Year = S::Year;
         type GoalId = Set<members::goal_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `year` field
+        pub struct year(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `year` field
-        pub struct year(());
         ///Marker type for the `goal_id` field
         pub struct goal_id(());
     }
@@ -392,8 +395,8 @@ pub mod goal_state {
 
 /// Builder for constructing an instance of this type
 pub struct GoalBuilder<'a, S: goal_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Vec<CowStr<'a>>>,
         Option<CowStr<'a>>,
@@ -410,7 +413,7 @@ pub struct GoalBuilder<'a, S: goal_state::State> {
         Option<i64>,
         Option<i64>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Goal<'a> {
@@ -424,8 +427,8 @@ impl<'a> GoalBuilder<'a, goal_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GoalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -442,7 +445,7 @@ impl<'a> GoalBuilder<'a, goal_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -450,12 +453,12 @@ impl<'a> GoalBuilder<'a, goal_state::Empty> {
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `accentColor` field (optional)
     pub fn accent_color(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `accentColor` field to an Option value (optional)
     pub fn maybe_accent_color(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -463,12 +466,12 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `categories` field (optional)
     pub fn categories(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `categories` field to an Option value (optional)
     pub fn maybe_categories(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -479,12 +482,12 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
         mut self,
         value: impl Into<Option<CowStr<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `completedAccentColor` field to an Option value (optional)
     pub fn maybe_completed_accent_color(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -492,12 +495,12 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `completedPiece` field (optional)
     pub fn completed_piece(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `completedPiece` field to an Option value (optional)
     pub fn maybe_completed_piece(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -508,12 +511,12 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
         mut self,
         value: impl Into<Option<BlobRef<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `completedPieceBlob` field to an Option value (optional)
     pub fn maybe_completed_piece_blob(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -524,12 +527,12 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
         mut self,
         value: impl Into<Option<UriValue<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `completedPieceUrl` field to an Option value (optional)
     pub fn maybe_completed_piece_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -544,11 +547,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> GoalBuilder<'a, goal_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         GoalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -556,12 +559,12 @@ where
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -576,11 +579,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GoalBuilder<'a, goal_state::SetGoalId<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         GoalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -595,11 +598,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> GoalBuilder<'a, goal_state::SetName<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         GoalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -607,12 +610,12 @@ where
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `piece` field (optional)
     pub fn piece(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `piece` field to an Option value (optional)
     pub fn maybe_piece(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -620,12 +623,12 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `pieceBlob` field (optional)
     pub fn piece_blob(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `pieceBlob` field to an Option value (optional)
     pub fn maybe_piece_blob(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -633,12 +636,12 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `pieceUrl` field (optional)
     pub fn piece_url(mut self, value: impl Into<Option<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `pieceUrl` field to an Option value (optional)
     pub fn maybe_piece_url(mut self, value: Option<UriValue<'a>>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -646,12 +649,12 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
 impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     /// Set the `targetCount` field (optional)
     pub fn target_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.13 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `targetCount` field to an Option value (optional)
     pub fn maybe_target_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.13 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -666,11 +669,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> GoalBuilder<'a, goal_state::SetYear<S>> {
-        self.__unsafe_private_named.14 = Option::Some(value.into());
+        self._fields.14 = Option::Some(value.into());
         GoalBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -678,29 +681,29 @@ where
 impl<'a, S> GoalBuilder<'a, S>
 where
     S: goal_state::State,
+    S::Year: goal_state::IsSet,
     S::CreatedAt: goal_state::IsSet,
     S::Name: goal_state::IsSet,
-    S::Year: goal_state::IsSet,
     S::GoalId: goal_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Goal<'a> {
         Goal {
-            accent_color: self.__unsafe_private_named.0,
-            categories: self.__unsafe_private_named.1,
-            completed_accent_color: self.__unsafe_private_named.2,
-            completed_piece: self.__unsafe_private_named.3,
-            completed_piece_blob: self.__unsafe_private_named.4,
-            completed_piece_url: self.__unsafe_private_named.5,
-            created_at: self.__unsafe_private_named.6.unwrap(),
-            description: self.__unsafe_private_named.7,
-            goal_id: self.__unsafe_private_named.8.unwrap(),
-            name: self.__unsafe_private_named.9.unwrap(),
-            piece: self.__unsafe_private_named.10,
-            piece_blob: self.__unsafe_private_named.11,
-            piece_url: self.__unsafe_private_named.12,
-            target_count: self.__unsafe_private_named.13,
-            year: self.__unsafe_private_named.14.unwrap(),
+            accent_color: self._fields.0,
+            categories: self._fields.1,
+            completed_accent_color: self._fields.2,
+            completed_piece: self._fields.3,
+            completed_piece_blob: self._fields.4,
+            completed_piece_url: self._fields.5,
+            created_at: self._fields.6.unwrap(),
+            description: self._fields.7,
+            goal_id: self._fields.8.unwrap(),
+            name: self._fields.9.unwrap(),
+            piece: self._fields.10,
+            piece_blob: self._fields.11,
+            piece_url: self._fields.12,
+            target_count: self._fields.13,
+            year: self._fields.14.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -713,21 +716,21 @@ where
         >,
     ) -> Goal<'a> {
         Goal {
-            accent_color: self.__unsafe_private_named.0,
-            categories: self.__unsafe_private_named.1,
-            completed_accent_color: self.__unsafe_private_named.2,
-            completed_piece: self.__unsafe_private_named.3,
-            completed_piece_blob: self.__unsafe_private_named.4,
-            completed_piece_url: self.__unsafe_private_named.5,
-            created_at: self.__unsafe_private_named.6.unwrap(),
-            description: self.__unsafe_private_named.7,
-            goal_id: self.__unsafe_private_named.8.unwrap(),
-            name: self.__unsafe_private_named.9.unwrap(),
-            piece: self.__unsafe_private_named.10,
-            piece_blob: self.__unsafe_private_named.11,
-            piece_url: self.__unsafe_private_named.12,
-            target_count: self.__unsafe_private_named.13,
-            year: self.__unsafe_private_named.14.unwrap(),
+            accent_color: self._fields.0,
+            categories: self._fields.1,
+            completed_accent_color: self._fields.2,
+            completed_piece: self._fields.3,
+            completed_piece_blob: self._fields.4,
+            completed_piece_url: self._fields.5,
+            created_at: self._fields.6.unwrap(),
+            description: self._fields.7,
+            goal_id: self._fields.8.unwrap(),
+            name: self._fields.9.unwrap(),
+            piece: self._fields.10,
+            piece_blob: self._fields.11,
+            piece_url: self._fields.12,
+            target_count: self._fields.13,
+            year: self._fields.14.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::types::string::{AtUri, Nsid, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
@@ -79,80 +82,80 @@ pub mod put_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
         type Rkey;
         type Collection;
         type Strategy;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
         type Rkey = Unset;
         type Collection = Unset;
         type Strategy = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Record = Set<members::record>;
-        type Rkey = S::Rkey;
-        type Collection = S::Collection;
-        type Strategy = S::Strategy;
+        type Record = Unset;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRkey<S> {}
     impl<S: State> State for SetRkey<S> {
-        type Record = S::Record;
         type Rkey = Set<members::rkey>;
         type Collection = S::Collection;
         type Strategy = S::Strategy;
+        type Record = S::Record;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
-        type Record = S::Record;
         type Rkey = S::Rkey;
         type Collection = Set<members::collection>;
         type Strategy = S::Strategy;
+        type Record = S::Record;
     }
     ///State transition - sets the `strategy` field to Set
     pub struct SetStrategy<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetStrategy<S> {}
     impl<S: State> State for SetStrategy<S> {
-        type Record = S::Record;
         type Rkey = S::Rkey;
         type Collection = S::Collection;
         type Strategy = Set<members::strategy>;
+        type Record = S::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRecord<S> {}
+    impl<S: State> State for SetRecord<S> {
+        type Rkey = S::Rkey;
+        type Collection = S::Collection;
+        type Strategy = S::Strategy;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
         ///Marker type for the `collection` field
         pub struct collection(());
         ///Marker type for the `strategy` field
         pub struct strategy(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PutRecordBuilder<'a, S: put_record_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Nsid<'a>>,
         Option<Data<'a>>,
         Option<RecordKey<Rkey<'a>>>,
         Option<Strategy<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> PutRecord<'a> {
@@ -166,9 +169,9 @@ impl<'a> PutRecordBuilder<'a, put_record_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PutRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -183,11 +186,11 @@ where
         mut self,
         value: impl Into<Nsid<'a>>,
     ) -> PutRecordBuilder<'a, put_record_state::SetCollection<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PutRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -202,11 +205,11 @@ where
         mut self,
         value: impl Into<Data<'a>>,
     ) -> PutRecordBuilder<'a, put_record_state::SetRecord<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PutRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -221,11 +224,11 @@ where
         mut self,
         value: impl Into<RecordKey<Rkey<'a>>>,
     ) -> PutRecordBuilder<'a, put_record_state::SetRkey<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PutRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -240,11 +243,11 @@ where
         mut self,
         value: impl Into<Strategy<'a>>,
     ) -> PutRecordBuilder<'a, put_record_state::SetStrategy<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         PutRecordBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -252,18 +255,18 @@ where
 impl<'a, S> PutRecordBuilder<'a, S>
 where
     S: put_record_state::State,
-    S::Record: put_record_state::IsSet,
     S::Rkey: put_record_state::IsSet,
     S::Collection: put_record_state::IsSet,
     S::Strategy: put_record_state::IsSet,
+    S::Record: put_record_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PutRecord<'a> {
         PutRecord {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            record: self.__unsafe_private_named.1.unwrap(),
-            rkey: self.__unsafe_private_named.2.unwrap(),
-            strategy: self.__unsafe_private_named.3.unwrap(),
+            collection: self._fields.0.unwrap(),
+            record: self._fields.1.unwrap(),
+            rkey: self._fields.2.unwrap(),
+            strategy: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -273,10 +276,10 @@ where
         extra_data: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<'a>>,
     ) -> PutRecord<'a> {
         PutRecord {
-            collection: self.__unsafe_private_named.0.unwrap(),
-            record: self.__unsafe_private_named.1.unwrap(),
-            rkey: self.__unsafe_private_named.2.unwrap(),
-            strategy: self.__unsafe_private_named.3.unwrap(),
+            collection: self._fields.0.unwrap(),
+            record: self._fields.1.unwrap(),
+            rkey: self._fields.2.unwrap(),
+            strategy: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -362,44 +365,44 @@ pub mod list_mute_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type CreatedAt;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type CreatedAt = S::CreatedAt;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
         type CreatedAt = Set<members::created_at>;
+        type Subject = S::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSubject<S> {}
+    impl<S: State> State for SetSubject<S> {
+        type CreatedAt = S::CreatedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ListMuteBuilder<'a, S: list_mute_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<list_mute::ContentTypes<'a>>,
         Option<Datetime>,
         Option<Datetime>,
@@ -407,7 +410,7 @@ pub struct ListMuteBuilder<'a, S: list_mute_state::State> {
         Option<AtUri<'a>>,
         Option<Vec<AtUri<'a>>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ListMute<'a> {
@@ -421,9 +424,9 @@ impl<'a> ListMuteBuilder<'a, list_mute_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ListMuteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -434,7 +437,7 @@ impl<'a, S: list_mute_state::State> ListMuteBuilder<'a, S> {
         mut self,
         value: impl Into<Option<list_mute::ContentTypes<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `contentTypes` field to an Option value (optional)
@@ -442,7 +445,7 @@ impl<'a, S: list_mute_state::State> ListMuteBuilder<'a, S> {
         mut self,
         value: Option<list_mute::ContentTypes<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -457,11 +460,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ListMuteBuilder<'a, list_mute_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ListMuteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -469,12 +472,12 @@ where
 impl<'a, S: list_mute_state::State> ListMuteBuilder<'a, S> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `expiresAt` field to an Option value (optional)
     pub fn maybe_expires_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -482,12 +485,12 @@ impl<'a, S: list_mute_state::State> ListMuteBuilder<'a, S> {
 impl<'a, S: list_mute_state::State> ListMuteBuilder<'a, S> {
     /// Set the `reason` field (optional)
     pub fn reason(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `reason` field to an Option value (optional)
     pub fn maybe_reason(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -502,11 +505,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ListMuteBuilder<'a, list_mute_state::SetSubject<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ListMuteBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -514,12 +517,12 @@ where
 impl<'a, S: list_mute_state::State> ListMuteBuilder<'a, S> {
     /// Set the `targetFeeds` field (optional)
     pub fn target_feeds(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `targetFeeds` field to an Option value (optional)
     pub fn maybe_target_feeds(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -527,18 +530,18 @@ impl<'a, S: list_mute_state::State> ListMuteBuilder<'a, S> {
 impl<'a, S> ListMuteBuilder<'a, S>
 where
     S: list_mute_state::State,
-    S::Subject: list_mute_state::IsSet,
     S::CreatedAt: list_mute_state::IsSet,
+    S::Subject: list_mute_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> ListMute<'a> {
         ListMute {
-            content_types: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            expires_at: self.__unsafe_private_named.2,
-            reason: self.__unsafe_private_named.3,
-            subject: self.__unsafe_private_named.4.unwrap(),
-            target_feeds: self.__unsafe_private_named.5,
+            content_types: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            expires_at: self._fields.2,
+            reason: self._fields.3,
+            subject: self._fields.4.unwrap(),
+            target_feeds: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -551,12 +554,12 @@ where
         >,
     ) -> ListMute<'a> {
         ListMute {
-            content_types: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            expires_at: self.__unsafe_private_named.2,
-            reason: self.__unsafe_private_named.3,
-            subject: self.__unsafe_private_named.4.unwrap(),
-            target_feeds: self.__unsafe_private_named.5,
+            content_types: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            expires_at: self._fields.2,
+            reason: self._fields.3,
+            subject: self._fields.4.unwrap(),
+            target_feeds: self._fields.5,
             extra_data: Some(extra_data),
         }
     }

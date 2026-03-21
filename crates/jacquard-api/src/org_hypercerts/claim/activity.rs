@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -474,13 +477,13 @@ pub mod contributor_state {
 
 /// Builder for constructing an instance of this type
 pub struct ContributorBuilder<'a, S: contributor_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ContributorContributionDetails<'a>>,
         Option<CowStr<'a>>,
         Option<ContributorContributorIdentity<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Contributor<'a> {
@@ -494,9 +497,9 @@ impl<'a> ContributorBuilder<'a, contributor_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ContributorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -507,7 +510,7 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ContributorContributionDetails<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `contributionDetails` field to an Option value (optional)
@@ -515,7 +518,7 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
         mut self,
         value: Option<ContributorContributionDetails<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -523,12 +526,12 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
 impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     /// Set the `contributionWeight` field (optional)
     pub fn contribution_weight(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `contributionWeight` field to an Option value (optional)
     pub fn maybe_contribution_weight(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -543,11 +546,11 @@ where
         mut self,
         value: impl Into<ContributorContributorIdentity<'a>>,
     ) -> ContributorBuilder<'a, contributor_state::SetContributorIdentity<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ContributorBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -560,9 +563,9 @@ where
     /// Build the final struct
     pub fn build(self) -> Contributor<'a> {
         Contributor {
-            contribution_details: self.__unsafe_private_named.0,
-            contribution_weight: self.__unsafe_private_named.1,
-            contributor_identity: self.__unsafe_private_named.2.unwrap(),
+            contribution_details: self._fields.0,
+            contribution_weight: self._fields.1,
+            contributor_identity: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -575,9 +578,9 @@ where
         >,
     ) -> Contributor<'a> {
         Contributor {
-            contribution_details: self.__unsafe_private_named.0,
-            contribution_weight: self.__unsafe_private_named.1,
-            contributor_identity: self.__unsafe_private_named.2.unwrap(),
+            contribution_details: self._fields.0,
+            contribution_weight: self._fields.1,
+            contributor_identity: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -923,57 +926,57 @@ pub mod activity_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Title;
-        type ShortDescription;
         type CreatedAt;
+        type ShortDescription;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Title = Unset;
-        type ShortDescription = Unset;
         type CreatedAt = Unset;
+        type ShortDescription = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Title = Set<members::title>;
+        type CreatedAt = S::CreatedAt;
         type ShortDescription = S::ShortDescription;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `short_description` field to Set
-    pub struct SetShortDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShortDescription<S> {}
-    impl<S: State> State for SetShortDescription<S> {
-        type Title = S::Title;
-        type ShortDescription = Set<members::short_description>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
         type Title = S::Title;
-        type ShortDescription = S::ShortDescription;
         type CreatedAt = Set<members::created_at>;
+        type ShortDescription = S::ShortDescription;
+    }
+    ///State transition - sets the `short_description` field to Set
+    pub struct SetShortDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetShortDescription<S> {}
+    impl<S: State> State for SetShortDescription<S> {
+        type Title = S::Title;
+        type CreatedAt = S::CreatedAt;
+        type ShortDescription = Set<members::short_description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `short_description` field
-        pub struct short_description(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `short_description` field
+        pub struct short_description(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct ActivityBuilder<'a, S: activity_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<activity::Contributor<'a>>>,
         Option<Datetime>,
         Option<LinearDocument<'a>>,
@@ -987,7 +990,7 @@ pub struct ActivityBuilder<'a, S: activity_state::State> {
         Option<CowStr<'a>>,
         Option<ActivityWorkScope<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Activity<'a> {
@@ -1001,8 +1004,8 @@ impl<'a> ActivityBuilder<'a, activity_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ActivityBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -1016,7 +1019,7 @@ impl<'a> ActivityBuilder<'a, activity_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1027,7 +1030,7 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<activity::Contributor<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `contributors` field to an Option value (optional)
@@ -1035,7 +1038,7 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
         mut self,
         value: Option<Vec<activity::Contributor<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1050,11 +1053,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ActivityBuilder<'a, activity_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ActivityBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1062,12 +1065,12 @@ where
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<LinearDocument<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<LinearDocument<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1075,12 +1078,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `endDate` field (optional)
     pub fn end_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `endDate` field to an Option value (optional)
     pub fn maybe_end_date(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1088,12 +1091,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<ActivityImage<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `image` field to an Option value (optional)
     pub fn maybe_image(mut self, value: Option<ActivityImage<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1101,12 +1104,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `locations` field (optional)
     pub fn locations(mut self, value: impl Into<Option<Vec<StrongRef<'a>>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `locations` field to an Option value (optional)
     pub fn maybe_locations(mut self, value: Option<Vec<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1114,12 +1117,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `rights` field (optional)
     pub fn rights(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `rights` field to an Option value (optional)
     pub fn maybe_rights(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1134,11 +1137,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ActivityBuilder<'a, activity_state::SetShortDescription<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         ActivityBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1149,7 +1152,7 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<Facet<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `shortDescriptionFacets` field to an Option value (optional)
@@ -1157,7 +1160,7 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
         mut self,
         value: Option<Vec<Facet<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -1165,12 +1168,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
 impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     /// Set the `startDate` field (optional)
     pub fn start_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `startDate` field to an Option value (optional)
     pub fn maybe_start_date(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -1185,11 +1188,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ActivityBuilder<'a, activity_state::SetTitle<S>> {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         ActivityBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1200,12 +1203,12 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ActivityWorkScope<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `workScope` field to an Option value (optional)
     pub fn maybe_work_scope(mut self, value: Option<ActivityWorkScope<'a>>) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -1214,24 +1217,24 @@ impl<'a, S> ActivityBuilder<'a, S>
 where
     S: activity_state::State,
     S::Title: activity_state::IsSet,
-    S::ShortDescription: activity_state::IsSet,
     S::CreatedAt: activity_state::IsSet,
+    S::ShortDescription: activity_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Activity<'a> {
         Activity {
-            contributors: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            end_date: self.__unsafe_private_named.3,
-            image: self.__unsafe_private_named.4,
-            locations: self.__unsafe_private_named.5,
-            rights: self.__unsafe_private_named.6,
-            short_description: self.__unsafe_private_named.7.unwrap(),
-            short_description_facets: self.__unsafe_private_named.8,
-            start_date: self.__unsafe_private_named.9,
-            title: self.__unsafe_private_named.10.unwrap(),
-            work_scope: self.__unsafe_private_named.11,
+            contributors: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            end_date: self._fields.3,
+            image: self._fields.4,
+            locations: self._fields.5,
+            rights: self._fields.6,
+            short_description: self._fields.7.unwrap(),
+            short_description_facets: self._fields.8,
+            start_date: self._fields.9,
+            title: self._fields.10.unwrap(),
+            work_scope: self._fields.11,
             extra_data: Default::default(),
         }
     }
@@ -1244,18 +1247,18 @@ where
         >,
     ) -> Activity<'a> {
         Activity {
-            contributors: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2,
-            end_date: self.__unsafe_private_named.3,
-            image: self.__unsafe_private_named.4,
-            locations: self.__unsafe_private_named.5,
-            rights: self.__unsafe_private_named.6,
-            short_description: self.__unsafe_private_named.7.unwrap(),
-            short_description_facets: self.__unsafe_private_named.8,
-            start_date: self.__unsafe_private_named.9,
-            title: self.__unsafe_private_named.10.unwrap(),
-            work_scope: self.__unsafe_private_named.11,
+            contributors: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2,
+            end_date: self._fields.3,
+            image: self._fields.4,
+            locations: self._fields.5,
+            rights: self._fields.6,
+            short_description: self._fields.7.unwrap(),
+            short_description_facets: self._fields.8,
+            start_date: self._fields.9,
+            title: self._fields.10.unwrap(),
+            work_scope: self._fields.11,
             extra_data: Some(extra_data),
         }
     }

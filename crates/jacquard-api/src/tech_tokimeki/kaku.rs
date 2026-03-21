@@ -13,7 +13,11 @@ pub mod request;
 pub mod request_response;
 pub mod room_gate;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -646,45 +650,45 @@ pub mod aspect_ratio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Width;
         type Height;
+        type Width;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Width = Unset;
         type Height = Unset;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type Width = Set<members::width>;
-        type Height = S::Height;
+        type Width = Unset;
     }
     ///State transition - sets the `height` field to Set
     pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetHeight<S> {}
     impl<S: State> State for SetHeight<S> {
-        type Width = S::Width;
         type Height = Set<members::height>;
+        type Width = S::Width;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetWidth<S> {}
+    impl<S: State> State for SetWidth<S> {
+        type Height = S::Height;
+        type Width = Set<members::width>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `width` field
-        pub struct width(());
         ///Marker type for the `height` field
         pub struct height(());
+        ///Marker type for the `width` field
+        pub struct width(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct AspectRatioBuilder<'a, S: aspect_ratio_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<i64>, Option<i64>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> AspectRatio<'a> {
@@ -698,9 +702,9 @@ impl<'a> AspectRatioBuilder<'a, aspect_ratio_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         AspectRatioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -715,11 +719,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetHeight<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         AspectRatioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -734,11 +738,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetWidth<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         AspectRatioBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -746,14 +750,14 @@ where
 impl<'a, S> AspectRatioBuilder<'a, S>
 where
     S: aspect_ratio_state::State,
-    S::Width: aspect_ratio_state::IsSet,
     S::Height: aspect_ratio_state::IsSet,
+    S::Width: aspect_ratio_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> AspectRatio<'a> {
         AspectRatio {
-            height: self.__unsafe_private_named.0.unwrap(),
-            width: self.__unsafe_private_named.1.unwrap(),
+            height: self._fields.0.unwrap(),
+            width: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -766,8 +770,8 @@ where
         >,
     ) -> AspectRatio<'a> {
         AspectRatio {
-            height: self.__unsafe_private_named.0.unwrap(),
-            width: self.__unsafe_private_named.1.unwrap(),
+            height: self._fields.0.unwrap(),
+            width: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1417,92 +1421,92 @@ pub mod collection_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Uri;
-        type Author;
-        type Cid;
         type Name;
+        type Uri;
+        type Cid;
+        type Author;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Uri = Unset;
-        type Author = Unset;
-        type Cid = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type Cid = S::Cid;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type CreatedAt = S::CreatedAt;
-        type Uri = Set<members::uri>;
-        type Author = S::Author;
-        type Cid = S::Cid;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-        type Author = Set<members::author>;
-        type Cid = S::Cid;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type Cid = Set<members::cid>;
-        type Name = S::Name;
+        type Uri = Unset;
+        type Cid = Unset;
+        type Author = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetName<S> {}
     impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type Cid = S::Cid;
         type Name = Set<members::name>;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Name = S::Name;
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type Name = S::Name;
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Author = S::Author;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Name = S::Name;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = Set<members::author>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Name = S::Name;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `author` field
-        pub struct author(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CollectionViewBuilder<'a, S: collection_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ProfileViewBasic<'a>>,
         Option<Cid<'a>>,
         Option<Datetime>,
@@ -1513,7 +1517,7 @@ pub struct CollectionViewBuilder<'a, S: collection_view_state::State> {
         Option<CowStr<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CollectionView<'a> {
@@ -1527,19 +1531,9 @@ impl<'a> CollectionViewBuilder<'a, collection_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CollectionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1554,11 +1548,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> CollectionViewBuilder<'a, collection_view_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CollectionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1573,11 +1567,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> CollectionViewBuilder<'a, collection_view_state::SetCid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CollectionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1592,11 +1586,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CollectionViewBuilder<'a, collection_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CollectionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1604,12 +1598,12 @@ where
 impl<'a, S: collection_view_state::State> CollectionViewBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1617,12 +1611,12 @@ impl<'a, S: collection_view_state::State> CollectionViewBuilder<'a, S> {
 impl<'a, S: collection_view_state::State> CollectionViewBuilder<'a, S> {
     /// Set the `indexedAt` field (optional)
     pub fn indexed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `indexedAt` field to an Option value (optional)
     pub fn maybe_indexed_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1630,12 +1624,12 @@ impl<'a, S: collection_view_state::State> CollectionViewBuilder<'a, S> {
 impl<'a, S: collection_view_state::State> CollectionViewBuilder<'a, S> {
     /// Set the `isPublic` field (optional)
     pub fn is_public(mut self, value: impl Into<Option<bool>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `isPublic` field to an Option value (optional)
     pub fn maybe_is_public(mut self, value: Option<bool>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1643,12 +1637,12 @@ impl<'a, S: collection_view_state::State> CollectionViewBuilder<'a, S> {
 impl<'a, S: collection_view_state::State> CollectionViewBuilder<'a, S> {
     /// Set the `itemCount` field (optional)
     pub fn item_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `itemCount` field to an Option value (optional)
     pub fn maybe_item_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1663,11 +1657,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CollectionViewBuilder<'a, collection_view_state::SetName<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         CollectionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1682,11 +1676,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> CollectionViewBuilder<'a, collection_view_state::SetUri<S>> {
-        self.__unsafe_private_named.8 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         CollectionViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1694,24 +1688,24 @@ where
 impl<'a, S> CollectionViewBuilder<'a, S>
 where
     S: collection_view_state::State,
-    S::CreatedAt: collection_view_state::IsSet,
-    S::Uri: collection_view_state::IsSet,
-    S::Author: collection_view_state::IsSet,
-    S::Cid: collection_view_state::IsSet,
     S::Name: collection_view_state::IsSet,
+    S::Uri: collection_view_state::IsSet,
+    S::Cid: collection_view_state::IsSet,
+    S::Author: collection_view_state::IsSet,
+    S::CreatedAt: collection_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionView<'a> {
         CollectionView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3,
-            indexed_at: self.__unsafe_private_named.4,
-            is_public: self.__unsafe_private_named.5.or_else(|| Some(true)),
-            item_count: self.__unsafe_private_named.6,
-            name: self.__unsafe_private_named.7.unwrap(),
-            uri: self.__unsafe_private_named.8.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3,
+            indexed_at: self._fields.4,
+            is_public: self._fields.5.or_else(|| Some(true)),
+            item_count: self._fields.6,
+            name: self._fields.7.unwrap(),
+            uri: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1724,15 +1718,15 @@ where
         >,
     ) -> CollectionView<'a> {
         CollectionView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            description: self.__unsafe_private_named.3,
-            indexed_at: self.__unsafe_private_named.4,
-            is_public: self.__unsafe_private_named.5.or_else(|| Some(true)),
-            item_count: self.__unsafe_private_named.6,
-            name: self.__unsafe_private_named.7.unwrap(),
-            uri: self.__unsafe_private_named.8.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            description: self._fields.3,
+            indexed_at: self._fields.4,
+            is_public: self._fields.5.or_else(|| Some(true)),
+            item_count: self._fields.6,
+            name: self._fields.7.unwrap(),
+            uri: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1748,112 +1742,112 @@ pub mod post_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type AspectRatio;
-        type Author;
         type Image;
-        type CreatedAt;
+        type Author;
         type Cid;
+        type AspectRatio;
+        type Uri;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type AspectRatio = Unset;
-        type Author = Unset;
         type Image = Unset;
-        type CreatedAt = Unset;
+        type Author = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type AspectRatio = S::AspectRatio;
-        type Author = S::Author;
-        type Image = S::Image;
-        type CreatedAt = S::CreatedAt;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `aspect_ratio` field to Set
-    pub struct SetAspectRatio<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAspectRatio<S> {}
-    impl<S: State> State for SetAspectRatio<S> {
-        type Uri = S::Uri;
-        type AspectRatio = Set<members::aspect_ratio>;
-        type Author = S::Author;
-        type Image = S::Image;
-        type CreatedAt = S::CreatedAt;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Uri = S::Uri;
-        type AspectRatio = S::AspectRatio;
-        type Author = Set<members::author>;
-        type Image = S::Image;
-        type CreatedAt = S::CreatedAt;
-        type Cid = S::Cid;
+        type AspectRatio = Unset;
+        type Uri = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `image` field to Set
     pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetImage<S> {}
     impl<S: State> State for SetImage<S> {
-        type Uri = S::Uri;
-        type AspectRatio = S::AspectRatio;
-        type Author = S::Author;
         type Image = Set<members::image>;
-        type CreatedAt = S::CreatedAt;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Uri = S::Uri;
-        type AspectRatio = S::AspectRatio;
         type Author = S::Author;
-        type Image = S::Image;
-        type CreatedAt = Set<members::created_at>;
         type Cid = S::Cid;
+        type AspectRatio = S::AspectRatio;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Image = S::Image;
+        type Author = Set<members::author>;
+        type Cid = S::Cid;
+        type AspectRatio = S::AspectRatio;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCid<S> {}
     impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
-        type AspectRatio = S::AspectRatio;
-        type Author = S::Author;
         type Image = S::Image;
-        type CreatedAt = S::CreatedAt;
+        type Author = S::Author;
         type Cid = Set<members::cid>;
+        type AspectRatio = S::AspectRatio;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `aspect_ratio` field to Set
+    pub struct SetAspectRatio<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAspectRatio<S> {}
+    impl<S: State> State for SetAspectRatio<S> {
+        type Image = S::Image;
+        type Author = S::Author;
+        type Cid = S::Cid;
+        type AspectRatio = Set<members::aspect_ratio>;
+        type Uri = S::Uri;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Image = S::Image;
+        type Author = S::Author;
+        type Cid = S::Cid;
+        type AspectRatio = S::AspectRatio;
+        type Uri = Set<members::uri>;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Image = S::Image;
+        type Author = S::Author;
+        type Cid = S::Cid;
+        type AspectRatio = S::AspectRatio;
+        type Uri = S::Uri;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `aspect_ratio` field
-        pub struct aspect_ratio(());
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `image` field
         pub struct image(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `author` field
+        pub struct author(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `aspect_ratio` field
+        pub struct aspect_ratio(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct PostViewBuilder<'a, S: post_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<kaku::AspectRatio<'a>>,
         Option<ProfileViewBasic<'a>>,
         Option<Cid<'a>>,
@@ -1867,7 +1861,7 @@ pub struct PostViewBuilder<'a, S: post_view_state::State> {
         Option<AtUri<'a>>,
         Option<kaku::ReactionType<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> PostView<'a> {
@@ -1881,8 +1875,8 @@ impl<'a> PostViewBuilder<'a, post_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         PostViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -1896,7 +1890,7 @@ impl<'a> PostViewBuilder<'a, post_view_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1911,11 +1905,11 @@ where
         mut self,
         value: impl Into<kaku::AspectRatio<'a>>,
     ) -> PostViewBuilder<'a, post_view_state::SetAspectRatio<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         PostViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1930,11 +1924,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> PostViewBuilder<'a, post_view_state::SetAuthor<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         PostViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1949,11 +1943,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> PostViewBuilder<'a, post_view_state::SetCid<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PostViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1968,11 +1962,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PostViewBuilder<'a, post_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         PostViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1987,11 +1981,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> PostViewBuilder<'a, post_view_state::SetImage<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         PostViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1999,12 +1993,12 @@ where
 impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
     /// Set the `indexedAt` field (optional)
     pub fn indexed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `indexedAt` field to an Option value (optional)
     pub fn maybe_indexed_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -2012,12 +2006,12 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
 impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
     /// Set the `linkedPost` field (optional)
     pub fn linked_post(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `linkedPost` field to an Option value (optional)
     pub fn maybe_linked_post(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -2028,7 +2022,7 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<kaku::ReactionCounts<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `reactionCounts` field to an Option value (optional)
@@ -2036,7 +2030,7 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
         mut self,
         value: Option<kaku::ReactionCounts<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -2044,12 +2038,12 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
 impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -2057,12 +2051,12 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
 impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `text` field to an Option value (optional)
     pub fn maybe_text(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -2077,11 +2071,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> PostViewBuilder<'a, post_view_state::SetUri<S>> {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         PostViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2092,7 +2086,7 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<kaku::ReactionType<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `viewerReaction` field to an Option value (optional)
@@ -2100,7 +2094,7 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
         mut self,
         value: Option<kaku::ReactionType<'a>>,
     ) -> Self {
-        self.__unsafe_private_named.11 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -2108,28 +2102,28 @@ impl<'a, S: post_view_state::State> PostViewBuilder<'a, S> {
 impl<'a, S> PostViewBuilder<'a, S>
 where
     S: post_view_state::State,
-    S::Uri: post_view_state::IsSet,
-    S::AspectRatio: post_view_state::IsSet,
-    S::Author: post_view_state::IsSet,
     S::Image: post_view_state::IsSet,
-    S::CreatedAt: post_view_state::IsSet,
+    S::Author: post_view_state::IsSet,
     S::Cid: post_view_state::IsSet,
+    S::AspectRatio: post_view_state::IsSet,
+    S::Uri: post_view_state::IsSet,
+    S::CreatedAt: post_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PostView<'a> {
         PostView {
-            aspect_ratio: self.__unsafe_private_named.0.unwrap(),
-            author: self.__unsafe_private_named.1.unwrap(),
-            cid: self.__unsafe_private_named.2.unwrap(),
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            image: self.__unsafe_private_named.4.unwrap(),
-            indexed_at: self.__unsafe_private_named.5,
-            linked_post: self.__unsafe_private_named.6,
-            reaction_counts: self.__unsafe_private_named.7,
-            tags: self.__unsafe_private_named.8,
-            text: self.__unsafe_private_named.9,
-            uri: self.__unsafe_private_named.10.unwrap(),
-            viewer_reaction: self.__unsafe_private_named.11,
+            aspect_ratio: self._fields.0.unwrap(),
+            author: self._fields.1.unwrap(),
+            cid: self._fields.2.unwrap(),
+            created_at: self._fields.3.unwrap(),
+            image: self._fields.4.unwrap(),
+            indexed_at: self._fields.5,
+            linked_post: self._fields.6,
+            reaction_counts: self._fields.7,
+            tags: self._fields.8,
+            text: self._fields.9,
+            uri: self._fields.10.unwrap(),
+            viewer_reaction: self._fields.11,
             extra_data: Default::default(),
         }
     }
@@ -2142,18 +2136,18 @@ where
         >,
     ) -> PostView<'a> {
         PostView {
-            aspect_ratio: self.__unsafe_private_named.0.unwrap(),
-            author: self.__unsafe_private_named.1.unwrap(),
-            cid: self.__unsafe_private_named.2.unwrap(),
-            created_at: self.__unsafe_private_named.3.unwrap(),
-            image: self.__unsafe_private_named.4.unwrap(),
-            indexed_at: self.__unsafe_private_named.5,
-            linked_post: self.__unsafe_private_named.6,
-            reaction_counts: self.__unsafe_private_named.7,
-            tags: self.__unsafe_private_named.8,
-            text: self.__unsafe_private_named.9,
-            uri: self.__unsafe_private_named.10.unwrap(),
-            viewer_reaction: self.__unsafe_private_named.11,
+            aspect_ratio: self._fields.0.unwrap(),
+            author: self._fields.1.unwrap(),
+            cid: self._fields.2.unwrap(),
+            created_at: self._fields.3.unwrap(),
+            image: self._fields.4.unwrap(),
+            indexed_at: self._fields.5,
+            linked_post: self._fields.6,
+            reaction_counts: self._fields.7,
+            tags: self._fields.8,
+            text: self._fields.9,
+            uri: self._fields.10.unwrap(),
+            viewer_reaction: self._fields.11,
             extra_data: Some(extra_data),
         }
     }
@@ -2286,15 +2280,15 @@ pub mod reply_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct ReplyViewBuilder<'a, S: reply_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ProfileViewBasic<'a>>,
         Option<Cid<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> ReplyView<'a> {
@@ -2308,9 +2302,9 @@ impl<'a> ReplyViewBuilder<'a, reply_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         ReplyViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2325,11 +2319,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> ReplyViewBuilder<'a, reply_view_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         ReplyViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2344,11 +2338,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> ReplyViewBuilder<'a, reply_view_state::SetCid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         ReplyViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2363,11 +2357,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ReplyViewBuilder<'a, reply_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         ReplyViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2382,11 +2376,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> ReplyViewBuilder<'a, reply_view_state::SetText<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         ReplyViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2401,11 +2395,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> ReplyViewBuilder<'a, reply_view_state::SetUri<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         ReplyViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2422,11 +2416,11 @@ where
     /// Build the final struct
     pub fn build(self) -> ReplyView<'a> {
         ReplyView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            text: self.__unsafe_private_named.3.unwrap(),
-            uri: self.__unsafe_private_named.4.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            text: self._fields.3.unwrap(),
+            uri: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2439,11 +2433,11 @@ where
         >,
     ) -> ReplyView<'a> {
         ReplyView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            text: self.__unsafe_private_named.3.unwrap(),
-            uri: self.__unsafe_private_named.4.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            text: self._fields.3.unwrap(),
+            uri: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2459,92 +2453,92 @@ pub mod request_response_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
+        type Post;
         type Uri;
         type Cid;
         type Author;
-        type Post;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
+        type Post = Unset;
         type Uri = Unset;
         type Cid = Unset;
         type Author = Unset;
-        type Post = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type Author = S::Author;
-        type Post = S::Post;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
-        type Cid = Set<members::cid>;
-        type Author = S::Author;
-        type Post = S::Post;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Author = Set<members::author>;
-        type Post = S::Post;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `post` field to Set
-    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPost<S> {}
-    impl<S: State> State for SetPost<S> {
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Author = S::Author;
-        type Post = Set<members::post>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
+        type CreatedAt = Set<members::created_at>;
+        type Post = S::Post;
         type Uri = S::Uri;
         type Cid = S::Cid;
         type Author = S::Author;
+    }
+    ///State transition - sets the `post` field to Set
+    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetPost<S> {}
+    impl<S: State> State for SetPost<S> {
+        type CreatedAt = S::CreatedAt;
+        type Post = Set<members::post>;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type CreatedAt = S::CreatedAt;
         type Post = S::Post;
-        type CreatedAt = Set<members::created_at>;
+        type Uri = Set<members::uri>;
+        type Cid = S::Cid;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCid<S> {}
+    impl<S: State> State for SetCid<S> {
+        type CreatedAt = S::CreatedAt;
+        type Post = S::Post;
+        type Uri = S::Uri;
+        type Cid = Set<members::cid>;
+        type Author = S::Author;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type CreatedAt = S::CreatedAt;
+        type Post = S::Post;
+        type Uri = S::Uri;
+        type Cid = S::Cid;
+        type Author = Set<members::author>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `post` field
+        pub struct post(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
         ///Marker type for the `author` field
         pub struct author(());
-        ///Marker type for the `post` field
-        pub struct post(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct RequestResponseViewBuilder<'a, S: request_response_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ProfileViewBasic<'a>>,
         Option<Cid<'a>>,
         Option<Datetime>,
@@ -2552,7 +2546,7 @@ pub struct RequestResponseViewBuilder<'a, S: request_response_view_state::State>
         Option<kaku::PostView<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RequestResponseView<'a> {
@@ -2566,9 +2560,9 @@ impl<'a> RequestResponseViewBuilder<'a, request_response_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RequestResponseViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2583,11 +2577,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> RequestResponseViewBuilder<'a, request_response_view_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RequestResponseViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2602,11 +2596,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> RequestResponseViewBuilder<'a, request_response_view_state::SetCid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RequestResponseViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2621,11 +2615,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> RequestResponseViewBuilder<'a, request_response_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RequestResponseViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2633,12 +2627,12 @@ where
 impl<'a, S: request_response_view_state::State> RequestResponseViewBuilder<'a, S> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
     pub fn maybe_message(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -2653,11 +2647,11 @@ where
         mut self,
         value: impl Into<kaku::PostView<'a>>,
     ) -> RequestResponseViewBuilder<'a, request_response_view_state::SetPost<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         RequestResponseViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2672,11 +2666,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> RequestResponseViewBuilder<'a, request_response_view_state::SetUri<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         RequestResponseViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2684,21 +2678,21 @@ where
 impl<'a, S> RequestResponseViewBuilder<'a, S>
 where
     S: request_response_view_state::State,
+    S::CreatedAt: request_response_view_state::IsSet,
+    S::Post: request_response_view_state::IsSet,
     S::Uri: request_response_view_state::IsSet,
     S::Cid: request_response_view_state::IsSet,
     S::Author: request_response_view_state::IsSet,
-    S::Post: request_response_view_state::IsSet,
-    S::CreatedAt: request_response_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RequestResponseView<'a> {
         RequestResponseView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            message: self.__unsafe_private_named.3,
-            post: self.__unsafe_private_named.4.unwrap(),
-            uri: self.__unsafe_private_named.5.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            message: self._fields.3,
+            post: self._fields.4.unwrap(),
+            uri: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2711,12 +2705,12 @@ where
         >,
     ) -> RequestResponseView<'a> {
         RequestResponseView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            message: self.__unsafe_private_named.3,
-            post: self.__unsafe_private_named.4.unwrap(),
-            uri: self.__unsafe_private_named.5.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            message: self._fields.3,
+            post: self._fields.4.unwrap(),
+            uri: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -2734,9 +2728,9 @@ pub mod request_view_state {
     pub trait State: sealed::Sealed {
         type Author;
         type Uri;
-        type Text;
         type IsOpen;
         type CreatedAt;
+        type Text;
         type Cid;
     }
     /// Empty state - all required fields are unset
@@ -2745,9 +2739,9 @@ pub mod request_view_state {
     impl State for Empty {
         type Author = Unset;
         type Uri = Unset;
-        type Text = Unset;
         type IsOpen = Unset;
         type CreatedAt = Unset;
+        type Text = Unset;
         type Cid = Unset;
     }
     ///State transition - sets the `author` field to Set
@@ -2756,9 +2750,9 @@ pub mod request_view_state {
     impl<S: State> State for SetAuthor<S> {
         type Author = Set<members::author>;
         type Uri = S::Uri;
-        type Text = S::Text;
         type IsOpen = S::IsOpen;
         type CreatedAt = S::CreatedAt;
+        type Text = S::Text;
         type Cid = S::Cid;
     }
     ///State transition - sets the `uri` field to Set
@@ -2767,20 +2761,9 @@ pub mod request_view_state {
     impl<S: State> State for SetUri<S> {
         type Author = S::Author;
         type Uri = Set<members::uri>;
+        type IsOpen = S::IsOpen;
+        type CreatedAt = S::CreatedAt;
         type Text = S::Text;
-        type IsOpen = S::IsOpen;
-        type CreatedAt = S::CreatedAt;
-        type Cid = S::Cid;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Author = S::Author;
-        type Uri = S::Uri;
-        type Text = Set<members::text>;
-        type IsOpen = S::IsOpen;
-        type CreatedAt = S::CreatedAt;
         type Cid = S::Cid;
     }
     ///State transition - sets the `is_open` field to Set
@@ -2789,9 +2772,9 @@ pub mod request_view_state {
     impl<S: State> State for SetIsOpen<S> {
         type Author = S::Author;
         type Uri = S::Uri;
-        type Text = S::Text;
         type IsOpen = Set<members::is_open>;
         type CreatedAt = S::CreatedAt;
+        type Text = S::Text;
         type Cid = S::Cid;
     }
     ///State transition - sets the `created_at` field to Set
@@ -2800,9 +2783,20 @@ pub mod request_view_state {
     impl<S: State> State for SetCreatedAt<S> {
         type Author = S::Author;
         type Uri = S::Uri;
-        type Text = S::Text;
         type IsOpen = S::IsOpen;
         type CreatedAt = Set<members::created_at>;
+        type Text = S::Text;
+        type Cid = S::Cid;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetText<S> {}
+    impl<S: State> State for SetText<S> {
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type IsOpen = S::IsOpen;
+        type CreatedAt = S::CreatedAt;
+        type Text = Set<members::text>;
         type Cid = S::Cid;
     }
     ///State transition - sets the `cid` field to Set
@@ -2811,9 +2805,9 @@ pub mod request_view_state {
     impl<S: State> State for SetCid<S> {
         type Author = S::Author;
         type Uri = S::Uri;
-        type Text = S::Text;
         type IsOpen = S::IsOpen;
         type CreatedAt = S::CreatedAt;
+        type Text = S::Text;
         type Cid = Set<members::cid>;
     }
     /// Marker types for field names
@@ -2823,12 +2817,12 @@ pub mod request_view_state {
         pub struct author(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `is_open` field
         pub struct is_open(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `text` field
+        pub struct text(());
         ///Marker type for the `cid` field
         pub struct cid(());
     }
@@ -2836,8 +2830,8 @@ pub mod request_view_state {
 
 /// Builder for constructing an instance of this type
 pub struct RequestViewBuilder<'a, S: request_view_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<ProfileViewBasic<'a>>,
         Option<Cid<'a>>,
         Option<Datetime>,
@@ -2850,7 +2844,7 @@ pub struct RequestViewBuilder<'a, S: request_view_state::State> {
         Option<CowStr<'a>>,
         Option<AtUri<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> RequestView<'a> {
@@ -2864,21 +2858,9 @@ impl<'a> RequestViewBuilder<'a, request_view_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         RequestViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-            ),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2893,11 +2875,11 @@ where
         mut self,
         value: impl Into<ProfileViewBasic<'a>>,
     ) -> RequestViewBuilder<'a, request_view_state::SetAuthor<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         RequestViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2912,11 +2894,11 @@ where
         mut self,
         value: impl Into<Cid<'a>>,
     ) -> RequestViewBuilder<'a, request_view_state::SetCid<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RequestViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2931,11 +2913,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> RequestViewBuilder<'a, request_view_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RequestViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2943,12 +2925,12 @@ where
 impl<'a, S: request_view_state::State> RequestViewBuilder<'a, S> {
     /// Set the `indexedAt` field (optional)
     pub fn indexed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `indexedAt` field to an Option value (optional)
     pub fn maybe_indexed_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -2963,11 +2945,11 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> RequestViewBuilder<'a, request_view_state::SetIsOpen<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         RequestViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2978,12 +2960,12 @@ impl<'a, S: request_view_state::State> RequestViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<Vec<UriValue<'a>>>>,
     ) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `referenceImages` field to an Option value (optional)
     pub fn maybe_reference_images(mut self, value: Option<Vec<UriValue<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -2991,12 +2973,12 @@ impl<'a, S: request_view_state::State> RequestViewBuilder<'a, S> {
 impl<'a, S: request_view_state::State> RequestViewBuilder<'a, S> {
     /// Set the `responseCount` field (optional)
     pub fn response_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `responseCount` field to an Option value (optional)
     pub fn maybe_response_count(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -3004,12 +2986,12 @@ impl<'a, S: request_view_state::State> RequestViewBuilder<'a, S> {
 impl<'a, S: request_view_state::State> RequestViewBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.7 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.7 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -3020,12 +3002,12 @@ impl<'a, S: request_view_state::State> RequestViewBuilder<'a, S> {
         mut self,
         value: impl Into<Option<ProfileViewBasic<'a>>>,
     ) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `targetActor` field to an Option value (optional)
     pub fn maybe_target_actor(mut self, value: Option<ProfileViewBasic<'a>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -3040,11 +3022,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> RequestViewBuilder<'a, request_view_state::SetText<S>> {
-        self.__unsafe_private_named.9 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         RequestViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3059,11 +3041,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> RequestViewBuilder<'a, request_view_state::SetUri<S>> {
-        self.__unsafe_private_named.10 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         RequestViewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -3073,25 +3055,25 @@ where
     S: request_view_state::State,
     S::Author: request_view_state::IsSet,
     S::Uri: request_view_state::IsSet,
-    S::Text: request_view_state::IsSet,
     S::IsOpen: request_view_state::IsSet,
     S::CreatedAt: request_view_state::IsSet,
+    S::Text: request_view_state::IsSet,
     S::Cid: request_view_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> RequestView<'a> {
         RequestView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            indexed_at: self.__unsafe_private_named.3,
-            is_open: self.__unsafe_private_named.4.unwrap(),
-            reference_images: self.__unsafe_private_named.5,
-            response_count: self.__unsafe_private_named.6,
-            tags: self.__unsafe_private_named.7,
-            target_actor: self.__unsafe_private_named.8,
-            text: self.__unsafe_private_named.9.unwrap(),
-            uri: self.__unsafe_private_named.10.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            indexed_at: self._fields.3,
+            is_open: self._fields.4.unwrap(),
+            reference_images: self._fields.5,
+            response_count: self._fields.6,
+            tags: self._fields.7,
+            target_actor: self._fields.8,
+            text: self._fields.9.unwrap(),
+            uri: self._fields.10.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -3104,17 +3086,17 @@ where
         >,
     ) -> RequestView<'a> {
         RequestView {
-            author: self.__unsafe_private_named.0.unwrap(),
-            cid: self.__unsafe_private_named.1.unwrap(),
-            created_at: self.__unsafe_private_named.2.unwrap(),
-            indexed_at: self.__unsafe_private_named.3,
-            is_open: self.__unsafe_private_named.4.unwrap(),
-            reference_images: self.__unsafe_private_named.5,
-            response_count: self.__unsafe_private_named.6,
-            tags: self.__unsafe_private_named.7,
-            target_actor: self.__unsafe_private_named.8,
-            text: self.__unsafe_private_named.9.unwrap(),
-            uri: self.__unsafe_private_named.10.unwrap(),
+            author: self._fields.0.unwrap(),
+            cid: self._fields.1.unwrap(),
+            created_at: self._fields.2.unwrap(),
+            indexed_at: self._fields.3,
+            is_open: self._fields.4.unwrap(),
+            reference_images: self._fields.5,
+            response_count: self._fields.6,
+            tags: self._fields.7,
+            target_actor: self._fields.8,
+            text: self._fields.9.unwrap(),
+            uri: self._fields.10.unwrap(),
             extra_data: Some(extra_data),
         }
     }

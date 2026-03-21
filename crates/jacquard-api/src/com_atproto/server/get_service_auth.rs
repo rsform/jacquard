@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_common::types::string::{Did, Nsid};
@@ -128,9 +131,9 @@ pub mod get_service_auth_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetServiceAuthBuilder<'a, S: get_service_auth_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>, Option<i64>, Option<Nsid<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<i64>, Option<Nsid<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetServiceAuth<'a> {
@@ -144,9 +147,9 @@ impl<'a> GetServiceAuthBuilder<'a, get_service_auth_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetServiceAuthBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -161,11 +164,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> GetServiceAuthBuilder<'a, get_service_auth_state::SetAud<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetServiceAuthBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -173,12 +176,12 @@ where
 impl<'a, S: get_service_auth_state::State> GetServiceAuthBuilder<'a, S> {
     /// Set the `exp` field (optional)
     pub fn exp(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `exp` field to an Option value (optional)
     pub fn maybe_exp(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -186,12 +189,12 @@ impl<'a, S: get_service_auth_state::State> GetServiceAuthBuilder<'a, S> {
 impl<'a, S: get_service_auth_state::State> GetServiceAuthBuilder<'a, S> {
     /// Set the `lxm` field (optional)
     pub fn lxm(mut self, value: impl Into<Option<Nsid<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `lxm` field to an Option value (optional)
     pub fn maybe_lxm(mut self, value: Option<Nsid<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -204,9 +207,9 @@ where
     /// Build the final struct
     pub fn build(self) -> GetServiceAuth<'a> {
         GetServiceAuth {
-            aud: self.__unsafe_private_named.0.unwrap(),
-            exp: self.__unsafe_private_named.1,
-            lxm: self.__unsafe_private_named.2,
+            aud: self._fields.0.unwrap(),
+            exp: self._fields.1,
+            lxm: self._fields.2,
         }
     }
 }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -230,49 +233,49 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type PublishedAt;
+        type Title;
         type Site;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type PublishedAt = Unset;
+        type Title = Unset;
         type Site = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type PublishedAt = S::PublishedAt;
-        type Site = S::Site;
     }
     ///State transition - sets the `published_at` field to Set
     pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
     impl<S: State> State for SetPublishedAt<S> {
-        type Title = S::Title;
         type PublishedAt = Set<members::published_at>;
+        type Title = S::Title;
+        type Site = S::Site;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type PublishedAt = S::PublishedAt;
+        type Title = Set<members::title>;
         type Site = S::Site;
     }
     ///State transition - sets the `site` field to Set
     pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetSite<S> {}
     impl<S: State> State for SetSite<S> {
-        type Title = S::Title;
         type PublishedAt = S::PublishedAt;
+        type Title = S::Title;
         type Site = Set<members::site>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `published_at` field
         pub struct published_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `site` field
         pub struct site(());
     }
@@ -280,8 +283,8 @@ pub mod document_state {
 
 /// Builder for constructing an instance of this type
 pub struct DocumentBuilder<'a, S: document_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<StrongRef<'a>>,
         Option<Content<'a>>,
         Option<BlobRef<'a>>,
@@ -296,7 +299,7 @@ pub struct DocumentBuilder<'a, S: document_state::State> {
         Option<CowStr<'a>>,
         Option<Datetime>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Document<'a> {
@@ -310,8 +313,8 @@ impl<'a> DocumentBuilder<'a, document_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (
+            _state: PhantomData,
+            _fields: (
                 None,
                 None,
                 None,
@@ -326,7 +329,7 @@ impl<'a> DocumentBuilder<'a, document_state::Empty> {
                 None,
                 None,
             ),
-            _phantom: PhantomData,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -334,12 +337,12 @@ impl<'a> DocumentBuilder<'a, document_state::Empty> {
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `bskyPostRef` field (optional)
     pub fn bsky_post_ref(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `bskyPostRef` field to an Option value (optional)
     pub fn maybe_bsky_post_ref(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -347,12 +350,12 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `content` field (optional)
     pub fn content(mut self, value: impl Into<Option<Content<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `content` field to an Option value (optional)
     pub fn maybe_content(mut self, value: Option<Content<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -360,12 +363,12 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `coverImage` field (optional)
     pub fn cover_image(mut self, value: impl Into<Option<BlobRef<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `coverImage` field to an Option value (optional)
     pub fn maybe_cover_image(mut self, value: Option<BlobRef<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -373,12 +376,12 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
     pub fn maybe_description(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -386,12 +389,12 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `path` field (optional)
     pub fn path(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `path` field to an Option value (optional)
     pub fn maybe_path(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -399,12 +402,12 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `preferences` field (optional)
     pub fn preferences(mut self, value: impl Into<Option<Preferences<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `preferences` field to an Option value (optional)
     pub fn maybe_preferences(mut self, value: Option<Preferences<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -419,11 +422,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> DocumentBuilder<'a, document_state::SetPublishedAt<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         DocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -438,11 +441,11 @@ where
         mut self,
         value: impl Into<UriValue<'a>>,
     ) -> DocumentBuilder<'a, document_state::SetSite<S>> {
-        self.__unsafe_private_named.7 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         DocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -450,12 +453,12 @@ where
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<CowStr<'a>>>>) -> Self {
-        self.__unsafe_private_named.8 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `tags` field to an Option value (optional)
     pub fn maybe_tags(mut self, value: Option<Vec<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.8 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -463,12 +466,12 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `textContent` field (optional)
     pub fn text_content(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.9 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `textContent` field to an Option value (optional)
     pub fn maybe_text_content(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.9 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -476,12 +479,12 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<Theme<'a>>>) -> Self {
-        self.__unsafe_private_named.10 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `theme` field to an Option value (optional)
     pub fn maybe_theme(mut self, value: Option<Theme<'a>>) -> Self {
-        self.__unsafe_private_named.10 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -496,11 +499,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> DocumentBuilder<'a, document_state::SetTitle<S>> {
-        self.__unsafe_private_named.11 = Option::Some(value.into());
+        self._fields.11 = Option::Some(value.into());
         DocumentBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -508,12 +511,12 @@ where
 impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.12 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.12 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -521,26 +524,26 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
 impl<'a, S> DocumentBuilder<'a, S>
 where
     S: document_state::State,
-    S::Title: document_state::IsSet,
     S::PublishedAt: document_state::IsSet,
+    S::Title: document_state::IsSet,
     S::Site: document_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Document<'a> {
         Document {
-            bsky_post_ref: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1,
-            cover_image: self.__unsafe_private_named.2,
-            description: self.__unsafe_private_named.3,
-            path: self.__unsafe_private_named.4,
-            preferences: self.__unsafe_private_named.5,
-            published_at: self.__unsafe_private_named.6.unwrap(),
-            site: self.__unsafe_private_named.7.unwrap(),
-            tags: self.__unsafe_private_named.8,
-            text_content: self.__unsafe_private_named.9,
-            theme: self.__unsafe_private_named.10,
-            title: self.__unsafe_private_named.11.unwrap(),
-            updated_at: self.__unsafe_private_named.12,
+            bsky_post_ref: self._fields.0,
+            content: self._fields.1,
+            cover_image: self._fields.2,
+            description: self._fields.3,
+            path: self._fields.4,
+            preferences: self._fields.5,
+            published_at: self._fields.6.unwrap(),
+            site: self._fields.7.unwrap(),
+            tags: self._fields.8,
+            text_content: self._fields.9,
+            theme: self._fields.10,
+            title: self._fields.11.unwrap(),
+            updated_at: self._fields.12,
             extra_data: Default::default(),
         }
     }
@@ -553,19 +556,19 @@ where
         >,
     ) -> Document<'a> {
         Document {
-            bsky_post_ref: self.__unsafe_private_named.0,
-            content: self.__unsafe_private_named.1,
-            cover_image: self.__unsafe_private_named.2,
-            description: self.__unsafe_private_named.3,
-            path: self.__unsafe_private_named.4,
-            preferences: self.__unsafe_private_named.5,
-            published_at: self.__unsafe_private_named.6.unwrap(),
-            site: self.__unsafe_private_named.7.unwrap(),
-            tags: self.__unsafe_private_named.8,
-            text_content: self.__unsafe_private_named.9,
-            theme: self.__unsafe_private_named.10,
-            title: self.__unsafe_private_named.11.unwrap(),
-            updated_at: self.__unsafe_private_named.12,
+            bsky_post_ref: self._fields.0,
+            content: self._fields.1,
+            cover_image: self._fields.2,
+            description: self._fields.3,
+            path: self._fields.4,
+            preferences: self._fields.5,
+            published_at: self._fields.6.unwrap(),
+            site: self._fields.7.unwrap(),
+            tags: self._fields.8,
+            text_content: self._fields.9,
+            theme: self._fields.10,
+            title: self._fields.11.unwrap(),
+            updated_at: self._fields.12,
             extra_data: Some(extra_data),
         }
     }

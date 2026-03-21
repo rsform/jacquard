@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -163,80 +166,80 @@ pub mod tangled_string_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Description;
         type CreatedAt;
-        type Filename;
         type Contents;
+        type Description;
+        type Filename;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Description = Unset;
         type CreatedAt = Unset;
-        type Filename = Unset;
         type Contents = Unset;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Description = Set<members::description>;
-        type CreatedAt = S::CreatedAt;
-        type Filename = S::Filename;
-        type Contents = S::Contents;
+        type Description = Unset;
+        type Filename = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Description = S::Description;
         type CreatedAt = Set<members::created_at>;
-        type Filename = S::Filename;
         type Contents = S::Contents;
-    }
-    ///State transition - sets the `filename` field to Set
-    pub struct SetFilename<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFilename<S> {}
-    impl<S: State> State for SetFilename<S> {
         type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-        type Filename = Set<members::filename>;
-        type Contents = S::Contents;
+        type Filename = S::Filename;
     }
     ///State transition - sets the `contents` field to Set
     pub struct SetContents<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetContents<S> {}
     impl<S: State> State for SetContents<S> {
-        type Description = S::Description;
         type CreatedAt = S::CreatedAt;
-        type Filename = S::Filename;
         type Contents = Set<members::contents>;
+        type Description = S::Description;
+        type Filename = S::Filename;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDescription<S> {}
+    impl<S: State> State for SetDescription<S> {
+        type CreatedAt = S::CreatedAt;
+        type Contents = S::Contents;
+        type Description = Set<members::description>;
+        type Filename = S::Filename;
+    }
+    ///State transition - sets the `filename` field to Set
+    pub struct SetFilename<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFilename<S> {}
+    impl<S: State> State for SetFilename<S> {
+        type CreatedAt = S::CreatedAt;
+        type Contents = S::Contents;
+        type Description = S::Description;
+        type Filename = Set<members::filename>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `description` field
-        pub struct description(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `filename` field
-        pub struct filename(());
         ///Marker type for the `contents` field
         pub struct contents(());
+        ///Marker type for the `description` field
+        pub struct description(());
+        ///Marker type for the `filename` field
+        pub struct filename(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct TangledStringBuilder<'a, S: tangled_string_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> TangledString<'a> {
@@ -250,9 +253,9 @@ impl<'a> TangledStringBuilder<'a, tangled_string_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         TangledStringBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -267,11 +270,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TangledStringBuilder<'a, tangled_string_state::SetContents<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         TangledStringBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -286,11 +289,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> TangledStringBuilder<'a, tangled_string_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         TangledStringBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -305,11 +308,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TangledStringBuilder<'a, tangled_string_state::SetDescription<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         TangledStringBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -324,11 +327,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> TangledStringBuilder<'a, tangled_string_state::SetFilename<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         TangledStringBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -336,18 +339,18 @@ where
 impl<'a, S> TangledStringBuilder<'a, S>
 where
     S: tangled_string_state::State,
-    S::Description: tangled_string_state::IsSet,
     S::CreatedAt: tangled_string_state::IsSet,
-    S::Filename: tangled_string_state::IsSet,
     S::Contents: tangled_string_state::IsSet,
+    S::Description: tangled_string_state::IsSet,
+    S::Filename: tangled_string_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> TangledString<'a> {
         TangledString {
-            contents: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2.unwrap(),
-            filename: self.__unsafe_private_named.3.unwrap(),
+            contents: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2.unwrap(),
+            filename: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -360,10 +363,10 @@ where
         >,
     ) -> TangledString<'a> {
         TangledString {
-            contents: self.__unsafe_private_named.0.unwrap(),
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            description: self.__unsafe_private_named.2.unwrap(),
-            filename: self.__unsafe_private_named.3.unwrap(),
+            contents: self._fields.0.unwrap(),
+            created_at: self._fields.1.unwrap(),
+            description: self._fields.2.unwrap(),
+            filename: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

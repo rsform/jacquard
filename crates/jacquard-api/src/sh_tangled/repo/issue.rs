@@ -8,7 +8,11 @@
 pub mod comment;
 pub mod state;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -171,8 +175,8 @@ pub mod issue_state {
 
 /// Builder for constructing an instance of this type
 pub struct IssueBuilder<'a, S: issue_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<CowStr<'a>>,
         Option<Datetime>,
         Option<Vec<Did<'a>>>,
@@ -180,7 +184,7 @@ pub struct IssueBuilder<'a, S: issue_state::State> {
         Option<AtUri<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Issue<'a> {
@@ -194,9 +198,9 @@ impl<'a> IssueBuilder<'a, issue_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         IssueBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -204,12 +208,12 @@ impl<'a> IssueBuilder<'a, issue_state::Empty> {
 impl<'a, S: issue_state::State> IssueBuilder<'a, S> {
     /// Set the `body` field (optional)
     pub fn body(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `body` field to an Option value (optional)
     pub fn maybe_body(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -224,11 +228,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> IssueBuilder<'a, issue_state::SetCreatedAt<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         IssueBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -236,12 +240,12 @@ where
 impl<'a, S: issue_state::State> IssueBuilder<'a, S> {
     /// Set the `mentions` field (optional)
     pub fn mentions(mut self, value: impl Into<Option<Vec<Did<'a>>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `mentions` field to an Option value (optional)
     pub fn maybe_mentions(mut self, value: Option<Vec<Did<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -249,12 +253,12 @@ impl<'a, S: issue_state::State> IssueBuilder<'a, S> {
 impl<'a, S: issue_state::State> IssueBuilder<'a, S> {
     /// Set the `references` field (optional)
     pub fn references(mut self, value: impl Into<Option<Vec<AtUri<'a>>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `references` field to an Option value (optional)
     pub fn maybe_references(mut self, value: Option<Vec<AtUri<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -269,11 +273,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> IssueBuilder<'a, issue_state::SetRepo<S>> {
-        self.__unsafe_private_named.4 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         IssueBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -288,11 +292,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> IssueBuilder<'a, issue_state::SetTitle<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         IssueBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -307,12 +311,12 @@ where
     /// Build the final struct
     pub fn build(self) -> Issue<'a> {
         Issue {
-            body: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            mentions: self.__unsafe_private_named.2,
-            references: self.__unsafe_private_named.3,
-            repo: self.__unsafe_private_named.4.unwrap(),
-            title: self.__unsafe_private_named.5.unwrap(),
+            body: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            mentions: self._fields.2,
+            references: self._fields.3,
+            repo: self._fields.4.unwrap(),
+            title: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -325,12 +329,12 @@ where
         >,
     ) -> Issue<'a> {
         Issue {
-            body: self.__unsafe_private_named.0,
-            created_at: self.__unsafe_private_named.1.unwrap(),
-            mentions: self.__unsafe_private_named.2,
-            references: self.__unsafe_private_named.3,
-            repo: self.__unsafe_private_named.4.unwrap(),
-            title: self.__unsafe_private_named.5.unwrap(),
+            body: self._fields.0,
+            created_at: self._fields.1.unwrap(),
+            mentions: self._fields.2,
+            references: self._fields.3,
+            repo: self._fields.4.unwrap(),
+            title: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -104,37 +107,37 @@ pub mod livestream_recommendation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Source;
         type Did;
+        type Source;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Source = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `source` field to Set
-    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSource<S> {}
-    impl<S: State> State for SetSource<S> {
-        type Source = Set<members::source>;
-        type Did = S::Did;
+        type Source = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDid<S> {}
     impl<S: State> State for SetDid<S> {
-        type Source = S::Source;
         type Did = Set<members::did>;
+        type Source = S::Source;
+    }
+    ///State transition - sets the `source` field to Set
+    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetSource<S> {}
+    impl<S: State> State for SetSource<S> {
+        type Did = S::Did;
+        type Source = Set<members::source>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `source` field
-        pub struct source(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `source` field
+        pub struct source(());
     }
 }
 
@@ -143,9 +146,9 @@ pub struct LivestreamRecommendationBuilder<
     'a,
     S: livestream_recommendation_state::State,
 > {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>, Option<CowStr<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> LivestreamRecommendation<'a> {
@@ -162,9 +165,9 @@ impl<'a> LivestreamRecommendationBuilder<'a, livestream_recommendation_state::Em
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         LivestreamRecommendationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -182,11 +185,11 @@ where
         'a,
         livestream_recommendation_state::SetDid<S>,
     > {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         LivestreamRecommendationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -204,11 +207,11 @@ where
         'a,
         livestream_recommendation_state::SetSource<S>,
     > {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         LivestreamRecommendationBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -216,14 +219,14 @@ where
 impl<'a, S> LivestreamRecommendationBuilder<'a, S>
 where
     S: livestream_recommendation_state::State,
-    S::Source: livestream_recommendation_state::IsSet,
     S::Did: livestream_recommendation_state::IsSet,
+    S::Source: livestream_recommendation_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> LivestreamRecommendation<'a> {
         LivestreamRecommendation {
-            did: self.__unsafe_private_named.0.unwrap(),
-            source: self.__unsafe_private_named.1.unwrap(),
+            did: self._fields.0.unwrap(),
+            source: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -236,8 +239,8 @@ where
         >,
     ) -> LivestreamRecommendation<'a> {
         LivestreamRecommendation {
-            did: self.__unsafe_private_named.0.unwrap(),
-            source: self.__unsafe_private_named.1.unwrap(),
+            did: self._fields.0.unwrap(),
+            source: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -355,9 +358,9 @@ pub mod get_recommendations_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetRecommendationsBuilder<'a, S: get_recommendations_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Did<'a>>,),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Did<'a>>,),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetRecommendations<'a> {
@@ -371,9 +374,9 @@ impl<'a> GetRecommendationsBuilder<'a, get_recommendations_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetRecommendationsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None,),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None,),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -388,11 +391,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> GetRecommendationsBuilder<'a, get_recommendations_state::SetUserDid<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         GetRecommendationsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -405,7 +408,7 @@ where
     /// Build the final struct
     pub fn build(self) -> GetRecommendations<'a> {
         GetRecommendations {
-            user_did: self.__unsafe_private_named.0.unwrap(),
+            user_did: self._fields.0.unwrap(),
         }
     }
 }

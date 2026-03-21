@@ -57,18 +57,21 @@ pub fn generate_build_method(
 
             if is_required {
                 // Required field: unwrap from Option (guaranteed Some by IsSet constraint).
-                quote! { #field_snake: self.__unsafe_private_named.#index.unwrap(), }
+                quote! { #field_snake: self._fields.#index.unwrap(), }
             } else {
                 // Optional field: apply schema default if present, otherwise pass through.
                 let field_name_str: &str = field_name.as_ref();
-                match schema.get_object_property(field_name_str).and_then(|p| schema_default_expr(p, resolved)) {
+                match schema
+                    .get_object_property(field_name_str)
+                    .and_then(|p| schema_default_expr(p, resolved))
+                {
                     Some(default_val) => {
                         quote! {
-                            #field_snake: self.__unsafe_private_named.#index.or_else(|| Some(#default_val)),
+                            #field_snake: self._fields.#index.or_else(|| Some(#default_val)),
                         }
                     }
                     None => {
-                        quote! { #field_snake: self.__unsafe_private_named.#index, }
+                        quote! { #field_snake: self._fields.#index, }
                     }
                 }
             }

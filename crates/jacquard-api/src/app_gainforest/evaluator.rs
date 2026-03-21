@@ -9,7 +9,11 @@ pub mod evaluation;
 pub mod service;
 pub mod subscription;
 
+
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -1006,58 +1010,58 @@ pub mod candidate_taxon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Rank;
         type ScientificName;
         type Confidence;
-        type Rank;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Rank = Unset;
         type ScientificName = Unset;
         type Confidence = Unset;
-        type Rank = Unset;
-    }
-    ///State transition - sets the `scientific_name` field to Set
-    pub struct SetScientificName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScientificName<S> {}
-    impl<S: State> State for SetScientificName<S> {
-        type ScientificName = Set<members::scientific_name>;
-        type Confidence = S::Confidence;
-        type Rank = S::Rank;
-    }
-    ///State transition - sets the `confidence` field to Set
-    pub struct SetConfidence<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetConfidence<S> {}
-    impl<S: State> State for SetConfidence<S> {
-        type ScientificName = S::ScientificName;
-        type Confidence = Set<members::confidence>;
-        type Rank = S::Rank;
     }
     ///State transition - sets the `rank` field to Set
     pub struct SetRank<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRank<S> {}
     impl<S: State> State for SetRank<S> {
+        type Rank = Set<members::rank>;
         type ScientificName = S::ScientificName;
         type Confidence = S::Confidence;
-        type Rank = Set<members::rank>;
+    }
+    ///State transition - sets the `scientific_name` field to Set
+    pub struct SetScientificName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetScientificName<S> {}
+    impl<S: State> State for SetScientificName<S> {
+        type Rank = S::Rank;
+        type ScientificName = Set<members::scientific_name>;
+        type Confidence = S::Confidence;
+    }
+    ///State transition - sets the `confidence` field to Set
+    pub struct SetConfidence<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetConfidence<S> {}
+    impl<S: State> State for SetConfidence<S> {
+        type Rank = S::Rank;
+        type ScientificName = S::ScientificName;
+        type Confidence = Set<members::confidence>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `rank` field
+        pub struct rank(());
         ///Marker type for the `scientific_name` field
         pub struct scientific_name(());
         ///Marker type for the `confidence` field
         pub struct confidence(());
-        ///Marker type for the `rank` field
-        pub struct rank(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CandidateTaxonBuilder<'a, S: candidate_taxon_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<i64>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
@@ -1066,7 +1070,7 @@ pub struct CandidateTaxonBuilder<'a, S: candidate_taxon_state::State> {
         Option<i64>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CandidateTaxon<'a> {
@@ -1080,9 +1084,9 @@ impl<'a> CandidateTaxonBuilder<'a, candidate_taxon_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CandidateTaxonBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1097,11 +1101,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CandidateTaxonBuilder<'a, candidate_taxon_state::SetConfidence<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CandidateTaxonBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1109,12 +1113,12 @@ where
 impl<'a, S: candidate_taxon_state::State> CandidateTaxonBuilder<'a, S> {
     /// Set the `family` field (optional)
     pub fn family(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `family` field to an Option value (optional)
     pub fn maybe_family(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1122,12 +1126,12 @@ impl<'a, S: candidate_taxon_state::State> CandidateTaxonBuilder<'a, S> {
 impl<'a, S: candidate_taxon_state::State> CandidateTaxonBuilder<'a, S> {
     /// Set the `gbifTaxonKey` field (optional)
     pub fn gbif_taxon_key(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `gbifTaxonKey` field to an Option value (optional)
     pub fn maybe_gbif_taxon_key(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1135,12 +1139,12 @@ impl<'a, S: candidate_taxon_state::State> CandidateTaxonBuilder<'a, S> {
 impl<'a, S: candidate_taxon_state::State> CandidateTaxonBuilder<'a, S> {
     /// Set the `genus` field (optional)
     pub fn genus(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `genus` field to an Option value (optional)
     pub fn maybe_genus(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1148,12 +1152,12 @@ impl<'a, S: candidate_taxon_state::State> CandidateTaxonBuilder<'a, S> {
 impl<'a, S: candidate_taxon_state::State> CandidateTaxonBuilder<'a, S> {
     /// Set the `kingdom` field (optional)
     pub fn kingdom(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `kingdom` field to an Option value (optional)
     pub fn maybe_kingdom(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1168,11 +1172,11 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CandidateTaxonBuilder<'a, candidate_taxon_state::SetRank<S>> {
-        self.__unsafe_private_named.5 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         CandidateTaxonBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1187,11 +1191,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CandidateTaxonBuilder<'a, candidate_taxon_state::SetScientificName<S>> {
-        self.__unsafe_private_named.6 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         CandidateTaxonBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1199,20 +1203,20 @@ where
 impl<'a, S> CandidateTaxonBuilder<'a, S>
 where
     S: candidate_taxon_state::State,
+    S::Rank: candidate_taxon_state::IsSet,
     S::ScientificName: candidate_taxon_state::IsSet,
     S::Confidence: candidate_taxon_state::IsSet,
-    S::Rank: candidate_taxon_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CandidateTaxon<'a> {
         CandidateTaxon {
-            confidence: self.__unsafe_private_named.0.unwrap(),
-            family: self.__unsafe_private_named.1,
-            gbif_taxon_key: self.__unsafe_private_named.2,
-            genus: self.__unsafe_private_named.3,
-            kingdom: self.__unsafe_private_named.4,
-            rank: self.__unsafe_private_named.5.unwrap(),
-            scientific_name: self.__unsafe_private_named.6.unwrap(),
+            confidence: self._fields.0.unwrap(),
+            family: self._fields.1,
+            gbif_taxon_key: self._fields.2,
+            genus: self._fields.3,
+            kingdom: self._fields.4,
+            rank: self._fields.5.unwrap(),
+            scientific_name: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1225,13 +1229,13 @@ where
         >,
     ) -> CandidateTaxon<'a> {
         CandidateTaxon {
-            confidence: self.__unsafe_private_named.0.unwrap(),
-            family: self.__unsafe_private_named.1,
-            gbif_taxon_key: self.__unsafe_private_named.2,
-            genus: self.__unsafe_private_named.3,
-            kingdom: self.__unsafe_private_named.4,
-            rank: self.__unsafe_private_named.5.unwrap(),
-            scientific_name: self.__unsafe_private_named.6.unwrap(),
+            confidence: self._fields.0.unwrap(),
+            family: self._fields.1,
+            gbif_taxon_key: self._fields.2,
+            genus: self._fields.3,
+            kingdom: self._fields.4,
+            rank: self._fields.5.unwrap(),
+            scientific_name: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1891,13 +1895,9 @@ pub mod data_quality_result_state {
 
 /// Builder for constructing an instance of this type
 pub struct DataQualityResultBuilder<'a, S: data_quality_result_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<i64>,
-        Option<Vec<evaluator::QualityFlag<'a>>>,
-        Option<CowStr<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<i64>, Option<Vec<evaluator::QualityFlag<'a>>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> DataQualityResult<'a> {
@@ -1911,9 +1911,9 @@ impl<'a> DataQualityResultBuilder<'a, data_quality_result_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         DataQualityResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1921,12 +1921,12 @@ impl<'a> DataQualityResultBuilder<'a, data_quality_result_state::Empty> {
 impl<'a, S: data_quality_result_state::State> DataQualityResultBuilder<'a, S> {
     /// Set the `completenessScore` field (optional)
     pub fn completeness_score(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `completenessScore` field to an Option value (optional)
     pub fn maybe_completeness_score(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -1941,11 +1941,11 @@ where
         mut self,
         value: impl Into<Vec<evaluator::QualityFlag<'a>>>,
     ) -> DataQualityResultBuilder<'a, data_quality_result_state::SetFlags<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         DataQualityResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -1953,12 +1953,12 @@ where
 impl<'a, S: data_quality_result_state::State> DataQualityResultBuilder<'a, S> {
     /// Set the `remarks` field (optional)
     pub fn remarks(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `remarks` field to an Option value (optional)
     pub fn maybe_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1971,9 +1971,9 @@ where
     /// Build the final struct
     pub fn build(self) -> DataQualityResult<'a> {
         DataQualityResult {
-            completeness_score: self.__unsafe_private_named.0,
-            flags: self.__unsafe_private_named.1.unwrap(),
-            remarks: self.__unsafe_private_named.2,
+            completeness_score: self._fields.0,
+            flags: self._fields.1.unwrap(),
+            remarks: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -1986,9 +1986,9 @@ where
         >,
     ) -> DataQualityResult<'a> {
         DataQualityResult {
-            completeness_score: self.__unsafe_private_named.0,
-            flags: self.__unsafe_private_named.1.unwrap(),
-            remarks: self.__unsafe_private_named.2,
+            completeness_score: self._fields.0,
+            flags: self._fields.1.unwrap(),
+            remarks: self._fields.2,
             extra_data: Some(extra_data),
         }
     }
@@ -2028,12 +2028,9 @@ pub mod measurement_result_state {
 
 /// Builder for constructing an instance of this type
 pub struct MeasurementResultBuilder<'a, S: measurement_result_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<Vec<evaluator::DerivedMeasurement<'a>>>,
-        Option<CowStr<'a>>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Vec<evaluator::DerivedMeasurement<'a>>>, Option<CowStr<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> MeasurementResult<'a> {
@@ -2047,9 +2044,9 @@ impl<'a> MeasurementResultBuilder<'a, measurement_result_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         MeasurementResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2064,11 +2061,11 @@ where
         mut self,
         value: impl Into<Vec<evaluator::DerivedMeasurement<'a>>>,
     ) -> MeasurementResultBuilder<'a, measurement_result_state::SetMeasurements<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         MeasurementResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2076,12 +2073,12 @@ where
 impl<'a, S: measurement_result_state::State> MeasurementResultBuilder<'a, S> {
     /// Set the `remarks` field (optional)
     pub fn remarks(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `remarks` field to an Option value (optional)
     pub fn maybe_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -2094,8 +2091,8 @@ where
     /// Build the final struct
     pub fn build(self) -> MeasurementResult<'a> {
         MeasurementResult {
-            measurements: self.__unsafe_private_named.0.unwrap(),
-            remarks: self.__unsafe_private_named.1,
+            measurements: self._fields.0.unwrap(),
+            remarks: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -2108,8 +2105,8 @@ where
         >,
     ) -> MeasurementResult<'a> {
         MeasurementResult {
-            measurements: self.__unsafe_private_named.0.unwrap(),
-            remarks: self.__unsafe_private_named.1,
+            measurements: self._fields.0.unwrap(),
+            remarks: self._fields.1,
             extra_data: Some(extra_data),
         }
     }
@@ -2149,13 +2146,13 @@ pub mod species_id_result_state {
 
 /// Builder for constructing an instance of this type
 pub struct SpeciesIdResultBuilder<'a, S: species_id_result_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Vec<evaluator::CandidateTaxon<'a>>>,
         Option<CowStr<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SpeciesIdResult<'a> {
@@ -2169,9 +2166,9 @@ impl<'a> SpeciesIdResultBuilder<'a, species_id_result_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SpeciesIdResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2186,11 +2183,11 @@ where
         mut self,
         value: impl Into<Vec<evaluator::CandidateTaxon<'a>>>,
     ) -> SpeciesIdResultBuilder<'a, species_id_result_state::SetCandidates<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         SpeciesIdResultBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2198,12 +2195,12 @@ where
 impl<'a, S: species_id_result_state::State> SpeciesIdResultBuilder<'a, S> {
     /// Set the `inputFeature` field (optional)
     pub fn input_feature(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `inputFeature` field to an Option value (optional)
     pub fn maybe_input_feature(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -2211,12 +2208,12 @@ impl<'a, S: species_id_result_state::State> SpeciesIdResultBuilder<'a, S> {
 impl<'a, S: species_id_result_state::State> SpeciesIdResultBuilder<'a, S> {
     /// Set the `remarks` field (optional)
     pub fn remarks(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `remarks` field to an Option value (optional)
     pub fn maybe_remarks(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -2229,9 +2226,9 @@ where
     /// Build the final struct
     pub fn build(self) -> SpeciesIdResult<'a> {
         SpeciesIdResult {
-            candidates: self.__unsafe_private_named.0.unwrap(),
-            input_feature: self.__unsafe_private_named.1,
-            remarks: self.__unsafe_private_named.2,
+            candidates: self._fields.0.unwrap(),
+            input_feature: self._fields.1,
+            remarks: self._fields.2,
             extra_data: Default::default(),
         }
     }
@@ -2244,9 +2241,9 @@ where
         >,
     ) -> SpeciesIdResult<'a> {
         SpeciesIdResult {
-            candidates: self.__unsafe_private_named.0.unwrap(),
-            input_feature: self.__unsafe_private_named.1,
-            remarks: self.__unsafe_private_named.2,
+            candidates: self._fields.0.unwrap(),
+            input_feature: self._fields.1,
+            remarks: self._fields.2,
             extra_data: Some(extra_data),
         }
     }
@@ -2286,9 +2283,9 @@ pub mod subject_ref_state {
 
 /// Builder for constructing an instance of this type
 pub struct SubjectRefBuilder<'a, S: subject_ref_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (Option<Cid<'a>>, Option<AtUri<'a>>),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<Cid<'a>>, Option<AtUri<'a>>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> SubjectRef<'a> {
@@ -2302,9 +2299,9 @@ impl<'a> SubjectRefBuilder<'a, subject_ref_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         SubjectRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2312,12 +2309,12 @@ impl<'a> SubjectRefBuilder<'a, subject_ref_state::Empty> {
 impl<'a, S: subject_ref_state::State> SubjectRefBuilder<'a, S> {
     /// Set the `cid` field (optional)
     pub fn cid(mut self, value: impl Into<Option<Cid<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `cid` field to an Option value (optional)
     pub fn maybe_cid(mut self, value: Option<Cid<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -2332,11 +2329,11 @@ where
         mut self,
         value: impl Into<AtUri<'a>>,
     ) -> SubjectRefBuilder<'a, subject_ref_state::SetUri<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         SubjectRefBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -2349,8 +2346,8 @@ where
     /// Build the final struct
     pub fn build(self) -> SubjectRef<'a> {
         SubjectRef {
-            cid: self.__unsafe_private_named.0,
-            uri: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0,
+            uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -2363,8 +2360,8 @@ where
         >,
     ) -> SubjectRef<'a> {
         SubjectRef {
-            cid: self.__unsafe_private_named.0,
-            uri: self.__unsafe_private_named.1.unwrap(),
+            cid: self._fields.0,
+            uri: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

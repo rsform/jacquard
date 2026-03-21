@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -241,81 +244,81 @@ pub mod crew_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Member;
         type Permissions;
         type AddedAt;
         type Role;
+        type Member;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Member = Unset;
         type Permissions = Unset;
         type AddedAt = Unset;
         type Role = Unset;
-    }
-    ///State transition - sets the `member` field to Set
-    pub struct SetMember<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMember<S> {}
-    impl<S: State> State for SetMember<S> {
-        type Member = Set<members::member>;
-        type Permissions = S::Permissions;
-        type AddedAt = S::AddedAt;
-        type Role = S::Role;
+        type Member = Unset;
     }
     ///State transition - sets the `permissions` field to Set
     pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetPermissions<S> {}
     impl<S: State> State for SetPermissions<S> {
-        type Member = S::Member;
         type Permissions = Set<members::permissions>;
         type AddedAt = S::AddedAt;
         type Role = S::Role;
+        type Member = S::Member;
     }
     ///State transition - sets the `added_at` field to Set
     pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAddedAt<S> {}
     impl<S: State> State for SetAddedAt<S> {
-        type Member = S::Member;
         type Permissions = S::Permissions;
         type AddedAt = Set<members::added_at>;
         type Role = S::Role;
+        type Member = S::Member;
     }
     ///State transition - sets the `role` field to Set
     pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetRole<S> {}
     impl<S: State> State for SetRole<S> {
-        type Member = S::Member;
         type Permissions = S::Permissions;
         type AddedAt = S::AddedAt;
         type Role = Set<members::role>;
+        type Member = S::Member;
+    }
+    ///State transition - sets the `member` field to Set
+    pub struct SetMember<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMember<S> {}
+    impl<S: State> State for SetMember<S> {
+        type Permissions = S::Permissions;
+        type AddedAt = S::AddedAt;
+        type Role = S::Role;
+        type Member = Set<members::member>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `member` field
-        pub struct member(());
         ///Marker type for the `permissions` field
         pub struct permissions(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
         ///Marker type for the `role` field
         pub struct role(());
+        ///Marker type for the `member` field
+        pub struct member(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CrewBuilder<'a, S: crew_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<Did<'a>>,
         Option<Vec<CowStr<'a>>>,
         Option<CrewRole<'a>>,
         Option<CowStr<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> Crew<'a> {
@@ -329,9 +332,9 @@ impl<'a> CrewBuilder<'a, crew_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CrewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -346,11 +349,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CrewBuilder<'a, crew_state::SetAddedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CrewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -365,11 +368,11 @@ where
         mut self,
         value: impl Into<Did<'a>>,
     ) -> CrewBuilder<'a, crew_state::SetMember<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CrewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -384,11 +387,11 @@ where
         mut self,
         value: impl Into<Vec<CowStr<'a>>>,
     ) -> CrewBuilder<'a, crew_state::SetPermissions<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CrewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -403,11 +406,11 @@ where
         mut self,
         value: impl Into<CrewRole<'a>>,
     ) -> CrewBuilder<'a, crew_state::SetRole<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         CrewBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -415,12 +418,12 @@ where
 impl<'a, S: crew_state::State> CrewBuilder<'a, S> {
     /// Set the `tier` field (optional)
     pub fn tier(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `tier` field to an Option value (optional)
     pub fn maybe_tier(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -428,19 +431,19 @@ impl<'a, S: crew_state::State> CrewBuilder<'a, S> {
 impl<'a, S> CrewBuilder<'a, S>
 where
     S: crew_state::State,
-    S::Member: crew_state::IsSet,
     S::Permissions: crew_state::IsSet,
     S::AddedAt: crew_state::IsSet,
     S::Role: crew_state::IsSet,
+    S::Member: crew_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Crew<'a> {
         Crew {
-            added_at: self.__unsafe_private_named.0.unwrap(),
-            member: self.__unsafe_private_named.1.unwrap(),
-            permissions: self.__unsafe_private_named.2.unwrap(),
-            role: self.__unsafe_private_named.3.unwrap(),
-            tier: self.__unsafe_private_named.4,
+            added_at: self._fields.0.unwrap(),
+            member: self._fields.1.unwrap(),
+            permissions: self._fields.2.unwrap(),
+            role: self._fields.3.unwrap(),
+            tier: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -453,11 +456,11 @@ where
         >,
     ) -> Crew<'a> {
         Crew {
-            added_at: self.__unsafe_private_named.0.unwrap(),
-            member: self.__unsafe_private_named.1.unwrap(),
-            permissions: self.__unsafe_private_named.2.unwrap(),
-            role: self.__unsafe_private_named.3.unwrap(),
-            tier: self.__unsafe_private_named.4,
+            added_at: self._fields.0.unwrap(),
+            member: self._fields.1.unwrap(),
+            permissions: self._fields.2.unwrap(),
+            role: self._fields.3.unwrap(),
+            tier: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

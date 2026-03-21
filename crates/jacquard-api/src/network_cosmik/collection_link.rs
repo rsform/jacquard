@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 
@@ -130,73 +133,73 @@ pub mod collection_link_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Card;
+        type Collection;
         type AddedAt;
         type AddedBy;
-        type Collection;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Card = Unset;
+        type Collection = Unset;
         type AddedAt = Unset;
         type AddedBy = Unset;
-        type Collection = Unset;
     }
     ///State transition - sets the `card` field to Set
     pub struct SetCard<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCard<S> {}
     impl<S: State> State for SetCard<S> {
         type Card = Set<members::card>;
+        type Collection = S::Collection;
         type AddedAt = S::AddedAt;
         type AddedBy = S::AddedBy;
-        type Collection = S::Collection;
-    }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type Card = S::Card;
-        type AddedAt = Set<members::added_at>;
-        type AddedBy = S::AddedBy;
-        type Collection = S::Collection;
-    }
-    ///State transition - sets the `added_by` field to Set
-    pub struct SetAddedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedBy<S> {}
-    impl<S: State> State for SetAddedBy<S> {
-        type Card = S::Card;
-        type AddedAt = S::AddedAt;
-        type AddedBy = Set<members::added_by>;
-        type Collection = S::Collection;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCollection<S> {}
     impl<S: State> State for SetCollection<S> {
         type Card = S::Card;
+        type Collection = Set<members::collection>;
         type AddedAt = S::AddedAt;
         type AddedBy = S::AddedBy;
-        type Collection = Set<members::collection>;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
+    impl<S: State> State for SetAddedAt<S> {
+        type Card = S::Card;
+        type Collection = S::Collection;
+        type AddedAt = Set<members::added_at>;
+        type AddedBy = S::AddedBy;
+    }
+    ///State transition - sets the `added_by` field to Set
+    pub struct SetAddedBy<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAddedBy<S> {}
+    impl<S: State> State for SetAddedBy<S> {
+        type Card = S::Card;
+        type Collection = S::Collection;
+        type AddedAt = S::AddedAt;
+        type AddedBy = Set<members::added_by>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `card` field
         pub struct card(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
         ///Marker type for the `added_by` field
         pub struct added_by(());
-        ///Marker type for the `collection` field
-        pub struct collection(());
     }
 }
 
 /// Builder for constructing an instance of this type
 pub struct CollectionLinkBuilder<'a, S: collection_link_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
+    _state: PhantomData<fn() -> S>,
+    _fields: (
         Option<Datetime>,
         Option<CowStr<'a>>,
         Option<StrongRef<'a>>,
@@ -205,7 +208,7 @@ pub struct CollectionLinkBuilder<'a, S: collection_link_state::State> {
         Option<StrongRef<'a>>,
         Option<Provenance<'a>>,
     ),
-    _phantom: PhantomData<&'a ()>,
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> CollectionLink<'a> {
@@ -219,9 +222,9 @@ impl<'a> CollectionLinkBuilder<'a, collection_link_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         CollectionLinkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -236,11 +239,11 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> CollectionLinkBuilder<'a, collection_link_state::SetAddedAt<S>> {
-        self.__unsafe_private_named.0 = Option::Some(value.into());
+        self._fields.0 = Option::Some(value.into());
         CollectionLinkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -255,11 +258,11 @@ where
         mut self,
         value: impl Into<CowStr<'a>>,
     ) -> CollectionLinkBuilder<'a, collection_link_state::SetAddedBy<S>> {
-        self.__unsafe_private_named.1 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         CollectionLinkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -274,11 +277,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> CollectionLinkBuilder<'a, collection_link_state::SetCard<S>> {
-        self.__unsafe_private_named.2 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CollectionLinkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -293,11 +296,11 @@ where
         mut self,
         value: impl Into<StrongRef<'a>>,
     ) -> CollectionLinkBuilder<'a, collection_link_state::SetCollection<S>> {
-        self.__unsafe_private_named.3 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         CollectionLinkBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: self.__unsafe_private_named,
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: self._fields,
+            _lifetime: PhantomData,
         }
     }
 }
@@ -305,12 +308,12 @@ where
 impl<'a, S: collection_link_state::State> CollectionLinkBuilder<'a, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self.__unsafe_private_named.4 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self.__unsafe_private_named.4 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -318,12 +321,12 @@ impl<'a, S: collection_link_state::State> CollectionLinkBuilder<'a, S> {
 impl<'a, S: collection_link_state::State> CollectionLinkBuilder<'a, S> {
     /// Set the `originalCard` field (optional)
     pub fn original_card(mut self, value: impl Into<Option<StrongRef<'a>>>) -> Self {
-        self.__unsafe_private_named.5 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `originalCard` field to an Option value (optional)
     pub fn maybe_original_card(mut self, value: Option<StrongRef<'a>>) -> Self {
-        self.__unsafe_private_named.5 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -331,12 +334,12 @@ impl<'a, S: collection_link_state::State> CollectionLinkBuilder<'a, S> {
 impl<'a, S: collection_link_state::State> CollectionLinkBuilder<'a, S> {
     /// Set the `provenance` field (optional)
     pub fn provenance(mut self, value: impl Into<Option<Provenance<'a>>>) -> Self {
-        self.__unsafe_private_named.6 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `provenance` field to an Option value (optional)
     pub fn maybe_provenance(mut self, value: Option<Provenance<'a>>) -> Self {
-        self.__unsafe_private_named.6 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -345,20 +348,20 @@ impl<'a, S> CollectionLinkBuilder<'a, S>
 where
     S: collection_link_state::State,
     S::Card: collection_link_state::IsSet,
+    S::Collection: collection_link_state::IsSet,
     S::AddedAt: collection_link_state::IsSet,
     S::AddedBy: collection_link_state::IsSet,
-    S::Collection: collection_link_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> CollectionLink<'a> {
         CollectionLink {
-            added_at: self.__unsafe_private_named.0.unwrap(),
-            added_by: self.__unsafe_private_named.1.unwrap(),
-            card: self.__unsafe_private_named.2.unwrap(),
-            collection: self.__unsafe_private_named.3.unwrap(),
-            created_at: self.__unsafe_private_named.4,
-            original_card: self.__unsafe_private_named.5,
-            provenance: self.__unsafe_private_named.6,
+            added_at: self._fields.0.unwrap(),
+            added_by: self._fields.1.unwrap(),
+            card: self._fields.2.unwrap(),
+            collection: self._fields.3.unwrap(),
+            created_at: self._fields.4,
+            original_card: self._fields.5,
+            provenance: self._fields.6,
             extra_data: Default::default(),
         }
     }
@@ -371,13 +374,13 @@ where
         >,
     ) -> CollectionLink<'a> {
         CollectionLink {
-            added_at: self.__unsafe_private_named.0.unwrap(),
-            added_by: self.__unsafe_private_named.1.unwrap(),
-            card: self.__unsafe_private_named.2.unwrap(),
-            collection: self.__unsafe_private_named.3.unwrap(),
-            created_at: self.__unsafe_private_named.4,
-            original_card: self.__unsafe_private_named.5,
-            provenance: self.__unsafe_private_named.6,
+            added_at: self._fields.0.unwrap(),
+            added_by: self._fields.1.unwrap(),
+            card: self._fields.2.unwrap(),
+            collection: self._fields.3.unwrap(),
+            created_at: self._fields.4,
+            original_card: self._fields.5,
+            provenance: self._fields.6,
             extra_data: Some(extra_data),
         }
     }

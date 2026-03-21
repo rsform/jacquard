@@ -5,7 +5,10 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+#[allow(unused_imports)]
 use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::CowStr;
 use jacquard_derive::{IntoStatic, lexicon};
@@ -84,14 +87,9 @@ pub mod get_artists_state {
 
 /// Builder for constructing an instance of this type
 pub struct GetArtistsBuilder<'a, S: get_artists_state::State> {
-    _phantom_state: PhantomData<fn() -> S>,
-    __unsafe_private_named: (
-        Option<CowStr<'a>>,
-        Option<i64>,
-        Option<CowStr<'a>>,
-        Option<i64>,
-    ),
-    _phantom: PhantomData<&'a ()>,
+    _state: PhantomData<fn() -> S>,
+    _fields: (Option<CowStr<'a>>, Option<i64>, Option<CowStr<'a>>, Option<i64>),
+    _lifetime: PhantomData<&'a ()>,
 }
 
 impl<'a> GetArtists<'a> {
@@ -105,9 +103,9 @@ impl<'a> GetArtistsBuilder<'a, get_artists_state::Empty> {
     /// Create a new builder with all fields unset
     pub fn new() -> Self {
         GetArtistsBuilder {
-            _phantom_state: PhantomData,
-            __unsafe_private_named: (None, None, None, None),
-            _phantom: PhantomData,
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _lifetime: PhantomData,
         }
     }
 }
@@ -115,12 +113,12 @@ impl<'a> GetArtistsBuilder<'a, get_artists_state::Empty> {
 impl<'a, S: get_artists_state::State> GetArtistsBuilder<'a, S> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.0 = value.into();
+        self._fields.0 = value.into();
         self
     }
     /// Set the `genre` field to an Option value (optional)
     pub fn maybe_genre(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.0 = value;
+        self._fields.0 = value;
         self
     }
 }
@@ -128,12 +126,12 @@ impl<'a, S: get_artists_state::State> GetArtistsBuilder<'a, S> {
 impl<'a, S: get_artists_state::State> GetArtistsBuilder<'a, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.1 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.1 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -141,12 +139,12 @@ impl<'a, S: get_artists_state::State> GetArtistsBuilder<'a, S> {
 impl<'a, S: get_artists_state::State> GetArtistsBuilder<'a, S> {
     /// Set the `names` field (optional)
     pub fn names(mut self, value: impl Into<Option<CowStr<'a>>>) -> Self {
-        self.__unsafe_private_named.2 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `names` field to an Option value (optional)
     pub fn maybe_names(mut self, value: Option<CowStr<'a>>) -> Self {
-        self.__unsafe_private_named.2 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -154,12 +152,12 @@ impl<'a, S: get_artists_state::State> GetArtistsBuilder<'a, S> {
 impl<'a, S: get_artists_state::State> GetArtistsBuilder<'a, S> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
-        self.__unsafe_private_named.3 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `offset` field to an Option value (optional)
     pub fn maybe_offset(mut self, value: Option<i64>) -> Self {
-        self.__unsafe_private_named.3 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -171,10 +169,10 @@ where
     /// Build the final struct
     pub fn build(self) -> GetArtists<'a> {
         GetArtists {
-            genre: self.__unsafe_private_named.0,
-            limit: self.__unsafe_private_named.1,
-            names: self.__unsafe_private_named.2,
-            offset: self.__unsafe_private_named.3,
+            genre: self._fields.0,
+            limit: self._fields.1,
+            names: self._fields.2,
+            offset: self._fields.3,
         }
     }
 }
