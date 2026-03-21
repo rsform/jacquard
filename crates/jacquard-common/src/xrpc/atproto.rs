@@ -5,7 +5,9 @@
 //! implementations sufficient for bootstrap code generation without builders or
 //! validation helpers.
 //!
+use crate::Bos;
 use crate::CowStr;
+use crate::DefaultStr;
 use crate::IntoStatic;
 use crate::types::ident::AtIdentifier;
 use crate::types::string::{AtUri, Cid, Did, Handle, Nsid};
@@ -15,7 +17,9 @@ use crate::xrpc::{GenericError, XrpcMethod, XrpcRequest, XrpcResp};
 use alloc::vec::Vec;
 use core::error::Error;
 use core::fmt::{self, Display};
+use core::marker::PhantomData;
 use serde::{Deserialize, Serialize};
+use smol_str::SmolStr;
 
 // ============================================================================
 // com.atproto.repo.listRecords
@@ -27,14 +31,14 @@ use serde::{Deserialize, Serialize};
 #[allow(missing_docs)]
 pub struct ListRecords<'a> {
     #[serde(borrow)]
-    pub collection: Nsid<'a>,
+    pub collection: Nsid<CowStr<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
     pub cursor: Option<CowStr<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(borrow)]
-    pub repo: AtIdentifier<'a>,
+    pub repo: AtIdentifier<CowStr<'a>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reverse: Option<bool>,
 }
@@ -131,9 +135,9 @@ pub struct GetRecord<'a> {
     #[serde(borrow)]
     pub cid: Option<Cid<'a>>,
     #[serde(borrow)]
-    pub collection: Nsid<'a>,
+    pub collection: Nsid<CowStr<'a>>,
     #[serde(borrow)]
-    pub repo: AtIdentifier<'a>,
+    pub repo: AtIdentifier<CowStr<'a>>,
     #[serde(borrow)]
     pub rkey: CowStr<'a>,
 }
@@ -237,13 +241,17 @@ impl<'a> XrpcRequest for GetRecord<'a> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 #[allow(missing_docs)]
-pub struct ResolveHandle<'a> {
-    #[serde(borrow)]
-    pub handle: Handle<'a>,
+pub struct ResolveHandle<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub handle: Handle<S>,
 }
 
-impl IntoStatic for ResolveHandle<'_> {
-    type Output = ResolveHandle<'static>;
+impl<S> IntoStatic for ResolveHandle<S>
+where
+    S: Bos<str> + AsRef<str> + IntoStatic,
+    <S as IntoStatic>::Output: Bos<str>,
+    <S as IntoStatic>::Output: AsRef<str>,
+{
+    type Output = ResolveHandle<<S as IntoStatic>::Output>;
 
     fn into_static(self) -> Self::Output {
         ResolveHandle {
@@ -256,13 +264,17 @@ impl IntoStatic for ResolveHandle<'_> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 #[allow(missing_docs)]
-pub struct ResolveHandleOutput<'a> {
-    #[serde(borrow)]
-    pub did: Did<'a>,
+pub struct ResolveHandleOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub did: Did<S>,
 }
 
-impl IntoStatic for ResolveHandleOutput<'_> {
-    type Output = ResolveHandleOutput<'static>;
+impl<S> IntoStatic for ResolveHandleOutput<S>
+where
+    S: Bos<str> + AsRef<str> + IntoStatic,
+    <S as IntoStatic>::Output: Bos<str>,
+    <S as IntoStatic>::Output: AsRef<str>,
+{
+    type Output = ResolveHandleOutput<<S as IntoStatic>::Output>;
 
     fn into_static(self) -> Self::Output {
         ResolveHandleOutput {
@@ -313,11 +325,11 @@ pub struct ResolveHandleResponse;
 impl XrpcResp for ResolveHandleResponse {
     const NSID: &'static str = "com.atproto.identity.resolveHandle";
     const ENCODING: &'static str = "application/json";
-    type Output<'de> = ResolveHandleOutput<'de>;
+    type Output<'de> = ResolveHandleOutput;
     type Err<'de> = ResolveHandleError<'de>;
 }
 
-impl<'a> XrpcRequest for ResolveHandle<'a> {
+impl<S: Bos<str> + AsRef<str> + Serialize> XrpcRequest for ResolveHandle<S> {
     const NSID: &'static str = "com.atproto.identity.resolveHandle";
     const METHOD: XrpcMethod = XrpcMethod::Query;
     type Response = ResolveHandleResponse;
@@ -331,13 +343,17 @@ impl<'a> XrpcRequest for ResolveHandle<'a> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 #[allow(missing_docs)]
-pub struct ResolveDid<'a> {
-    #[serde(borrow)]
-    pub did: Did<'a>,
+pub struct ResolveDid<S: Bos<str> + AsRef<str> = DefaultStr> {
+    pub did: Did<S>,
 }
 
-impl IntoStatic for ResolveDid<'_> {
-    type Output = ResolveDid<'static>;
+impl<S> IntoStatic for ResolveDid<S>
+where
+    S: Bos<str> + AsRef<str> + IntoStatic,
+    <S as IntoStatic>::Output: Bos<str>,
+    <S as IntoStatic>::Output: AsRef<str>,
+{
+    type Output = ResolveDid<<S as IntoStatic>::Output>;
 
     fn into_static(self) -> Self::Output {
         ResolveDid {
@@ -421,7 +437,10 @@ impl XrpcResp for ResolveDidResponse {
     type Err<'de> = ResolveDidError<'de>;
 }
 
-impl<'a> XrpcRequest for ResolveDid<'a> {
+impl<S> XrpcRequest for ResolveDid<S>
+where
+    S: Bos<str> + AsRef<str> + Serialize,
+{
     const NSID: &'static str = "com.atproto.identity.resolveDid";
     const METHOD: XrpcMethod = XrpcMethod::Query;
     type Response = ResolveDidResponse;
@@ -439,11 +458,10 @@ mod tests {
     #[test]
     fn test_list_records_serializes() {
         let req = ListRecords {
-            repo: AtIdentifier::new("test.bsky.social")
+            repo: AtIdentifier::new_cow("test.bsky.social".into()).unwrap(),
+            collection: Nsid::new_cow("app.bsky.feed.post".into())
                 .unwrap()
-                .into_static()
-                .into(),
-            collection: Nsid::new("app.bsky.feed.post").unwrap().into_static(),
+                .into_static(),
             cursor: None,
             limit: Some(50),
             reverse: None,
@@ -534,11 +552,10 @@ mod tests {
     #[test]
     fn test_types_implement_into_static() {
         let list_records = ListRecords {
-            repo: AtIdentifier::new("test.bsky.social")
+            repo: AtIdentifier::new_cow("test.bsky.social".into()).unwrap(),
+            collection: Nsid::new_cow("app.bsky.feed.post".into())
                 .unwrap()
-                .into_static()
-                .into(),
-            collection: Nsid::new("app.bsky.feed.post").unwrap().into_static(),
+                .into_static(),
             cursor: None,
             limit: Some(50),
             reverse: None,
@@ -546,11 +563,10 @@ mod tests {
         let _static = list_records.into_static();
 
         let get_record = GetRecord {
-            repo: AtIdentifier::new("test.bsky.social")
+            repo: AtIdentifier::new_cow("test.bsky.social".into()).unwrap(),
+            collection: Nsid::new_cow("app.bsky.feed.post".into())
                 .unwrap()
-                .into_static()
-                .into(),
-            collection: Nsid::new("app.bsky.feed.post").unwrap().into_static(),
+                .into_static(),
             rkey: CowStr::from("abc123").into_static(),
             cid: None,
         };

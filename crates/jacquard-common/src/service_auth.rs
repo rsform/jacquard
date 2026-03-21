@@ -77,18 +77,18 @@ pub enum ServiceAuthError {
     #[error("audience mismatch: expected {expected}, got {actual}")]
     AudienceMismatch {
         /// Expected audience DID
-        expected: Did<'static>,
+        expected: Did,
         /// Actual audience DID in token
-        actual: Did<'static>,
+        actual: Did,
     },
 
     /// Method mismatch (lxm field)
     #[error("method mismatch: expected {expected}, got {actual:?}")]
     MethodMismatch {
         /// Expected method NSID
-        expected: Nsid<'static>,
+        expected: Nsid,
         /// Actual method NSID in token (if any)
-        actual: Option<Nsid<'static>>,
+        actual: Option<Nsid>,
     },
 
     /// Missing required field
@@ -128,12 +128,10 @@ impl IntoStatic for JwtHeader<'_> {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ServiceAuthClaims<'a> {
     /// Issuer (user's DID)
-    #[serde(borrow)]
-    pub iss: Did<'a>,
+    pub iss: Did,
 
     /// Audience (target service DID)
-    #[serde(borrow)]
-    pub aud: Did<'a>,
+    pub aud: Did,
 
     /// Expiration time (unix timestamp)
     pub exp: i64,
@@ -147,7 +145,7 @@ pub struct ServiceAuthClaims<'a> {
 
     /// Lexicon method NSID (method binding)
     #[serde(borrow, skip_serializing_if = "Option::is_none")]
-    pub lxm: Option<Nsid<'a>>,
+    pub lxm: Option<Nsid<CowStr<'a>>>,
 }
 
 impl<'a> IntoStatic for ServiceAuthClaims<'a> {
@@ -196,7 +194,7 @@ impl<'a> ServiceAuthClaims<'a> {
     }
 
     /// Check if the method (lxm) matches the expected NSID.
-    pub fn check_method(&self, nsid: &Nsid) -> bool {
+    pub fn check_method(&self, nsid: &Nsid<CowStr<'_>>) -> bool {
         self.lxm
             .as_ref()
             .map(|lxm| lxm.as_str() == nsid.as_str())
@@ -204,11 +202,15 @@ impl<'a> ServiceAuthClaims<'a> {
     }
 
     /// Require that the method (lxm) matches the expected NSID.
-    pub fn require_method(&self, nsid: &Nsid) -> Result<(), ServiceAuthError> {
+    pub fn require_method(&self, nsid: &Nsid<CowStr<'_>>) -> Result<(), ServiceAuthError> {
         if !self.check_method(nsid) {
             return Err(ServiceAuthError::MethodMismatch {
-                expected: nsid.clone().into_static(),
-                actual: self.lxm.as_ref().map(|l| l.clone().into_static()),
+                // TODO: remove this call once migration complete
+                expected: unsafe { Nsid::unchecked(nsid.as_str()).into_static() },
+                actual: self
+                    .lxm
+                    .as_ref()
+                    .map(|l| Nsid::new_owned(l.as_str()).unwrap()),
             });
         }
         Ok(())
@@ -420,8 +422,8 @@ mod tests {
     fn test_claims_expiration() {
         let now = chrono::Utc::now().timestamp();
         let expired_claims = ServiceAuthClaims {
-            iss: Did::new("did:plc:test").unwrap(),
-            aud: Did::new("did:web:example.com").unwrap(),
+            iss: Did::new_static("did:plc:test").unwrap(),
+            aud: Did::new_static("did:web:example.com").unwrap(),
             exp: now - 100,
             iat: now - 200,
             jti: None,
@@ -431,8 +433,8 @@ mod tests {
         assert!(expired_claims.is_expired());
 
         let valid_claims = ServiceAuthClaims {
-            iss: Did::new("did:plc:test").unwrap(),
-            aud: Did::new("did:web:example.com").unwrap(),
+            iss: Did::new_static("did:plc:test").unwrap(),
+            aud: Did::new_static("did:web:example.com").unwrap(),
             exp: now + 100,
             iat: now,
             jti: None,
@@ -446,18 +448,18 @@ mod tests {
     fn test_audience_validation() {
         let now = chrono::Utc::now().timestamp();
         let claims = ServiceAuthClaims {
-            iss: Did::new("did:plc:test").unwrap(),
-            aud: Did::new("did:web:example.com").unwrap(),
+            iss: Did::new_static("did:plc:test").unwrap(),
+            aud: Did::new_static("did:web:example.com").unwrap(),
             exp: now + 100,
             iat: now,
             jti: None,
             lxm: None,
         };
 
-        let expected_aud = Did::new("did:web:example.com").unwrap();
+        let expected_aud = Did::new_static("did:web:example.com").unwrap();
         assert!(claims.validate(&expected_aud).is_ok());
 
-        let wrong_aud = Did::new("did:web:wrong.com").unwrap();
+        let wrong_aud = Did::new_static("did:web:wrong.com").unwrap();
         assert!(matches!(
             claims.validate(&wrong_aud),
             Err(ServiceAuthError::AudienceMismatch { .. })
@@ -467,18 +469,18 @@ mod tests {
     #[test]
     fn test_method_check() {
         let claims = ServiceAuthClaims {
-            iss: Did::new("did:plc:test").unwrap(),
-            aud: Did::new("did:web:example.com").unwrap(),
+            iss: Did::new_static("did:plc:test").unwrap(),
+            aud: Did::new_static("did:web:example.com").unwrap(),
             exp: chrono::Utc::now().timestamp() + 100,
             iat: chrono::Utc::now().timestamp(),
             jti: None,
-            lxm: Some(Nsid::new("app.bsky.feed.getFeedSkeleton").unwrap()),
+            lxm: Some(Nsid::new_static("app.bsky.feed.getFeedSkeleton").unwrap()),
         };
 
-        let expected = Nsid::new("app.bsky.feed.getFeedSkeleton").unwrap();
+        let expected = Nsid::new_static("app.bsky.feed.getFeedSkeleton").unwrap();
         assert!(claims.check_method(&expected));
 
-        let wrong = Nsid::new("app.bsky.feed.getTimeline").unwrap();
+        let wrong = Nsid::new_static("app.bsky.feed.getTimeline".into()).unwrap();
         assert!(!claims.check_method(&wrong));
     }
 }

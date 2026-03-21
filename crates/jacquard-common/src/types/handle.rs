@@ -1,8 +1,10 @@
+use crate::bos::{Bos, DefaultStr};
 use crate::types::string::AtStrError;
 use crate::types::{DISALLOWED_TLDS, ends_with};
 use crate::{CowStr, IntoStatic};
-use alloc::string::{String, ToString};
+use alloc::string::String;
 use core::fmt;
+use core::hash::{Hash, Hasher};
 use core::ops::Deref;
 use core::str::FromStr;
 #[cfg(all(not(target_arch = "wasm32"), feature = "std"))]
@@ -11,320 +13,323 @@ use regex::Regex;
 use regex_automata::meta::Regex;
 #[cfg(target_arch = "wasm32")]
 use regex_lite::Regex;
-use serde::{Deserialize, Deserializer, Serialize, de::Error};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use smol_str::{SmolStr, StrExt};
 
 use super::Lazy;
 
-/// AT Protocol handle (human-readable account identifier)
+/// AT Protocol handle (human-readable account identifier).
 ///
-/// Handles are user-friendly account identifiers that must resolve to a DID through DNS
-/// or HTTPS. Unlike DIDs, handles can change over time, though they remain an important
-/// part of user identity.
+/// # Case semantics
 ///
-/// Format rules:
-/// - Maximum 253 characters
-/// - At least two segments separated by dots (e.g., "alice.bsky.social")
-/// - Each segment is 1-63 characters of ASCII letters, numbers, and hyphens
-/// - Segments cannot start or end with a hyphen
-/// - Final segment (TLD) cannot start with a digit
-/// - Case-insensitive (normalized to lowercase)
-///
-/// Certain TLDs are disallowed (.local, .localhost, .arpa, .invalid, .internal, .example, .alt, .onion).
+/// Handle is **case-preserving but case-insensitive**: the stored string retains its
+/// original casing, but equality, hashing, serialization, and display all operate on
+/// the lowercased form. `as_str()` returns the raw stored value.
 ///
 /// See: <https://atproto.com/specs/handle>
-#[derive(Clone, PartialEq, Eq, Serialize, Hash)]
-#[serde(transparent)]
+#[derive(Clone)]
 #[repr(transparent)]
-pub struct Handle<'h>(pub(crate) CowStr<'h>);
+pub struct Handle<S: Bos<str> = DefaultStr>(pub(crate) S);
 
-/// Regex for handle validation per AT Protocol spec
+/// Regex for handle validation per AT Protocol spec.
 pub static HANDLE_REGEX: Lazy<Regex> = Lazy::new(|| {
     Regex::new(r"^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$").unwrap()
 });
-impl<'h> Handle<'h> {
-    /// Fallible constructor, validates, borrows from input
+
+// ---------------------------------------------------------------------------
+// Shared validation
+// ---------------------------------------------------------------------------
+
+fn strip_handle_prefix(handle: &str) -> &str {
+    handle
+        .strip_prefix("at://")
+        .or_else(|| handle.strip_prefix('@'))
+        .unwrap_or(handle)
+}
+
+fn validate_handle(handle: &str) -> Result<(), AtStrError> {
+    if handle.len() > 253 {
+        Err(AtStrError::too_long("handle", handle, 253, handle.len()))
+    } else if !HANDLE_REGEX.is_match(handle) {
+        Err(AtStrError::regex(
+            "handle",
+            handle,
+            SmolStr::new_static("invalid"),
+        ))
+    } else if ends_with(handle, DISALLOWED_TLDS) && handle != "handle.invalid" {
+        Err(AtStrError::disallowed("handle", handle, DISALLOWED_TLDS))
+    } else {
+        Ok(())
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Core methods
+// ---------------------------------------------------------------------------
+
+impl<S: Bos<str> + AsRef<str>> Handle<S> {
+    /// Get the handle as a string slice.
     ///
-    /// Accepts (and strips) preceding '@' or 'at://' if present
+    /// Returns the raw stored value, which may contain uppercase if the handle
+    /// was deserialized from non-canonical wire data. For canonical output,
+    /// use `Display` or `Serialize`.
+    pub fn as_str(&self) -> &str {
+        self.0.as_ref()
+    }
+
+    /// Confirm that this is a (syntactically) valid handle (as we pass-through
+    /// "handle.invalid" during construction).
+    pub fn is_valid(&self) -> bool {
+        let s = self.as_str();
+        s.len() <= 253 && HANDLE_REGEX.is_match(s) && !ends_with(s, DISALLOWED_TLDS)
+    }
+}
+
+impl<S: Bos<str>> Handle<S> {
+    /// Infallible unchecked constructor.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure the handle is valid.
+    pub unsafe fn unchecked(handle: S) -> Self {
+        Handle(handle)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Borrowed construction: Handle<&'h str>
+// ---------------------------------------------------------------------------
+
+impl<'h> Handle<&'h str> {
+    /// Fallible constructor, validates, borrows from input.
+    ///
+    /// Rejects uppercase input — use `Handle::<SmolStr>::new_owned()` for
+    /// case-insensitive construction.
+    /// Accepts (and strips) preceding '@' or 'at://' if present.
     pub fn new(handle: &'h str) -> Result<Self, AtStrError> {
         if handle.contains(|c: char| c.is_ascii_uppercase()) {
-            return Self::new_owned(handle);
-        }
-        let stripped = handle
-            .strip_prefix("at://")
-            .or_else(|| handle.strip_prefix('@'))
-            .unwrap_or(handle);
-        if stripped.len() > 253 {
-            Err(AtStrError::too_long(
-                "handle",
-                stripped,
-                253,
-                stripped.len(),
-            ))
-        } else if !HANDLE_REGEX.is_match(stripped) {
-            Err(AtStrError::regex(
-                "handle",
-                stripped,
-                SmolStr::new_static("invalid"),
-            ))
-        } else if ends_with(stripped, DISALLOWED_TLDS) {
-            // specifically pass this through as it is returned in instances where someone
-            // has screwed up their handle, and it's awkward to fail so early
-            if handle == "handle.invalid" {
-                Ok(Self(CowStr::Borrowed(stripped)))
-            } else {
-                Err(AtStrError::disallowed("handle", stripped, DISALLOWED_TLDS))
-            }
-        } else {
-            Ok(Self(CowStr::Borrowed(stripped)))
-        }
-    }
-
-    /// confirm that this is a (syntactically) valid handle (as we pass-through
-    /// "handle.invalid" during construction)
-    pub fn is_valid(&self) -> bool {
-        self.0.len() <= 253
-            && HANDLE_REGEX.is_match(&self.0)
-            && !ends_with(&self.0, DISALLOWED_TLDS)
-    }
-
-    /// Fallible constructor, validates, takes ownership
-    pub fn new_owned(handle: impl AsRef<str>) -> Result<Self, AtStrError> {
-        let handle = handle.as_ref();
-        let stripped = handle
-            .strip_prefix("at://")
-            .or_else(|| handle.strip_prefix('@'))
-            .unwrap_or(handle);
-        let normalized = stripped.to_lowercase_smolstr();
-        let handle = normalized.as_str();
-        if handle.len() > 253 {
-            Err(AtStrError::too_long("handle", handle, 253, handle.len()))
-        } else if !HANDLE_REGEX.is_match(handle) {
-            Err(AtStrError::regex(
+            return Err(AtStrError::regex(
                 "handle",
                 handle,
-                SmolStr::new_static("invalid"),
-            ))
-        } else if ends_with(handle, DISALLOWED_TLDS) {
-            // specifically pass this through as it is returned in instances where someone
-            // has screwed up their handle, and it's awkward to fail so early
-            if handle == "handle.invalid" {
-                Ok(Self(CowStr::Owned(normalized)))
-            } else {
-                Err(AtStrError::disallowed(
-                    "handle",
-                    normalized.as_str(),
-                    DISALLOWED_TLDS,
-                ))
-            }
-        } else {
-            Ok(Self(CowStr::Owned(normalized)))
+                SmolStr::new_static("contains uppercase (use new_owned for normalisation)"),
+            ));
         }
+        let stripped = strip_handle_prefix(handle);
+        validate_handle(stripped)?;
+        Ok(Self(stripped))
     }
 
-    /// Fallible constructor, validates, doesn't allocate
-    pub fn new_static(handle: &'static str) -> Result<Self, AtStrError> {
-        let stripped = handle
-            .strip_prefix("at://")
-            .or_else(|| handle.strip_prefix('@'))
-            .unwrap_or(handle);
+    /// Infallible constructor. Panics on invalid handles.
+    pub fn raw(handle: &'h str) -> Self {
+        Self::new(handle).expect("invalid handle")
+    }
+}
 
-        let handle = if handle.contains(|c: char| c.is_ascii_uppercase()) {
+// ---------------------------------------------------------------------------
+// Owned construction: any S that can be built from SmolStr
+// ---------------------------------------------------------------------------
+
+impl<S: Bos<str> + From<SmolStr>> Handle<S> {
+    /// Fallible constructor, validates, takes ownership. Normalises to lowercase.
+    pub fn new_owned(handle: impl AsRef<str>) -> Result<Self, AtStrError> {
+        let handle = handle.as_ref();
+        let stripped = strip_handle_prefix(handle);
+        let normalized = stripped.to_lowercase_smolstr();
+        validate_handle(&normalized)?;
+        Ok(Self(S::from(normalized)))
+    }
+
+    /// Fallible constructor for static strings. Zero-alloc if already lowercase.
+    pub fn new_static(handle: &'static str) -> Result<Self, AtStrError> {
+        let stripped = strip_handle_prefix(handle);
+        let smol = if stripped.contains(|c: char| c.is_ascii_uppercase()) {
             stripped.to_lowercase_smolstr()
         } else {
             SmolStr::new_static(stripped)
         };
-        if handle.len() > 253 {
-            Err(AtStrError::too_long("handle", &handle, 253, handle.len()))
-        } else if !HANDLE_REGEX.is_match(&handle) {
-            Err(AtStrError::regex(
-                "handle",
-                &handle,
-                SmolStr::new_static("invalid"),
-            ))
-        } else if ends_with(&handle, DISALLOWED_TLDS) {
-            // specifically pass this through as it is returned in instances where someone
-            // has screwed up their handle, and it's awkward to fail so early
-            if handle == "handle.invalid" {
-                Ok(Self(CowStr::Owned(handle)))
-            } else {
-                Err(AtStrError::disallowed("handle", stripped, DISALLOWED_TLDS))
-            }
-        } else {
-            Ok(Self(CowStr::Owned(handle)))
-        }
+        validate_handle(&smol)?;
+        Ok(Self(S::from(smol)))
     }
+}
 
-    /// Fallible constructor, validates, borrows from input if possible
-    ///
-    /// May allocate for a long handle with an at:// or @ prefix, otherwise borrows.
-    /// Accepts (and strips) preceding '@' or 'at://' if present
+// ---------------------------------------------------------------------------
+// CowStr construction
+// ---------------------------------------------------------------------------
+
+impl<'h> Handle<CowStr<'h>> {
+    /// Fallible constructor, borrows if possible, allocates for uppercase/prefix.
     pub fn new_cow(handle: CowStr<'h>) -> Result<Self, AtStrError> {
         if handle.contains(|c: char| c.is_ascii_uppercase()) {
-            return Self::new_owned(handle);
+            return Handle::<CowStr<'h>>::new_owned(handle);
         }
-        let handle = if let Some(stripped) = handle.strip_prefix("at://") {
-            CowStr::copy_from_str(stripped)
-        } else if let Some(stripped) = handle.strip_prefix('@') {
-            CowStr::copy_from_str(stripped)
+        let handle = if handle.starts_with("at://") || handle.starts_with('@') {
+            CowStr::copy_from_str(strip_handle_prefix(&handle))
         } else {
             handle
         };
-        if handle.len() > 253 {
-            Err(AtStrError::too_long("handle", &handle, 253, handle.len()))
-        } else if !HANDLE_REGEX.is_match(&handle) {
-            Err(AtStrError::regex(
-                "handle",
-                &handle,
-                SmolStr::new_static("invalid"),
-            ))
-        } else if ends_with(&handle, DISALLOWED_TLDS) {
-            // specifically pass this through as it is returned in instances where someone
-            // has screwed up their handle, and it's awkward to fail so early
-            if handle == "handle.invalid" {
-                Ok(Self(handle))
-            } else {
-                Err(AtStrError::disallowed(
-                    "handle",
-                    handle.as_str(),
-                    DISALLOWED_TLDS,
-                ))
-            }
+        validate_handle(&handle)?;
+        Ok(Self(handle))
+    }
+
+    pub unsafe fn unchecked_cow(handle: CowStr<'h>) -> Self {
+        Self(handle)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Deserialization — generic over S: Deserialize<'de>
+// ---------------------------------------------------------------------------
+
+impl<'de, S> Deserialize<'de> for Handle<S>
+where
+    S: Bos<str> + AsRef<str> + Deserialize<'de>,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        validate_handle(s.as_ref()).map_err(serde::de::Error::custom)?;
+        Ok(Handle(s))
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Serialization — always lowercase
+// ---------------------------------------------------------------------------
+
+impl<S: Bos<str> + AsRef<str>> Serialize for Handle<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: Serializer,
+    {
+        let raw = self.as_str();
+        if raw.bytes().all(|b| !b.is_ascii_uppercase()) {
+            serializer.serialize_str(raw)
         } else {
-            Ok(Self(handle))
-        }
-    }
-
-    /// Infallible constructor for when you *know* the string is a valid handle.
-    /// Will panic on invalid handles. If you're manually decoding atproto records
-    /// or API values you know are valid (rather than using serde), this is the one to use.
-    /// The `From<String>` and `From<CowStr>` impls use the same logic.
-    ///
-    /// Accepts (and strips) preceding '@' or 'at://' if present
-    pub fn raw(handle: &'h str) -> Self {
-        if handle.contains(|c: char| c.is_ascii_uppercase()) {
-            return Self::new_owned(handle).expect("Invalid handle");
-        }
-        let stripped = handle
-            .strip_prefix("at://")
-            .or_else(|| handle.strip_prefix('@'))
-            .unwrap_or(handle);
-        let handle = stripped;
-        if handle.len() > 253 {
-            panic!("handle too long")
-        } else if !HANDLE_REGEX.is_match(handle) {
-            panic!("Invalid handle")
-        } else if ends_with(handle, DISALLOWED_TLDS) {
-            // specifically pass this through as it is returned in instances where someone
-            // has screwed up their handle, and it's awkward to fail so early
-            if handle == "handle.invalid" {
-                Self(CowStr::Borrowed(stripped))
-            } else {
-                panic!("top-level domain not allowed in handles")
-            }
-        } else {
-            Self(CowStr::Borrowed(handle))
-        }
-    }
-
-    /// Infallible constructor for when you *know* the string is a valid handle.
-    /// Marked unsafe because responsibility for upholding the invariant is on the developer.
-    ///
-    /// Accepts (and strips) preceding '@' or 'at://' if present
-    pub unsafe fn unchecked(handle: &'h str) -> Self {
-        let stripped = handle
-            .strip_prefix("at://")
-            .or_else(|| handle.strip_prefix('@'))
-            .unwrap_or(handle);
-        if stripped.contains(|c: char| c.is_ascii_uppercase()) {
-            return Self(CowStr::Owned(stripped.to_lowercase_smolstr()));
-        }
-        Self(CowStr::Borrowed(stripped))
-    }
-
-    /// Get the handle as a string slice
-    pub fn as_str(&self) -> &str {
-        {
-            let this = &self.0;
-            this
+            let lowered = raw.to_lowercase_smolstr();
+            serializer.serialize_str(&lowered)
         }
     }
 }
 
-impl FromStr for Handle<'_> {
-    type Err = AtStrError;
+// ---------------------------------------------------------------------------
+// Case-insensitive equality and hashing
+// ---------------------------------------------------------------------------
 
-    /// Has to take ownership due to the lifetime constraints of the FromStr trait.
-    /// Prefer `Handle::new()` or `Handle::raw` if you want to borrow.
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::new_owned(s)
+impl<S: Bos<str> + AsRef<str>, T: Bos<str> + AsRef<str>> PartialEq<Handle<T>> for Handle<S> {
+    fn eq(&self, other: &Handle<T>) -> bool {
+        self.as_str().eq_ignore_ascii_case(other.as_str())
     }
 }
 
-impl IntoStatic for Handle<'_> {
-    type Output = Handle<'static>;
+impl<S: Bos<str> + AsRef<str>> Eq for Handle<S> {}
+
+impl<S: Bos<str> + AsRef<str>> Hash for Handle<S> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        for byte in self.as_str().bytes() {
+            state.write_u8(byte.to_ascii_lowercase());
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Other trait impls
+// ---------------------------------------------------------------------------
+
+impl<S: Bos<str> + IntoStatic> IntoStatic for Handle<S>
+where
+    S::Output: Bos<str>,
+{
+    type Output = Handle<S::Output>;
 
     fn into_static(self) -> Self::Output {
         Handle(self.0.into_static())
     }
 }
 
-impl<'de, 'a> Deserialize<'de> for Handle<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let value = Deserialize::deserialize(deserializer)?;
-        Self::new_cow(value).map_err(D::Error::custom)
+impl FromStr for Handle {
+    type Err = AtStrError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::new_owned(s)
     }
 }
 
-impl fmt::Display for Handle<'_> {
+impl FromStr for Handle<CowStr<'static>> {
+    type Err = AtStrError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::new_owned(s)
+    }
+}
+
+impl FromStr for Handle<String> {
+    type Err = AtStrError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::new_owned(s)
+    }
+}
+
+impl<S: Bos<str> + AsRef<str>> fmt::Display for Handle<S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0)
+        if self.0.as_ref().contains(|c: char| c.is_ascii_uppercase()) {
+            for c in self.as_str().chars() {
+                fmt::Write::write_char(f, c.to_ascii_lowercase())?;
+            }
+        } else {
+            f.write_str(self.as_str())?;
+        }
+        Ok(())
     }
 }
 
-impl fmt::Debug for Handle<'_> {
+impl<S: Bos<str> + AsRef<str>> fmt::Debug for Handle<S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "at://{}", self.0)
+        write!(f, "at://")?;
+        if self.0.as_ref().contains(|c: char| c.is_ascii_uppercase()) {
+            for c in self.as_str().chars() {
+                fmt::Write::write_char(f, c.to_ascii_lowercase())?;
+            }
+        } else {
+            f.write_str(self.as_str())?;
+        }
+        Ok(())
     }
 }
 
-impl<'h> From<Handle<'h>> for String {
-    fn from(value: Handle<'h>) -> Self {
-        value.0.to_string()
+impl<S: Bos<str> + AsRef<str>> From<Handle<S>> for String {
+    fn from(value: Handle<S>) -> Self {
+        value.as_str().to_ascii_lowercase()
     }
 }
 
-impl<'h> From<Handle<'h>> for CowStr<'h> {
-    fn from(value: Handle<'h>) -> Self {
-        value.0
+impl<S: Bos<str> + AsRef<str>> From<Handle<S>> for SmolStr {
+    fn from(value: Handle<S>) -> Self {
+        value.as_str().to_ascii_lowercase_smolstr()
     }
 }
 
-impl From<String> for Handle<'static> {
+impl From<String> for Handle {
     fn from(value: String) -> Self {
         Self::new_owned(value).unwrap()
     }
 }
 
-impl<'h> From<CowStr<'h>> for Handle<'h> {
+impl<'h> From<CowStr<'h>> for Handle<CowStr<'h>> {
     fn from(value: CowStr<'h>) -> Self {
-        Self::new_owned(value).unwrap()
+        Self::new_cow(value).unwrap()
     }
 }
 
-impl AsRef<str> for Handle<'_> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for Handle<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl Deref for Handle<'_> {
+impl<S: Bos<str> + AsRef<str>> Deref for Handle<S> {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {
@@ -338,94 +343,191 @@ mod tests {
 
     #[test]
     fn valid_handles() {
-        assert!(Handle::new("alice.test").is_ok());
-        assert!(Handle::new("foo.bsky.social").is_ok());
-        assert!(Handle::new("a.b.c.d.e").is_ok());
-        assert!(Handle::new("a1.b2.c3").is_ok());
-        assert!(Handle::new("name-with-dash.com").is_ok());
+        assert!(Handle::<&str>::new("alice.test").is_ok());
+        assert!(Handle::<&str>::new("foo.bsky.social").is_ok());
+        assert!(Handle::<&str>::new("a.b.c.d.e").is_ok());
+        assert!(Handle::<&str>::new("a1.b2.c3").is_ok());
+        assert!(Handle::<&str>::new("name-with-dash.com").is_ok());
+    }
+
+    #[test]
+    fn valid_handles_owned() {
+        assert!(Handle::<SmolStr>::new_owned("alice.test").is_ok());
+        assert!(Handle::<SmolStr>::new_owned("Alice.Test").is_ok());
+        assert!(Handle::<String>::new_owned("foo.bsky.social").is_ok());
+    }
+
+    #[test]
+    fn borrowed_rejects_uppercase() {
+        assert!(Handle::<&str>::new("Alice.Test").is_err());
     }
 
     #[test]
     fn prefix_stripping() {
-        assert_eq!(Handle::new("@alice.test").unwrap().as_str(), "alice.test");
         assert_eq!(
-            Handle::new("at://alice.test").unwrap().as_str(),
+            Handle::<&str>::new("@alice.test").unwrap().as_str(),
             "alice.test"
         );
-        assert_eq!(Handle::new("alice.test").unwrap().as_str(), "alice.test");
+        assert_eq!(
+            Handle::<&str>::new("at://alice.test").unwrap().as_str(),
+            "alice.test"
+        );
+        assert_eq!(
+            Handle::<&str>::new("alice.test").unwrap().as_str(),
+            "alice.test"
+        );
+    }
+
+    #[test]
+    fn prefix_stripping_owned() {
+        assert_eq!(
+            Handle::<SmolStr>::new_owned("@Alice.Test")
+                .unwrap()
+                .as_str(),
+            "alice.test"
+        );
+        assert_eq!(
+            Handle::<SmolStr>::new_owned("at://alice.test")
+                .unwrap()
+                .as_str(),
+            "alice.test"
+        );
     }
 
     #[test]
     fn max_length() {
-        // 253 chars: three 63-char segments + one 61-char segment + 3 dots = 253
-        let s1 = format!("a{}a", "b".repeat(61)); // 63
-        let s2 = format!("c{}c", "d".repeat(61)); // 63
-        let s3 = format!("e{}e", "f".repeat(61)); // 63
-        let s4 = format!("g{}g", "h".repeat(59)); // 61
-        let valid_253 = format!("{}.{}.{}.{}", s1, s2, s3, s4);
+        let s1 = format!("a{}a", "b".repeat(61));
+        let s2 = format!("c{}c", "d".repeat(61));
+        let s3 = format!("e{}e", "f".repeat(61));
+        let s4 = format!("g{}g", "h".repeat(59));
+        let valid_253 = format!("{s1}.{s2}.{s3}.{s4}");
         assert_eq!(valid_253.len(), 253);
-        assert!(Handle::new(&valid_253).is_ok());
+        assert!(Handle::<&str>::new(&valid_253).is_ok());
 
-        // 254 chars: make last segment 62 chars
-        let s4_long = format!("g{}g", "h".repeat(60)); // 62
-        let too_long_254 = format!("{}.{}.{}.{}", s1, s2, s3, s4_long);
+        let s4_long = format!("g{}g", "h".repeat(60));
+        let too_long_254 = format!("{s1}.{s2}.{s3}.{s4_long}");
         assert_eq!(too_long_254.len(), 254);
-        assert!(Handle::new(&too_long_254).is_err());
+        assert!(Handle::<&str>::new(&too_long_254).is_err());
     }
 
     #[test]
     fn segment_length_constraints() {
-        let valid_63_char_segment = format!("{}.com", "a".repeat(63));
-        assert!(Handle::new(&valid_63_char_segment).is_ok());
-
-        let too_long_64_char_segment = format!("{}.com", "a".repeat(64));
-        assert!(Handle::new(&too_long_64_char_segment).is_err());
+        let valid = format!("{}.com", "a".repeat(63));
+        assert!(Handle::<&str>::new(&valid).is_ok());
+        let too_long = format!("{}.com", "a".repeat(64));
+        assert!(Handle::<&str>::new(&too_long).is_err());
     }
 
     #[test]
     fn hyphen_placement() {
-        assert!(Handle::new("valid-label.com").is_ok());
-        assert!(Handle::new("-nope.com").is_err());
-        assert!(Handle::new("nope-.com").is_err());
+        assert!(Handle::<&str>::new("valid-label.com").is_ok());
+        assert!(Handle::<&str>::new("-nope.com").is_err());
+        assert!(Handle::<&str>::new("nope-.com").is_err());
     }
 
     #[test]
     fn tld_must_start_with_letter() {
-        assert!(Handle::new("foo.bar").is_ok());
-        assert!(Handle::new("foo.9bar").is_err());
+        assert!(Handle::<&str>::new("foo.bar").is_ok());
+        assert!(Handle::<&str>::new("foo.9bar").is_err());
     }
 
     #[test]
     fn disallowed_tlds() {
-        assert!(Handle::new("foo.local").is_err());
-        assert!(Handle::new("foo.localhost").is_err());
-        assert!(Handle::new("foo.arpa").is_err());
-        assert!(Handle::new("foo.invalid").is_err());
-        assert!(Handle::new("foo.internal").is_err());
-        assert!(Handle::new("foo.example").is_err());
-        assert!(Handle::new("foo.alt").is_err());
-        assert!(Handle::new("foo.onion").is_err());
+        for tld in [
+            "local",
+            "localhost",
+            "arpa",
+            "invalid",
+            "internal",
+            "example",
+            "alt",
+            "onion",
+        ] {
+            assert!(
+                Handle::<&str>::new(&format!("foo.{tld}")).is_err(),
+                "should reject .{tld}"
+            );
+        }
     }
 
     #[test]
     fn minimum_segments() {
-        assert!(Handle::new("a.b").is_ok());
-        assert!(Handle::new("a").is_err());
-        assert!(Handle::new("com").is_err());
+        assert!(Handle::<&str>::new("a.b").is_ok());
+        assert!(Handle::<&str>::new("a").is_err());
+        assert!(Handle::<&str>::new("com").is_err());
     }
 
     #[test]
     fn invalid_characters() {
-        assert!(Handle::new("foo!bar.com").is_err());
-        assert!(Handle::new("foo_bar.com").is_err());
-        assert!(Handle::new("foo bar.com").is_err());
-        assert!(Handle::new("foo@bar.com").is_err());
+        assert!(Handle::<&str>::new("foo!bar.com").is_err());
+        assert!(Handle::<&str>::new("foo_bar.com").is_err());
+        assert!(Handle::<&str>::new("foo bar.com").is_err());
+        assert!(Handle::<&str>::new("foo@bar.com").is_err());
     }
 
     #[test]
     fn empty_segments() {
-        assert!(Handle::new("foo..com").is_err());
-        assert!(Handle::new(".foo.com").is_err());
-        assert!(Handle::new("foo.com.").is_err());
+        assert!(Handle::<&str>::new("foo..com").is_err());
+        assert!(Handle::<&str>::new(".foo.com").is_err());
+        assert!(Handle::<&str>::new("foo.com.").is_err());
+    }
+
+    #[test]
+    fn handle_invalid_passthrough() {
+        assert!(Handle::<&str>::new("handle.invalid").is_ok());
+        assert!(Handle::<SmolStr>::new_owned("handle.invalid").is_ok());
+    }
+
+    #[test]
+    fn into_static_borrowed() {
+        let h = Handle::<&str>::new("alice.test").unwrap();
+        let owned: Handle<SmolStr> = h.into_static();
+        assert_eq!(owned.as_str(), "alice.test");
+    }
+
+    #[test]
+    fn into_static_already_owned() {
+        let h = Handle::<SmolStr>::new_owned("alice.test").unwrap();
+        let owned: Handle<SmolStr> = h.into_static();
+        assert_eq!(owned.as_str(), "alice.test");
+    }
+
+    #[test]
+    fn case_insensitive_equality() {
+        let lower = Handle::<SmolStr>::new_owned("alice.test").unwrap();
+        let upper = Handle(SmolStr::new("Alice.Test"));
+        assert_eq!(lower, upper);
+    }
+
+    #[test]
+    fn case_insensitive_hash() {
+        let a = Handle::<SmolStr>::new_owned("alice.test").unwrap();
+        let b = Handle(SmolStr::new("Alice.Test"));
+        assert_eq!(a, b);
+        #[allow(deprecated)]
+        let (mut ha, mut hb) = (core::hash::SipHasher::new(), core::hash::SipHasher::new());
+        a.hash(&mut ha);
+        b.hash(&mut hb);
+        assert_eq!(ha.finish(), hb.finish());
+    }
+
+    #[test]
+    fn display_lowercases() {
+        let h = Handle(SmolStr::new("Alice.Test"));
+        assert_eq!(format!("{h}"), "alice.test");
+    }
+
+    #[test]
+    fn serialize_lowercases() {
+        let h = Handle(SmolStr::new("Alice.Test"));
+        let json = serde_json::to_string(&h).unwrap();
+        assert_eq!(json, "\"alice.test\"");
+    }
+
+    #[test]
+    fn cross_type_equality() {
+        let borrowed = Handle::<&str>::new("alice.test").unwrap();
+        let owned = Handle::<SmolStr>::new_owned("alice.test").unwrap();
+        assert_eq!(borrowed, owned);
     }
 }

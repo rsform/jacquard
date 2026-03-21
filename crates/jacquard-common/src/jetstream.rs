@@ -21,13 +21,13 @@ pub struct JetstreamParams<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
     #[builder(into)]
-    pub wanted_collections: Option<Vec<Nsid<'a>>>,
+    pub wanted_collections: Option<Vec<Nsid<CowStr<'a>>>>,
 
     /// Filter by DIDs (max 10,000)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
+    // TODO: add S: Bos<...> param
     #[builder(into)]
-    pub wanted_dids: Option<Vec<Did<'a>>>,
+    pub wanted_dids: Option<Vec<Did>>,
 
     /// Unix microseconds timestamp to start playback
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -92,7 +92,7 @@ pub struct JetstreamCommit<'a> {
     pub operation: CommitOperation,
     /// Collection NSID
     #[serde(borrow)]
-    pub collection: Nsid<'a>,
+    pub collection: Nsid<CowStr<'a>>,
     /// Record key
     #[serde(borrow)]
     pub rkey: Rkey<'a>,
@@ -110,12 +110,12 @@ pub struct JetstreamCommit<'a> {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct JetstreamIdentity<'a> {
     /// DID
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    // TODO: add S: Bos<...> param
+    pub did: Did,
     /// Handle
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(borrow)]
-    pub handle: Option<Handle<'a>>,
+    pub handle: Option<Handle<CowStr<'a>>>,
     /// Sequence number
     pub seq: i64,
     /// Timestamp
@@ -128,8 +128,8 @@ pub struct JetstreamAccount<'a> {
     /// Account active status
     pub active: bool,
     /// DID
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    // TODO: add S: Bos<...> param
+    pub did: Did,
     /// Sequence number
     pub seq: i64,
     /// Timestamp
@@ -148,8 +148,8 @@ pub enum JetstreamMessage<'a> {
     /// Commit event
     Commit {
         /// DID
-        #[serde(borrow)]
-        did: Did<'a>,
+        // TODO: add S: Bos<...> param
+        did: Did,
         /// Unix microseconds timestamp
         time_us: i64,
         /// Commit details
@@ -159,8 +159,8 @@ pub enum JetstreamMessage<'a> {
     /// Identity event
     Identity {
         /// DID
-        #[serde(borrow)]
-        did: Did<'a>,
+        // TODO: add S: Bos<...> param
+        did: Did,
         /// Unix microseconds timestamp
         time_us: i64,
         /// Identity details
@@ -170,8 +170,8 @@ pub enum JetstreamMessage<'a> {
     /// Account event
     Account {
         /// DID
-        #[serde(borrow)]
-        did: Did<'a>,
+        // TODO: add S: Bos<...> param
+        did: Did,
         /// Unix microseconds timestamp
         time_us: i64,
         /// Account details
@@ -188,8 +188,8 @@ pub enum RawJetstreamMessage<'a> {
     /// Commit event
     Commit {
         /// DID
-        #[serde(borrow)]
-        did: Did<'a>,
+        // TODO: add S: Bos<...> param
+        did: Did,
         /// Unix microseconds timestamp
         time_us: i64,
         /// Commit details
@@ -199,8 +199,8 @@ pub enum RawJetstreamMessage<'a> {
     /// Identity event
     Identity {
         /// DID
-        #[serde(borrow)]
-        did: Did<'a>,
+        // TODO: add S: Bos<...> param
+        did: Did,
         /// Unix microseconds timestamp
         time_us: i64,
         /// Identity details
@@ -210,8 +210,8 @@ pub enum RawJetstreamMessage<'a> {
     /// Account event
     Account {
         /// DID
-        #[serde(borrow)]
-        did: Did<'a>,
+        // TODO: add S: Bos<...> param
+        did: Did,
         /// Unix microseconds timestamp
         time_us: i64,
         /// Account details

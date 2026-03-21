@@ -1,3 +1,4 @@
+use crate::bos::{Bos, DefaultStr};
 use crate::types::recordkey::RecordKeyType;
 use crate::types::string::AtStrError;
 use crate::{CowStr, IntoStatic};
@@ -11,244 +12,202 @@ use regex::Regex;
 use regex_automata::meta::Regex;
 #[cfg(target_arch = "wasm32")]
 use regex_lite::Regex;
-use serde::{Deserialize, Deserializer, Serialize, de::Error};
+use serde::{Deserialize, Deserializer, Serialize};
 use smol_str::{SmolStr, ToSmolStr};
 
 use super::Lazy;
 
-/// Namespaced Identifier (NSID) for Lexicon schemas and XRPC endpoints
-///
-/// NSIDs provide globally unique identifiers for Lexicon schemas, record types, and XRPC methods.
-/// They're structured as reversed domain names with a camelCase name segment.
-///
-/// Format: `domain.authority.name` (e.g., `com.example.fooBar`)
-/// - Domain authority: reversed domain name (≤253 chars, lowercase, dots separate segments)
-/// - Name: camelCase identifier (letters and numbers only, cannot start with a digit)
-///
-/// Validation rules:
-/// - Minimum 3 segments
-/// - Maximum 317 characters total
-/// - Each domain segment is 1-63 characters
-/// - Case-sensitive
+/// Namespaced Identifier (NSID) for Lexicon schemas and XRPC endpoints.
 ///
 /// See: <https://atproto.com/specs/nsid>
-#[derive(Clone, PartialEq, Eq, Serialize, Hash, PartialOrd, Ord)]
+#[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize)]
 #[serde(transparent)]
 #[repr(transparent)]
-pub struct Nsid<'n>(pub(crate) CowStr<'n>);
+pub struct Nsid<S: Bos<str> = DefaultStr>(pub(crate) S);
 
-/// Regex for NSID validation per AT Protocol spec
+/// Regex for NSID validation per AT Protocol spec.
 pub static NSID_REGEX: Lazy<Regex> = Lazy::new(|| {
     Regex::new(r"^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(\.[a-zA-Z][a-zA-Z0-9]{0,62})$").unwrap()
 });
 
-impl<'n> Nsid<'n> {
-    /// Fallible constructor, validates, borrows from input
-    pub fn new(nsid: &'n str) -> Result<Self, AtStrError> {
-        if nsid.len() > 317 {
-            Err(AtStrError::too_long("nsid", nsid, 317, nsid.len()))
-        } else if !NSID_REGEX.is_match(nsid) {
-            Err(AtStrError::regex(
-                "nsid",
-                nsid,
-                SmolStr::new_static("invalid"),
-            ))
-        } else {
-            Ok(Self(CowStr::Borrowed(nsid)))
-        }
+fn validate_nsid(nsid: &str) -> Result<(), AtStrError> {
+    if nsid.len() > 317 {
+        Err(AtStrError::too_long("nsid", nsid, 317, nsid.len()))
+    } else if !NSID_REGEX.is_match(nsid) {
+        Err(AtStrError::regex(
+            "nsid",
+            nsid,
+            SmolStr::new_static("invalid"),
+        ))
+    } else {
+        Ok(())
     }
+}
 
-    /// Fallible constructor, validates, borrows from input
-    pub fn new_owned(nsid: impl AsRef<str>) -> Result<Self, AtStrError> {
-        let nsid = nsid.as_ref();
-        if nsid.len() > 317 {
-            Err(AtStrError::too_long("nsid", nsid, 317, nsid.len()))
-        } else if !NSID_REGEX.is_match(nsid) {
-            Err(AtStrError::regex(
-                "nsid",
-                nsid,
-                SmolStr::new_static("invalid"),
-            ))
-        } else {
-            Ok(Self(CowStr::Owned(nsid.to_smolstr())))
-        }
-    }
-
-    /// Fallible constructor, validates, doesn't allocate
-    pub fn new_static(nsid: &'static str) -> Result<Self, AtStrError> {
-        if nsid.len() > 317 {
-            Err(AtStrError::too_long("nsid", nsid, 317, nsid.len()))
-        } else if !NSID_REGEX.is_match(nsid) {
-            Err(AtStrError::regex(
-                "nsid",
-                nsid,
-                SmolStr::new_static("invalid"),
-            ))
-        } else {
-            Ok(Self(CowStr::new_static(nsid)))
-        }
-    }
-
-    /// Fallible constructor, validates, borrows from input if possible
-    pub fn new_cow(nsid: CowStr<'n>) -> Result<Self, AtStrError> {
-        if nsid.len() > 317 {
-            Err(AtStrError::too_long("nsid", &nsid, 317, nsid.len()))
-        } else if !NSID_REGEX.is_match(&nsid) {
-            Err(AtStrError::regex(
-                "nsid",
-                &nsid,
-                SmolStr::new_static("invalid"),
-            ))
-        } else {
-            Ok(Self(nsid))
-        }
-    }
-
-    /// Infallible constructor for when you *know* the string is a valid NSID.
-    /// Will panic on invalid NSIDs. If you're manually decoding atproto records
-    /// or API values you know are valid (rather than using serde), this is the one to use.
-    /// The `From<String>` and `From<CowStr>` impls use the same logic.
-    pub fn raw(nsid: &'n str) -> Self {
-        if nsid.len() > 317 {
-            panic!("NSID too long")
-        } else if !NSID_REGEX.is_match(nsid) {
-            panic!("Invalid NSID")
-        } else {
-            Self(CowStr::Borrowed(nsid))
-        }
-    }
-
-    /// Infallible constructor for when you *know* the string is a valid NSID.
-    /// Marked unsafe because responsibility for upholding the invariant is on the developer.
-    pub unsafe fn unchecked(nsid: &'n str) -> Self {
-        Self(CowStr::Borrowed(nsid))
+impl<S: Bos<str> + AsRef<str>> Nsid<S> {
+    /// Get the NSID as a string slice.
+    pub fn as_str(&self) -> &str {
+        self.0.as_ref()
     }
 
     /// Returns the domain authority part of the NSID.
     pub fn domain_authority(&self) -> &str {
-        let split = self.0.rfind('.').expect("enforced by constructor");
-        &self.0[..split]
+        let s = self.as_str();
+        let split = s.rfind('.').expect("enforced by constructor");
+        &s[..split]
     }
 
     /// Returns the name segment of the NSID.
     pub fn name(&self) -> &str {
-        let split = self.0.rfind('.').expect("enforced by constructor");
-        &self.0[split + 1..]
-    }
-
-    /// Get the NSID as a string slice
-    pub fn as_str(&self) -> &str {
-        {
-            let this = &self.0;
-            this
-        }
+        let s = self.as_str();
+        let split = s.rfind('.').expect("enforced by constructor");
+        &s[split + 1..]
     }
 }
 
-impl<'n> FromStr for Nsid<'n> {
-    type Err = AtStrError;
-
-    /// Has to take ownership due to the lifetime constraints of the FromStr trait.
-    /// Prefer `Nsid::new()` or `Nsid::raw` if you want to borrow.
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::new_owned(s)
+impl<S: Bos<str>> Nsid<S> {
+    /// # Safety
+    ///
+    /// The caller must ensure the NSID is valid.
+    pub unsafe fn unchecked(nsid: S) -> Self {
+        Nsid(nsid)
     }
 }
 
-impl IntoStatic for Nsid<'_> {
-    type Output = Nsid<'static>;
+impl<'n> Nsid<&'n str> {
+    /// Fallible constructor, validates, borrows from input.
+    pub fn new(nsid: &'n str) -> Result<Self, AtStrError> {
+        validate_nsid(nsid)?;
+        Ok(Self(nsid))
+    }
+
+    /// Infallible constructor. Panics on invalid NSIDs.
+    pub fn raw(nsid: &'n str) -> Self {
+        Self::new(nsid).expect("invalid NSID")
+    }
+}
+
+impl<S: Bos<str> + From<SmolStr>> Nsid<S> {
+    /// Fallible constructor, validates, takes ownership.
+    pub fn new_owned(nsid: impl AsRef<str>) -> Result<Self, AtStrError> {
+        let nsid = nsid.as_ref();
+        validate_nsid(nsid)?;
+        Ok(Self(S::from(nsid.to_smolstr())))
+    }
+
+    /// Fallible constructor for static strings. Zero-alloc if possible.
+    pub fn new_static(nsid: &'static str) -> Result<Self, AtStrError> {
+        validate_nsid(nsid)?;
+        Ok(Self(S::from(SmolStr::new_static(nsid))))
+    }
+}
+
+impl<'n> Nsid<CowStr<'n>> {
+    /// Fallible constructor, borrows if possible.
+    pub fn new_cow(nsid: CowStr<'n>) -> Result<Self, AtStrError> {
+        validate_nsid(&nsid)?;
+        Ok(Self(nsid))
+    }
+}
+
+impl<'de, S> Deserialize<'de> for Nsid<S>
+where
+    S: Bos<str> + AsRef<str> + Deserialize<'de>,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        validate_nsid(s.as_ref()).map_err(serde::de::Error::custom)?;
+        Ok(Nsid(s))
+    }
+}
+
+impl<S: Bos<str> + IntoStatic> IntoStatic for Nsid<S>
+where
+    S::Output: Bos<str>,
+{
+    type Output = Nsid<S::Output>;
 
     fn into_static(self) -> Self::Output {
         Nsid(self.0.into_static())
     }
 }
 
-impl<'de, 'a> Deserialize<'de> for Nsid<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let value = Deserialize::deserialize(deserializer)?;
-        Self::new_cow(value).map_err(D::Error::custom)
+impl FromStr for Nsid {
+    type Err = AtStrError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::new_owned(s)
     }
 }
 
-impl fmt::Display for Nsid<'_> {
+impl FromStr for Nsid<CowStr<'static>> {
+    type Err = AtStrError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::new_owned(s)
+    }
+}
+
+impl FromStr for Nsid<String> {
+    type Err = AtStrError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::new_owned(s)
+    }
+}
+
+impl<S: Bos<str> + AsRef<str>> fmt::Display for Nsid<S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&self.0)
+        f.write_str(self.as_str())
     }
 }
 
-impl fmt::Debug for Nsid<'_> {
+impl<S: Bos<str> + AsRef<str>> fmt::Debug for Nsid<S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "at://{}", self.0)
+        write!(f, "at://{}", self.as_str())
     }
 }
 
-impl<'n> From<Nsid<'n>> for String {
-    fn from(value: Nsid) -> Self {
-        value.0.to_string()
+impl<S: Bos<str> + AsRef<str>> From<Nsid<S>> for String {
+    fn from(value: Nsid<S>) -> Self {
+        value.as_str().to_string()
     }
 }
 
-impl<'n> From<Nsid<'n>> for CowStr<'n> {
-    fn from(value: Nsid<'n>) -> Self {
-        value.0
+impl<S: Bos<str> + AsRef<str>> From<Nsid<S>> for SmolStr {
+    fn from(value: Nsid<S>) -> Self {
+        value.as_str().to_smolstr()
     }
 }
 
-impl From<Nsid<'_>> for SmolStr {
-    fn from(value: Nsid) -> Self {
-        value.0.to_smolstr()
-    }
-}
-
-impl<'n> From<String> for Nsid<'n> {
+impl From<String> for Nsid {
     fn from(value: String) -> Self {
-        if value.len() > 317 {
-            panic!("NSID too long")
-        } else if !NSID_REGEX.is_match(&value) {
-            panic!("Invalid NSID")
-        } else {
-            Self(CowStr::Owned(value.to_smolstr()))
-        }
+        Self::new_owned(value).unwrap()
     }
 }
 
-impl<'n> From<CowStr<'n>> for Nsid<'n> {
+impl<'n> From<CowStr<'n>> for Nsid<CowStr<'n>> {
     fn from(value: CowStr<'n>) -> Self {
-        if value.len() > 317 {
-            panic!("NSID too long")
-        } else if !NSID_REGEX.is_match(&value) {
-            panic!("Invalid NSID")
-        } else {
-            Self(value)
-        }
+        Self::new_cow(value).unwrap()
     }
 }
 
-impl From<SmolStr> for Nsid<'_> {
+impl From<SmolStr> for Nsid {
     fn from(value: SmolStr) -> Self {
-        if value.len() > 317 {
-            panic!("NSID too long")
-        } else if !NSID_REGEX.is_match(&value) {
-            panic!("Invalid NSID")
-        } else {
-            Self(CowStr::Owned(value))
-        }
+        Self::new_owned(value).unwrap()
     }
 }
 
-impl AsRef<str> for Nsid<'_> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for Nsid<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl Deref for Nsid<'_> {
+impl<S: Bos<str> + AsRef<str>> Deref for Nsid<S> {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {
@@ -256,7 +215,7 @@ impl Deref for Nsid<'_> {
     }
 }
 
-unsafe impl RecordKeyType for Nsid<'_> {
+unsafe impl<S: Bos<str> + AsRef<str> + Clone + Serialize> RecordKeyType for Nsid<S> {
     fn as_str(&self) -> &str {
         self.as_str()
     }
@@ -268,90 +227,85 @@ mod tests {
 
     #[test]
     fn valid_nsids() {
-        assert!(Nsid::new("com.example.foo").is_ok());
-        assert!(Nsid::new("com.example.fooBar").is_ok());
-        assert!(Nsid::new("com.long-domain.foo").is_ok());
-        assert!(Nsid::new("a.b.c").is_ok());
-        assert!(Nsid::new("a1.b2.c3").is_ok());
+        assert!(Nsid::<&str>::new("com.example.foo").is_ok());
+        assert!(Nsid::<&str>::new("com.example.fooBar").is_ok());
+        assert!(Nsid::<&str>::new("com.long-domain.foo").is_ok());
+        assert!(Nsid::<&str>::new("a.b.c").is_ok());
+        assert!(Nsid::<&str>::new("a1.b2.c3").is_ok());
     }
 
     #[test]
     fn minimum_segments() {
-        assert!(Nsid::new("a.b.c").is_ok()); // 3 segments minimum
-        assert!(Nsid::new("a.b").is_err());
-        assert!(Nsid::new("a").is_err());
+        assert!(Nsid::<&str>::new("a.b.c").is_ok());
+        assert!(Nsid::<&str>::new("a.b").is_err());
+        assert!(Nsid::<&str>::new("a").is_err());
     }
 
     #[test]
     fn domain_and_name_parsing() {
-        let nsid = Nsid::new("com.example.fooBar").unwrap();
+        let nsid = Nsid::<&str>::new("com.example.fooBar").unwrap();
         assert_eq!(nsid.domain_authority(), "com.example");
         assert_eq!(nsid.name(), "fooBar");
     }
 
     #[test]
     fn max_length() {
-        // 317 chars: 63 + 63 + 63 + 63 + 63 = 315 + 4 dots + 1 = 320, too much
-        // try: 63 + 63 + 63 + 63 + 62 = 314 + 4 dots = 318, still too much
-        // try: 63 + 63 + 63 + 63 + 61 = 313 + 4 dots = 317
         let s1 = format!("a{}a", "b".repeat(61));
         let s2 = format!("c{}c", "d".repeat(61));
         let s3 = format!("e{}e", "f".repeat(61));
         let s4 = format!("g{}g", "h".repeat(61));
         let s5 = format!("i{}i", "j".repeat(59));
-        let valid_317 = format!("{}.{}.{}.{}.{}", s1, s2, s3, s4, s5);
+        let valid_317 = format!("{s1}.{s2}.{s3}.{s4}.{s5}");
         assert_eq!(valid_317.len(), 317);
-        assert!(Nsid::new(&valid_317).is_ok());
+        assert!(Nsid::<&str>::new(&valid_317).is_ok());
 
         let s5_long = format!("i{}i", "j".repeat(60));
-        let too_long_318 = format!("{}.{}.{}.{}.{}", s1, s2, s3, s4, s5_long);
+        let too_long_318 = format!("{s1}.{s2}.{s3}.{s4}.{s5_long}");
         assert_eq!(too_long_318.len(), 318);
-        assert!(Nsid::new(&too_long_318).is_err());
+        assert!(Nsid::<&str>::new(&too_long_318).is_err());
     }
 
     #[test]
     fn segment_length() {
         let valid_63 = format!("{}.{}.foo", "a".repeat(63), "b".repeat(63));
-        assert!(Nsid::new(&valid_63).is_ok());
+        assert!(Nsid::<&str>::new(&valid_63).is_ok());
 
         let too_long_64 = format!("{}.b.foo", "a".repeat(64));
-        assert!(Nsid::new(&too_long_64).is_err());
+        assert!(Nsid::<&str>::new(&too_long_64).is_err());
     }
 
     #[test]
     fn first_segment_cannot_start_with_digit() {
-        assert!(Nsid::new("com.example.foo").is_ok());
-        assert!(Nsid::new("9com.example.foo").is_err());
+        assert!(Nsid::<&str>::new("com.example.foo").is_ok());
+        assert!(Nsid::<&str>::new("9com.example.foo").is_err());
     }
 
     #[test]
     fn name_segment_rules() {
-        assert!(Nsid::new("com.example.foo").is_ok());
-        assert!(Nsid::new("com.example.fooBar123").is_ok());
-        assert!(Nsid::new("com.example.9foo").is_err()); // can't start with digit
-        assert!(Nsid::new("com.example.foo-bar").is_err()); // no hyphens in name
+        assert!(Nsid::<&str>::new("com.example.foo").is_ok());
+        assert!(Nsid::<&str>::new("com.example.fooBar123").is_ok());
+        assert!(Nsid::<&str>::new("com.example.9foo").is_err());
+        assert!(Nsid::<&str>::new("com.example.foo-bar").is_err());
     }
 
     #[test]
     fn domain_segment_rules() {
-        assert!(Nsid::new("foo-bar.example.baz").is_ok());
-        assert!(Nsid::new("foo.bar-baz.qux").is_ok());
-        assert!(Nsid::new("-foo.bar.baz").is_err()); // can't start with hyphen
-        assert!(Nsid::new("foo-.bar.baz").is_err()); // can't end with hyphen
+        assert!(Nsid::<&str>::new("foo-bar.example.baz").is_ok());
+        assert!(Nsid::<&str>::new("foo.bar-baz.qux").is_ok());
+        assert!(Nsid::<&str>::new("-foo.bar.baz").is_err());
+        assert!(Nsid::<&str>::new("foo-.bar.baz").is_err());
     }
 
     #[test]
     fn case_sensitivity() {
-        // Domain should be case-insensitive per spec (but not enforced in validation)
-        // Name is case-sensitive
-        assert!(Nsid::new("com.example.fooBar").is_ok());
-        assert!(Nsid::new("com.example.FooBar").is_ok());
+        assert!(Nsid::<&str>::new("com.example.fooBar").is_ok());
+        assert!(Nsid::<&str>::new("com.example.FooBar").is_ok());
     }
 
     #[test]
-    fn no_hyphens_in_name() {
-        assert!(Nsid::new("com.example.foo").is_ok());
-        assert!(Nsid::new("com.example.foo-bar").is_err());
-        assert!(Nsid::new("com.example.fooBar").is_ok());
+    fn into_static() {
+        let n = Nsid::<&str>::new("com.example.foo").unwrap();
+        let owned: Nsid<SmolStr> = n.into_static();
+        assert_eq!(owned.as_str(), "com.example.foo");
     }
 }

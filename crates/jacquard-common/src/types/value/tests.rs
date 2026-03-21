@@ -468,20 +468,20 @@ fn test_atproto_types_deserialization() {
     #[derive(Debug, Deserialize)]
     struct AtprotoTypes<'a> {
         #[serde(borrow)]
-        did: Did<'a>,
-        handle: Handle<'a>,
+        did: Did<CowStr<'a>>,
+        handle: Handle<CowStr<'a>>,
         cid: Cid<'a>,
     }
 
     let mut map = BTreeMap::new();
     map.insert(
         SmolStr::new_static("did"),
-        Data::String(AtprotoStr::Did(Did::new("did:plc:abc123").unwrap())),
+        Data::String(AtprotoStr::Did(Did::new_owned("did:plc:abc123").unwrap())),
     );
     map.insert(
         SmolStr::new_static("handle"),
         Data::String(AtprotoStr::Handle(
-            Handle::new("alice.bsky.social").unwrap(),
+            Handle::new_static("alice.bsky.social").unwrap(),
         )),
     );
     map.insert(
@@ -508,9 +508,9 @@ fn test_datetime_and_nsid_deserialization() {
     #[derive(Debug, Deserialize)]
     struct MixedTypes<'a> {
         #[serde(borrow)]
-        nsid: Nsid<'a>,
-        handle: Handle<'a>,
-        did: Did<'a>,
+        nsid: Nsid<CowStr<'a>>,
+        handle: Handle<CowStr<'a>>,
+        did: Did<CowStr<'a>>,
         // These use SmolStr internally, so they allocate but still deserialize fine
         tid: Tid,
         created_at: Datetime,
@@ -519,17 +519,19 @@ fn test_datetime_and_nsid_deserialization() {
     let mut map = BTreeMap::new();
     map.insert(
         SmolStr::new_static("nsid"),
-        Data::String(AtprotoStr::Nsid(Nsid::new("app.bsky.feed.post").unwrap())),
+        Data::String(AtprotoStr::Nsid(
+            Nsid::new_static("app.bsky.feed.post").unwrap(),
+        )),
     );
     map.insert(
         SmolStr::new_static("handle"),
         Data::String(AtprotoStr::Handle(
-            Handle::new("alice.bsky.social").unwrap(),
+            Handle::new_static("alice.bsky.social").unwrap(),
         )),
     );
     map.insert(
         SmolStr::new_static("did"),
-        Data::String(AtprotoStr::Did(Did::new("did:plc:test123").unwrap())),
+        Data::String(AtprotoStr::Did(Did::new_owned("did:plc:test123").unwrap())),
     );
     map.insert(
         SmolStr::new_static("tid"),
@@ -559,7 +561,7 @@ fn test_aturi_deserialization() {
     struct WithAtUri<'a> {
         #[serde(borrow)]
         uri: AtUri<'a>,
-        did: Did<'a>,
+        did: Did<CowStr<'a>>,
     }
 
     let mut map = BTreeMap::new();
@@ -571,7 +573,7 @@ fn test_aturi_deserialization() {
     );
     map.insert(
         SmolStr::new_static("did"),
-        Data::String(AtprotoStr::Did(Did::new("did:plc:test").unwrap())),
+        Data::String(AtprotoStr::Did(Did::new_owned("did:plc:test").unwrap())),
     );
     let data = Data::Object(Object(map));
 
@@ -615,21 +617,21 @@ fn test_atidentifier_deserialization() {
     #[derive(Debug, Deserialize)]
     struct WithIdentifiers<'a> {
         #[serde(borrow)]
-        ident_did: AtIdentifier<'a>,
-        ident_handle: AtIdentifier<'a>,
+        ident_did: AtIdentifier<CowStr<'a>>,
+        ident_handle: AtIdentifier<CowStr<'a>>,
     }
 
     let mut map = BTreeMap::new();
     map.insert(
         SmolStr::new_static("ident_did"),
         Data::String(AtprotoStr::AtIdentifier(AtIdentifier::Did(
-            Did::new("did:plc:abc").unwrap(),
+            Did::new_owned("did:plc:abc").unwrap(),
         ))),
     );
     map.insert(
         SmolStr::new_static("ident_handle"),
         Data::String(AtprotoStr::AtIdentifier(AtIdentifier::Handle(
-            Handle::new("bob.test").unwrap(),
+            Handle::new_static("bob.test").unwrap(),
         ))),
     );
     let data = Data::Object(Object(map));

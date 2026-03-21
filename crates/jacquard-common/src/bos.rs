@@ -32,6 +32,8 @@
 //! }
 //! ```
 
+use core::{fmt, marker::PhantomData, ops::Deref};
+
 use alloc::{
     borrow::{Cow, ToOwned},
     boxed::Box,
@@ -39,9 +41,10 @@ use alloc::{
     vec::Vec,
 };
 
+use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
 
-use crate::CowStr;
+use crate::{CowStr, IntoStatic};
 
 mod internal {
     pub trait Ref<T: ?Sized> {
@@ -140,6 +143,8 @@ macro_rules! impl_bos {
 // --- Standard library impls ---
 
 impl_bos! {
+    //{T: ?Sized} T => T
+
     {T: ?Sized} &mut T => T
 
     {T, const N: usize} [T; N] => [T]
@@ -188,72 +193,6 @@ impl<'a> Bos<str> for CowStr<'a> {
 /// annotation required) and provides small-string inline storage without heap allocation
 /// for strings of 22 bytes or fewer.
 pub type DefaultStr = SmolStr;
-
-/// Construct `S` from either a borrowed `&'de str` or an owned `SmolStr`.
-///
-/// Validated string types (Handle, Did, Nsid, etc.) may need to normalise input during
-/// deserialization (e.g. lowercasing handles). The normalisation always produces a `SmolStr`,
-/// but when the input is already valid the deserializer wants to borrow directly from the
-/// input buffer. This trait provides the two construction paths so that a single custom
-/// deserialize visitor can produce any backing type.
-pub trait StrConsumer<'de, 'r>: Bos<str> + Sized {
-    /// Construct from a borrowed string slice (zero-copy path).
-    fn from_borrowed_str(s: &'de str) -> Self;
-
-    /// Construct from an owned `SmolStr` (normalisation/allocation path).
-    fn from_smolstr(s: &'r SmolStr) -> Self;
-}
-
-impl<'de, 'r> StrConsumer<'de, 'r> for SmolStr {
-    #[inline]
-    fn from_borrowed_str(s: &'de str) -> Self {
-        SmolStr::new(s)
-    }
-
-    #[inline]
-    fn from_smolstr(s: &'r SmolStr) -> Self {
-        s.clone()
-    }
-}
-
-impl<'de, 'r> StrConsumer<'de, 'r> for String {
-    #[inline]
-    fn from_borrowed_str(s: &'de str) -> Self {
-        s.into()
-    }
-
-    #[inline]
-    fn from_smolstr(s: &'r SmolStr) -> Self {
-        s.clone().into()
-    }
-}
-
-impl<'de, 'r> StrConsumer<'de, 'r> for &'de str
-where
-    'r: 'de,
-{
-    #[inline]
-    fn from_borrowed_str(s: &'de str) -> Self {
-        s
-    }
-
-    #[inline]
-    fn from_smolstr(s: &'r SmolStr) -> Self {
-        s.as_str()
-    }
-}
-
-impl<'de, 'r> StrConsumer<'de, 'r> for CowStr<'de> {
-    #[inline]
-    fn from_borrowed_str(s: &'de str) -> Self {
-        CowStr::Borrowed(s)
-    }
-
-    #[inline]
-    fn from_smolstr(s: &'r SmolStr) -> Self {
-        CowStr::Owned(s.clone())
-    }
-}
 
 #[cfg(test)]
 mod tests {

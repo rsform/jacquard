@@ -1,3 +1,4 @@
+use crate::cowstr::ToCowStr;
 use crate::deps::fluent_uri::Uri;
 use crate::{
     CowStr, IntoStatic,
@@ -19,7 +20,7 @@ use smol_str::ToSmolStr;
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UriValue<'u> {
     /// DID URI (did:)
-    Did(Did<'u>),
+    Did(Did<CowStr<'u>>),
     /// AT Protocol URI (at://)
     At(AtUri<'u>),
     /// HTTPS URL
@@ -51,7 +52,7 @@ impl<'u> UriValue<'u> {
     /// Parse a URI from a string slice, borrowing
     pub fn new(uri: &'u str) -> Result<Self, UriParseError> {
         if uri.starts_with("did:") {
-            Ok(UriValue::Did(Did::new(uri)?))
+            Ok(UriValue::Did(Did::new_cow(uri.to_cowstr())?))
         } else if uri.starts_with("at://") {
             Ok(UriValue::At(AtUri::new(uri)?))
         } else if uri.starts_with("https://") {
@@ -189,7 +190,9 @@ impl<'a, R: Collection> RecordUri<'a, R> {
         }
         Err(UriError::CollectionMismatch {
             expected: R::NSID,
-            found: uri.collection().map(|c| c.clone().into_static()),
+            found: uri
+                .collection()
+                .map(|c| Nsid::new_owned(c.as_str()).unwrap()),
         })
     }
 
@@ -234,7 +237,7 @@ pub enum UriError {
         /// The collection of the record
         expected: &'static str,
         /// What the at-uri had
-        found: Option<Nsid<'static>>,
+        found: Option<Nsid>,
     },
     /// Couldn't parse the string as an AtUri
     #[error("Invalid URI: {0}")]

@@ -2,7 +2,7 @@ use crate::deps::fluent_uri::Uri;
 use crate::types::crypto::{CryptoError, PublicKey};
 use crate::types::string::{Did, Handle};
 use crate::types::value::Data;
-use crate::{CowStr, IntoStatic};
+use crate::{Bos, CowStr, DefaultStr, IntoStatic};
 use alloc::collections::BTreeMap;
 use alloc::string::String;
 use alloc::vec::Vec;
@@ -35,7 +35,7 @@ use smol_str::SmolStr;
 ///     "publicKeyMultibase": "z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"
 ///   }]
 /// }"##;
-/// let doc: DidDocument<'_> = serde_json::from_str(json)?;
+/// let doc: DidDocument = serde_json::from_str(json)?;
 /// assert_eq!(doc.id.as_str(), "did:plc:alice");
 /// assert!(doc.pds_endpoint().is_some());
 /// # Ok(())
@@ -44,47 +44,52 @@ use smol_str::SmolStr;
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
-pub struct DidDocument<'a> {
+#[serde(bound(
+    serialize = "S: Serialize + Bos<str> + AsRef<str>",
+    deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+))]
+pub struct DidDocument<S: Bos<str> + AsRef<str> = DefaultStr> {
     /// required prelude
     #[serde(rename = "@context")]
     #[serde(default = "default_context")]
-    pub context: Vec<CowStr<'a>>,
+    pub context: Vec<SmolStr>,
 
     /// Document identifier (e.g., `did:plc:...` or `did:web:...`)
-    #[serde(borrow)]
-    pub id: Did<'a>,
+    pub id: Did<S>,
 
     /// Alternate identifiers for the subject, such as at://\<handle\>
-    #[serde(borrow)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub also_known_as: Option<Vec<CowStr<'a>>>,
+    pub also_known_as: Option<Vec<S>>,
 
     /// Verification methods (keys) for this DID
-    #[serde(borrow)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub verification_method: Option<Vec<VerificationMethod<'a>>>,
+    pub verification_method: Option<Vec<VerificationMethod<S>>>,
 
     /// Services associated with this DID (e.g., AtprotoPersonalDataServer)
-    #[serde(borrow)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub service: Option<Vec<Service<'a>>>,
-
-    /// Forward‑compatible capture of unmodeled fields
-    #[serde(flatten)]
-    pub extra_data: BTreeMap<SmolStr, Data<'a>>,
+    pub service: Option<Vec<Service<S>>>,
+    // Forward‑compatible capture of unmodeled fields
+    // TODO: re-enable extra data fields
+    // #[serde(flatten)]
+    // pub extra_data: BTreeMap<SmolStr, Data<'static>>,
 }
 
 /// Default context fields for DID documents
-pub fn default_context() -> Vec<CowStr<'static>> {
+pub fn default_context() -> Vec<SmolStr> {
     vec![
-        CowStr::new_static("https://www.w3.org/ns/did/v1"),
-        CowStr::new_static("https://w3id.org/security/multikey/v1"),
-        CowStr::new_static("https://w3id.org/security/suites/secp256k1-2019/v1"),
+        SmolStr::new_static("https://www.w3.org/ns/did/v1"),
+        SmolStr::new_static("https://w3id.org/security/multikey/v1"),
+        SmolStr::new_static("https://w3id.org/security/suites/secp256k1-2019/v1"),
     ]
 }
 
-impl crate::IntoStatic for DidDocument<'_> {
-    type Output = DidDocument<'static>;
+impl<S> crate::IntoStatic for DidDocument<S>
+where
+    S: Bos<str> + AsRef<str> + crate::IntoStatic,
+    <S as IntoStatic>::Output: AsRef<str>,
+    <S as IntoStatic>::Output: Bos<str>,
+{
+    type Output = DidDocument<<S as crate::IntoStatic>::Output>;
     fn into_static(self) -> Self::Output {
         DidDocument {
             context: default_context(),
@@ -92,19 +97,23 @@ impl crate::IntoStatic for DidDocument<'_> {
             also_known_as: self.also_known_as.into_static(),
             verification_method: self.verification_method.into_static(),
             service: self.service.into_static(),
-            extra_data: self.extra_data.into_static(),
+            // TODO: re-enable extra data fields
+            // extra_data: self.extra_data.into_static(),
         }
     }
 }
 
-impl<'a> DidDocument<'a> {
+impl<S> DidDocument<S>
+where
+    S: Bos<str> + AsRef<str> + Clone,
+{
     /// Extract validated handles from `alsoKnownAs` entries like `at://\<handle\>`.
-    pub fn handles(&self) -> Vec<Handle<'static>> {
+    pub fn handles(&self) -> Vec<Handle> {
         self.also_known_as
             .as_ref()
             .map(|v| {
                 v.iter()
-                    .filter_map(|h| Handle::new(h).ok())
+                    .filter_map(|h| Handle::new(h.as_ref()).ok())
                     .map(|h| h.into_static())
                     .collect()
             })
@@ -112,13 +121,11 @@ impl<'a> DidDocument<'a> {
     }
 
     /// Extract the first Multikey `publicKeyMultibase` value from verification methods.
-    pub fn atproto_multikey(&self) -> Option<CowStr<'static>> {
+    pub fn atproto_multikey(&self) -> Option<S> {
         self.verification_method.as_ref().and_then(|methods| {
             methods.iter().find_map(|m| {
                 if m.r#type.as_ref() == "Multikey" {
-                    m.public_key_multibase
-                        .as_ref()
-                        .map(|k| k.clone().into_static())
+                    m.public_key_multibase.as_ref().map(|k| k.clone())
                 } else {
                     None
                 }
@@ -128,22 +135,13 @@ impl<'a> DidDocument<'a> {
 
     /// Extract the AtprotoPersonalDataServer service endpoint as a `fluent_uri::Uri<String>`.
     /// Accepts endpoint as string or object (string preferred).
-    pub fn pds_endpoint(&self) -> Option<Uri<String>> {
+    pub fn pds_endpoint(&self) -> Option<Uri<&str>> {
         self.service.as_ref().and_then(|services| {
             services.iter().find_map(|s| {
                 if s.r#type.as_ref() == "AtprotoPersonalDataServer" {
                     match &s.service_endpoint {
-                        Some(Data::String(strv)) => {
-                            Uri::parse(strv.as_ref()).ok().map(|u| u.to_owned())
-                        }
-                        Some(Data::Object(obj)) => {
-                            // Some documents may include structured endpoints; try common fields
-                            if let Some(Data::String(urlv)) = obj.0.get("url") {
-                                Uri::parse(urlv.as_ref()).ok().map(|u| u.to_owned())
-                            } else {
-                                None
-                            }
-                        }
+                        Some(strv) => Uri::parse(strv.as_ref()).ok(),
+
                         _ => None,
                     }
                 } else {
@@ -156,7 +154,7 @@ impl<'a> DidDocument<'a> {
     /// Decode the atproto Multikey (first occurrence) into a typed public key.
     pub fn atproto_public_key(&self) -> Result<Option<PublicKey<'static>>, CryptoError> {
         if let Some(multibase) = self.atproto_multikey() {
-            let pk = PublicKey::decode(&multibase)?;
+            let pk = PublicKey::decode(multibase.as_ref())?;
             Ok(Some(pk))
         } else {
             Ok(None)
@@ -168,36 +166,43 @@ impl<'a> DidDocument<'a> {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
-pub struct VerificationMethod<'a> {
+#[serde(bound(
+    serialize = "S: Serialize + Bos<str> + AsRef<str>",
+    deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+))]
+pub struct VerificationMethod<S: Bos<str> + AsRef<str>> {
     /// Identifier for this key material within the document
-    #[serde(borrow)]
-    pub id: CowStr<'a>,
+    pub id: S,
     /// Key type (e.g., `Multikey`)
-    #[serde(borrow, rename = "type")]
-    pub r#type: CowStr<'a>,
+    #[serde(rename = "type")]
+    pub r#type: S,
     /// Optional controller DID
-    #[serde(borrow)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub controller: Option<CowStr<'a>>,
+    pub controller: Option<S>,
     /// Multikey `publicKeyMultibase` (base58btc)
-    #[serde(borrow)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub public_key_multibase: Option<CowStr<'a>>,
-
-    /// Forward‑compatible capture of unmodeled fields
-    #[serde(flatten)]
-    pub extra_data: BTreeMap<SmolStr, Data<'a>>,
+    pub public_key_multibase: Option<S>,
+    // Forward‑compatible capture of unmodeled fields
+    // TODO: re-enable extra data fields
+    // #[serde(flatten)]
+    // pub extra_data: BTreeMap<SmolStr, Data<'static>>,
 }
 
-impl crate::IntoStatic for VerificationMethod<'_> {
-    type Output = VerificationMethod<'static>;
+impl<S> crate::IntoStatic for VerificationMethod<S>
+where
+    S: Bos<str> + AsRef<str> + crate::IntoStatic,
+    <S as IntoStatic>::Output: AsRef<str>,
+    <S as IntoStatic>::Output: Bos<str>,
+{
+    type Output = VerificationMethod<<S as crate::IntoStatic>::Output>;
     fn into_static(self) -> Self::Output {
         VerificationMethod {
             id: self.id.into_static(),
             r#type: self.r#type.into_static(),
             controller: self.controller.into_static(),
             public_key_multibase: self.public_key_multibase.into_static(),
-            extra_data: self.extra_data.into_static(),
+            // TODO: re-enable extra data fields
+            // extra_data: self.extra_data.into_static(),
         }
     }
 }
@@ -206,31 +211,41 @@ impl crate::IntoStatic for VerificationMethod<'_> {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Builder)]
 #[builder(start_fn = new)]
 #[serde(rename_all = "camelCase")]
-pub struct Service<'a> {
+#[serde(bound(
+    serialize = "S: Serialize + Bos<str> + AsRef<str>",
+    deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+))]
+pub struct Service<S: Bos<str> + AsRef<str>> {
     /// Service identifier
-    #[serde(borrow)]
-    pub id: CowStr<'a>,
+    pub id: S,
     /// Service type (e.g., `AtprotoPersonalDataServer`)
-    #[serde(borrow, rename = "type")]
-    pub r#type: CowStr<'a>,
-    /// String or object; we preserve as Data
-    #[serde(borrow)]
+    #[serde(rename = "type")]
+    pub r#type: S,
+    /// currently atproto expects this to be a url
+    ///
+    /// TODO: add back in map/set support once Data<'_> is migrated
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub service_endpoint: Option<Data<'a>>,
-
-    /// Forward‑compatible capture of unmodeled fields
-    #[serde(flatten)]
-    pub extra_data: BTreeMap<SmolStr, Data<'a>>,
+    pub service_endpoint: Option<S>,
+    // Forward‑compatible capture of unmodeled fields
+    // TODO: re-enable extra data fields
+    // #[serde(flatten)]
+    // pub extra_data: BTreeMap<SmolStr, Data<'static>>,
 }
 
-impl crate::IntoStatic for Service<'_> {
-    type Output = Service<'static>;
+impl<S> crate::IntoStatic for Service<S>
+where
+    S: Bos<str> + AsRef<str> + crate::IntoStatic,
+    <S as IntoStatic>::Output: AsRef<str>,
+    <S as IntoStatic>::Output: Bos<str>,
+{
+    type Output = Service<<S as crate::IntoStatic>::Output>;
     fn into_static(self) -> Self::Output {
         Service {
             id: self.id.into_static(),
             r#type: self.r#type.into_static(),
             service_endpoint: self.service_endpoint.into_static(),
-            extra_data: self.extra_data.into_static(),
+            // TODO: re-enable extra data fields
+            // extra_data: self.extra_data.into_static(),
         }
     }
 }
@@ -274,7 +289,7 @@ mod tests {
             ]
         });
         let doc_string = serde_json::to_string(&doc_json).unwrap();
-        let doc: DidDocument<'_> = serde_json::from_str(&doc_string).unwrap();
+        let doc: DidDocument = serde_json::from_str(&doc_string).unwrap();
         let pk = doc.atproto_public_key().unwrap().expect("present");
         assert!(matches!(pk.codec, crate::types::crypto::KeyCodec::Ed25519));
         assert_eq!(pk.bytes.as_ref(), &k);
@@ -283,7 +298,7 @@ mod tests {
     #[test]
     fn parse_sample_doc_and_helpers() {
         let raw = include_str!("test_did_doc.json");
-        let doc: DidDocument<'_> = serde_json::from_str(raw).expect("parse doc");
+        let doc: DidDocument = serde_json::from_str(raw).expect("parse doc");
         // id
         assert_eq!(doc.id.as_str(), "did:plc:yfvwmnlztr4dwkb7hwz55r2g");
         // pds endpoint
@@ -294,7 +309,7 @@ mod tests {
         assert!(handles.iter().any(|h| h.as_str() == "nonbinary.computer"));
         // multikey string present
         let mk = doc.atproto_multikey().expect("has multikey");
-        assert!(mk.as_ref().starts_with('z'));
+        assert!(AsRef::<str>::as_ref(&mk).starts_with('z'));
         // typed decode (may be ed25519, secp256k1, or p256 depending on multicodec)
         let _ = doc.atproto_public_key().expect("decode ok");
     }

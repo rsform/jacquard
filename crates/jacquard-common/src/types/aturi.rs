@@ -1,3 +1,4 @@
+use crate::cowstr::ToCowStr;
 use crate::types::ident::AtIdentifier;
 use crate::types::nsid::Nsid;
 use crate::types::recordkey::{RecordKey, Rkey};
@@ -48,7 +49,7 @@ struct Inner<'u> {
     uri: CowStr<'u>,
     #[borrows(uri)]
     #[covariant]
-    pub authority: AtIdentifier<'this>,
+    pub authority: AtIdentifier<CowStr<'this>>,
     #[borrows(uri)]
     #[covariant]
     pub path: Option<RepoPath<'this>>,
@@ -66,12 +67,14 @@ impl Clone for AtUri<'_> {
                 CowStr::Owned(uri.as_ref().to_smolstr()),
                 |uri| {
                     let parts = ATURI_REGEX.captures(uri).unwrap();
-                    unsafe { AtIdentifier::unchecked(parts.name("authority").unwrap().as_str()) }
+                    AtIdentifier::new_cow(parts.name("authority").unwrap().as_str().to_cowstr())
+                        .unwrap()
                 },
                 |uri| {
                     let parts = ATURI_REGEX.captures(uri).unwrap();
                     if let Some(collection) = parts.name("collection") {
-                        let collection = unsafe { Nsid::unchecked(collection.as_str()) };
+                        let collection =
+                            unsafe { Nsid::unchecked(CowStr::Borrowed(collection.as_str())) };
                         let rkey = if let Some(rkey) = parts.name("rkey") {
                             let rkey = unsafe { RecordKey::from(Rkey::unchecked(rkey.as_str())) };
                             Some(rkey)
@@ -107,7 +110,7 @@ impl Hash for AtUri<'_> {
 #[derive(Clone, PartialEq, Eq, Hash, Debug)]
 pub struct RepoPath<'u> {
     /// Collection NSID (e.g., `app.bsky.feed.post`)
-    pub collection: Nsid<'u>,
+    pub collection: Nsid<CowStr<'u>>,
     /// Optional record key identifying a specific record
     pub rkey: Option<RecordKey<Rkey<'u>>>,
 }
@@ -147,10 +150,10 @@ impl<'u> AtUri<'u> {
     pub fn new(uri: &'u str) -> Result<Self, AtStrError> {
         if let Some(parts) = ATURI_REGEX.captures(uri) {
             if let Some(authority) = parts.name("authority") {
-                let authority = AtIdentifier::new(authority.as_str())
+                let authority = AtIdentifier::new_cow(authority.as_str().to_cowstr())
                     .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                 let path = if let Some(collection) = parts.name("collection") {
-                    let collection = Nsid::new(collection.as_str())
+                    let collection = Nsid::new_cow(CowStr::Borrowed(collection.as_str()))
                         .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                     let rkey = if let Some(rkey) = parts.name("rkey") {
                         let rkey =
@@ -196,9 +199,9 @@ impl<'u> AtUri<'u> {
     pub fn raw(uri: &'u str) -> Self {
         if let Some(parts) = ATURI_REGEX.captures(uri) {
             if let Some(authority) = parts.name("authority") {
-                let authority = AtIdentifier::raw(authority.as_str());
+                let authority = AtIdentifier::new_cow(authority.as_str().to_cowstr()).unwrap();
                 let path = if let Some(collection) = parts.name("collection") {
-                    let collection = Nsid::raw(collection.as_str());
+                    let collection = Nsid::new_cow(CowStr::Borrowed(collection.as_str())).unwrap();
                     let rkey = if let Some(rkey) = parts.name("rkey") {
                         let rkey = RecordKey::from(Rkey::raw(rkey.as_str()));
                         Some(rkey)
@@ -237,9 +240,11 @@ impl<'u> AtUri<'u> {
     pub unsafe fn unchecked(uri: &'u str) -> Self {
         if let Some(parts) = ATURI_REGEX.captures(uri) {
             if let Some(authority) = parts.name("authority") {
-                let authority = unsafe { AtIdentifier::unchecked(authority.as_str()) };
+                let authority =
+                    unsafe { AtIdentifier::unchecked_cow(authority.as_str().to_cowstr()) };
                 let path = if let Some(collection) = parts.name("collection") {
-                    let collection = unsafe { Nsid::unchecked(collection.as_str()) };
+                    let collection =
+                        unsafe { Nsid::unchecked(CowStr::Borrowed(collection.as_str())) };
                     let rkey = if let Some(rkey) = parts.name("rkey") {
                         let rkey = RecordKey::from(unsafe { Rkey::unchecked(rkey.as_str()) });
                         Some(rkey)
@@ -270,7 +275,9 @@ impl<'u> AtUri<'u> {
                 Self {
                     inner: InnerBuilder {
                         uri: CowStr::Borrowed(uri),
-                        authority_builder: |_| unsafe { AtIdentifier::unchecked(uri) },
+                        authority_builder: |_| unsafe {
+                            AtIdentifier::unchecked_cow(uri.to_cowstr())
+                        },
                         path_builder: |_| None,
                         fragment_builder: |_| None,
                     }
@@ -281,7 +288,7 @@ impl<'u> AtUri<'u> {
             Self {
                 inner: InnerBuilder {
                     uri: CowStr::Borrowed(uri),
-                    authority_builder: |_| unsafe { AtIdentifier::unchecked(uri) },
+                    authority_builder: |_| unsafe { AtIdentifier::unchecked_cow(uri.to_cowstr()) },
                     path_builder: |_| None,
                     fragment_builder: |_| None,
                 }
@@ -323,7 +330,7 @@ impl<'u> AtUri<'u> {
     }
 
     /// Get the authority component (DID or handle)
-    pub fn authority(&self) -> &AtIdentifier<'_> {
+    pub fn authority(&self) -> &AtIdentifier<CowStr<'_>> {
         self.inner.borrow_authority()
     }
 
@@ -338,7 +345,7 @@ impl<'u> AtUri<'u> {
     }
 
     /// Get the collection NSID from the path, if present
-    pub fn collection(&self) -> Option<&Nsid<'_>> {
+    pub fn collection(&self) -> Option<&Nsid<CowStr<'_>>> {
         self.inner.borrow_path().as_ref().map(|p| &p.collection)
     }
 
@@ -403,7 +410,7 @@ impl AtUri<'static> {
                 let _authority = AtIdentifier::new(authority.as_str())
                     .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.as_ref().to_string(), e))?;
                 let path = if let Some(collection) = parts.name("collection") {
-                    let collection = Nsid::new(collection.as_str()).map_err(|e| {
+                    let collection = Nsid::new_cow(CowStr::Borrowed(collection.as_str())).map_err(|e| {
                         AtStrError::wrap("at-uri-scheme", uri.as_ref().to_string(), e)
                     })?;
                     let rkey = if let Some(rkey) = parts.name("rkey") {
@@ -425,15 +432,18 @@ impl AtUri<'static> {
                         |uri| {
                             let parts = ATURI_REGEX.captures(uri).unwrap();
                             unsafe {
-                                AtIdentifier::unchecked(parts.name("authority").unwrap().as_str())
+                                AtIdentifier::unchecked_cow(
+                                    parts.name("authority").unwrap().as_str().to_cowstr(),
+                                )
                             }
                         },
                         |uri| {
                             if path.is_some() {
                                 let parts = ATURI_REGEX.captures(uri).unwrap();
                                 if let Some(collection) = parts.name("collection") {
-                                    let collection =
-                                        unsafe { Nsid::unchecked(collection.as_str()) };
+                                    let collection = unsafe {
+                                        Nsid::unchecked(CowStr::Borrowed(collection.as_str()))
+                                    };
                                     let rkey = if let Some(rkey) = parts.name("rkey") {
                                         let rkey = unsafe {
                                             RecordKey::from(Rkey::unchecked(rkey.as_str()))
@@ -483,7 +493,7 @@ impl AtUri<'static> {
                 let authority = AtIdentifier::new_static(authority.as_str())
                     .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                 let path = if let Some(collection) = parts.name("collection") {
-                    let collection = Nsid::new_static(collection.as_str())
+                    let collection = Nsid::new_cow(CowStr::Borrowed(collection.as_str()))
                         .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                     let rkey = if let Some(rkey) = parts.name("rkey") {
                         let rkey =
@@ -535,7 +545,7 @@ impl FromStr for AtUri<'_> {
                 let _authority = AtIdentifier::new(authority.as_str())
                     .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                 let path = if let Some(collection) = parts.name("collection") {
-                    let collection = Nsid::new(collection.as_str())
+                    let collection = Nsid::new_cow(CowStr::Borrowed(collection.as_str()))
                         .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                     let rkey = if let Some(rkey) = parts.name("rkey") {
                         let rkey =
@@ -557,15 +567,18 @@ impl FromStr for AtUri<'_> {
                         |uri| {
                             let parts = ATURI_REGEX.captures(uri).unwrap();
                             unsafe {
-                                AtIdentifier::unchecked(parts.name("authority").unwrap().as_str())
+                                AtIdentifier::unchecked_cow(
+                                    parts.name("authority").unwrap().as_str().to_cowstr(),
+                                )
                             }
                         },
                         |uri| {
                             if path.is_some() {
                                 let parts = ATURI_REGEX.captures(uri).unwrap();
                                 if let Some(collection) = parts.name("collection") {
-                                    let collection =
-                                        unsafe { Nsid::unchecked(collection.as_str()) };
+                                    let collection = unsafe {
+                                        Nsid::unchecked(CowStr::Borrowed(collection.as_str()))
+                                    };
                                     let rkey = if let Some(rkey) = parts.name("rkey") {
                                         let rkey = unsafe {
                                             RecordKey::from(Rkey::unchecked(rkey.as_str()))
@@ -617,13 +630,18 @@ impl IntoStatic for AtUri<'_> {
                 self.inner.borrow_uri().clone().into_static(),
                 |uri| {
                     let parts = ATURI_REGEX.captures(uri).unwrap();
-                    unsafe { AtIdentifier::unchecked(parts.name("authority").unwrap().as_str()) }
+                    unsafe {
+                        AtIdentifier::unchecked_cow(
+                            parts.name("authority").unwrap().as_str().to_cowstr(),
+                        )
+                    }
                 },
                 |uri| {
                     if self.inner.borrow_path().is_some() {
                         let parts = ATURI_REGEX.captures(uri).unwrap();
                         if let Some(collection) = parts.name("collection") {
-                            let collection = unsafe { Nsid::unchecked(collection.as_str()) };
+                            let collection =
+                                unsafe { Nsid::unchecked(CowStr::Borrowed(collection.as_str())) };
                             let rkey = if let Some(rkey) = parts.name("rkey") {
                                 let rkey =
                                     unsafe { RecordKey::from(Rkey::unchecked(rkey.as_str())) };
@@ -711,7 +729,7 @@ impl<'d> TryFrom<CowStr<'d>> for AtUri<'d> {
                 let _authority = AtIdentifier::new(authority.as_str())
                     .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                 let _path = if let Some(collection) = parts.name("collection") {
-                    let collection = Nsid::new(collection.as_str())
+                    let collection = Nsid::new_cow(CowStr::Borrowed(collection.as_str()))
                         .map_err(|e| AtStrError::wrap("at-uri-scheme", uri.to_string(), e))?;
                     let rkey = if let Some(rkey) = parts.name("rkey") {
                         let rkey =
@@ -734,13 +752,17 @@ impl<'d> TryFrom<CowStr<'d>> for AtUri<'d> {
                         |uri| {
                             let parts = ATURI_REGEX.captures(uri).unwrap();
                             unsafe {
-                                AtIdentifier::unchecked(parts.name("authority").unwrap().as_str())
+                                AtIdentifier::unchecked_cow(
+                                    parts.name("authority").unwrap().as_str().to_cowstr(),
+                                )
                             }
                         },
                         |uri| {
                             let parts = ATURI_REGEX.captures(uri).unwrap();
                             if let Some(collection) = parts.name("collection") {
-                                let collection = unsafe { Nsid::unchecked(collection.as_str()) };
+                                let collection = unsafe {
+                                    Nsid::unchecked(CowStr::Borrowed(collection.as_str()))
+                                };
                                 let rkey = if let Some(rkey) = parts.name("rkey") {
                                     let rkey =
                                         unsafe { RecordKey::from(Rkey::unchecked(rkey.as_str())) };

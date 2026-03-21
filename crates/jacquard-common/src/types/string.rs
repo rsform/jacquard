@@ -26,6 +26,7 @@ impl From<(usize, usize)> for SourceSpan {
     }
 }
 
+use crate::cowstr::ToCowStr;
 pub use crate::{
     CowStr,
     types::{
@@ -64,13 +65,13 @@ pub enum AtprotoStr<'s> {
     /// Timestamp identifier
     Tid(Tid),
     /// Namespaced identifier
-    Nsid(Nsid<'s>),
+    Nsid(Nsid<CowStr<'s>>),
     /// Decentralized identifier
-    Did(Did<'s>),
+    Did(Did<CowStr<'s>>),
     /// Account handle
-    Handle(Handle<'s>),
+    Handle(Handle<CowStr<'s>>),
     /// Identifier (DID or handle)
-    AtIdentifier(AtIdentifier<'s>),
+    AtIdentifier(AtIdentifier<CowStr<'s>>),
     /// AT URI
     AtUri(AtUri<'s>),
     /// Generic URI
@@ -102,13 +103,13 @@ impl<'s> AtprotoStr<'s> {
             Self::Language(lang)
         } else if let Ok(tid) = Tid::from_str(string) {
             Self::Tid(tid)
-        } else if let Ok(did) = Did::new(string) {
+        } else if let Ok(did) = Did::new_cow(string.to_cowstr()) {
             Self::Did(did)
-        } else if let Ok(handle) = Handle::new(string) {
+        } else if let Ok(handle) = Handle::new_cow(string.to_cowstr()) {
             Self::Handle(handle)
-        } else if let Ok(atid) = AtIdentifier::new(string) {
+        } else if let Ok(atid) = AtIdentifier::new_cow(string.to_cowstr()) {
             Self::AtIdentifier(atid)
-        } else if let Ok(nsid) = Nsid::new(string) {
+        } else if let Ok(nsid) = Nsid::new_cow(string.to_cowstr()) {
             Self::Nsid(nsid)
         } else if let Ok(aturi) = AtUri::new(string) {
             Self::AtUri(aturi)

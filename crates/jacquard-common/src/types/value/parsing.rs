@@ -1,3 +1,4 @@
+use crate::cowstr::ToCowStr;
 use crate::deps::fluent_uri::Uri;
 use crate::{
     IntoStatic,
@@ -51,7 +52,7 @@ pub fn insert_string<'s>(
             }
         }
         LexiconStringType::Did => {
-            if let Ok(value) = Did::new(value) {
+            if let Ok(value) = Did::new_cow(value.to_cowstr()) {
                 map.insert(key.to_smolstr(), Data::String(AtprotoStr::Did(value)));
             } else {
                 map.insert(
@@ -61,7 +62,7 @@ pub fn insert_string<'s>(
             }
         }
         LexiconStringType::Handle => {
-            if let Ok(value) = Handle::new(value) {
+            if let Ok(value) = Handle::new_cow(value.into()) {
                 map.insert(key.to_smolstr(), Data::String(AtprotoStr::Handle(value)));
             } else {
                 map.insert(
@@ -71,7 +72,7 @@ pub fn insert_string<'s>(
             }
         }
         LexiconStringType::AtIdentifier => {
-            if let Ok(value) = AtIdentifier::new(value) {
+            if let Ok(value) = AtIdentifier::new_cow(value.to_cowstr()) {
                 map.insert(
                     key.to_smolstr(),
                     Data::String(AtprotoStr::AtIdentifier(value)),
@@ -84,7 +85,7 @@ pub fn insert_string<'s>(
             }
         }
         LexiconStringType::Nsid => {
-            if let Ok(value) = Nsid::new(value) {
+            if let Ok(value) = Nsid::new_cow(value.to_cowstr()) {
                 map.insert(key.to_smolstr(), Data::String(AtprotoStr::Nsid(value)));
             } else {
                 map.insert(
@@ -156,7 +157,7 @@ pub fn insert_string<'s>(
 /// smarter parsing to avoid trying as many posibilities.
 pub fn parse_string<'s>(string: &'s str) -> AtprotoStr<'s> {
     if string.len() < 2048 && string.starts_with("did:") {
-        if let Ok(did) = Did::new(string) {
+        if let Ok(did) = Did::new_cow(string.to_cowstr()) {
             return AtprotoStr::Did(did);
         }
     } else if string.starts_with("20") && string.ends_with("Z") {
@@ -193,29 +194,29 @@ pub fn parse_string<'s>(string: &'s str) -> AtprotoStr<'s> {
 
         // First segment is a known TLD → reverse domain order → try NSID first.
         if first_is_tld {
-            if let Ok(nsid) = Nsid::new(string) {
+            if let Ok(nsid) = Nsid::new_cow(string.to_cowstr()) {
                 return AtprotoStr::Nsid(nsid);
             }
         }
 
         // Last segment is a known TLD and first is not → normal domain order → handle.
         if last_is_tld && !first_is_tld {
-            if let Ok(handle) = AtIdentifier::new(string) {
+            if let Ok(handle) = AtIdentifier::new_cow(string.to_cowstr()) {
                 return AtprotoStr::AtIdentifier(handle);
             }
         }
 
         // camelCase in last segment → NSID (e.g., "com.atproto.repo.getRecord").
         if has_upper_last_segment {
-            if let Ok(nsid) = Nsid::new(string) {
+            if let Ok(nsid) = Nsid::new_cow(string.to_cowstr()) {
                 return AtprotoStr::Nsid(nsid);
             }
         }
 
         // Fallback: try both, preferring handle.
-        if let Ok(handle) = AtIdentifier::new(string) {
+        if let Ok(handle) = AtIdentifier::new_cow(string.to_cowstr()) {
             return AtprotoStr::AtIdentifier(handle);
-        } else if let Ok(nsid) = Nsid::new(string) {
+        } else if let Ok(nsid) = Nsid::new_cow(string.to_cowstr()) {
             return AtprotoStr::Nsid(nsid);
         } else if string.contains("://") && Uri::<&str>::parse(string).is_ok() {
             return AtprotoStr::Uri(UriValue::Any(string.into()));

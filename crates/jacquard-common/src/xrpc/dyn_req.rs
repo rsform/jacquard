@@ -1,12 +1,12 @@
 pub trait DynXrpcRequest {
-    fn nsid(&self) -> Nsid<'static>;
+    fn nsid(&self) -> Nsid;
     fn method(&self) -> XrpcMethod;
     fn response_type(&self) -> &'static str;
     fn encode_body(&self) -> Result<Vec<u8>, EncodeError>;
 }
 
 pub trait DynXrpcResp {
-    fn nsid(&self) -> Nsid<'static>;
+    fn nsid(&self) -> Nsid;
     fn encoding(&self) -> &'static str;
     fn decode_output(&self, body: &[u8]) -> Result<Data<'_>, DecodeError>;
 }
@@ -15,7 +15,7 @@ impl<XRPC> DynXrpcRequest for XRPC
 where
     XRPC: XrpcRequest,
 {
-    fn nsid(&self) -> Nsid<'static> {
+    fn nsid(&self) -> Nsid {
         unsafe { Nsid::new_static(XRPC::NSID).unwrap_unchecked() }
     }
 
@@ -36,7 +36,7 @@ impl<XRPC> DynXrpcResp for XRPC
 where
     XRPC: XrpcResp,
 {
-    fn nsid(&self) -> Nsid<'static> {
+    fn nsid(&self) -> Nsid {
         unsafe { Nsid::new_static(XRPC::NSID).unwrap_unchecked() }
     }
 

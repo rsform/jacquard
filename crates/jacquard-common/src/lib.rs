@@ -214,7 +214,7 @@ pub use spin::Lazy;
 
 pub use cowstr::CowStr;
 pub use into_static::IntoStatic;
-pub use bos::{Bos, BorrowOrShare, DefaultStr, StrConsumer};
+pub use bos::{Bos, BorrowOrShare, DefaultStr};
 
 /// A copy-on-write immutable string type that uses [`smol_str::SmolStr`] for
 /// the "owned" variant.

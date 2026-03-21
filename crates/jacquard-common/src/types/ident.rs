@@ -1,15 +1,17 @@
+use crate::bos::{Bos, DefaultStr};
 use crate::types::handle::Handle;
 use crate::types::string::AtStrError;
-use crate::{IntoStatic, types::did::Did};
+use crate::{CowStr, IntoStatic, types::did::Did};
 use alloc::string::String;
+use alloc::string::ToString;
 use core::fmt;
 use core::str::FromStr;
 
 use serde::{Deserialize, Serialize};
 
-use crate::CowStr;
+use smol_str::SmolStr;
 
-/// AT Protocol identifier (either a DID or handle)
+/// AT Protocol identifier (either a DID or handle).
 ///
 /// Represents the union of DIDs and handles, which can both be used to identify
 /// accounts in AT Protocol. DIDs are permanent identifiers, while handles are
@@ -18,80 +20,23 @@ use crate::CowStr;
 /// Automatically determines whether a string is a DID or a handle during parsing.
 #[derive(Clone, Debug, PartialEq, Eq, Deserialize, Serialize, Hash)]
 #[serde(untagged)]
-pub enum AtIdentifier<'i> {
+#[serde(bound(
+    serialize = "S: Bos<str> + AsRef<str> + Serialize",
+    deserialize = "S: Bos<str> + AsRef<str> + Deserialize<'de>"
+))]
+pub enum AtIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {
     /// DID variant
-    #[serde(borrow)]
-    Did(Did<'i>),
+    Did(Did<S>),
     /// Handle variant
-    Handle(Handle<'i>),
+    Handle(Handle<S>),
 }
 
-impl<'i> AtIdentifier<'i> {
-    /// Fallible constructor, validates, borrows from input
-    pub fn new(ident: &'i str) -> Result<Self, AtStrError> {
-        if let Ok(did) = ident.parse() {
-            Ok(AtIdentifier::Did(did))
-        } else {
-            ident.parse().map(AtIdentifier::Handle)
-        }
-    }
+// ---------------------------------------------------------------------------
+// Core methods
+// ---------------------------------------------------------------------------
 
-    /// Fallible constructor, validates, takes ownership
-    pub fn new_owned(ident: impl AsRef<str>) -> Result<Self, AtStrError> {
-        let ident = ident.as_ref();
-        if let Ok(did) = Did::new_owned(ident) {
-            Ok(AtIdentifier::Did(did))
-        } else {
-            Ok(AtIdentifier::Handle(Handle::new_owned(ident)?))
-        }
-    }
-
-    /// Fallible constructor, validates, doesn't allocate
-    pub fn new_static(ident: &'static str) -> Result<AtIdentifier<'static>, AtStrError> {
-        if let Ok(did) = Did::new_static(ident) {
-            Ok(AtIdentifier::Did(did))
-        } else {
-            Ok(AtIdentifier::Handle(Handle::new_static(ident)?))
-        }
-    }
-
-    /// Fallible constructor, validates, borrows from input if possible
-    pub fn new_cow(ident: CowStr<'i>) -> Result<Self, AtStrError> {
-        if let Ok(did) = Did::new_cow(ident.clone()) {
-            Ok(AtIdentifier::Did(did))
-        } else {
-            Ok(AtIdentifier::Handle(Handle::new_cow(ident)?))
-        }
-    }
-
-    /// Infallible constructor for when you *know* the string is a valid identifier.
-    /// Will panic on invalid identifiers. If you're manually decoding atproto records
-    /// or API values you know are valid (rather than using serde), this is the one to use.
-    /// The `From<String>` and `From<CowStr>` impls use the same logic.
-    pub fn raw(ident: &'i str) -> Self {
-        if let Ok(did) = ident.parse() {
-            AtIdentifier::Did(did)
-        } else {
-            ident
-                .parse()
-                .map(AtIdentifier::Handle)
-                .expect("valid handle")
-        }
-    }
-
-    /// Infallible constructor for when you *know* the string is a valid identifier.
-    /// Marked unsafe because responsibility for upholding the invariant is on the developer.
-    ///
-    /// Will validate DIDs, but will treat anything else as a valid handle
-    pub unsafe fn unchecked(ident: &'i str) -> Self {
-        if let Ok(did) = ident.parse() {
-            AtIdentifier::Did(did)
-        } else {
-            unsafe { AtIdentifier::Handle(Handle::unchecked(ident)) }
-        }
-    }
-
-    /// Get the identifier as a string slice
+impl<S: Bos<str> + AsRef<str>> AtIdentifier<S> {
+    /// Get the identifier as a string slice.
     pub fn as_str(&self) -> &str {
         match self {
             AtIdentifier::Did(did) => did.as_str(),
@@ -100,32 +45,98 @@ impl<'i> AtIdentifier<'i> {
     }
 }
 
-impl<'i> From<Did<'i>> for AtIdentifier<'i> {
-    fn from(did: Did<'i>) -> Self {
-        AtIdentifier::Did(did)
-    }
-}
+// ---------------------------------------------------------------------------
+// Borrowed construction
+// ---------------------------------------------------------------------------
 
-impl<'i> From<Handle<'i>> for AtIdentifier<'i> {
-    fn from(handle: Handle<'i>) -> Self {
-        AtIdentifier::Handle(handle)
-    }
-}
-
-impl FromStr for AtIdentifier<'_> {
-    type Err = AtStrError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        if let Ok(did) = s.parse() {
+impl<'i> AtIdentifier<&'i str> {
+    /// Fallible constructor, validates, borrows from input.
+    pub fn new(ident: &'i str) -> Result<Self, AtStrError> {
+        if let Ok(did) = Did::new(ident) {
             Ok(AtIdentifier::Did(did))
         } else {
-            s.parse().map(AtIdentifier::Handle)
+            Handle::new(ident).map(AtIdentifier::Handle)
+        }
+    }
+
+    /// Infallible constructor. Panics on invalid identifiers.
+    pub fn raw(ident: &'i str) -> Self {
+        Self::new(ident).expect("valid identifier")
+    }
+
+    /// Infallible unchecked constructor.
+    ///
+    /// # Safety
+    ///
+    /// Validates DIDs, treats anything else as a valid handle.
+    pub unsafe fn unchecked(ident: &'i str) -> Self {
+        if let Ok(did) = Did::new(ident) {
+            AtIdentifier::Did(did)
+        } else {
+            unsafe { AtIdentifier::Handle(Handle::unchecked(ident)) }
         }
     }
 }
 
-impl IntoStatic for AtIdentifier<'_> {
-    type Output = AtIdentifier<'static>;
+// ---------------------------------------------------------------------------
+// Owned construction
+// ---------------------------------------------------------------------------
+
+impl<S: Bos<str> + AsRef<str> + From<SmolStr>> AtIdentifier<S> {
+    /// Fallible constructor, validates, takes ownership.
+    pub fn new_owned(ident: impl AsRef<str>) -> Result<Self, AtStrError> {
+        let ident = ident.as_ref();
+        if let Ok(did) = Did::new_owned(ident) {
+            Ok(AtIdentifier::Did(did))
+        } else {
+            Handle::new_owned(ident).map(AtIdentifier::Handle)
+        }
+    }
+
+    /// Fallible constructor for static strings.
+    pub fn new_static(ident: &'static str) -> Result<Self, AtStrError> {
+        if let Ok(did) = Did::new_static(ident) {
+            Ok(AtIdentifier::Did(did))
+        } else {
+            Handle::new_static(ident).map(AtIdentifier::Handle)
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// CowStr construction
+// ---------------------------------------------------------------------------
+
+impl<'i> AtIdentifier<CowStr<'i>> {
+    /// Fallible constructor, borrows if possible.
+    pub fn new_cow(ident: CowStr<'i>) -> Result<Self, AtStrError> {
+        if let Ok(did) = Did::new_cow(ident.clone()) {
+            Ok(AtIdentifier::Did(did))
+        } else {
+            Handle::new_cow(ident).map(AtIdentifier::Handle)
+        }
+    }
+
+    pub unsafe fn unchecked_cow(ident: CowStr<'i>) -> Self {
+        unsafe {
+            if let Ok(did) = Did::new_cow(ident.clone()) {
+                AtIdentifier::Did(did)
+            } else {
+                AtIdentifier::Handle(Handle::unchecked_cow(ident))
+            }
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Trait impls
+// ---------------------------------------------------------------------------
+
+impl<S: Bos<str> + AsRef<str> + IntoStatic> IntoStatic for AtIdentifier<S>
+where
+    S::Output: Bos<str> + AsRef<str>,
+{
+    type Output = AtIdentifier<S::Output>;
 
     fn into_static(self) -> Self::Output {
         match self {
@@ -135,7 +146,43 @@ impl IntoStatic for AtIdentifier<'_> {
     }
 }
 
-impl fmt::Display for AtIdentifier<'_> {
+impl<S: Bos<str> + AsRef<str>> From<Did<S>> for AtIdentifier<S> {
+    fn from(did: Did<S>) -> Self {
+        AtIdentifier::Did(did)
+    }
+}
+
+impl<S: Bos<str> + AsRef<str>> From<Handle<S>> for AtIdentifier<S> {
+    fn from(handle: Handle<S>) -> Self {
+        AtIdentifier::Handle(handle)
+    }
+}
+
+impl FromStr for AtIdentifier {
+    type Err = AtStrError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::new_owned(s)
+    }
+}
+
+impl FromStr for AtIdentifier<CowStr<'static>> {
+    type Err = AtStrError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::new_owned(s)
+    }
+}
+
+impl FromStr for AtIdentifier<String> {
+    type Err = AtStrError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::new_owned(s)
+    }
+}
+
+impl<S: Bos<str> + AsRef<str>> fmt::Display for AtIdentifier<S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             AtIdentifier::Did(did) => did.fmt(f),
@@ -144,83 +191,72 @@ impl fmt::Display for AtIdentifier<'_> {
     }
 }
 
-impl From<String> for AtIdentifier<'static> {
+impl From<String> for AtIdentifier {
     fn from(value: String) -> Self {
-        if let Ok(did) = value.parse() {
-            AtIdentifier::Did(did)
-        } else {
-            value
-                .parse()
-                .map(AtIdentifier::Handle)
-                .expect("valid handle")
-        }
+        Self::new_owned(value).expect("valid identifier")
     }
 }
 
-impl<'i> From<CowStr<'i>> for AtIdentifier<'i> {
+impl<'i> From<CowStr<'i>> for AtIdentifier<CowStr<'i>> {
     fn from(value: CowStr<'i>) -> Self {
-        if let Ok(did) = value.parse() {
-            AtIdentifier::Did(did)
-        } else {
-            value
-                .parse()
-                .map(AtIdentifier::Handle)
-                .expect("valid handle")
-        }
+        Self::new_cow(value).expect("valid identifier")
     }
 }
 
-impl<'i> From<AtIdentifier<'i>> for String {
-    fn from(value: AtIdentifier) -> Self {
-        match value {
-            AtIdentifier::Did(did) => did.into(),
-            AtIdentifier::Handle(handle) => handle.into(),
-        }
+impl<S: Bos<str> + AsRef<str>> From<AtIdentifier<S>> for String {
+    fn from(value: AtIdentifier<S>) -> Self {
+        value.as_str().to_string()
     }
 }
 
-impl AsRef<str> for AtIdentifier<'_> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for AtIdentifier<S> {
     fn as_ref(&self) -> &str {
-        match self {
-            AtIdentifier::Did(did) => did.as_ref(),
-            AtIdentifier::Handle(handle) => handle.as_ref(),
-        }
+        self.as_str()
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::cowstr::ToCowStr;
 
     #[test]
     fn parses_did() {
-        let ident = AtIdentifier::new("did:plc:foo").unwrap();
+        let ident = AtIdentifier::<&str>::new("did:plc:foo").unwrap();
         assert!(matches!(ident, AtIdentifier::Did(_)));
         assert_eq!(ident.as_str(), "did:plc:foo");
     }
 
     #[test]
     fn parses_handle() {
-        let ident = AtIdentifier::new("alice.test").unwrap();
+        let ident = AtIdentifier::<&str>::new("alice.test").unwrap();
         assert!(matches!(ident, AtIdentifier::Handle(_)));
         assert_eq!(ident.as_str(), "alice.test");
     }
 
     #[test]
     fn did_takes_precedence() {
-        // DID is tried first, so valid DIDs are parsed as DIDs
-        let ident = AtIdentifier::new("did:web:alice.test").unwrap();
+        let ident = AtIdentifier::<&str>::new("did:web:alice.test").unwrap();
         assert!(matches!(ident, AtIdentifier::Did(_)));
     }
 
     #[test]
     fn from_types() {
-        let did = Did::new("did:plc:foo").unwrap();
-        let ident: AtIdentifier = did.into();
+        let did = Did::<SmolStr>::new_owned("did:plc:foo").unwrap();
+        let ident: AtIdentifier<SmolStr> = did.into();
         assert!(matches!(ident, AtIdentifier::Did(_)));
 
-        let handle = Handle::new("alice.test").unwrap();
-        let ident: AtIdentifier = handle.into();
+        let handle = Handle::new_cow("alice.test".to_cowstr()).unwrap();
+        let ident: AtIdentifier<CowStr> = handle.into();
+        assert!(matches!(ident, AtIdentifier::Handle(_)));
+    }
+
+    #[test]
+    fn owned_construction() {
+        let ident = AtIdentifier::<SmolStr>::new_owned("did:plc:foo").unwrap();
+        assert!(matches!(ident, AtIdentifier::Did(_)));
+
+        let ident = AtIdentifier::<SmolStr>::new_owned("alice.test").unwrap();
         assert!(matches!(ident, AtIdentifier::Handle(_)));
     }
 }

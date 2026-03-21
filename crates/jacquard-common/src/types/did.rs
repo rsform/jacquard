@@ -1,3 +1,4 @@
+use crate::bos::{Bos, DefaultStr};
 use crate::types::string::AtStrError;
 use crate::{CowStr, IntoStatic};
 use alloc::string::{String, ToString};
@@ -10,239 +11,235 @@ use regex::Regex;
 use regex_automata::meta::Regex;
 #[cfg(target_arch = "wasm32")]
 use regex_lite::Regex;
-use serde::{Deserialize, Deserializer, Serialize, de::Error};
+use serde::{Deserialize, Deserializer, Serialize};
 use smol_str::{SmolStr, ToSmolStr};
 
 use super::Lazy;
 
-/// Decentralized Identifier (DID) for AT Protocol accounts
+/// Decentralized Identifier (DID) for AT Protocol accounts.
 ///
 /// DIDs are the persistent, long-term account identifiers in AT Protocol. Unlike handles,
 /// which can change, a DID permanently identifies an account across the network.
 ///
-/// Supported DID methods:
-/// - `did:plc` - Bluesky's novel DID method
-/// - `did:web` - Based on HTTPS and DNS
-///
-/// Validation enforces a maximum length of 2048 characters and uses the pattern:
-/// `did:[method]:[method-specific-id]` where the method is lowercase ASCII and the
-/// method-specific-id allows alphanumerics, dots, colons, hyphens, underscores, and percent signs.
-///
 /// See: <https://atproto.com/specs/did>
-#[derive(Clone, PartialEq, Eq, Serialize, Hash, PartialOrd, Ord)]
+#[derive(Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize)]
 #[serde(transparent)]
 #[repr(transparent)]
-pub struct Did<'d>(pub(crate) CowStr<'d>);
+pub struct Did<S: Bos<str> = DefaultStr>(pub(crate) S);
 
 /// Regex for DID validation per AT Protocol spec.
 ///
 /// Note: This regex allows `%` in the identifier but prevents DIDs from ending with `:` or `%`.
 /// It does NOT validate that percent-encoding is well-formed (i.e., `%XX` where XX are hex digits).
-/// This matches the behavior of the official TypeScript implementation, which also does not
-/// enforce percent-encoding validity at validation time. While the spec states "percent sign
-/// must be followed by two hex characters," this is treated as a best practice rather than
-/// a hard validation requirement.
+/// This matches the behavior of the official TypeScript implementation.
 pub static DID_REGEX: Lazy<Regex> =
     Lazy::new(|| Regex::new(r"^did:[a-z]+:[a-zA-Z0-9._:%-]*[a-zA-Z0-9._-]$").unwrap());
 
-impl<'d> Did<'d> {
-    /// Fallible constructor, validates, borrows from input
+// ---------------------------------------------------------------------------
+// Shared validation
+// ---------------------------------------------------------------------------
+
+fn strip_did_prefix(did: &str) -> &str {
+    did.strip_prefix("at://").unwrap_or(did)
+}
+
+fn validate_did(did: &str) -> Result<(), AtStrError> {
+    if did.len() > 2048 {
+        Err(AtStrError::too_long("did", did, 2048, did.len()))
+    } else if !DID_REGEX.is_match(did) {
+        Err(AtStrError::regex(
+            "did",
+            did,
+            SmolStr::new_static("invalid"),
+        ))
+    } else {
+        Ok(())
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Core methods
+// ---------------------------------------------------------------------------
+
+impl<S: Bos<str> + AsRef<str>> Did<S> {
+    /// Get the DID as a string slice.
+    pub fn as_str(&self) -> &str {
+        self.0.as_ref()
+    }
+}
+
+impl<S: Bos<str>> Did<S> {
+    /// Infallible unchecked constructor.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure the DID is valid.
+    pub unsafe fn unchecked(did: S) -> Self {
+        Did(did)
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Borrowed construction
+// ---------------------------------------------------------------------------
+
+impl<'d> Did<&'d str> {
+    /// Fallible constructor, validates, borrows from input.
+    /// Accepts (and strips) preceding 'at://' if present.
     pub fn new(did: &'d str) -> Result<Self, AtStrError> {
-        let did = did.strip_prefix("at://").unwrap_or(did);
-        if did.len() > 2048 {
-            Err(AtStrError::too_long("did", did, 2048, did.len()))
-        } else if !DID_REGEX.is_match(did) {
-            Err(AtStrError::regex(
-                "did",
-                did,
-                SmolStr::new_static("invalid"),
-            ))
-        } else {
-            Ok(Self(CowStr::Borrowed(did)))
-        }
+        let stripped = strip_did_prefix(did);
+        validate_did(stripped)?;
+        Ok(Self(stripped))
     }
 
-    /// Fallible constructor, validates, borrows from input if possible
-    ///
-    /// May allocate for a long DID with an at:// prefix, otherwise borrows.
+    /// Infallible constructor. Panics on invalid DIDs.
+    pub fn raw(did: &'d str) -> Self {
+        Self::new(did).expect("invalid DID")
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Owned construction
+// ---------------------------------------------------------------------------
+
+impl<S: Bos<str> + From<SmolStr>> Did<S> {
+    /// Fallible constructor, validates, takes ownership.
+    pub fn new_owned(did: impl AsRef<str>) -> Result<Self, AtStrError> {
+        let did = did.as_ref();
+        let stripped = strip_did_prefix(did);
+        validate_did(stripped)?;
+        Ok(Self(S::from(stripped.to_smolstr())))
+    }
+
+    /// Fallible constructor for static strings. Zero-alloc if possible.
+    pub fn new_static(did: &'static str) -> Result<Self, AtStrError> {
+        let stripped = strip_did_prefix(did);
+        validate_did(stripped)?;
+        Ok(Self(S::from(SmolStr::new_static(stripped))))
+    }
+}
+
+// ---------------------------------------------------------------------------
+// CowStr construction
+// ---------------------------------------------------------------------------
+
+impl<'d> Did<CowStr<'d>> {
+    /// Fallible constructor, borrows if possible.
     pub fn new_cow(did: CowStr<'d>) -> Result<Self, AtStrError> {
-        let did = if let Some(did) = did.strip_prefix("at://") {
-            CowStr::copy_from_str(did)
+        let did = if let Some(stripped) = did.strip_prefix("at://") {
+            CowStr::copy_from_str(stripped)
         } else {
             did
         };
-        if did.len() > 2048 {
-            Err(AtStrError::too_long("did", &did, 2048, did.len()))
-        } else if !DID_REGEX.is_match(&did) {
-            Err(AtStrError::regex(
-                "did",
-                &did,
-                SmolStr::new_static("invalid"),
-            ))
-        } else {
-            Ok(Self(did))
-        }
+        validate_did(&did)?;
+        Ok(Self(did))
     }
 
-    /// Fallible constructor, validates, takes ownership
-    pub fn new_owned(did: impl AsRef<str>) -> Result<Self, AtStrError> {
-        let did = did.as_ref();
-        let did = did.strip_prefix("at://").unwrap_or(did);
-        if did.len() > 2048 {
-            Err(AtStrError::too_long("did", did, 2048, did.len()))
-        } else if !DID_REGEX.is_match(did) {
-            Err(AtStrError::regex(
-                "did",
-                did,
-                SmolStr::new_static("invalid"),
-            ))
-        } else {
-            Ok(Self(CowStr::Owned(did.to_smolstr())))
-        }
-    }
-
-    /// Fallible constructor, validates, doesn't allocate
-    pub fn new_static(did: &'static str) -> Result<Self, AtStrError> {
-        let did = did.strip_prefix("at://").unwrap_or(did);
-        if did.len() > 2048 {
-            Err(AtStrError::too_long("did", did, 2048, did.len()))
-        } else if !DID_REGEX.is_match(did) {
-            Err(AtStrError::regex(
-                "did",
-                did,
-                SmolStr::new_static("invalid"),
-            ))
-        } else {
-            Ok(Self(CowStr::new_static(did)))
-        }
-    }
-
-    /// Infallible constructor for when you *know* the string is a valid DID.
-    /// Will panic on invalid DIDs. If you're manually decoding atproto records
-    /// or API values you know are valid (rather than using serde), this is the one to use.
-    /// The `From<String>` and `From<CowStr>` impls use the same logic.
-    pub fn raw(did: &'d str) -> Self {
-        let did = did.strip_prefix("at://").unwrap_or(did);
-        if did.len() > 2048 {
-            panic!("DID too long")
-        } else if !DID_REGEX.is_match(did) {
-            panic!("Invalid DID")
-        } else {
-            Self(CowStr::Borrowed(did))
-        }
-    }
-
-    /// Infallible constructor for when you *know* the string is a valid DID.
-    /// Marked unsafe because responsibility for upholding the invariant is on the developer.
-    pub unsafe fn unchecked(did: &'d str) -> Self {
-        Self(CowStr::Borrowed(did))
-    }
-
-    /// Get the DID as a string slice
-    pub fn as_str(&self) -> &str {
-        {
-            let this = &self.0;
-            this
-        }
+    pub unsafe fn unchecked_cow(did: CowStr<'d>) -> Self {
+        Self(did)
     }
 }
 
-impl FromStr for Did<'_> {
-    type Err = AtStrError;
+// ---------------------------------------------------------------------------
+// Deserialization
+// ---------------------------------------------------------------------------
 
-    /// Has to take ownership due to the lifetime constraints of the FromStr trait.
-    /// Prefer `Did::new()` or `Did::raw` if you want to borrow.
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::new_owned(s)
+impl<'de, S> Deserialize<'de> for Did<S>
+where
+    S: Bos<str> + AsRef<str> + Deserialize<'de>,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        validate_did(s.as_ref()).map_err(serde::de::Error::custom)?;
+        Ok(Did(s))
     }
 }
 
-impl IntoStatic for Did<'_> {
-    type Output = Did<'static>;
+// ---------------------------------------------------------------------------
+// Trait impls
+// ---------------------------------------------------------------------------
+
+impl<S: Bos<str> + IntoStatic> IntoStatic for Did<S>
+where
+    S::Output: Bos<str>,
+{
+    type Output = Did<S::Output>;
 
     fn into_static(self) -> Self::Output {
         Did(self.0.into_static())
     }
 }
 
-impl<'de, 'a> Deserialize<'de> for Did<'a>
-where
-    'de: 'a,
-{
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let value = Deserialize::deserialize(deserializer)?;
-        Self::new_cow(value).map_err(D::Error::custom)
+impl FromStr for Did {
+    type Err = AtStrError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::new_owned(s)
     }
 }
 
-impl fmt::Display for Did<'_> {
+impl FromStr for Did<CowStr<'static>> {
+    type Err = AtStrError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::new_owned(s)
+    }
+}
+
+impl FromStr for Did<String> {
+    type Err = AtStrError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Self::new_owned(s)
+    }
+}
+
+impl<S: Bos<str> + AsRef<str>> fmt::Display for Did<S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&self.0)
+        f.write_str(self.as_str())
     }
 }
 
-impl fmt::Debug for Did<'_> {
+impl<S: Bos<str> + AsRef<str>> fmt::Debug for Did<S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "at://{}", self.0)
+        write!(f, "at://{}", self.as_str())
     }
 }
 
-impl<'d> From<Did<'d>> for String {
-    fn from(value: Did<'d>) -> Self {
-        value.0.to_string()
+impl<S: Bos<str> + AsRef<str>> From<Did<S>> for String {
+    fn from(value: Did<S>) -> Self {
+        value.as_str().to_string()
     }
 }
 
-impl<'d> From<Did<'d>> for CowStr<'d> {
-    fn from(value: Did<'d>) -> Self {
-        value.0
+impl<S: Bos<str> + AsRef<str>> From<Did<S>> for CowStr<'static> {
+    fn from(value: Did<S>) -> Self {
+        CowStr::copy_from_str(value.as_str())
     }
 }
 
-impl From<String> for Did<'static> {
+impl From<String> for Did {
     fn from(value: String) -> Self {
-        let value = if let Some(did) = value.strip_prefix("at://") {
-            CowStr::Borrowed(did)
-        } else {
-            value.into()
-        };
-        if value.len() > 2048 {
-            panic!("DID too long")
-        } else if !DID_REGEX.is_match(&value) {
-            panic!("Invalid DID")
-        } else {
-            Self(value.into_static())
-        }
+        Self::new_owned(value).unwrap()
     }
 }
 
-impl<'d> From<CowStr<'d>> for Did<'d> {
+impl<'d> From<CowStr<'d>> for Did<CowStr<'d>> {
     fn from(value: CowStr<'d>) -> Self {
-        let value = if let Some(did) = value.strip_prefix("at://") {
-            CowStr::Borrowed(did)
-        } else {
-            value
-        };
-        if value.len() > 2048 {
-            panic!("DID too long")
-        } else if !DID_REGEX.is_match(&value) {
-            panic!("Invalid DID")
-        } else {
-            Self(value.into_static())
-        }
+        Self::new_cow(value).unwrap()
     }
 }
 
-impl AsRef<str> for Did<'_> {
+impl<S: Bos<str> + AsRef<str>> AsRef<str> for Did<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl Deref for Did<'_> {
+impl<S: Bos<str> + AsRef<str>> Deref for Did<S> {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {
@@ -256,88 +253,104 @@ mod tests {
 
     #[test]
     fn valid_dids() {
-        assert!(Did::new("did:plc:abc123").is_ok());
-        assert!(Did::new("did:web:example.com").is_ok());
-        assert!(Did::new("did:method:val_ue").is_ok());
-        assert!(Did::new("did:method:val-ue").is_ok());
-        assert!(Did::new("did:method:val.ue").is_ok());
-        assert!(Did::new("did:method:val%20ue").is_ok());
+        assert!(Did::<&str>::new("did:plc:abc123").is_ok());
+        assert!(Did::<&str>::new("did:web:example.com").is_ok());
+        assert!(Did::<&str>::new("did:method:val_ue").is_ok());
+        assert!(Did::<&str>::new("did:method:val-ue").is_ok());
+        assert!(Did::<&str>::new("did:method:val.ue").is_ok());
+        assert!(Did::<&str>::new("did:method:val%20ue").is_ok());
+    }
+
+    #[test]
+    fn valid_dids_owned() {
+        assert!(Did::<SmolStr>::new_owned("did:plc:abc123").is_ok());
+        assert!(Did::<String>::new_owned("did:web:example.com").is_ok());
     }
 
     #[test]
     fn prefix_stripping() {
         assert_eq!(
-            Did::new("at://did:plc:foo").unwrap().as_str(),
+            Did::<&str>::new("at://did:plc:foo").unwrap().as_str(),
             "did:plc:foo"
         );
-        assert_eq!(Did::new("did:plc:foo").unwrap().as_str(), "did:plc:foo");
+        assert_eq!(
+            Did::<&str>::new("did:plc:foo").unwrap().as_str(),
+            "did:plc:foo"
+        );
     }
 
     #[test]
     fn must_start_with_did() {
-        assert!(Did::new("DID:plc:foo").is_err());
-        assert!(Did::new("plc:foo").is_err());
-        assert!(Did::new("foo").is_err());
+        assert!(Did::<&str>::new("DID:plc:foo").is_err());
+        assert!(Did::<&str>::new("plc:foo").is_err());
+        assert!(Did::<&str>::new("foo").is_err());
     }
 
     #[test]
     fn method_must_be_lowercase() {
-        assert!(Did::new("did:plc:foo").is_ok());
-        assert!(Did::new("did:PLC:foo").is_err());
-        assert!(Did::new("did:Plc:foo").is_err());
+        assert!(Did::<&str>::new("did:plc:foo").is_ok());
+        assert!(Did::<&str>::new("did:PLC:foo").is_err());
+        assert!(Did::<&str>::new("did:Plc:foo").is_err());
     }
 
     #[test]
     fn cannot_end_with_colon_or_percent() {
-        assert!(Did::new("did:plc:foo:").is_err());
-        assert!(Did::new("did:plc:foo%").is_err());
-        assert!(Did::new("did:plc:foo:bar").is_ok());
+        assert!(Did::<&str>::new("did:plc:foo:").is_err());
+        assert!(Did::<&str>::new("did:plc:foo%").is_err());
+        assert!(Did::<&str>::new("did:plc:foo:bar").is_ok());
     }
 
     #[test]
     fn max_length() {
         let valid_2048 = format!("did:plc:{}", "a".repeat(2048 - 8));
         assert_eq!(valid_2048.len(), 2048);
-        assert!(Did::new(&valid_2048).is_ok());
+        assert!(Did::<&str>::new(&valid_2048).is_ok());
 
         let too_long_2049 = format!("did:plc:{}", "a".repeat(2049 - 8));
         assert_eq!(too_long_2049.len(), 2049);
-        assert!(Did::new(&too_long_2049).is_err());
+        assert!(Did::<&str>::new(&too_long_2049).is_err());
     }
 
     #[test]
     fn allowed_characters() {
-        assert!(Did::new("did:method:abc123").is_ok());
-        assert!(Did::new("did:method:ABC123").is_ok());
-        assert!(Did::new("did:method:a_b_c").is_ok());
-        assert!(Did::new("did:method:a-b-c").is_ok());
-        assert!(Did::new("did:method:a.b.c").is_ok());
-        assert!(Did::new("did:method:a:b:c").is_ok());
+        assert!(Did::<&str>::new("did:method:abc123").is_ok());
+        assert!(Did::<&str>::new("did:method:ABC123").is_ok());
+        assert!(Did::<&str>::new("did:method:a_b_c").is_ok());
+        assert!(Did::<&str>::new("did:method:a-b-c").is_ok());
+        assert!(Did::<&str>::new("did:method:a.b.c").is_ok());
+        assert!(Did::<&str>::new("did:method:a:b:c").is_ok());
     }
 
     #[test]
     fn disallowed_characters() {
-        assert!(Did::new("did:method:a b").is_err());
-        assert!(Did::new("did:method:a@b").is_err());
-        assert!(Did::new("did:method:a#b").is_err());
-        assert!(Did::new("did:method:a?b").is_err());
+        assert!(Did::<&str>::new("did:method:a b").is_err());
+        assert!(Did::<&str>::new("did:method:a@b").is_err());
+        assert!(Did::<&str>::new("did:method:a#b").is_err());
+        assert!(Did::<&str>::new("did:method:a?b").is_err());
     }
 
     #[test]
     fn percent_encoding() {
-        // Valid percent encoding
-        assert!(Did::new("did:method:foo%20bar").is_ok());
-        assert!(Did::new("did:method:foo%2Fbar").is_ok());
+        assert!(Did::<&str>::new("did:method:foo%20bar").is_ok());
+        assert!(Did::<&str>::new("did:method:foo%2Fbar").is_ok());
+        assert!(Did::<&str>::new("did:method:foo%").is_err());
+        // Matches TS reference impl: malformed percent-encoding accepted.
+        assert!(Did::<&str>::new("did:method:foo%2x").is_ok());
+        assert!(Did::<&str>::new("did:method:foo%ZZ").is_ok());
+    }
 
-        // DIDs cannot end with %
-        assert!(Did::new("did:method:foo%").is_err());
+    #[test]
+    fn into_static() {
+        let d = Did::<&str>::new("did:plc:abc123").unwrap();
+        let owned: Did<SmolStr> = d.into_static();
+        assert_eq!(owned.as_str(), "did:plc:abc123");
+    }
 
-        // IMPORTANT: The regex does NOT validate that percent-encoding is well-formed.
-        // This matches the TypeScript reference implementation's behavior.
-        // While the spec says "percent sign must be followed by two hex characters",
-        // implementations treat this as a best practice, not a hard validation requirement.
-        // Thus, malformed percent encoding like %2x is accepted by the regex.
-        assert!(Did::new("did:method:foo%2x").is_ok());
-        assert!(Did::new("did:method:foo%ZZ").is_ok());
+    #[test]
+    fn cross_type_equality() {
+        let borrowed = Did::<&str>::new("did:plc:abc123").unwrap();
+        let owned = Did::<SmolStr>::new_owned("did:plc:abc123").unwrap();
+        // Different S types but same content — PartialEq compares the inner S values.
+        assert_eq!(borrowed.as_str(), owned.as_str());
     }
 }

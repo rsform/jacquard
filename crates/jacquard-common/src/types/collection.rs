@@ -3,7 +3,6 @@ use core::fmt;
 
 use serde::{Deserialize, Serialize};
 
-use crate::IntoStatic;
 use crate::types::value::Data;
 use crate::types::{
     aturi::RepoPath,
@@ -11,6 +10,7 @@ use crate::types::{
     recordkey::{RecordKey, RecordKeyType, Rkey},
 };
 use crate::xrpc::XrpcResp;
+use crate::{CowStr, IntoStatic};
 
 /// Trait for a collection of records that can be stored in a repository.
 ///
@@ -35,7 +35,7 @@ pub trait Collection: fmt::Debug + Serialize {
     /// Panics if [`Self::NSID`] is not a valid NSID.
     ///
     /// [`Nsid`]: crate::types::string::Nsid
-    fn nsid() -> crate::types::nsid::Nsid<'static> {
+    fn nsid() -> crate::types::nsid::Nsid<CowStr<'static>> {
         Nsid::new_static(Self::NSID).expect("should be valid NSID")
     }
 
