@@ -101,6 +101,15 @@ impl_into_static_passthru!(
     crate::deps::smol_str::SmolStr
 );
 
+impl IntoStatic for &str {
+    type Output = crate::deps::smol_str::SmolStr;
+
+    #[inline]
+    fn into_static(self) -> Self::Output {
+        crate::deps::smol_str::SmolStr::new(self)
+    }
+}
+
 impl<T: IntoStatic> IntoStatic for Box<T> {
     type Output = Box<T::Output>;
 

@@ -11,8 +11,13 @@ jacquard-common = { path = "../jacquard-common" }
 jacquard-derive = { path = "../jacquard-derive" }
 jacquard-lexicon = { path = "../jacquard-lexicon" }
 serde = { workspace = true }
+smol_str = { workspace = true }
 thiserror = { workspace = true }
 miette = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true, features = ["std"] }
+serde_ipld_dagcbor = { workspace = true }
 
 [features]
 default = ["app_bsky", "com_atproto", "test_collision", "test_ns1", "test_ns2", "test_ns3"]
@@ -25,3 +30,7 @@ test_ns3 = ["test_ns1"]
 
 [build-dependencies]
 jacquard-lexicon = { path = "../jacquard-lexicon", features = ["codegen"] }
+
+
+[lints.rust]
+dead_code = "allow"

@@ -214,6 +214,7 @@ pub use spin::Lazy;
 
 pub use cowstr::CowStr;
 pub use into_static::IntoStatic;
+pub use bos::{Bos, BorrowOrShare, DefaultStr};
 
 /// A copy-on-write immutable string type that uses [`smol_str::SmolStr`] for
 /// the "owned" variant.
@@ -222,6 +223,9 @@ pub mod cowstr;
 #[macro_use]
 /// Trait for taking ownership of most borrowed types in jacquard.
 pub mod into_static;
+/// Borrow-or-share traits for abstracting over owned and borrowed string representations.
+#[macro_use]
+pub mod bos;
 /// Re-exports of external crate dependencies for consistent access across jacquard.
 pub mod deps;
 pub mod error;

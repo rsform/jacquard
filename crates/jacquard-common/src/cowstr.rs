@@ -263,6 +263,7 @@ impl fmt::Display for CowStr<'_> {
     }
 }
 
+// TODO(bos-migration): Change Output to SmolStr once types are parameterised by S: Bos<str>.
 impl IntoStatic for CowStr<'_> {
     type Output = CowStr<'static>;
 

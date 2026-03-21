@@ -26,6 +26,9 @@ pub mod pretty;
 #[path = "generated/macro_mode/lib.rs"]
 pub mod macro_mode;
 
+// Serde spike: empirical validation for borrow-or-share type param + serde interaction.
+mod serde_spike;
+
 #[cfg(test)]
 mod tests {
     // -- Pretty mode type accessibility --

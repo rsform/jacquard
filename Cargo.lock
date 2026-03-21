@@ -2475,6 +2475,9 @@ dependencies = [
  "jacquard-lexicon",
  "miette",
  "serde",
+ "serde_ipld_dagcbor",
+ "serde_json",
+ "smol_str",
  "thiserror 2.0.18",
 ]
 
