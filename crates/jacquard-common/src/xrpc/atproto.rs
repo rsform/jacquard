@@ -5,7 +5,9 @@
 //! implementations sufficient for bootstrap code generation without builders or
 //! validation helpers.
 
-use crate::{CowStr, IntoStatic};
+use alloc::vec::Vec;
+use crate::CowStr;
+use crate::IntoStatic;
 use crate::types::string::{AtUri, Cid, Did, Handle, Nsid};
 use crate::types::ident::AtIdentifier;
 use crate::types::value::Data;
@@ -26,7 +28,6 @@ use serde::{Deserialize, Serialize};
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListRecords<'a> {
@@ -43,6 +44,20 @@ pub struct ListRecords<'a> {
     pub reverse: Option<bool>,
 }
 
+impl IntoStatic for ListRecords<'_> {
+    type Output = ListRecords<'static>;
+
+    fn into_static(self) -> Self::Output {
+        ListRecords {
+            collection: self.collection.into_static(),
+            cursor: self.cursor.into_static(),
+            limit: self.limit,
+            repo: self.repo.into_static(),
+            reverse: self.reverse,
+        }
+    }
+}
+
 /// Output for com.atproto.repo.listRecords.
 #[derive(
     Serialize,
@@ -51,7 +66,6 @@ pub struct ListRecords<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListRecordsOutput<'a> {
@@ -62,6 +76,17 @@ pub struct ListRecordsOutput<'a> {
     pub records: Vec<ListRecordsRecord<'a>>,
 }
 
+impl IntoStatic for ListRecordsOutput<'_> {
+    type Output = ListRecordsOutput<'static>;
+
+    fn into_static(self) -> Self::Output {
+        ListRecordsOutput {
+            cursor: self.cursor.into_static(),
+            records: self.records.into_static(),
+        }
+    }
+}
+
 /// A single record in a list response.
 #[derive(
     Serialize,
@@ -70,7 +95,6 @@ pub struct ListRecordsOutput<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ListRecordsRecord<'a> {
@@ -81,6 +105,18 @@ pub struct ListRecordsRecord<'a> {
     pub uri: AtUri<'a>,
     #[serde(borrow)]
     pub value: Data<'a>,
+}
+
+impl IntoStatic for ListRecordsRecord<'_> {
+    type Output = ListRecordsRecord<'static>;
+
+    fn into_static(self) -> Self::Output {
+        ListRecordsRecord {
+            cid: self.cid.into_static(),
+            uri: self.uri.into_static(),
+            value: self.value.into_static(),
+        }
+    }
 }
 
 /// Response marker for com.atproto.repo.listRecords.
@@ -111,7 +147,6 @@ impl<'a> XrpcRequest for ListRecords<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetRecord<'a> {
@@ -126,6 +161,19 @@ pub struct GetRecord<'a> {
     pub rkey: CowStr<'a>,
 }
 
+impl IntoStatic for GetRecord<'_> {
+    type Output = GetRecord<'static>;
+
+    fn into_static(self) -> Self::Output {
+        GetRecord {
+            cid: self.cid.into_static(),
+            collection: self.collection.into_static(),
+            repo: self.repo.into_static(),
+            rkey: self.rkey.into_static(),
+        }
+    }
+}
+
 /// Output for com.atproto.repo.getRecord.
 #[derive(
     Serialize,
@@ -134,7 +182,6 @@ pub struct GetRecord<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetRecordOutput<'a> {
@@ -147,6 +194,18 @@ pub struct GetRecordOutput<'a> {
     pub value: Data<'a>,
 }
 
+impl IntoStatic for GetRecordOutput<'_> {
+    type Output = GetRecordOutput<'static>;
+
+    fn into_static(self) -> Self::Output {
+        GetRecordOutput {
+            cid: self.cid.into_static(),
+            uri: self.uri.into_static(),
+            value: self.value.into_static(),
+        }
+    }
+}
+
 /// Error type for com.atproto.repo.getRecord.
 #[derive(
     Serialize,
@@ -155,7 +214,6 @@ pub struct GetRecordOutput<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -179,6 +237,16 @@ impl<'a> Display for GetRecordError<'a> {
 }
 
 impl Error for GetRecordError<'_> {}
+
+impl IntoStatic for GetRecordError<'_> {
+    type Output = GetRecordError<'static>;
+
+    fn into_static(self) -> Self::Output {
+        match self {
+            Self::RecordNotFound(msg) => GetRecordError::RecordNotFound(msg.into_static()),
+        }
+    }
+}
 
 /// Response marker for com.atproto.repo.getRecord.
 pub struct GetRecordResponse;
@@ -208,12 +276,21 @@ impl<'a> XrpcRequest for GetRecord<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveHandle<'a> {
     #[serde(borrow)]
     pub handle: Handle<'a>,
+}
+
+impl IntoStatic for ResolveHandle<'_> {
+    type Output = ResolveHandle<'static>;
+
+    fn into_static(self) -> Self::Output {
+        ResolveHandle {
+            handle: self.handle.into_static(),
+        }
+    }
 }
 
 /// Output for com.atproto.identity.resolveHandle.
@@ -224,12 +301,21 @@ pub struct ResolveHandle<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveHandleOutput<'a> {
     #[serde(borrow)]
     pub did: Did<'a>,
+}
+
+impl IntoStatic for ResolveHandleOutput<'_> {
+    type Output = ResolveHandleOutput<'static>;
+
+    fn into_static(self) -> Self::Output {
+        ResolveHandleOutput {
+            did: self.did.into_static(),
+        }
+    }
 }
 
 /// Error type for com.atproto.identity.resolveHandle.
@@ -240,7 +326,6 @@ pub struct ResolveHandleOutput<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -264,6 +349,16 @@ impl<'a> Display for ResolveHandleError<'a> {
 }
 
 impl Error for ResolveHandleError<'_> {}
+
+impl IntoStatic for ResolveHandleError<'_> {
+    type Output = ResolveHandleError<'static>;
+
+    fn into_static(self) -> Self::Output {
+        match self {
+            Self::HandleNotFound(msg) => ResolveHandleError::HandleNotFound(msg.into_static()),
+        }
+    }
+}
 
 /// Response marker for com.atproto.identity.resolveHandle.
 pub struct ResolveHandleResponse;
@@ -293,12 +388,21 @@ impl<'a> XrpcRequest for ResolveHandle<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveDid<'a> {
     #[serde(borrow)]
     pub did: Did<'a>,
+}
+
+impl IntoStatic for ResolveDid<'_> {
+    type Output = ResolveDid<'static>;
+
+    fn into_static(self) -> Self::Output {
+        ResolveDid {
+            did: self.did.into_static(),
+        }
+    }
 }
 
 /// Output for com.atproto.identity.resolveDid.
@@ -309,12 +413,21 @@ pub struct ResolveDid<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
 )]
 #[serde(rename_all = "camelCase")]
 pub struct ResolveDidOutput<'a> {
     #[serde(borrow)]
     pub did_doc: Data<'a>,
+}
+
+impl IntoStatic for ResolveDidOutput<'_> {
+    type Output = ResolveDidOutput<'static>;
+
+    fn into_static(self) -> Self::Output {
+        ResolveDidOutput {
+            did_doc: self.did_doc.into_static(),
+        }
+    }
 }
 
 /// Error type for com.atproto.identity.resolveDid.
@@ -325,7 +438,6 @@ pub struct ResolveDidOutput<'a> {
     Clone,
     PartialEq,
     Eq,
-    jacquard_derive::IntoStatic,
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]
@@ -359,6 +471,17 @@ impl<'a> Display for ResolveDidError<'a> {
 
 impl Error for ResolveDidError<'_> {}
 
+impl IntoStatic for ResolveDidError<'_> {
+    type Output = ResolveDidError<'static>;
+
+    fn into_static(self) -> Self::Output {
+        match self {
+            Self::DidNotFound(msg) => ResolveDidError::DidNotFound(msg.into_static()),
+            Self::DidDeactivated(msg) => ResolveDidError::DidDeactivated(msg.into_static()),
+        }
+    }
+}
+
 /// Response marker for com.atproto.identity.resolveDid.
 pub struct ResolveDidResponse;
 
@@ -383,7 +506,6 @@ impl<'a> XrpcRequest for ResolveDid<'a> {
 mod tests {
     use super::*;
     use crate::IntoStatic;
-    use serde_json::json;
 
     #[test]
     fn test_list_records_serializes() {
